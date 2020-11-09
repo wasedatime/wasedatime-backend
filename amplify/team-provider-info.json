@@ -10,6 +10,11 @@
       "StackName": "amplify-wasedatime-web-prod-111058",
       "StackId": "arn:aws:cloudformation:ap-northeast-1:564383102056:stack/amplify-wasedatime-web-prod-111058/a8ede2b0-17f9-11eb-8b13-0acb89b0ba98",
       "AmplifyAppId": "dfwr8pcazlfx2"
+    },
+    "categories": {
+      "function": {
+        "getReviews": {}
+      }
     }
   }
 }
