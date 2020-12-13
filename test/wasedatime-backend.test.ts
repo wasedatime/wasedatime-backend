@@ -1,11 +1,11 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
+import {expect as expectCDK, MatchStyle, matchTemplate} from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
-import * as WasedatimeBackend from '../lib/wasedatime-backend-stack';
+import * as WasedatimeBackend from '../lib/stacks/webapp';
 
 test('Empty Stack', () => {
     const app = new cdk.App();
     // WHEN
-    const stack = new WasedatimeBackend.WasedatimeBackendStack(app, 'MyTestStack');
+    const stack = new WasedatimeBackend.WasedatimeWebApp(app, 'MyTestStack');
     // THEN
     expectCDK(stack).to(matchTemplate({
       "Resources": {}
