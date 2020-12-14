@@ -9,7 +9,7 @@ export class SyllabusDataPipeline extends cdk.Stack {
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
-        this.syllabusBucket = new Bucket(this, 's3-bucket-syllabus', {
+        this.syllabusBucket = new Bucket(this, 'syllabus-bucket', {
             accessControl: BucketAccessControl.PUBLIC_READ,
             blockPublicAccess: publicAccess,
             bucketName: "wasedatime-syllabus-prod",
@@ -28,4 +28,10 @@ export class SyllabusDataPipeline extends cdk.Stack {
     getData(): Bucket {
         return this.syllabusBucket;
     }
+}
+
+export class CareerDataPipeline {
+}
+
+export class FeedsDataPipeline {
 }

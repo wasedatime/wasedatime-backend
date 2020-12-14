@@ -1,32 +1,53 @@
 import * as cdk from '@aws-cdk/core';
-import {App, Branch} from "@aws-cdk/aws-amplify";
-import {Role} from "@aws-cdk/aws-iam";
+import {App, Branch, Domain} from "@aws-cdk/aws-amplify";
+import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {webappBuildSpec, webappEnv, webappGithub} from '../configs/code-automation';
 import {developerAuth, webappSiteRules} from "../configs/website-configs";
+import {Duration} from "@aws-cdk/core/lib/duration";
 
 export class WasedatimeWebApp extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
-        const webApp: App = new App(this, 'wasedatime-webapp', {
+
+        const amplifyServiceRole: LazyRole = new LazyRole(this, 'amplify-role', {
+            assumedBy: new ServicePrincipal("amplify.amazonaws.com"),
+            description: "Allows Amplify Backend Deployment to access AWS resources on your behalf.",
+            path: "/aws-service-role/amplify.amazonaws.com/",
+            maxSessionDuration: Duration.hours(1)
+        });
+
+        const webApp: App = new App(this, 'webapp', {
             appName: "WasedatimeWebApp",
             autoBranchDeletion: true,
             buildSpec: webappBuildSpec,
             customRules: webappSiteRules,
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: webappEnv,
-            role: Role.fromRoleArn(this,
-                'wasedatime-webapp-service-role',
-                "arn:aws:iam::564383102056:role/AWSServiceRoleAmplify"
-            ),
+            role: amplifyServiceRole,
             sourceCodeProvider: webappGithub
         });
 
-        const devBranch: Branch = webApp.addBranch('wasedatime-webapp-dev', {
+        const mainBranch: Branch = webApp.addBranch('main', {
+            autoBuild: true,
+            branchName: "main",
+            stage: "PRODUCTION"
+        });
+
+        const devBranch: Branch = webApp.addBranch('dev', {
             autoBuild: true,
             basicAuth: developerAuth,
             branchName: "develop",
             stage: "DEVELOPMENT"
+        });
+
+        const domain: Domain = new Domain(this, 'domain', {
+            app: webApp,
+            // domainName: "wasedatime.com",
+            subDomains: [
+                {branch: devBranch, prefix: "dev"},
+                {branch: mainBranch, prefix: "main"}
+            ]
         });
     }
 }

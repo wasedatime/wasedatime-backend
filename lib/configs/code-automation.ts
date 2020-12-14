@@ -20,4 +20,4 @@ export const awsEnv: StackProps = {
         account: '564383102056',
         region: 'ap-northeast-1'
     }
-}
+};
