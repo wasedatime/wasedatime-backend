@@ -102,7 +102,7 @@ export class SyllabusDataPipeline extends cdk.Stack {
                     resources: [this.snsTopic.topicArn]
                 })
             ]
-        }))
+        }));
         this.stateMachine = new StateMachine(this, 'state-machine', {
             definition: startState
                 .next(getLambdaTaskInstance(this, ["GEC"]))

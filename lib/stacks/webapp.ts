@@ -10,6 +10,12 @@ import {AwsServicePrincipal} from "../configs/aws";
 
 export class WasedatimeWebApp extends cdk.Stack {
 
+    private readonly app: App;
+
+    private readonly branches: { [key: string]: Branch };
+
+    private readonly domain: Domain;
+
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
@@ -21,7 +27,7 @@ export class WasedatimeWebApp extends cdk.Stack {
             roleName: "amplify-webapp-deploy"
         });
 
-        const webApp: App = new App(this, 'webapp', {
+        this.app = new App(this, 'webapp', {
             appName: "WasedatimeWebApp",
             autoBranchDeletion: true,
             buildSpec: webappBuildSpec,
@@ -32,21 +38,20 @@ export class WasedatimeWebApp extends cdk.Stack {
             sourceCodeProvider: webappGithub
         });
 
-        const mainBranch: Branch = webApp.addBranch('main', {
+        const mainBranch: Branch = this.app.addBranch('main', {
             autoBuild: true,
             branchName: "main",
             stage: "PRODUCTION"
         });
 
-        const devBranch: Branch = webApp.addBranch('dev', {
+        const devBranch: Branch = this.app.addBranch('dev', {
             autoBuild: true,
             basicAuth: developerAuth,
             branchName: "develop",
             stage: "DEVELOPMENT"
         });
 
-        const domain: Domain = new Domain(this, 'domain', {
-            app: webApp,
+        this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
                 {branch: devBranch, prefix: "dev"},

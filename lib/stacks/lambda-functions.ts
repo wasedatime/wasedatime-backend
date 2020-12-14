@@ -7,6 +7,7 @@ import {ApiEventSource} from "@aws-cdk/aws-lambda-event-sources";
 import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AwsServicePrincipal} from "../configs/aws";
 
+
 export class CourseReviewsFunctions extends cdk.Stack {
 
     constructor(scope: ApiEndpoint, id: string, props?: cdk.StackProps) {
@@ -17,7 +18,7 @@ export class CourseReviewsFunctions extends cdk.Stack {
             description: "Allow lambda function to perform crud operation on dynamodb",
             path: `/aws-service-role/${AwsServicePrincipal.LAMBDA}/`,
             roleName: "lambda-dynamodb-crud"
-        })
+        });
 
         const getReviewsFunction = new Function(this, 'get-reviews', {
             code: Code.fromAsset('/resources/lambda/get-reviews.zip'),
@@ -31,10 +32,10 @@ export class CourseReviewsFunctions extends cdk.Stack {
             role: dynamoDBCrudRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-        })
+        });
         getReviewsFunction.addEventSource(
             new ApiEventSource('POST', "/course-reviews", {})
-        )
+        );
     }
 }
 

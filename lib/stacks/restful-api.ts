@@ -1,11 +1,13 @@
 import * as cdk from "@aws-cdk/core";
 import {RemovalPolicy} from "@aws-cdk/core";
 import {EndpointType, Integration, IntegrationType, IResource, Resource, RestApi} from '@aws-cdk/aws-apigateway';
-import {allowHeaders, allowOrigins, courseReviewReqSchema, syllabusSchema} from "../configs/api";
 import {Bucket} from "@aws-cdk/aws-s3";
-import {SyllabusDataPipeline} from "./data-pipelines";
 import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
+
+import {SyllabusDataPipeline} from "./data-pipelines";
 import {awsEnv} from "../configs/aws";
+import {allowHeaders, allowOrigins, courseReviewReqSchema, syllabusSchema} from "../configs/api";
+
 
 export class ApiEndpoint extends cdk.Stack {
 

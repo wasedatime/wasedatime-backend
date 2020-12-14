@@ -1,4 +1,5 @@
 import {App} from "@aws-cdk/core";
+
 import {WasedatimeWebApp} from "./stacks/webapp";
 import {ApiEndpoint} from "./stacks/restful-api";
 import {awsEnv} from "./configs/aws";
