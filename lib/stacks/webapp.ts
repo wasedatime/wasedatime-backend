@@ -1,13 +1,14 @@
 import * as cdk from '@aws-cdk/core';
-import * as amplify from '@aws-cdk/aws-amplify'
-import {webappBuildSpec, webappEnv, webappGithub} from '../configs/code-automation'
-import {developerAuth, webappSiteRules} from "../configs/website-configs";
+import {App, Branch} from "@aws-cdk/aws-amplify";
 import {Role} from "@aws-cdk/aws-iam";
+
+import {webappBuildSpec, webappEnv, webappGithub} from '../configs/code-automation';
+import {developerAuth, webappSiteRules} from "../configs/website-configs";
 
 export class WasedatimeWebApp extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
-        const webapp = new amplify.App(this, 'wasedatime-webapp', {
+        const webApp: App = new App(this, 'wasedatime-webapp', {
             appName: "WasedatimeWebApp",
             autoBranchDeletion: true,
             buildSpec: webappBuildSpec,
@@ -21,11 +22,11 @@ export class WasedatimeWebApp extends cdk.Stack {
             sourceCodeProvider: webappGithub
         });
 
-        const devBranch = webapp.addBranch('wasedatime-webapp-dev', {
+        const devBranch: Branch = webApp.addBranch('wasedatime-webapp-dev', {
             autoBuild: true,
             basicAuth: developerAuth,
             branchName: "develop",
             stage: "DEVELOPMENT"
-        })
+        });
     }
 }
