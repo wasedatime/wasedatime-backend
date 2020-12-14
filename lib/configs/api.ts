@@ -1,5 +1,6 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
 
+
 export const allowOrigins: string[] = [
     "https://wasedatime.com",
     "https://www.wasedatime.com",

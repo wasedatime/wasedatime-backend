@@ -4,10 +4,11 @@ import {EndpointType, Integration, IntegrationType, IResource, Resource, RestApi
 import {allowHeaders, allowOrigins, courseReviewReqSchema, syllabusSchema} from "../configs/api";
 import {Bucket} from "@aws-cdk/aws-s3";
 import {SyllabusDataPipeline} from "./data-pipelines";
-import {awsEnv} from "../configs/code-automation";
 import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
+import {awsEnv} from "../configs/aws";
 
 export class ApiEndpoint extends cdk.Stack {
+
     private apiEndpoint: RestApi;
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -24,13 +25,13 @@ export class ApiEndpoint extends cdk.Stack {
             contentType: "application/json",
             description: "The new syllabus JSON schema for each school.",
             modelName: "Syllabus"
-        })
+        });
         this.apiEndpoint.addModel('course-reviews-req-model', {
             schema: courseReviewReqSchema,
             contentType: "application/json",
             description: "HTTP POST request body schema for fetching reviews for several courses",
             modelName: "ReviewsReq"
-        })
+        });
 
         // todo add stage & deployment strategy
 
@@ -43,6 +44,7 @@ export class ApiEndpoint extends cdk.Stack {
 }
 
 export class SyllabusApi extends cdk.Stack {
+
     constructor(scope: ApiEndpoint, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
@@ -73,6 +75,7 @@ export class SyllabusApi extends cdk.Stack {
 }
 
 export class CourseReviewApi extends cdk.Stack {
+
     constructor(scope: ApiEndpoint, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
@@ -99,7 +102,7 @@ export class CourseReviewApi extends cdk.Stack {
         courseReviews.addMethod('POST', new Integration({
             type: IntegrationType.AWS,
             integrationHttpMethod: 'GET',
-            uri: ``
+            uri: ``//todo
         }), {
             apiKeyRequired: false,
         });

@@ -1,6 +1,7 @@
 import {GitHubSourceCodeProvider} from "@aws-cdk/aws-amplify";
-import {SecretValue, StackProps} from "@aws-cdk/core";
+import {SecretValue} from "@aws-cdk/core";
 import {BuildSpec} from "@aws-cdk/aws-codebuild/lib/build-spec";
+
 
 export const webappGithub: GitHubSourceCodeProvider = new GitHubSourceCodeProvider({
     owner: "wasedatime",
@@ -15,9 +16,3 @@ export const webappEnv: { [key: string]: string; } = {
 
 export const webappBuildSpec: BuildSpec = BuildSpec.fromSourceFilename("/resources/amplify/buildspec.yml");
 
-export const awsEnv: StackProps = {
-    env: {
-        account: '564383102056',
-        region: 'ap-northeast-1'
-    }
-};
