@@ -12,7 +12,7 @@ export class WasedatimeWebApp extends cdk.Stack {
 
     private readonly app: App;
 
-    private readonly branches: { [key: string]: Branch };
+    private readonly branches: { [key: string]: Branch } = {};
 
     private readonly domain: Domain;
 
@@ -43,13 +43,14 @@ export class WasedatimeWebApp extends cdk.Stack {
             branchName: "main",
             stage: "PRODUCTION"
         });
-
+        this.branches["main"] = mainBranch;
         const devBranch: Branch = this.app.addBranch('dev', {
             autoBuild: true,
             basicAuth: developerAuth,
             branchName: "develop",
             stage: "DEVELOPMENT"
         });
+        this.branches["dev"] = devBranch;
 
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
@@ -58,5 +59,16 @@ export class WasedatimeWebApp extends cdk.Stack {
                 {branch: mainBranch, prefix: "main"}
             ]
         });
+    }
+
+    getBranch(env: string) {
+        switch (env) {
+            case "main":
+                return this.branches["main"];
+            case "dev":
+                return this.branches["dev"];
+            default:
+                throw RangeError("No branch is established under the specified environment.");
+        }
     }
 }

@@ -1,12 +1,26 @@
 import * as cdk from "@aws-cdk/core";
 import {RemovalPolicy} from "@aws-cdk/core";
-import {EndpointType, Integration, IntegrationType, IResource, Resource, RestApi} from '@aws-cdk/aws-apigateway';
+import {
+    EndpointType,
+    Integration,
+    IntegrationType,
+    IResource,
+    LambdaIntegration,
+    Method,
+    Resource,
+    RestApi,
+    SecurityPolicy
+} from '@aws-cdk/aws-apigateway';
 import {Bucket} from "@aws-cdk/aws-s3";
 import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
+import {Function} from "@aws-cdk/aws-lambda";
+import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
 
-import {SyllabusDataPipeline} from "./data-pipelines";
+import {SyllabusDataPipeline} from "../constructs/data-pipelines";
 import {awsEnv} from "../configs/aws";
 import {allowHeaders, allowOrigins, courseReviewReqSchema, syllabusSchema} from "../configs/api";
+import {WEBAPP_DOMAIN} from "../configs/website";
+import {CourseReviewsFunctions} from "./lambda-functions";
 
 
 export class ApiEndpoint extends cdk.Stack {
@@ -20,6 +34,17 @@ export class ApiEndpoint extends cdk.Stack {
             restApiName: "wasedatime-api-dev",
             endpointTypes: [EndpointType.REGIONAL],
             cloudWatchRole: false
+        });
+
+        const apiDomainCert = new Certificate(this, 'domain-certificate', {
+            domainName: "api." + WEBAPP_DOMAIN,
+            validation: CertificateValidation.fromEmail()
+        });
+        this.apiEndpoint.addDomainName('domain', {
+            certificate: apiDomainCert,
+            domainName: "api." + WEBAPP_DOMAIN,
+            endpointType: EndpointType.REGIONAL,
+            securityPolicy: SecurityPolicy.TLS_1_2
         });
 
         this.apiEndpoint.addModel('syllabus-model', {
@@ -50,7 +75,10 @@ export class SyllabusApi extends cdk.Stack {
     constructor(scope: ApiEndpoint, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const syllabusBucket: Bucket = new SyllabusDataPipeline(scope, 'syllabus-datapipeline', awsEnv).getData();
+        const syllabusBucket: Bucket = new SyllabusDataPipeline(scope, 'syllabus-datapipeline', {
+            name: "",
+            description: ""
+        }).getData();
 
         const syllabus: Resource = new Resource(scope, 'syllabus', {
             parent: scope.getApiEndpoint(),
@@ -76,12 +104,19 @@ export class SyllabusApi extends cdk.Stack {
     }
 }
 
+//todo add model validation and method response options
 export class CourseReviewApi extends cdk.Stack {
+
+    private readonly dbTable: Table;
+
+    private readonly resources: Resource;
+
+    private readonly methods: { [key: string]: Method } = {}; // todo use enum
 
     constructor(scope: ApiEndpoint, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const CourseReviewTable: Table = new Table(this, 'dynamodb-review-table', {
+        this.dbTable = new Table(this, 'dynamodb-review-table', {
             partitionKey: {name: "course_key", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
@@ -92,21 +127,22 @@ export class CourseReviewApi extends cdk.Stack {
             writeCapacity: 5
         });
 
+        const postFunction: Function = new CourseReviewsFunctions(this, 'handler-post', awsEnv)
+            .getFunctionByMethod('POST');
+
         const courseReviews: Resource = new Resource(this, 'course-reviews', {
             parent: scope.getApiEndpoint(),
             pathPart: "course-reviews"
         });
-        courseReviews.addCorsPreflight({
+
+        const options: Method = courseReviews.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: ['POST', 'OPTIONS'],
         });
-        courseReviews.addMethod('POST', new Integration({
-            type: IntegrationType.AWS,
-            integrationHttpMethod: 'GET',
-            uri: ``//todo
-        }), {
-            apiKeyRequired: false,
+        const post: Method = courseReviews.addMethod('POST', new LambdaIntegration(postFunction, {proxy: true}), {
+            operationName: "BatchGetReviews"
         });
+
     }
 }

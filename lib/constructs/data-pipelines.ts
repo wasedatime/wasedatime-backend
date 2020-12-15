@@ -4,15 +4,23 @@ import {Bucket, BucketAccessControl, BucketEncryption} from '@aws-cdk/aws-s3';
 import {Errors, State, StateMachine, TaskInput} from "@aws-cdk/aws-stepfunctions";
 import {LambdaInvocationType, LambdaInvoke, SnsPublish} from "@aws-cdk/aws-stepfunctions-tasks";
 import {Topic} from "@aws-cdk/aws-sns";
-import {SyllabusScraper} from "./lambda-functions";
+import {SyllabusScraper} from "../stacks/lambda-functions";
 import {Function} from "@aws-cdk/aws-lambda";
 import {Effect, LazyRole, Policy, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {prodCorsRule, publicAccess} from "../configs/s3-bucket";
 import {awsEnv, AwsServicePrincipal} from "../configs/aws";
 
+// todo abstract datapipeline
+export interface DataPipelineProps {
 
-export class SyllabusDataPipeline extends cdk.Stack {
+    readonly name: string;
+
+    readonly description: string;
+
+}
+
+export class SyllabusDataPipeline extends cdk.Construct {
 
     private readonly bucket: Bucket;
 
@@ -20,8 +28,8 @@ export class SyllabusDataPipeline extends cdk.Stack {
 
     private readonly stateMachine: StateMachine;
 
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id, props);
+    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
+        super(scope, id);
 
         this.bucket = new Bucket(this, 'syllabus-bucket', {
             accessControl: BucketAccessControl.PUBLIC_READ,
@@ -122,7 +130,17 @@ export class SyllabusDataPipeline extends cdk.Stack {
     getData(): Bucket {
         return this.bucket;
     }
+
+    getSNSTopic(): Topic {
+        return this.snsTopic;
+    }
+
+    getProcessor(): StateMachine {
+        return this.stateMachine;
+    }
 }
+
+//todo more pipelines
 
 export class CareerDataPipeline {
 }

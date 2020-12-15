@@ -3,8 +3,8 @@ import {StackProps} from "@aws-cdk/core";
 
 export const awsEnv: StackProps = {
     env: {
-        account: '564383102056',
-        region: 'ap-northeast-1'
+        account: process.env.AWS_ACCOUNT_ID,
+        region: process.env.AWS_REGION
     }
 };
 

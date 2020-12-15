@@ -23,9 +23,12 @@
   "dependencies": {
     "@aws-cdk/aws-amplify": "^1.78.0",
     "@aws-cdk/aws-apigateway": "^1.78.0",
+    "@aws-cdk/aws-certificatemanager": "^1.78.0",
     "@aws-cdk/aws-codebuild": "^1.78.0",
     "@aws-cdk/aws-cognito": "^1.78.0",
     "@aws-cdk/aws-dynamodb": "^1.78.0",
+    "@aws-cdk/aws-events": "^1.78.0",
+    "@aws-cdk/aws-events-targets": "^1.78.0",
     "@aws-cdk/aws-iam": "^1.78.0",
     "@aws-cdk/aws-lambda": "^1.78.0",
     "@aws-cdk/aws-lambda-event-sources": "^1.78.0",

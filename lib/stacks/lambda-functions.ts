@@ -1,16 +1,16 @@
 import * as cdk from "@aws-cdk/core";
 import {Duration} from "@aws-cdk/core";
-import {ApiEndpoint} from "./restful-api";
 import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
-import {ApiEventSource} from "@aws-cdk/aws-lambda-event-sources";
 import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AwsServicePrincipal} from "../configs/aws";
 
 
 export class CourseReviewsFunctions extends cdk.Stack {
 
-    constructor(scope: ApiEndpoint, id: string, props?: cdk.StackProps) {
+    private readonly postFunction: Function;
+
+    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
         const dynamoDBCrudRole = new LazyRole(this, 'dynamo-crud-role', {
@@ -20,8 +20,8 @@ export class CourseReviewsFunctions extends cdk.Stack {
             roleName: "lambda-dynamodb-crud"
         });
 
-        const getReviewsFunction = new Function(this, 'get-reviews', {
-            code: Code.fromAsset('/resources/lambda/get-reviews.zip'),
+        this.postFunction = new Function(this, 'get-reviews', {
+            code: Code.fromAsset('src/lambda/get-reviews'),
             handler: "get_reviews.handler",
             deadLetterQueueEnabled: false,
             description: "Get course reviews from database.",
@@ -33,9 +33,15 @@ export class CourseReviewsFunctions extends cdk.Stack {
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
         });
-        getReviewsFunction.addEventSource(
-            new ApiEventSource('POST', "/course-reviews", {})
-        );
+    }
+
+    getFunctionByMethod(method: string): Function {
+        switch (method) {
+            case 'POST':
+                return this.postFunction;
+            default:
+                throw new RangeError("No lambda handler is available on this method.");
+        }
     }
 }
 
@@ -54,7 +60,7 @@ export class SyllabusScraper extends cdk.Stack {
         });
 
         this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('/resources/lambda/syllabus-scraper.zip'),
+            code: Code.fromAsset('src/lambda/syllabus-scraper'),
             handler: "syllabus_scraper.handler",
             deadLetterQueueEnabled: false,
             description: "Base function for scraping syllabus data from Waseda University.",
