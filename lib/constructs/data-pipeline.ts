@@ -1,37 +1,47 @@
 import * as cdk from '@aws-cdk/core';
-import {RemovalPolicy} from '@aws-cdk/core';
+import {Construct, RemovalPolicy} from '@aws-cdk/core';
 import {Bucket, BucketAccessControl, BucketEncryption} from '@aws-cdk/aws-s3';
 import {Errors, State, StateMachine, TaskInput} from "@aws-cdk/aws-stepfunctions";
 import {LambdaInvocationType, LambdaInvoke, SnsPublish} from "@aws-cdk/aws-stepfunctions-tasks";
-import {Topic} from "@aws-cdk/aws-sns";
-import {SyllabusScraper} from "../stacks/lambda-functions";
 import {Function} from "@aws-cdk/aws-lambda";
 import {Effect, LazyRole, Policy, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {Table} from "@aws-cdk/aws-dynamodb";
 
 import {prodCorsRule, publicAccess} from "../configs/s3-bucket";
 import {awsEnv, AwsServicePrincipal} from "../configs/aws";
+import {AbstractTaskManager, SyllabusScraperStatusNotifier} from "./task-managers";
+import {SyllabusScraper} from "./lambda-functions";
 
-// todo abstract datapipeline
+
 export interface DataPipelineProps {
-
-    readonly name: string;
-
-    readonly description: string;
 
 }
 
-export class SyllabusDataPipeline extends cdk.Construct {
+export abstract class AbstractDataPipeline extends Construct {
 
-    private readonly bucket: Bucket;
+    abstract dataSource?: Bucket;
 
-    private readonly snsTopic: Topic;
+    abstract processor: Function | StateMachine;
 
-    private readonly stateMachine: StateMachine;
+    abstract dataWarehouse: Bucket | Table;
+
+    abstract statusNotifier: AbstractTaskManager;
+}
+
+export class SyllabusDataPipeline extends AbstractDataPipeline {
+
+    readonly dataSource?: Bucket;
+
+    readonly processor: Function | StateMachine;
+
+    readonly dataWarehouse: Bucket | Table;
+
+    readonly statusNotifier: SyllabusScraperStatusNotifier;
 
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
 
-        this.bucket = new Bucket(this, 'syllabus-bucket', {
+        this.dataWarehouse = new Bucket(this, 'syllabus-bucket', {
             accessControl: BucketAccessControl.PUBLIC_READ,
             blockPublicAccess: publicAccess,
             bucketName: "wasedatime-syllabus-prod",
@@ -42,21 +52,19 @@ export class SyllabusDataPipeline extends cdk.Construct {
             versioned: true
         });
 
-        this.snsTopic = new Topic(this, 'status-topic', {
-            topicName: "syllabus-scraper-status"
-        });
+        this.statusNotifier = new SyllabusScraperStatusNotifier(this, 'status-notifier', {});
 
         const errorState = new SnsPublish(this, 'fsm-error', {
             message: TaskInput.fromText(
                 "States.Format('[ERROR] AWS Step Function: " +
                 "An Error occurred when scraping the syllabus caused by: {}', $.Cause)",
             ),
-            topic: this.snsTopic,
+            topic: this.statusNotifier.topic,
             comment: "Publish error caused by the execution to sns topic."
         });
         const startState: SnsPublish = new SnsPublish(this, 'fsm-start', {
             message: TaskInput.fromText("[INFO] AWS Step Function: Started scraping the syllabus."),
-            topic: this.snsTopic,
+            topic: this.statusNotifier.topic,
             comment: "Publish info about the beginning of the execution to sns topic."
         });
         const endState: State = new SnsPublish(this, 'fsm-end', {
@@ -65,7 +73,7 @@ export class SyllabusDataPipeline extends cdk.Construct {
                 "See https://ap-northeast-1.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-1" +
                 "#logStream:group=%252Faws%252Flambda%252Fscrape-syllabus for logs."
             ),
-            topic: this.snsTopic,
+            topic: this.statusNotifier.topic,
             comment: "Publish info about the beginning of the execution to sns topic."
         });
 
@@ -107,11 +115,11 @@ export class SyllabusDataPipeline extends cdk.Construct {
                     sid: "allow-sns-publish",
                     effect: Effect.ALLOW,
                     actions: ["sns:Publish"],
-                    resources: [this.snsTopic.topicArn]
+                    resources: [this.statusNotifier.topic.topicArn]
                 })
             ]
         }));
-        this.stateMachine = new StateMachine(this, 'state-machine', {
+        this.processor = new StateMachine(this, 'state-machine', {
             definition: startState
                 .next(getLambdaTaskInstance(this, ["GEC"]))
                 .next(getLambdaTaskInstance(this, ["CMS", "HSS"]))
@@ -125,18 +133,7 @@ export class SyllabusDataPipeline extends cdk.Construct {
                     "G_SAPS", "G_SA", "G_SJAL", "G_SICCS", "G_SEEE", "EHUM", "ART", "CIE", "G_ITS"]))
                 .next(endState)
         });
-    }
-
-    getData(): Bucket {
-        return this.bucket;
-    }
-
-    getSNSTopic(): Topic {
-        return this.snsTopic;
-    }
-
-    getProcessor(): StateMachine {
-        return this.stateMachine;
+        this.statusNotifier.addTarget(this.processor);
     }
 }
 

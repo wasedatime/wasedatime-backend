@@ -3,6 +3,7 @@ import {Duration} from "@aws-cdk/core";
 import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
+
 import {AwsServicePrincipal} from "../configs/aws";
 
 

@@ -1,17 +1,25 @@
-import {App} from "@aws-cdk/core";
-
-import {WasedatimeWebApp} from "./stacks/webapp";
-import {ApiEndpoint} from "./stacks/restful-api";
+import {PresentationLayer, WasedaTimePresentationLayer} from "./stacks/presentation";
 import {awsEnv} from "./configs/aws";
+import {AbstractServerlessApp} from "./stacks/architecture";
+import {ServiceLayer, WasedaTimeServiceLayer} from "./stacks/service";
+import {PersistenceLayer, WasedaTimePersistenceLayer} from "./stacks/persistence";
 
 
-export class WasedaTime extends App {
+export class WasedaTime extends AbstractServerlessApp {
+
+    readonly presentationLayer: PresentationLayer;
+
+    readonly serviceLayer: ServiceLayer;
+
+    readonly persistenceLayer: PersistenceLayer;
 
     constructor() {
         super();
 
-        new WasedatimeWebApp(this, 'wasedatime-webapp', awsEnv);
+        this.persistenceLayer = new WasedaTimePersistenceLayer(this, 'persistence', awsEnv);
 
-        new ApiEndpoint(this, 'wasedatime-api', awsEnv);
+        this.serviceLayer = new WasedaTimeServiceLayer(this, 'service', awsEnv);
+
+        this.presentationLayer = new WasedaTimePresentationLayer(this, 'presentation', awsEnv);
     }
 }

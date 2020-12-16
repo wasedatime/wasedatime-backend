@@ -1,23 +1,45 @@
-import * as cdk from '@aws-cdk/core';
 import {App, Branch, Domain} from "@aws-cdk/aws-amplify";
+import * as cdk from "@aws-cdk/core";
+import {Construct} from "@aws-cdk/core";
+import {AbstractTaskManager, AmplifyBuildStatusNotifier} from "./task-managers";
 import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
-import {Duration} from "@aws-cdk/core/lib/duration";
-
-import {webappBuildSpec, webappEnv, webappGithub} from '../configs/code-automation';
-import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../configs/website";
 import {AwsServicePrincipal} from "../configs/aws";
+import {Duration} from "@aws-cdk/core/lib/duration";
+import {webappBuildSpec, webappEnv, webappGithub} from "../configs/code-automation";
+import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../configs/website";
 
 
-export class WasedatimeWebApp extends cdk.Stack {
+export interface WebAppProps {
 
-    private readonly app: App;
+}
 
-    private readonly branches: { [key: string]: Branch } = {};
+export abstract class AbstractWebApp extends Construct {
 
-    private readonly domain: Domain;
+    abstract app: App;
 
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id, props);
+    abstract branches?: { [env: string]: Branch };
+
+    abstract domain?: Domain;
+
+    abstract statusNotifier?: AbstractTaskManager;
+
+    protected constructor(scope: cdk.Construct, id: string) {
+        super(scope, id);
+    }
+}
+
+export class AmplifyWebApp extends AbstractWebApp {
+
+    readonly app: App;
+
+    readonly branches: { [key: string]: Branch } = {};
+
+    readonly domain: Domain;
+
+    readonly statusNotifier?: AmplifyBuildStatusNotifier;
+
+    constructor(scope: cdk.Construct, id: string) {
+        super(scope, id);
 
         const amplifyServiceRole: LazyRole = new LazyRole(this, 'amplify-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.AMPLIFY),
@@ -52,6 +74,8 @@ export class WasedatimeWebApp extends cdk.Stack {
         });
         this.branches["dev"] = devBranch;
 
+        this.statusNotifier = new AmplifyBuildStatusNotifier(this, 'build-notifier', this.app, {});
+
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
@@ -59,16 +83,5 @@ export class WasedatimeWebApp extends cdk.Stack {
                 {branch: mainBranch, prefix: "main"}
             ]
         });
-    }
-
-    getBranch(env: string) {
-        switch (env) {
-            case "main":
-                return this.branches["main"];
-            case "dev":
-                return this.branches["dev"];
-            default:
-                throw RangeError("No branch is established under the specified environment.");
-        }
     }
 }
