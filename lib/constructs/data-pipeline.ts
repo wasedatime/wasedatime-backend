@@ -78,7 +78,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         });
 
         const scraperBaseFunction: Function =
-            new SyllabusScraper(this, 'scraper-base-function').getBaseFunction();
+            new SyllabusScraper(this, 'scraper-base-function').baseFunction;
 
         function getLambdaTaskInstance(constructContext: cdk.Construct, schools: string[]): State {
             const randint: string = Math.floor(Math.random() * (1000)).toString();

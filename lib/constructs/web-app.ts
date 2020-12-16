@@ -49,7 +49,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             roleName: "amplify-webapp-deploy"
         });
 
-        this.app = new App(this, 'webapp', {
+        this.app = new App(this, 'app', {
             appName: "WasedatimeWebApp",
             autoBranchDeletion: true,
             buildSpec: webappBuildSpec,

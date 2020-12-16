@@ -14,6 +14,7 @@ export class WasedaTime extends AbstractServerlessApp {
     readonly persistenceLayer: PersistenceLayer;
 
     constructor() {
+
         super();
 
         this.persistenceLayer = new WasedaTimePersistenceLayer(this, 'persistence', awsEnv);

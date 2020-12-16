@@ -18,7 +18,7 @@ export abstract class PersistenceLayer extends cdk.Stack {
 
 export class WasedaTimePersistenceLayer extends PersistenceLayer {
 
-    readonly dataPipelines: { [name: string]: AbstractDataPipeline };
+    readonly dataPipelines: { [name: string]: AbstractDataPipeline } = {};
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);

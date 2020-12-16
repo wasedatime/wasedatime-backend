@@ -31,11 +31,11 @@ export interface TaskManagerProps {
 
 export abstract class AbstractTaskManager extends Construct {
 
-    abstract rules: { [eventName: string]: Rule };
+    abstract rules: { [eventName: string]: Rule } = {};
 
     abstract target: IRuleTarget;
 
-    abstract topic?: Topic;
+    abstract topic: Topic;
 
     protected constructor(scope: cdk.Construct, id: string, props: TaskManagerProps) {
         super(scope, id);
@@ -51,7 +51,7 @@ export abstract class AbstractTaskManager extends Construct {
 
 export class SyllabusScraperTaskManger extends AbstractTaskManager {
 
-    readonly rules: { [eventName: string]: Rule };
+    readonly rules: { [eventName: string]: Rule } = {};
 
     readonly topic: Topic;
 
@@ -102,7 +102,7 @@ export class SyllabusScraperTaskManger extends AbstractTaskManager {
 
 export class AmplifyBuildStatusManager extends AbstractTaskManager {
 
-    readonly rules: { [eventName: string]: Rule };
+    readonly rules: { [eventName: string]: Rule } = {};
 
     readonly target: SfnStateMachine;
 

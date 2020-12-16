@@ -16,24 +16,24 @@ export interface ApiServiceProps {
 
 export abstract class AbstractRestApiService extends cdk.Construct {
 
-    abstract integrations: { [httpMethod: string]: Integration };
+    abstract integrations: { [httpMethod: string]: Integration } = {};
 
     abstract resource: Resource;
 
-    abstract methods: { [httpMethod: string]: Method };
+    abstract methods: { [httpMethod: string]: Method } = {};
 
-    protected constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+    protected constructor(scope: AbstractRestApiEndpoint, id: string, props?: ApiServiceProps) {
         super(scope, id);
     }
 }
 
 export class SyllabusApiService extends AbstractRestApiService {
 
-    readonly integrations: { [httpMethod: string]: Integration };
+    readonly integrations: { [httpMethod: string]: Integration } = {};
 
     readonly resource: Resource;
 
-    readonly methods: { [httpMethod: string]: Method };
+    readonly methods: { [httpMethod: string]: Method } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
@@ -64,13 +64,13 @@ export class SyllabusApiService extends AbstractRestApiService {
 //todo add model validation and method response options
 export class CourseReviewApi extends AbstractRestApiService {
 
-    readonly integrations: { [httpMethod: string]: Integration };
+    readonly integrations: { [httpMethod: string]: Integration } = {};
 
     readonly resource: Resource;
 
-    readonly methods: { [httpMethod: string]: Method };
+    readonly methods: { [httpMethod: string]: Method } = {};
 
-    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+    constructor(scope: AbstractRestApiEndpoint, id: string, props?: ApiServiceProps) {
         super(scope, id, props);
 
         const courseReviewTable = new Table(this, 'dynamodb-review-table', {
@@ -84,8 +84,7 @@ export class CourseReviewApi extends AbstractRestApiService {
             writeCapacity: 5
         });
 
-        const postFunction: Function = new CourseReviewsFunctions(this, 'handler-post')
-            .getFunctionByMethod('POST');
+        const postFunction: Function = new CourseReviewsFunctions(this, 'handler-post').postFunction;
 
         this.resource = new Resource(this, 'course-reviews', {
             parent: scope.apiEndpoint.root,
