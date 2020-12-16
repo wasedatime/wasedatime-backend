@@ -7,12 +7,12 @@ import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AwsServicePrincipal} from "../configs/aws";
 
 
-export class CourseReviewsFunctions extends cdk.Stack {
+export class CourseReviewsFunctions extends cdk.Construct {
 
     private readonly postFunction: Function;
 
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id, props);
+    constructor(scope: cdk.Construct, id: string) {
+        super(scope, id);
 
         const dynamoDBCrudRole = new LazyRole(this, 'dynamo-crud-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
@@ -46,12 +46,12 @@ export class CourseReviewsFunctions extends cdk.Stack {
     }
 }
 
-export class SyllabusScraper extends cdk.Stack {
+export class SyllabusScraper extends cdk.Construct {
 
     private readonly baseFunction: Function;
 
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id, props);
+    constructor(scope: cdk.Construct, id: string) {
+        super(scope, id);
 
         const lambdaBasicRole = new LazyRole(this, 'lambda-base-exec-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),

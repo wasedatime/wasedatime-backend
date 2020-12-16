@@ -8,8 +8,8 @@ import {Effect, LazyRole, Policy, PolicyStatement, ServicePrincipal} from "@aws-
 import {Table} from "@aws-cdk/aws-dynamodb";
 
 import {prodCorsRule, publicAccess} from "../configs/s3-bucket";
-import {awsEnv, AwsServicePrincipal} from "../configs/aws";
-import {AbstractTaskManager, SyllabusScraperStatusNotifier} from "./task-managers";
+import {AwsServicePrincipal} from "../configs/aws";
+import {AbstractTaskManager, SyllabusScraperTaskManger} from "./task-managers";
 import {SyllabusScraper} from "./lambda-functions";
 
 
@@ -34,9 +34,9 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
 
     readonly processor: Function | StateMachine;
 
-    readonly dataWarehouse: Bucket | Table;
+    readonly dataWarehouse: Bucket;
 
-    readonly statusNotifier: SyllabusScraperStatusNotifier;
+    readonly statusNotifier: SyllabusScraperTaskManger;
 
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
@@ -52,7 +52,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             versioned: true
         });
 
-        this.statusNotifier = new SyllabusScraperStatusNotifier(this, 'status-notifier', {});
+        this.statusNotifier = new SyllabusScraperTaskManger(this, 'status-notifier', {});
 
         const errorState = new SnsPublish(this, 'fsm-error', {
             message: TaskInput.fromText(
@@ -78,7 +78,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         });
 
         const scraperBaseFunction: Function =
-            new SyllabusScraper(this, 'scraper-base-function', awsEnv).getBaseFunction();
+            new SyllabusScraper(this, 'scraper-base-function').getBaseFunction();
 
         function getLambdaTaskInstance(constructContext: cdk.Construct, schools: string[]): State {
             const randint: string = Math.floor(Math.random() * (1000)).toString();
@@ -133,7 +133,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
                     "G_SAPS", "G_SA", "G_SJAL", "G_SICCS", "G_SEEE", "EHUM", "ART", "CIE", "G_ITS"]))
                 .next(endState)
         });
-        this.statusNotifier.addTarget(this.processor);
+        this.statusNotifier.setTarget(this.processor);
     }
 }
 

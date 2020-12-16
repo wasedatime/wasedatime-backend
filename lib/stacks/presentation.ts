@@ -19,6 +19,6 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        this.app = new AmplifyWebApp(this, 'amplify-web-app');
+        this.app = new AmplifyWebApp(this, 'amplify-web-app', {});
     }
 }

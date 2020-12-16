@@ -1,6 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 
-import {AbstractApiEndpoint} from "../constructs/api-endpoint";
+import {AbstractApiEndpoint, WasedaTimeRestApiEndpoint} from "../constructs/api-endpoint";
 
 
 export abstract class ServiceLayer extends cdk.Stack {
@@ -18,5 +18,7 @@ export class WasedaTimeServiceLayer extends ServiceLayer {
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
+
+        this.apiEndpoints["rest"] = new WasedaTimeRestApiEndpoint(this, 'rest-api', {});
     }
 }

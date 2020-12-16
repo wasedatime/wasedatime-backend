@@ -5,7 +5,6 @@ import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-d
 import {Function} from "@aws-cdk/aws-lambda";
 
 import {CourseReviewsFunctions} from "./lambda-functions";
-import {awsEnv} from "../configs/aws";
 import {allowHeaders, allowOrigins} from "../configs/api";
 import {AbstractRestApiEndpoint} from "./api-endpoint";
 
@@ -17,7 +16,7 @@ export interface ApiServiceProps {
 
 export abstract class AbstractRestApiService extends cdk.Construct {
 
-    abstract integration: Integration;
+    abstract integrations: { [httpMethod: string]: Integration };
 
     abstract resource: Resource;
 
@@ -30,7 +29,7 @@ export abstract class AbstractRestApiService extends cdk.Construct {
 
 export class SyllabusApiService extends AbstractRestApiService {
 
-    readonly integration: Integration;
+    readonly integrations: { [httpMethod: string]: Integration };
 
     readonly resource: Resource;
 
@@ -65,7 +64,7 @@ export class SyllabusApiService extends AbstractRestApiService {
 //todo add model validation and method response options
 export class CourseReviewApi extends AbstractRestApiService {
 
-    readonly integration: Integration;
+    readonly integrations: { [httpMethod: string]: Integration };
 
     readonly resource: Resource;
 
@@ -85,7 +84,7 @@ export class CourseReviewApi extends AbstractRestApiService {
             writeCapacity: 5
         });
 
-        const postFunction: Function = new CourseReviewsFunctions(this, 'handler-post', awsEnv)
+        const postFunction: Function = new CourseReviewsFunctions(this, 'handler-post')
             .getFunctionByMethod('POST');
 
         this.resource = new Resource(this, 'course-reviews', {
@@ -98,9 +97,9 @@ export class CourseReviewApi extends AbstractRestApiService {
             allowHeaders: allowHeaders,
             allowMethods: ['POST', 'OPTIONS'],
         });
-        this.methods['POST'] = this.resource.addMethod('POST', new LambdaIntegration(postFunction, {proxy: true}), {
-            operationName: "BatchGetReviews"
-        });
-
+        this.integrations['POST'] = new LambdaIntegration(postFunction, {proxy: true})
+        this.methods['POST'] = this.resource.addMethod('POST', this.integrations['POST'],
+            {operationName: "BatchGetReviews"}
+        );
     }
 }

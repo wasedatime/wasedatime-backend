@@ -1,17 +1,31 @@
 import * as cdk from '@aws-cdk/core';
 import {Construct} from '@aws-cdk/core';
-import {Rule, Schedule} from "@aws-cdk/aws-events";
+import {EventField, IRuleTarget, Rule, RuleTargetInput, Schedule} from "@aws-cdk/aws-events";
 import {Function} from "@aws-cdk/aws-lambda";
 import {Topic} from "@aws-cdk/aws-sns";
-import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
+import {SfnStateMachine, SnsTopic} from "@aws-cdk/aws-events-targets";
 import {StateMachine} from "@aws-cdk/aws-stepfunctions";
 import {Effect, LazyRole, Policy, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
-import {App} from "@aws-cdk/aws-amplify";
 
 import {AwsServicePrincipal} from "../configs/aws";
+import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 
+
+export enum SubscriptionType {
+    EMAIL,
+    LAMBDA,
+    SMS,
+    SQS,
+    URL
+}
 
 export interface TaskManagerProps {
+
+    target?: any;
+
+    // topicName: string,
+    //
+    // rules: { [eventName: string]: Rule },
 
 }
 
@@ -19,22 +33,29 @@ export abstract class AbstractTaskManager extends Construct {
 
     abstract rules: { [eventName: string]: Rule };
 
-    abstract eventHandler?: Function;
+    abstract target: IRuleTarget;
 
-    abstract topic: Topic;
+    abstract topic?: Topic;
 
     protected constructor(scope: cdk.Construct, id: string, props: TaskManagerProps) {
         super(scope, id);
     }
+
+    // abstract addRules(ruleName: string): AbstractEventNotifier;
+    //
+    // abstract setTarget(target: Construct): void;
+    //
+    // abstract addSubscriber(subscriptionType: number, subscriber: any): AbstractEventNotifier;
 }
 
-export class SyllabusScraperStatusNotifier extends AbstractTaskManager {
+
+export class SyllabusScraperTaskManger extends AbstractTaskManager {
 
     readonly rules: { [eventName: string]: Rule };
 
-    readonly eventHandler?: Function;
-
     readonly topic: Topic;
+
+    target: SfnStateMachine;
 
     constructor(scope: cdk.Construct, id: string, props: TaskManagerProps) {
         super(scope, id, props);
@@ -42,6 +63,11 @@ export class SyllabusScraperStatusNotifier extends AbstractTaskManager {
         this.topic = new Topic(this, 'status-topic', {
             topicName: "syllabus-scraper-status"
         });
+
+        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
+            "arn:aws:lambda:ap-northeast-1:564383102056:function:lambda-publish-notification"
+        );
+        this.topic.addSubscription(new LambdaSubscription(subscriber));
 
         this.rules["regular"] = new Rule(this, 'regular', {
             description: "Execute the syllabus scraper every month.",
@@ -53,7 +79,7 @@ export class SyllabusScraperStatusNotifier extends AbstractTaskManager {
         });
     }
 
-    addTarget(stateMachine: StateMachine) {
+    setTarget(target: StateMachine) {
         const stateMachineExecRole = new LazyRole(this, 'state-machine-execute-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.EVENT_BRIDGE),
             description: "Allows EventBridge to execute the state machine.",
@@ -65,36 +91,40 @@ export class SyllabusScraperStatusNotifier extends AbstractTaskManager {
             statements: [new PolicyStatement({
                 effect: Effect.ALLOW,
                 actions: ["states:StartExecution"],
-                resources: [stateMachine.stateMachineArn]
+                resources: [target.stateMachineArn]
             })]
         }));
-        this.rules["regular"].addTarget(new SfnStateMachine(stateMachine, {
-            role: stateMachineExecRole
-        }));
+        this.target = new SfnStateMachine(target, {role: stateMachineExecRole});
+
+        this.rules["regular"].addTarget(this.target);
     }
 }
 
-export class AmplifyBuildStatusNotifier extends AbstractTaskManager {
+export class AmplifyBuildStatusManager extends AbstractTaskManager {
 
     readonly rules: { [eventName: string]: Rule };
 
-    readonly eventHandler?: Function;
+    readonly target: SfnStateMachine;
 
     readonly topic: Topic;
 
-    constructor(scope: cdk.Construct, id: string, amplifyApp: App, props: TaskManagerProps) {
+    constructor(scope: cdk.Construct, id: string, props: TaskManagerProps) {
         super(scope, id, props);
 
         this.topic = new Topic(this, 'status-topic', {
             topicName: "amplify-build-status"
         });
+        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
+            "arn:aws:lambda:ap-northeast-1:564383102056:function:forwardAmplifyNotificationSlack"
+        );
+        this.topic.addSubscription(new LambdaSubscription(subscriber))
 
         this.rules["on-build"] = new Rule(this, 'build-sentinel', {
             description: "Triggered on Amplify build",
             enabled: true,
             eventPattern: {
                 detail: {
-                    "appId": amplifyApp.appId,
+                    "appId": props.target,
                     "jobStatus": [
                         "SUCCEED",
                         "FAILED",
@@ -109,5 +139,20 @@ export class AmplifyBuildStatusNotifier extends AbstractTaskManager {
                 }
             }
         });
+
+        const appId: string = EventField.fromPath("$.detail.appId");
+        const branch: string = EventField.fromPath("$.detail.branchName");
+        const jobStat: string = EventField.fromPath("$.detail.jobStatus")
+        const jobId: string = EventField.fromPath("$.detail.jobId");
+        const region: string = EventField.fromPath("$.region");
+        const buildMessage: string = `
+        Build notification from the AWS Amplify Console for app: https://${branch}.${appId}.amplifyapp.com/. 
+        Your build status is ${jobStat}. 
+        Go to https://console.aws.amazon.com/amplify/home?region=${region}#${appId}/${branch}/${jobId} 
+        to view details on your build.
+        `
+        this.rules["on-build"].addTarget(new SnsTopic(this.topic, {
+            message: RuleTargetInput.fromText(buildMessage)
+        }));
     }
 }

@@ -1,7 +1,7 @@
 import {App, Branch, Domain} from "@aws-cdk/aws-amplify";
 import * as cdk from "@aws-cdk/core";
 import {Construct} from "@aws-cdk/core";
-import {AbstractTaskManager, AmplifyBuildStatusNotifier} from "./task-managers";
+import {AbstractTaskManager, AmplifyBuildStatusManager} from "./task-managers";
 import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AwsServicePrincipal} from "../configs/aws";
 import {Duration} from "@aws-cdk/core/lib/duration";
@@ -23,7 +23,7 @@ export abstract class AbstractWebApp extends Construct {
 
     abstract statusNotifier?: AbstractTaskManager;
 
-    protected constructor(scope: cdk.Construct, id: string) {
+    protected constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
         super(scope, id);
     }
 }
@@ -36,10 +36,10 @@ export class AmplifyWebApp extends AbstractWebApp {
 
     readonly domain: Domain;
 
-    readonly statusNotifier?: AmplifyBuildStatusNotifier;
+    readonly statusNotifier: AmplifyBuildStatusManager;
 
-    constructor(scope: cdk.Construct, id: string) {
-        super(scope, id);
+    constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
+        super(scope, id, props);
 
         const amplifyServiceRole: LazyRole = new LazyRole(this, 'amplify-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.AMPLIFY),
@@ -74,8 +74,6 @@ export class AmplifyWebApp extends AbstractWebApp {
         });
         this.branches["dev"] = devBranch;
 
-        this.statusNotifier = new AmplifyBuildStatusNotifier(this, 'build-notifier', this.app, {});
-
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
@@ -83,5 +81,7 @@ export class AmplifyWebApp extends AbstractWebApp {
                 {branch: mainBranch, prefix: "main"}
             ]
         });
+
+        this.statusNotifier = new AmplifyBuildStatusManager(this, 'build-manager', {target: this.app.appId});
     }
 }
