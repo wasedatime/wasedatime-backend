@@ -14,9 +14,9 @@ export const enum DataEndpoint {
     CAREER
 }
 
-export enum Worker {
+export enum OperationEndpoint {
 
-    SYLLABUS,
+    APP,
 
-    CAREER
+    SYLLABUS
 }

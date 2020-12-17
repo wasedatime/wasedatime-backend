@@ -1,18 +1,23 @@
 import {WasedaTimePresentationLayer} from "./stacks/presentation";
 import {awsEnv} from "./configs/aws";
 import {AbstractServerlessApp} from "./architecture/patterns";
-import {WasedaTimeServiceLayer} from "./stacks/service";
+import {WasedaTimeBusinessLayer} from "./stacks/business";
 import {WasedaTimePersistenceLayer} from "./stacks/persistence";
-import {PersistenceLayer, PresentationLayer, ServiceLayer} from "./architecture/layers";
+import {AdminLayer, BusinessLayer, PersistenceLayer, PresentationLayer} from "./architecture/layers";
+import {WasedaTimeAdminLayer} from "./stacks/admin";
+import {OperationInterface} from "./architecture/interfaces";
+import {OperationEndpoint} from "./configs/registry";
 
 
 export class WasedaTime extends AbstractServerlessApp {
 
     readonly presentationLayer: PresentationLayer;
 
-    readonly serviceLayer: ServiceLayer;
+    readonly businessLayer: BusinessLayer;
 
     readonly persistenceLayer: PersistenceLayer;
+
+    readonly adminLayer: AdminLayer;
 
     constructor() {
 
@@ -21,11 +26,24 @@ export class WasedaTime extends AbstractServerlessApp {
         this.persistenceLayer = new WasedaTimePersistenceLayer(this, 'persistence', awsEnv);
         const dataInterface = this.persistenceLayer.dataInterface;
 
-        this.serviceLayer = new WasedaTimeServiceLayer(this, 'service', dataInterface, awsEnv);
-        this.serviceLayer.dataInterface = dataInterface;
-        const serviceInterface = this.serviceLayer.serviceInterface;
+        this.businessLayer = new WasedaTimeBusinessLayer(this, 'business', dataInterface, awsEnv);
+        this.businessLayer.dataInterface = dataInterface;
+        const serviceInterface = this.businessLayer.serviceInterface;
 
         this.presentationLayer = new WasedaTimePresentationLayer(this, 'presentation', serviceInterface, awsEnv);
         this.presentationLayer.serviceInterface = serviceInterface;
+
+        const operationInterface = new OperationInterface;
+
+        operationInterface.setEndpoint(
+            OperationEndpoint.SYLLABUS,
+            this.persistenceLayer.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
+        );
+        operationInterface.setEndpoint(
+            OperationEndpoint.APP,
+            this.presentationLayer.operationInterface.getEndpoint(OperationEndpoint.APP)
+        );
+
+        this.adminLayer = new WasedaTimeAdminLayer(this, 'admin', operationInterface, awsEnv);
     }
 }

@@ -1,18 +1,19 @@
-import {DataEndpoint, ServiceEndpoint} from "../configs/registry";
-import {DataRegistry, Registry, ServiceRegistry} from "./protocols";
+import {DataEndpoint, OperationEndpoint, ServiceEndpoint} from "../configs/registry";
+import {Protocol, Registry} from "./protocols";
 
-export interface Discoverable {
 
-    protocol: Registry;
+interface IInterface {
+
+    protocol: Protocol;
 
     getEndpoint(name: number): string;
 
     setEndpoint(name: number, value: string): void;
 }
 
-export class DataInterface implements Discoverable {
+export class DataInterface implements IInterface {
 
-    protocol: DataRegistry;
+    protocol: Registry<DataEndpoint>;
 
     constructor() {
         this.protocol = new Map<DataEndpoint, string>();
@@ -32,9 +33,9 @@ export class DataInterface implements Discoverable {
     }
 }
 
-export class ServiceInterface implements Discoverable {
+export class ServiceInterface implements IInterface {
 
-    protocol: ServiceRegistry;
+    protocol: Registry<ServiceEndpoint>;
 
     constructor() {
         this.protocol = new Map<ServiceEndpoint, string>();
@@ -49,6 +50,28 @@ export class ServiceInterface implements Discoverable {
     }
 
     setEndpoint(name: ServiceEndpoint, value: string): void {
+        this.protocol.set(name, value);
+        return;
+    }
+}
+
+export class OperationInterface implements IInterface {
+
+    protocol: Registry<OperationEndpoint>;
+
+    constructor() {
+        this.protocol = new Map<OperationEndpoint, string>();
+    }
+
+    getEndpoint(name: OperationEndpoint): string {
+        const value = this.protocol.get(name);
+        if (typeof value === "undefined") {
+            throw RangeError("Service not configured for this entry.");
+        }
+        return value;
+    }
+
+    setEndpoint(name: OperationEndpoint, value: string): void {
         this.protocol.set(name, value);
         return;
     }

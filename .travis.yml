@@ -1,6 +1,8 @@
 language: node_js
 node_js:
   - lts/*
+#before_install:
+#  - bash script/zip_lambda.sh
 install:
   - npm ci
 script:
@@ -8,6 +10,10 @@ script:
   - npm run build
 after_script:
   - cdk diff
-#after_success:
-#  - cdk synth
-#  - cdk deploy
+after_success:
+  - cdk synth
+#deploy:
+#  provider: script
+#  script: cdk deploy
+#  on:
+#    branch: main

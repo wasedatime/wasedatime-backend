@@ -3,11 +3,11 @@ import * as cdk from "@aws-cdk/core";
 import {AbstractApiEndpoint, AbstractRestApiEndpoint, WasedaTimeRestApiEndpoint} from "../constructs/api-endpoint";
 import {DataEndpoint, ServiceEndpoint} from "../configs/registry";
 import {ApiEndpoint} from "../configs/api/api-endpoint";
-import {ServiceLayer} from "../architecture/layers";
+import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";
 
 
-export class WasedaTimeServiceLayer extends ServiceLayer {
+export class WasedaTimeBusinessLayer extends BusinessLayer {
 
     apiEndpoints: { [name in ApiEndpoint]?: AbstractApiEndpoint } = {};
 

@@ -1,6 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import {UserPool, UserPoolClient, UserPoolDomain} from "@aws-cdk/aws-cognito";
 
+
 export interface AuthEndpointProps {
 
 }
