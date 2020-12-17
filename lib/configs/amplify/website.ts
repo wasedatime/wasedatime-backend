@@ -6,6 +6,8 @@ require('dotenv').config();
 
 export const WEBAPP_DOMAIN: string = "wasedatime.com";
 
+export const API_DOC_DOMAIN: string = "openapi.wasedatime.com";
+
 const wwwRedirect: CustomRule = new CustomRule({
     source: "https://www.wasedatime.com",
     target: "https://wasedatime.com",
@@ -25,8 +27,7 @@ const robotRewrite: CustomRule = new CustomRule({
 });
 
 export const webappSiteRules: CustomRule[] = [
-    wwwRedirect, sitemapRewrite, robotRewrite,
-    CustomRule.SINGLE_PAGE_APPLICATION_REDIRECT
+    wwwRedirect, sitemapRewrite, robotRewrite, CustomRule.SINGLE_PAGE_APPLICATION_REDIRECT
 ];
 
 export const developerAuth: BasicAuth = BasicAuth.fromCredentials(

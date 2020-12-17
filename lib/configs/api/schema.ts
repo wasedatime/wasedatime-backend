@@ -1,17 +1,5 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
 
-
-export const allowOrigins: string[] = [
-    "https://wasedatime.com",
-    "https://www.wasedatime.com",
-    "https://dev.wasedatime.com",
-    "https://preview.wasedatime.com"
-];
-
-export const allowHeaders: string[] = [
-    'Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token'
-];
-
 export const syllabusSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     id: "https://api.wasedatime.com/schemas/syllabus.json",
@@ -299,7 +287,6 @@ export const syllabusSchema: JsonSchema = {
         }
     }
 };
-
 export const courseReviewReqSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     id: "https://api.wasedatime.com/schemas/course_reviews.json",

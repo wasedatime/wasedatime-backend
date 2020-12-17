@@ -1,8 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 
-import {PresentationLayer} from "./presentation";
-import {ServiceLayer} from "./service";
-import {PersistenceLayer} from "./persistence";
+import {PersistenceLayer, PresentationLayer, ServiceLayer} from "./layers";
 
 
 export abstract class AbstractServerlessApp extends cdk.App {

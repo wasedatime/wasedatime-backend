@@ -1,44 +1,43 @@
 import * as cdk from "@aws-cdk/core";
-import {Integration, IntegrationType, LambdaIntegration, Method, Resource} from "@aws-cdk/aws-apigateway";
-import {Bucket} from "@aws-cdk/aws-s3";
+import {Integration, LambdaIntegration, Method, Resource} from "@aws-cdk/aws-apigateway";
 import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
 import {Function} from "@aws-cdk/aws-lambda";
 
 import {CourseReviewsFunctions} from "./lambda-functions";
-import {allowHeaders, allowOrigins} from "../configs/api";
 import {AbstractRestApiEndpoint} from "./api-endpoint";
+import {HttpMethod} from "@aws-cdk/aws-apigatewayv2";
+import {allowHeaders, allowOrigins} from "../configs/api/cors";
 
 
 export interface ApiServiceProps {
 
-    storage: Bucket;
+    integrations: { [method in HttpMethod]?: Integration };
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
 
-    abstract integrations: { [httpMethod: string]: Integration } = {};
+    readonly integrations: { [method in HttpMethod]?: Integration };
 
     abstract resource: Resource;
 
-    abstract methods: { [httpMethod: string]: Method } = {};
+    abstract methods: { [method in HttpMethod]?: Method };
 
-    protected constructor(scope: AbstractRestApiEndpoint, id: string, props?: ApiServiceProps) {
+    protected constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+
         super(scope, id);
+
+        this.integrations = props.integrations;
     }
 }
 
 export class SyllabusApiService extends AbstractRestApiService {
 
-    readonly integrations: { [httpMethod: string]: Integration } = {};
-
     readonly resource: Resource;
 
-    readonly methods: { [httpMethod: string]: Method } = {};
+    readonly methods: { [method in HttpMethod]?: Method } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
-
-        const syllabusBucket: Bucket = props.storage;
 
         this.resource = new Resource(scope, 'syllabus', {
             parent: scope.apiEndpoint.root,
@@ -46,16 +45,12 @@ export class SyllabusApiService extends AbstractRestApiService {
         });
         const syllabusSchools: Resource = this.resource.addResource("{school}");
 
-        this.methods['OPTIONS'] = syllabusSchools.addCorsPreflight({
+        this.methods[HttpMethod.OPTIONS] = syllabusSchools.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: ['GET', 'OPTIONS'],
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
         });
-        this.methods['GET'] = syllabusSchools.addMethod('GET', new Integration({
-            type: IntegrationType.HTTP,
-            integrationHttpMethod: 'GET',
-            uri: `https://${syllabusBucket.bucketRegionalDomainName}/syllabus/{school}.json`
-        }), {
+        this.methods[HttpMethod.GET] = syllabusSchools.addMethod(HttpMethod.GET, props.integrations[HttpMethod.GET], {
             apiKeyRequired: false,
         });
     }
@@ -64,13 +59,11 @@ export class SyllabusApiService extends AbstractRestApiService {
 //todo add model validation and method response options
 export class CourseReviewApi extends AbstractRestApiService {
 
-    readonly integrations: { [httpMethod: string]: Integration } = {};
-
     readonly resource: Resource;
 
-    readonly methods: { [httpMethod: string]: Method } = {};
+    readonly methods: { [method in HttpMethod]?: Method };
 
-    constructor(scope: AbstractRestApiEndpoint, id: string, props?: ApiServiceProps) {
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
         const courseReviewTable = new Table(this, 'dynamodb-review-table', {
@@ -91,13 +84,13 @@ export class CourseReviewApi extends AbstractRestApiService {
             pathPart: "course-reviews"
         });
 
-        this.methods['OPTIONS'] = this.resource.addCorsPreflight({
+        this.methods[HttpMethod.OPTIONS] = this.resource.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: ['POST', 'OPTIONS'],
+            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
         });
-        this.integrations['POST'] = new LambdaIntegration(postFunction, {proxy: true})
-        this.methods['POST'] = this.resource.addMethod('POST', this.integrations['POST'],
+        this.integrations[HttpMethod.POST] = new LambdaIntegration(postFunction, {proxy: true})
+        this.methods[HttpMethod.POST] = this.resource.addMethod(HttpMethod.POST, this.integrations[HttpMethod.POST],
             {operationName: "BatchGetReviews"}
         );
     }

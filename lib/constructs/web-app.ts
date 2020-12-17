@@ -5,12 +5,16 @@ import {AbstractTaskManager, AmplifyBuildStatusManager} from "./task-managers";
 import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AwsServicePrincipal} from "../configs/aws";
 import {Duration} from "@aws-cdk/core/lib/duration";
-import {webappBuildSpec, webappEnv, webappGithub} from "../configs/code-automation";
-import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../configs/website";
+import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../configs/amplify/website";
+import {webappBuildSpec, webappEnv} from "../configs/amplify/build-setting";
+import {webAppCode} from "../configs/amplify/code-base";
 
 
 export interface WebAppProps {
 
+    apiDomain?: string;
+
+    authDomain?: string;
 }
 
 export abstract class AbstractWebApp extends Construct {
@@ -57,7 +61,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: webappEnv,
             role: amplifyServiceRole,
-            sourceCodeProvider: webappGithub
+            sourceCodeProvider: webAppCode
         });
 
         const mainBranch: Branch = this.app.addBranch('main', {

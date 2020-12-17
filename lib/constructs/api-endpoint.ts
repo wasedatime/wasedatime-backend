@@ -1,16 +1,27 @@
 import * as cdk from "@aws-cdk/core";
-import {EndpointType, LambdaRestApi, Resource, RestApi, SecurityPolicy, SpecRestApi} from "@aws-cdk/aws-apigateway";
+import {
+    DomainName,
+    EndpointType,
+    Integration,
+    IntegrationType,
+    LambdaRestApi,
+    Resource,
+    RestApi,
+    SecurityPolicy,
+    SpecRestApi
+} from "@aws-cdk/aws-apigateway";
 import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
-import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
+import {HttpApi, HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
 
-import {AbstractRestApiService, CourseReviewApi} from "./api-service";
-import {WEBAPP_DOMAIN} from "../configs/website";
-import {courseReviewReqSchema, syllabusSchema} from "../configs/api";
+import {AbstractRestApiService, SyllabusApiService} from "./api-service";
+import {WEBAPP_DOMAIN} from "../configs/amplify/website";
+import {courseReviewReqSchema, syllabusSchema} from "../configs/api/schema";
 
 
 export interface ApiEndpointProps {
 
+    dataSource: string;
 }
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
@@ -26,12 +37,23 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
     abstract apiEndpoint: RestApi;
 
-    abstract apiServices: { [path: string]: AbstractRestApiService }
-
-    abstract getResourcebyPath(path: string): Resource;
+    abstract apiServices: { [path: string]: AbstractRestApiService };
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);
+    }
+
+    getDomain(): string {
+        const domainName: DomainName | undefined = this.apiEndpoint.domainName;
+
+        if (typeof domainName === "undefined") {
+            throw RangeError("Domain not configured for this API endpoint.");
+        }
+        return domainName.domainName;
+    }
+
+    getResourcebyPath(path: string): Resource {
+        return this.apiServices[""].resource;
     }
 }
 
@@ -74,12 +96,16 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             modelName: "ReviewsReq"
         });
 
-        new CourseReviewApi(this, 'course-review-api');
+        const syllabusIntegration = new Integration({
+            type: IntegrationType.HTTP,
+            integrationHttpMethod: 'GET',
+            uri: `https://${props.dataSource}/syllabus/{school}.json`
+        });
+
+        new SyllabusApiService(this, 'course-review-api', {
+            integrations: {[HttpMethod.GET]: syllabusIntegration}
+        });
 
         // todo add stage & deployment strategy
-    }
-
-    getResourcebyPath(path: string): Resource {
-        return this.apiServices[""].resource;
     }
 }

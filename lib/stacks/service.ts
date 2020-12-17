@@ -1,24 +1,25 @@
 import * as cdk from "@aws-cdk/core";
 
-import {AbstractApiEndpoint, WasedaTimeRestApiEndpoint} from "../constructs/api-endpoint";
+import {AbstractApiEndpoint, AbstractRestApiEndpoint, WasedaTimeRestApiEndpoint} from "../constructs/api-endpoint";
+import {DataEndpoint, ServiceEndpoint} from "../configs/registry";
+import {ApiEndpoint} from "../configs/api/api-endpoint";
+import {ServiceLayer} from "../architecture/layers";
+import {DataInterface} from "../architecture/interfaces";
 
-
-export abstract class ServiceLayer extends cdk.Stack {
-
-    abstract apiEndpoints: { [name: string]: AbstractApiEndpoint } = {};
-
-    protected constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id, props);
-    }
-}
 
 export class WasedaTimeServiceLayer extends ServiceLayer {
 
-    readonly apiEndpoints: { [name: string]: AbstractApiEndpoint } = {};
+    apiEndpoints: { [name in ApiEndpoint]?: AbstractApiEndpoint } = {};
 
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id, props);
+    constructor(scope: cdk.Construct, id: string, dataInterface: DataInterface, props: cdk.StackProps) {
+        super(scope, id, dataInterface, props);
 
-        this.apiEndpoints["rest"] = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {});
+        const mainApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
+            dataSource: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS)
+        });
+
+        this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
+
+        this.serviceInterface.setEndpoint(ServiceEndpoint.MAIN, mainApiEndpoint.getDomain());
     }
 }

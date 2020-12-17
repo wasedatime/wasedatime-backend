@@ -7,10 +7,11 @@ import {Function} from "@aws-cdk/aws-lambda";
 import {Effect, LazyRole, Policy, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {Table} from "@aws-cdk/aws-dynamodb";
 
-import {prodCorsRule, publicAccess} from "../configs/s3-bucket";
+import {publicAccess} from "../configs/s3/access-setting";
 import {AwsServicePrincipal} from "../configs/aws";
 import {AbstractTaskManager, SyllabusScraperTaskManger} from "./task-managers";
 import {SyllabusScraper} from "./lambda-functions";
+import {prodCorsRule} from "../configs/s3/cors";
 
 
 export interface DataPipelineProps {
