@@ -1,6 +1,12 @@
 import * as cdk from "@aws-cdk/core";
 
-import {AbstractDataPipeline, SyllabusDataPipeline, Worker} from "../constructs/data-pipeline";
+import {
+    AbstractDataPipeline,
+    CareerDataPipeline,
+    FeedsDataPipeline,
+    SyllabusDataPipeline,
+    Worker
+} from "../constructs/data-pipeline";
 import {DataEndpoint, OperationEndpoint} from "../configs/registry";
 import {PersistenceLayer} from "../architecture/layers";
 import {Collection, DynamoDatabase} from "../constructs/database";
@@ -20,9 +26,24 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
 
         const dynamoDatabase = new DynamoDatabase(this, 'dynamo-db', {});
 
+        this.dataPipelines[Worker.CAREER] = new CareerDataPipeline(this, 'career-datapipeline', {
+            dataWarehouse: dynamoDatabase.tables[Collection.CAREER]
+        });
+        this.dataPipelines[Worker.FEEDS] = new FeedsDataPipeline(this, 'feeds-datapipeline', {
+            dataWarehouse: dynamoDatabase.tables[Collection.FEEDS]
+        });
+
         this.dataInterface.setEndpoint(
             DataEndpoint.COURSE_REVIEWS,
             dynamoDatabase.tables[Collection.COURSE_REVIEW].tableArn
+        );
+        this.dataInterface.setEndpoint(
+            DataEndpoint.FEEDS,
+            dynamoDatabase.tables[Collection.FEEDS].tableArn
+        );
+        this.dataInterface.setEndpoint(
+            DataEndpoint.CAREER,
+            dynamoDatabase.tables[Collection.CAREER].tableArn
         );
 
         this.dataInterface.setEndpoint(

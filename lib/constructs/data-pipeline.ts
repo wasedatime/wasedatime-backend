@@ -17,11 +17,14 @@ export enum Worker {
 
     SYLLABUS,
 
-    CAREER
+    CAREER,
+
+    FEEDS
 }
 
 export interface DataPipelineProps {
 
+    dataWarehouse?: Table;
 }
 
 export abstract class AbstractDataPipeline extends Construct {
@@ -100,10 +103,51 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
     }
 }
 
-//todo more pipelines
+//todo add s3 deployment and notifications
 
-export class CareerDataPipeline {
+export class CareerDataPipeline extends AbstractDataPipeline {
+    readonly dataSource?: Bucket;
+
+    readonly processor: Function;
+
+    readonly dataWarehouse: Table;
+
+    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
+        super(scope, id);
+
+        this.dataSource = new Bucket(this, 'career-bucket', {
+            accessControl: BucketAccessControl.PUBLIC_READ,
+            blockPublicAccess: publicAccess,
+            bucketName: "wasedatime-career-prod",
+            cors: prodCorsRule,
+            encryption: BucketEncryption.S3_MANAGED,
+            publicReadAccess: true,
+            removalPolicy: RemovalPolicy.DESTROY,
+            versioned: true
+        });
+    }
 }
 
-export class FeedsDataPipeline {
+export class FeedsDataPipeline extends AbstractDataPipeline {
+
+    readonly dataSource?: Bucket;
+
+    readonly processor: Function;
+
+    readonly dataWarehouse: Table;
+
+    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
+        super(scope, id);
+
+        this.dataSource = new Bucket(this, 'feeds-bucket', {
+            accessControl: BucketAccessControl.PUBLIC_READ,
+            blockPublicAccess: publicAccess,
+            bucketName: "wasedatime-feeds-prod",
+            cors: prodCorsRule,
+            encryption: BucketEncryption.S3_MANAGED,
+            publicReadAccess: true,
+            removalPolicy: RemovalPolicy.DESTROY,
+            versioned: true
+        });
+    }
 }

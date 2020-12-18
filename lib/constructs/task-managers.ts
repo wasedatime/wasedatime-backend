@@ -21,11 +21,6 @@ export enum TaskManager {
 export interface TaskManagerProps {
 
     target: string;
-
-    // topicName: string,
-    //
-    // rules: { [eventName: string]: Rule },
-
 }
 
 export abstract class AbstractTaskManager extends Construct {

@@ -1,9 +1,6 @@
 import * as cdk from "@aws-cdk/core";
-import {Integration, LambdaIntegration, Method, Resource} from "@aws-cdk/aws-apigateway";
-import {Function} from "@aws-cdk/aws-lambda";
+import {IModel, Integration, Method, Resource} from "@aws-cdk/aws-apigateway";
 import {HttpMethod} from "@aws-cdk/aws-apigatewayv2";
-
-import {CourseReviewsFunctions} from "./lambda-functions";
 import {AbstractRestApiEndpoint} from "./api-endpoint";
 import {allowHeaders, allowOrigins} from "../configs/api/cors";
 
@@ -11,11 +8,11 @@ import {allowHeaders, allowOrigins} from "../configs/api/cors";
 export interface ApiServiceProps {
 
     integrations: { [method in HttpMethod]?: Integration };
+
+    models: { [method in HttpMethod]?: IModel };
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
-
-    readonly integrations: { [method in HttpMethod]?: Integration };
 
     abstract resource: Resource;
 
@@ -51,21 +48,23 @@ export class SyllabusApiService extends AbstractRestApiService {
         });
         this.methods[HttpMethod.GET] = syllabusSchools.addMethod(HttpMethod.GET, props.integrations[HttpMethod.GET], {
             apiKeyRequired: false,
+            operationName: "GetSyllabusBySchool",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: props.models[HttpMethod.GET]!}
+            }]
         });
     }
 }
 
-//todo add model validation and method response options
-export class CourseReviewApi extends AbstractRestApiService {
+export class CourseReviewsApiService extends AbstractRestApiService {
 
     readonly resource: Resource;
 
-    readonly methods: { [method in HttpMethod]?: Method };
+    readonly methods: { [method in HttpMethod]?: Method } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
-
-        const postFunction: Function = new CourseReviewsFunctions(this, 'handler-post').postFunction;
 
         this.resource = new Resource(this, 'course-reviews', {
             parent: scope.apiEndpoint.root,
@@ -77,9 +76,44 @@ export class CourseReviewApi extends AbstractRestApiService {
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
         });
-        this.integrations[HttpMethod.POST] = new LambdaIntegration(postFunction, {proxy: true})
-        this.methods[HttpMethod.POST] = this.resource.addMethod(HttpMethod.POST, this.integrations[HttpMethod.POST],
-            {operationName: "BatchGetReviews"}
+        this.methods[HttpMethod.POST] = this.resource.addMethod(HttpMethod.POST, props.integrations[HttpMethod.POST],
+            {
+                operationName: "BatchGetReviews",
+                methodResponses: [{
+                    statusCode: '200',
+                    responseModels: {["application/json"]: props.models[HttpMethod.POST]!}
+                }]
+            }
         );
+    }
+}
+
+export class FeedsApiService extends AbstractRestApiService {
+
+    readonly resource: Resource;
+
+    readonly methods: { [method in HttpMethod]?: Method } = {};
+
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+        super(scope, id, props);
+
+        this.resource = new Resource(scope, 'feeds', {
+            parent: scope.apiEndpoint.root,
+            pathPart: "feeds"
+        });
+
+        this.methods[HttpMethod.OPTIONS] = this.resource.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
+        });
+        this.methods[HttpMethod.GET] = this.resource.addMethod(HttpMethod.GET, props.integrations[HttpMethod.GET], {
+            apiKeyRequired: false,
+            operationName: "ListArticles",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: props.models[HttpMethod.GET]!}
+            }]
+        });
     }
 }

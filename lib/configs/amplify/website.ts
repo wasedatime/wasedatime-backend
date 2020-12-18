@@ -1,8 +1,6 @@
 import {BasicAuth, CustomRule, RedirectStatus} from "@aws-cdk/aws-amplify";
 import {SecretValue} from "@aws-cdk/core";
 
-require('dotenv').config();
-
 
 export const WEBAPP_DOMAIN: string = "wasedatime.com";
 

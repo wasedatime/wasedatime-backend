@@ -1,12 +1,12 @@
 import {App, Branch, Domain} from "@aws-cdk/aws-amplify";
 import * as cdk from "@aws-cdk/core";
 import {Duration} from "@aws-cdk/core/lib/duration";
-import {LazyRole, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {AwsServicePrincipal} from "../configs/aws";
 import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../configs/amplify/website";
 import {webappBuildSpec, webappEnv} from "../configs/amplify/build-setting";
-import {webAppCode} from "../configs/amplify/code-base";
+import {webAppCode} from "../configs/amplify/codebase";
 
 
 export interface WebAppProps {
@@ -45,7 +45,9 @@ export class AmplifyWebApp extends AbstractWebApp {
             description: "Allows Amplify Backend Deployment to access AWS resources on your behalf.",
             path: `/aws-service-role/${AwsServicePrincipal.AMPLIFY}/`,
             maxSessionDuration: Duration.hours(1),
-            roleName: "amplify-webapp-deploy"
+            roleName: "amplify-webapp-deploy",
+            managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 'admin-access',
+                "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")]
         });
 
         this.app = new App(this, 'app', {

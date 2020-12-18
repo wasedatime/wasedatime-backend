@@ -8,13 +8,13 @@ export interface AuthEndpointProps {
 
 export abstract class AuthEndpoint extends cdk.Construct {
 
-    readonly userPools: { [name: string]: UserPool };
+    abstract userPools: { [name: string]: UserPool };
 
-    readonly endpoint: UserPoolClient;
+    abstract endpoint: UserPoolClient;
 
-    readonly domain: UserPoolDomain;
+    abstract domain: UserPoolDomain;
 
-    constructor(scope: cdk.Construct, id: string, props: AuthEndpointProps) {
+    protected constructor(scope: cdk.Construct, id: string, props: AuthEndpointProps) {
 
         super(scope, id);
     }
@@ -22,4 +22,13 @@ export abstract class AuthEndpoint extends cdk.Construct {
 
 export class OauthEndpoint extends AuthEndpoint {
 
+    readonly userPools: { [name: string]: UserPool };
+
+    readonly endpoint: UserPoolClient;
+
+    readonly domain: UserPoolDomain;
+
+    constructor(scope: cdk.Construct, id: string, props: AuthEndpointProps) {
+        super(scope, id, props);
+    }
 }

@@ -1,5 +1,7 @@
 import {StackProps} from "@aws-cdk/core";
 
+require('dotenv').config();
+
 
 export const awsEnv: StackProps = {
     env: {
