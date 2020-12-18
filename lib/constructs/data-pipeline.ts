@@ -4,11 +4,9 @@ import {Bucket, BucketAccessControl, BucketEncryption} from '@aws-cdk/aws-s3';
 import {StateMachine, TaskInput} from "@aws-cdk/aws-stepfunctions";
 import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tasks";
 import {Function} from "@aws-cdk/aws-lambda";
-import {Effect, LazyRole, Policy, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {Table} from "@aws-cdk/aws-dynamodb";
 
 import {publicAccess} from "../configs/s3/access-setting";
-import {AwsServicePrincipal} from "../configs/aws";
 import {SyllabusScraper} from "./lambda-functions";
 import {prodCorsRule} from "../configs/s3/cors";
 
@@ -71,23 +69,6 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             });
         }
 
-        const stateMachineRole: LazyRole = new LazyRole(this, 'state-machine-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.STEP_FUNCTIONS),
-            description: "Allows State Machine to publish to SNS and invoke lambda functions.",
-            path: `/aws-service-role/${AwsServicePrincipal.STEP_FUNCTIONS}/`,
-            roleName: "stepfunctions-syllabus-scraper-execute"
-        });
-        stateMachineRole.attachInlinePolicy(new Policy(this, 'lambda-invoke-policy', {
-            policyName: "lambda-invoke-policy",
-            statements: [
-                new PolicyStatement({
-                    sid: "allow-lambda-invoke",
-                    effect: Effect.ALLOW,
-                    actions: ["lambda:InvokeFunction"],
-                    resources: [scraperBaseFunction.functionArn]
-                })
-            ]
-        }));
         this.processor = new StateMachine(this, 'state-machine', {
             definition: getLambdaTaskInstance(this, ["GEC"], "0")
                 .next(getLambdaTaskInstance(this, ["CMS", "HSS"], "1"))
@@ -116,8 +97,7 @@ export class CareerDataPipeline extends AbstractDataPipeline {
         super(scope, id);
 
         this.dataSource = new Bucket(this, 'career-bucket', {
-            accessControl: BucketAccessControl.PUBLIC_READ,
-            blockPublicAccess: publicAccess,
+            accessControl: BucketAccessControl.PRIVATE,
             bucketName: "wasedatime-career-prod",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
@@ -140,8 +120,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
         super(scope, id);
 
         this.dataSource = new Bucket(this, 'feeds-bucket', {
-            accessControl: BucketAccessControl.PUBLIC_READ,
-            blockPublicAccess: publicAccess,
+            accessControl: BucketAccessControl.PRIVATE,
             bucketName: "wasedatime-feeds-prod",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,

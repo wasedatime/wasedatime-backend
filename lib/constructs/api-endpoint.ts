@@ -96,7 +96,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
 
 
         const apiDomainCert = new Certificate(this, 'domain-certificate', {
-            domainName: "api." + WEBAPP_DOMAIN,
+            domainName: "rest-api." + WEBAPP_DOMAIN,
             validation: CertificateValidation.fromEmail()
         });
         const domain = this.apiEndpoint.addDomainName('domain', {

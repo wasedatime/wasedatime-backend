@@ -43,7 +43,7 @@ export class AmplifyWebApp extends AbstractWebApp {
         const amplifyServiceRole: LazyRole = new LazyRole(this, 'amplify-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.AMPLIFY),
             description: "Allows Amplify Backend Deployment to access AWS resources on your behalf.",
-            path: `/aws-service-role/${AwsServicePrincipal.AMPLIFY}/`,
+            path: `/service-role/${AwsServicePrincipal.AMPLIFY}/`,
             maxSessionDuration: Duration.hours(1),
             roleName: "amplify-webapp-deploy",
             managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 'admin-access',
@@ -58,7 +58,8 @@ export class AmplifyWebApp extends AbstractWebApp {
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: webappEnv,
             role: amplifyServiceRole,
-            sourceCodeProvider: webAppCode
+            sourceCodeProvider: webAppCode,
+
         });
 
         const mainBranch: Branch = this.app.addBranch('main', {
@@ -78,7 +79,7 @@ export class AmplifyWebApp extends AbstractWebApp {
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
-                {branch: devBranch, prefix: "dev"},
+                // {branch: devBranch, prefix: "dev"},
                 {branch: mainBranch, prefix: "main"}
             ]
         });

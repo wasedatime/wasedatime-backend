@@ -5,10 +5,7 @@ import {Function} from "@aws-cdk/aws-lambda";
 import {Topic} from "@aws-cdk/aws-sns";
 import {SfnStateMachine, SnsTopic} from "@aws-cdk/aws-events-targets";
 import {StateMachine} from "@aws-cdk/aws-stepfunctions";
-import {Effect, LazyRole, Policy, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
-
-import {AwsServicePrincipal} from "../configs/aws";
 import {syllabusSchedule} from "../configs/schedule";
 
 
@@ -63,23 +60,7 @@ export class SyllabusScraperTaskManger extends AbstractTaskManager {
         );
         this.topic.addSubscription(new LambdaSubscription(subscriber));
 
-        const stateMachineExecRole = new LazyRole(this, 'state-machine-execute-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.EVENT_BRIDGE),
-            description: "Allows EventBridge to execute the state machine.",
-            path: `/aws-service-role/${AwsServicePrincipal.EVENT_BRIDGE}/`,
-            roleName: "stepfunctions-syllabus-scraper-execute"
-        });
-        stateMachineExecRole.attachInlinePolicy(new Policy(this, 'execute-policy', {
-            policyName: "AWSEventBridgeInvokeStepFunction.",
-            statements: [new PolicyStatement({
-                effect: Effect.ALLOW,
-                actions: ["states:StartExecution"],
-                resources: [props.target]
-            })]
-        }));
-        this.target = new SfnStateMachine(
-            StateMachine.fromStateMachineArn(this, 'sfn-target', props.target), {role: stateMachineExecRole}
-        );
+        this.target = new SfnStateMachine(StateMachine.fromStateMachineArn(this, 'sfn-target', props.target));
 
         for (const name in syllabusSchedule) {
             if (syllabusSchedule.hasOwnProperty(name)) {
@@ -124,8 +105,8 @@ export class AmplifyBuildStatusNotifier extends AbstractTaskManager {
                     "Amplify Deployment Status Change"
                 ],
                 detail: {
-                    "appId": props.target,
-                    "jobStatus": [
+                    appId: props.target,
+                    jobStatus: [
                         "SUCCEED",
                         "FAILED",
                         "STARTED"

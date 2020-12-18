@@ -1,8 +1,9 @@
 language: node_js
 node_js:
   - lts/*
-#before_install:
-#  - bash script/zip_lambda.sh
+before_install:
+  #  - bash script/zip_lambda.sh
+  - bash script/create_aws_profile.sh
 install:
   - npm ci
 script:
@@ -14,8 +15,8 @@ after_success:
   - cdk synth
 before_deploy:
   - cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_REGION}
-#deploy:
-#  provider: script
-#  script: cdk deploy
-#  on:
-#    branch: main
+deploy:
+  provider: script
+  script: cdk deploy
+  on:
+    branch: main

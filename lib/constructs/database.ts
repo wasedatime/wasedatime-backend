@@ -25,7 +25,7 @@ export class DynamoDatabase extends cdk.Construct {
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             sortKey: {name: "timestamp", type: AttributeType.STRING},
-            tableName: "course-review",
+            tableName: "course-reviews",
             readCapacity: 5,
             writeCapacity: 5
         });

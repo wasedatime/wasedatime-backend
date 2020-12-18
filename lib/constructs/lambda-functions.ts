@@ -17,7 +17,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
         const dynamoDBCrudRole: LazyRole = new LazyRole(this, 'dynamo-crud-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to perform crud operation on dynamodb",
-            path: `/aws-service-role/${AwsServicePrincipal.LAMBDA}/`,
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
             roleName: "lambda-dynamodb-crud",
             managedPolicies: [
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
@@ -50,16 +50,6 @@ export class SyllabusScraper extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string) {
         super(scope, id);
 
-        // todo add policy
-        const lambdaBasicRole: LazyRole = new LazyRole(this, 'lambda-base-exec-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
-            description: "Lambda basic execution role.",
-            path: `/aws-service-role/${AwsServicePrincipal.LAMBDA}/`,
-            roleName: "lambda-basic-execution",
-            managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
-                "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole")]
-        });
-
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/syllabus-scraper/function.zip'),
             handler: "syllabus_scraper.handler",
@@ -67,9 +57,7 @@ export class SyllabusScraper extends cdk.Construct {
             description: "Base function for scraping syllabus data from Waseda University.",
             functionName: "syllabus-scraper",
             logRetention: RetentionDays.SIX_MONTHS,
-            logRetentionRole: lambdaBasicRole,
             memorySize: 128,
-            role: lambdaBasicRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
         });
@@ -83,15 +71,6 @@ export class slackWebhookPublisher extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string) {
         super(scope, id);
 
-        const lambdaBasicRole: LazyRole = new LazyRole(this, 'lambda-base-exec-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
-            description: "Lambda basic execution role.",
-            path: `/aws-service-role/${AwsServicePrincipal.LAMBDA}/`,
-            roleName: "lambda-basic-execution",
-            managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
-                "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole")]
-        });
-
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/slack-webhook-publisher/function.zip'),
             handler: "syllabus_scraper.handler",
@@ -99,9 +78,7 @@ export class slackWebhookPublisher extends cdk.Construct {
             description: "Forwards message from SNS to slack webhook.",
             functionName: "slack-webhook-publisher",
             logRetention: RetentionDays.SIX_MONTHS,
-            logRetentionRole: undefined,
             memorySize: 128,
-            role: lambdaBasicRole,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3),
         });
