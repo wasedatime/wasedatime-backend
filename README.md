@@ -1,10 +1,19 @@
-# Welcome to your CDK TypeScript project!
+# WasedaTime Backend
 
-This is a blank project for TypeScript development with CDK.
+![](https://travis-ci.com/wasedatime/wasedatime-backend.svg?branch=develop)
+![](https://img.shields.io/website?up_color=green&up_message=online&url=https%3A%2F%2Fwasedatime.com)
 
+This repository defines the serverless application architecture, resource configuration and infrastructure provision strategy of 
+[wasedatime.com](https://wasedatime.com).
+
+## Architecture
+
+![Application architecture](arch.jpg)
+
+## CDK Usage
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
-## Useful commands
+### Useful commands
 
  * `npm run build`   compile typescript to js
  * `npm run watch`   watch for changes and compile

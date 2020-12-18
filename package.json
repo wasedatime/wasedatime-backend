@@ -2,7 +2,7 @@
   "name": "wasedatime-backend",
   "version": "0.1.0",
   "bin": {
-    "wasedatime-backend": "bin/wasedatime-backend.js"
+    "wasedatime-backend": "bin/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -21,7 +21,31 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-cdk/aws-amplify": "^1.78.0",
+    "@aws-cdk/aws-apigateway": "^1.78.0",
+    "@aws-cdk/aws-apigatewayv2": "^1.78.0",
+    "@aws-cdk/aws-appsync": "^1.78.0",
+    "@aws-cdk/aws-budgets": "^1.78.0",
+    "@aws-cdk/aws-certificatemanager": "^1.78.0",
+    "@aws-cdk/aws-chatbot": "^1.78.0",
+    "@aws-cdk/aws-cloudwatch": "^1.78.0",
+    "@aws-cdk/aws-codebuild": "^1.78.0",
+    "@aws-cdk/aws-cognito": "^1.78.0",
+    "@aws-cdk/aws-dynamodb": "^1.78.0",
+    "@aws-cdk/aws-events": "^1.78.0",
+    "@aws-cdk/aws-events-targets": "^1.78.0",
+    "@aws-cdk/aws-iam": "^1.78.0",
+    "@aws-cdk/aws-lambda": "^1.78.0",
+    "@aws-cdk/aws-lambda-event-sources": "^1.78.0",
+    "@aws-cdk/aws-logs": "^1.78.0",
+    "@aws-cdk/aws-s3": "^1.78.0",
+    "@aws-cdk/aws-sns": "^1.78.0",
+    "@aws-cdk/aws-sns-subscriptions": "^1.78.0",
+    "@aws-cdk/aws-sso": "^1.78.0",
+    "@aws-cdk/aws-stepfunctions": "^1.78.0",
+    "@aws-cdk/aws-stepfunctions-tasks": "^1.78.0",
     "@aws-cdk/core": "1.78.0",
+    "dotenv": "^8.2.0",
     "source-map-support": "^0.5.16"
   }
 }
