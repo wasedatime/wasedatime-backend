@@ -21,8 +21,6 @@ export abstract class AbstractRestApiService extends cdk.Construct {
     protected constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
 
         super(scope, id);
-
-        this.integrations = props.integrations;
     }
 }
 
