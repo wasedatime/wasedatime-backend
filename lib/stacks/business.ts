@@ -5,6 +5,7 @@ import {DataEndpoint, ServiceEndpoint} from "../configs/registry";
 import {ApiEndpoint} from "../configs/api/api-endpoint";
 import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";
+import {WasedaTimeAuthEndpoint} from "../constructs/auth-endpoint";
 
 
 export class WasedaTimeBusinessLayer extends BusinessLayer {
@@ -21,5 +22,7 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
 
         this.serviceInterface.setEndpoint(ServiceEndpoint.MAIN, mainApiEndpoint.getDomain());
+
+        new WasedaTimeAuthEndpoint(this, 'cognito-endpoint', {});
     }
 }
