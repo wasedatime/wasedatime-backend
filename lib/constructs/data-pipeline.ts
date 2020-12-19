@@ -9,6 +9,9 @@ import {Table} from "@aws-cdk/aws-dynamodb";
 import {publicAccess} from "../configs/s3/access-setting";
 import {SyllabusScraper} from "./lambda-functions";
 import {prodCorsRule} from "../configs/s3/cors";
+import {syllabusSchedule} from "../configs/schedule";
+import {Rule} from "@aws-cdk/aws-events";
+import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
 
 export enum Worker {
@@ -41,6 +44,8 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
     readonly processor: StateMachine;
 
     readonly dataWarehouse: Bucket;
+
+    readonly schedules: { [name: string]: Rule };
 
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
@@ -81,6 +86,17 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
                 .next(getLambdaTaskInstance(this, ["G_SPS", "G_IPS", "G_WLS", "G_E", "G_SSS", "G_SC", "G_LAW",
                     "G_SAPS", "G_SA", "G_SJAL", "G_SICCS", "G_SEEE", "EHUM", "ART", "CIE", "G_ITS"], "8"))
         });
+
+        for (const name in syllabusSchedule) {
+            if (syllabusSchedule.hasOwnProperty(name)) {
+                this.schedules[name] = new Rule(this, name, {
+                    ruleName: name,
+                    enabled: true,
+                    schedule: syllabusSchedule[name],
+                    targets: [new SfnStateMachine(this.processor)]
+                });
+            }
+        }
     }
 }
 

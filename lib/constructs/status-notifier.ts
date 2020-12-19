@@ -2,80 +2,36 @@ import * as cdk from '@aws-cdk/core';
 import {Construct} from '@aws-cdk/core';
 import {EventField, IRuleTarget, Rule, RuleTargetInput} from "@aws-cdk/aws-events";
 import {Function} from "@aws-cdk/aws-lambda";
-import {Topic} from "@aws-cdk/aws-sns";
-import {SfnStateMachine, SnsTopic} from "@aws-cdk/aws-events-targets";
-import {StateMachine} from "@aws-cdk/aws-stepfunctions";
+import {ITopic, Topic} from "@aws-cdk/aws-sns";
+import {SnsTopic} from "@aws-cdk/aws-events-targets";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
-import {syllabusSchedule} from "../configs/schedule";
 
 
-export enum TaskManager {
+export enum StatusNotifier {
     BUILD_STATUS,
-    SCRAPER_TASK,
-    SCRAPER_STATUS
+    SCRAPER_STATUS,
+    CFN_STATUS
 }
 
-export interface TaskManagerProps {
+export interface StatusNotifierProps {
 
-    target: string;
+    target?: string;
 }
 
-export abstract class AbstractTaskManager extends Construct {
+export abstract class AbstractStatusNotifier extends Construct {
 
     abstract rules: { [eventName: string]: Rule } = {};
 
     abstract target?: IRuleTarget | string;
 
-    abstract topic: Topic;
+    abstract topic: ITopic;
 
-    protected constructor(scope: cdk.Construct, id: string, props: TaskManagerProps) {
+    protected constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id);
     }
-
-    // abstract addRules(ruleName: string): AbstractEventNotifier;
-    //
-    // abstract setTarget(target: Construct): void;
-    //
-    // abstract addSubscriber(subscriptionType: number, subscriber: any): AbstractEventNotifier;
 }
 
-
-export class SyllabusScraperTaskManger extends AbstractTaskManager {
-
-    readonly rules: { [eventName: string]: Rule } = {};
-
-    readonly topic: Topic;
-
-    readonly target: SfnStateMachine;
-
-    constructor(scope: cdk.Construct, id: string, props: TaskManagerProps) {
-        super(scope, id, props);
-
-        this.topic = new Topic(this, 'status-topic', {
-            topicName: "syllabus-scraper-status"
-        });
-
-        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
-            "arn:aws:lambda:ap-northeast-1:564383102056:function:lambda-publish-notification"
-        );
-        this.topic.addSubscription(new LambdaSubscription(subscriber));
-
-        this.target = new SfnStateMachine(StateMachine.fromStateMachineArn(this, 'sfn-target', props.target));
-
-        for (const name in syllabusSchedule) {
-            if (syllabusSchedule.hasOwnProperty(name)) {
-                this.rules[name] = new Rule(this, name, {
-                    ruleName: name,
-                    enabled: true,
-                    schedule: syllabusSchedule[name],
-                    targets: [this.target]
-                });
-            }
-        }
-    }
-}
-
-export class AmplifyBuildStatusNotifier extends AbstractTaskManager {
+export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
 
     readonly rules: { [eventName: string]: Rule } = {};
 
@@ -83,7 +39,7 @@ export class AmplifyBuildStatusNotifier extends AbstractTaskManager {
 
     readonly topic: Topic;
 
-    constructor(scope: cdk.Construct, id: string, props: TaskManagerProps) {
+    constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
         this.topic = new Topic(this, 'build-status-topic', {
@@ -92,7 +48,7 @@ export class AmplifyBuildStatusNotifier extends AbstractTaskManager {
         const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
             "arn:aws:lambda:ap-northeast-1:564383102056:function:forwardAmplifyNotificationSlack"
         );
-        this.topic.addSubscription(new LambdaSubscription(subscriber))
+        this.topic.addSubscription(new LambdaSubscription(subscriber));
 
         this.rules["on-build"] = new Rule(this, 'build-sentinel', {
             description: "Triggered on Amplify build",
@@ -105,8 +61,8 @@ export class AmplifyBuildStatusNotifier extends AbstractTaskManager {
                     "Amplify Deployment Status Change"
                 ],
                 detail: {
-                    appId: props.target,
-                    jobStatus: [
+                    "appId": [props.target],
+                    "jobStatus": [
                         "SUCCEED",
                         "FAILED",
                         "STARTED"
@@ -132,7 +88,7 @@ export class AmplifyBuildStatusNotifier extends AbstractTaskManager {
     }
 }
 
-export class SyllabusScraperStatusNotifier extends AbstractTaskManager {
+export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
 
     readonly rules: { [eventName: string]: Rule } = {};
 
@@ -140,7 +96,7 @@ export class SyllabusScraperStatusNotifier extends AbstractTaskManager {
 
     readonly topic: Topic;
 
-    constructor(scope: cdk.Construct, id: string, props: TaskManagerProps) {
+    constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
         this.topic = new Topic(this, 'scraper-status-topic', {
@@ -187,5 +143,26 @@ export class SyllabusScraperStatusNotifier extends AbstractTaskManager {
         this.rules["task-status"].addTarget(new SnsTopic(this.topic, {
             message: RuleTargetInput.fromText(taskMessage)
         }));
+    }
+}
+
+export class StackStatusNotifier extends AbstractStatusNotifier {
+
+    readonly rules: { [eventName: string]: Rule } = {};
+
+    readonly target?: string;
+
+    readonly topic: ITopic;
+
+    constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
+        super(scope, id, props);
+
+        this.topic = Topic.fromTopicArn(this, 'stack-status-topic',
+            'arn:aws:sns:ap-northeast-1:564383102056:cfn-alert'
+        );
+
+        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
+            'arn:aws:lambda:ap-northeast-1:564383102056:function:cf-notify-CFNotifyFunction-185B600AO8IES'
+        );
     }
 }
