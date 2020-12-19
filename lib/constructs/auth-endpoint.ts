@@ -34,7 +34,7 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
 
     readonly userPool: UserPool;
 
-    readonly clients: { [name: string]: UserPoolClient };
+    readonly clients: { [name: string]: UserPoolClient } = {};
 
     readonly domain: UserPoolDomain;
 
