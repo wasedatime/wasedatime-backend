@@ -25,7 +25,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")
             ]
         });
 
