@@ -290,21 +290,12 @@ export const syllabusSchema: JsonSchema = {
 };
 export const courseReviewReqSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
-    id: "https://api.wasedatime.com/schemas/course_reviews.json",
     type: JsonSchemaType.OBJECT,
-    title: "CourseReview",
-    description: "HTTP POST request body for fetching reviews for several courses",
     properties: {
         "course_keys": {
-            id: "#/properties/course_keys",
             type: JsonSchemaType.ARRAY,
-            title: "CourseKeys",
-            description: "An array of course keys for which review is to be fetched",
             items: {
-                id: "#/properties/course_keys/items",
-                title: "Items",
-                type: JsonSchemaType.STRING,
-                description: "course key items"
+                type: JsonSchemaType.STRING
             }
         }
     },
