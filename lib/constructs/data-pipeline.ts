@@ -45,7 +45,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
 
     readonly dataWarehouse: Bucket;
 
-    readonly schedules: { [name: string]: Rule };
+    readonly schedules: { [name: string]: Rule } = {};
 
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
