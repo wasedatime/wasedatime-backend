@@ -27,6 +27,6 @@ export class WasedaTimeAdminLayer extends AdminLayer {
             target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
         });
 
-        this.taskManagers[StatusNotifier.CFN_STATUS] = new StackStatusNotifier(this, 'scraper-notifier', {});
+        this.taskManagers[StatusNotifier.CFN_STATUS] = new StackStatusNotifier(this, 'cfn-notifier', {});
     }
 }
