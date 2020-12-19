@@ -51,6 +51,17 @@ export class DynamoDatabase extends cdk.Construct {
             readCapacity: 1,
             writeCapacity: 1
         });
+
+        this.tables[Collection.COURSE_REVIEW] = new Table(this, 'dynamodb-syllabus-table', {
+            partitionKey: {name: "dept", type: AttributeType.STRING},
+            billingMode: BillingMode.PROVISIONED,
+            encryption: TableEncryption.DEFAULT,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            sortKey: {name: "a", type: AttributeType.STRING},
+            tableName: "waseda-syllabus",
+            readCapacity: 5,
+            writeCapacity: 5
+        });
     }
 }
 
