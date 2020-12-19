@@ -301,7 +301,7 @@ export const courseReviewReqSchema: JsonSchema = {
             title: "CourseKeys",
             description: "An array of course keys for which review is to be fetched",
             items: {
-                id: "#/items",
+                id: "#/properties/course_keys/items",
                 title: "Items",
                 type: JsonSchemaType.STRING,
                 description: "course key items"
