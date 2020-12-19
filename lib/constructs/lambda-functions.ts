@@ -16,7 +16,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string) {
         super(scope, id);
 
-        const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
+        const dynamoDBCrudRole: LazyRole = new LazyRole(this, 'dynamo-crud-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to perform crud operation on dynamodb",
             path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
@@ -25,19 +25,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
-            ]
-        });
-
-        const dynamoDBPutRole: LazyRole = new LazyRole(this, 'dynamo-put-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
-            description: "Allow lambda function to perform crud operation on dynamodb",
-            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-            roleName: "lambda-dynamodb-crud",
-            managedPolicies: [
-                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec-1',
-                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
-                ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
                     "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")
             ]
         });
@@ -49,9 +36,9 @@ export class CourseReviewsFunctions extends cdk.Construct {
             description: "Get course reviews from database.",
             functionName: "get-reviews",
             logRetention: RetentionDays.ONE_MONTH,
-            logRetentionRole: dynamoDBReadRole,
+            logRetentionRole: dynamoDBCrudRole,
             memorySize: 128,
-            role: dynamoDBReadRole,
+            role: dynamoDBCrudRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3)
         });
@@ -63,9 +50,9 @@ export class CourseReviewsFunctions extends cdk.Construct {
             description: "Put course reviews into database.",
             functionName: "put-review",
             logRetention: RetentionDays.ONE_MONTH,
-            logRetentionRole: dynamoDBPutRole,
+            logRetentionRole: dynamoDBCrudRole,
             memorySize: 128,
-            role: dynamoDBPutRole,
+            role: dynamoDBCrudRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3)
         });

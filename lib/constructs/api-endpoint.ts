@@ -149,11 +149,12 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             `https://${props.dataSource}/syllabus/{school}.json`,
             {httpMethod: 'GET', proxy: true}
         );
+        const courseReviewsFunctions = new CourseReviewsFunctions(this, 'handler-post');
         const courseReviewsPostIntegration = new LambdaIntegration(
-            new CourseReviewsFunctions(this, 'handler-post').postFunction, {proxy: true}
+            courseReviewsFunctions.postFunction, {proxy: true}
         );
         const courseReviewsPutIntegration = new LambdaIntegration(
-            new CourseReviewsFunctions(this, 'handler-put').putFunction, {proxy: true}
+            courseReviewsFunctions.putFunction, {proxy: true}
         );
         const feedsIntegration = new MockIntegration({
             integrationResponses: [{
