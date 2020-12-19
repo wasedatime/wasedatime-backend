@@ -45,7 +45,7 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
             accountRecovery: AccountRecovery.EMAIL_ONLY,
             autoVerify: {email: true, phone: false},
             emailSettings: {
-                from: "noreply@wasedatime.com"
+                // from: "noreply@wasedatime.com"
             },
             enableSmsRole: false,
             mfa: Mfa.OFF,
