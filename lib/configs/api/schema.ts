@@ -343,8 +343,11 @@ export const courseReviewRespSchema: JsonSchema = {
                                 "course_code": {
                                     type: JsonSchemaType.STRING
                                 },
-                                "timestamp": {
-                                    type: JsonSchemaType.STRING
+                                "updated_at": {
+                                    type: JsonSchemaType.INTEGER
+                                },
+                                "created_at": {
+                                    type: JsonSchemaType.INTEGER
                                 },
                                 "benefit": {
                                     type: JsonSchemaType.INTEGER
@@ -387,7 +390,8 @@ export const courseReviewRespSchema: JsonSchema = {
                                 "title_jp",
                                 "instructor_jp",
                                 "course_code",
-                                "timestamp",
+                                "updated_at",
+                                "created_at",
                                 "benefit",
                                 "difficulty",
                                 "satisfaction",

@@ -87,6 +87,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
 //todo add s3 deployment and notifications
 
 export class CareerDataPipeline extends AbstractDataPipeline {
+
     readonly dataSource?: Bucket;
 
     readonly processor: Function;
