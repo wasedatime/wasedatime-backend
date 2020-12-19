@@ -18,7 +18,13 @@ import {GraphqlApi} from "@aws-cdk/aws-appsync";
 
 import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
 import {WEBAPP_DOMAIN} from "../configs/amplify/website";
-import {articleListSchema, articlePlainJson, courseReviewReqSchema, syllabusSchema} from "../configs/api/schema";
+import {
+    articleListSchema,
+    articlePlainJson,
+    courseReviewReqSchema,
+    courseReviewRespSchema,
+    syllabusSchema
+} from "../configs/api/schema";
 import {CourseReviewsFunctions} from "./lambda-functions";
 
 
@@ -127,7 +133,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             modelName: "ReviewsReq"
         });
         const courseReviewsRespModel = this.apiEndpoint.addModel('course-reviews-resp-model', {
-            schema: courseReviewReqSchema,
+            schema: courseReviewRespSchema,
             contentType: "application/json",
             description: "HTTP POST response body schema for fetching reviews for several courses",
             modelName: "ReviewsResp"
@@ -143,8 +149,11 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             `https://${props.dataSource}/syllabus/{school}.json`,
             {httpMethod: 'GET', proxy: true}
         );
-        const courseReviewsIntegration = new LambdaIntegration(
+        const courseReviewsPostIntegration = new LambdaIntegration(
             new CourseReviewsFunctions(this, 'handler-post').postFunction, {proxy: true}
+        );
+        const courseReviewsPutIntegration = new LambdaIntegration(
+            new CourseReviewsFunctions(this, 'handler-put').putFunction, {proxy: true}
         );
         const feedsIntegration = new MockIntegration({
             integrationResponses: [{
@@ -158,7 +167,10 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             models: {[HttpMethod.GET]: syllabusSchoolModel}
         });
         this.apiServices["course-reviews"] = new CourseReviewsApiService(this, 'course-reviews-api', {
-            integrations: {[HttpMethod.POST]: courseReviewsIntegration},
+            integrations: {
+                [HttpMethod.POST]: courseReviewsPostIntegration,
+                [HttpMethod.PUT]: courseReviewsPutIntegration
+            },
             models: {[HttpMethod.POST]: courseReviewsRespModel}
         });
         this.apiServices["feeds"] = new FeedsApiService(this, 'feeds-api', {

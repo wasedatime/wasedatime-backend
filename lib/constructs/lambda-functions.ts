@@ -11,6 +11,8 @@ export class CourseReviewsFunctions extends cdk.Construct {
 
     readonly postFunction: Function;
 
+    readonly putFunction: Function;
+
     constructor(scope: cdk.Construct, id: string) {
         super(scope, id);
 
@@ -23,13 +25,13 @@ export class CourseReviewsFunctions extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")
             ]
         });
 
         this.postFunction = new Function(this, 'get-reviews', {
             code: Code.fromAsset('src/lambda/get-reviews/function.zip'),
-            handler: "get_reviews.handler",
+            handler: "lambda_function.lambda_handler",
             deadLetterQueueEnabled: false,
             description: "Get course reviews from database.",
             functionName: "get-reviews",
@@ -38,7 +40,21 @@ export class CourseReviewsFunctions extends cdk.Construct {
             memorySize: 128,
             role: dynamoDBCrudRole,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(3),
+            timeout: Duration.seconds(3)
+        });
+
+        this.putFunction = new Function(this, 'put-review', {
+            code: Code.fromAsset('src/lambda/put-review/function.zip'),
+            handler: "lambda_function.lambda_handler",
+            deadLetterQueueEnabled: false,
+            description: "Put course reviews into database.",
+            functionName: "put-review",
+            logRetention: RetentionDays.ONE_MONTH,
+            logRetentionRole: dynamoDBCrudRole,
+            memorySize: 128,
+            role: dynamoDBCrudRole,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3)
         });
     }
 }

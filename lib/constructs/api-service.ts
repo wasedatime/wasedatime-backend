@@ -83,6 +83,14 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 }]
             }
         );
+        this.methods[HttpMethod.PUT] = this.resource.addMethod(HttpMethod.PUT, props.integrations[HttpMethod.PUT],
+            {
+                operationName: "UpdateReview",
+                methodResponses: [{
+                    statusCode: '200',
+                    // responseModels: {["application/json"]: props.models[HttpMethod.PUT]!}
+                }]
+            });
     }
 }
 
