@@ -64,7 +64,7 @@ export class SyllabusScraper extends cdk.Construct {
     }
 }
 
-export class slackWebhookPublisher extends cdk.Construct {
+export class SlackWebhookPublisher extends cdk.Construct {
 
     readonly baseFunction: Function;
 
