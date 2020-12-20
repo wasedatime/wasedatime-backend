@@ -6,7 +6,6 @@ import {
     LambdaIntegration,
     LambdaRestApi,
     MockIntegration,
-    Resource,
     RestApi,
     SpecRestApi,
     Stage
@@ -18,6 +17,7 @@ import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, Syllab
 import {
     articleListSchema,
     articlePlainJson,
+    baseJsonApiSchema,
     courseReviewReqSchema,
     courseReviewRespSchema,
     syllabusSchema
@@ -25,6 +25,7 @@ import {
 import {CourseReviewsFunctions} from "./lambda-functions";
 import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AwsServicePrincipal} from "../configs/aws";
+import {ApiServices} from "../configs/api/service";
 
 
 export interface ApiEndpointProps {
@@ -45,7 +46,7 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
     abstract apiEndpoint: RestApi;
 
-    abstract apiServices: { [path: string]: AbstractRestApiService };
+    abstract apiServices: { [name in ApiServices]?: AbstractRestApiService };
 
     abstract stages: { [name: string]: Stage };
 
@@ -61,17 +62,13 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
         }
         return domainName.domainName;
     }
-
-    getResourcebyPath(path: string): Resource {
-        return this.apiServices[""].resource;
-    }
 }
 
 export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
 
     readonly apiEndpoint: RestApi;
 
-    readonly apiServices: { [path: string]: AbstractRestApiService } = {};
+    readonly apiServices: { [name in ApiServices]?: AbstractRestApiService } = {};
 
     readonly stages: { [name: string]: Stage } = {};
 
@@ -91,13 +88,6 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             }
         });
         this.stages['prod'] = this.apiEndpoint.deploymentStage;
-        this.stages['dev'] = new Stage(this, 'dev-stage', {
-            deployment: this.apiEndpoint.latestDeployment!,
-            throttlingBurstLimit: 10,
-            throttlingRateLimit: 10,
-            stageName: 'dev',
-            description: 'Develop stage'
-        });
 
 
         // const apiDomainCert = new Certificate(this, 'domain-certificate', {
@@ -105,7 +95,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         //     validation: CertificateValidation.fromEmail()
         // });
         // const domain = this.apiEndpoint.addDomainName('domain', {
-        //     certificate: apiDomainCert,
+        //     certificate: Certificate.fromCertificateArn(this, 'api-domain',
+        //         'arn:aws:acm:ap-northeast-1:564383102056:certificate/f5ae3aa1-b20c-40e5-8dfe-4baabb1540fd'),
         //     domainName: "api." + WEBAPP_DOMAIN,
         //     endpointType: EndpointType.REGIONAL,
         //     securityPolicy: SecurityPolicy.TLS_1_2
@@ -137,6 +128,12 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "HTTP POST response body schema for fetching reviews for several courses",
             modelName: "ReviewsResp"
         });
+        const baseJsonApiModel = this.apiEndpoint.addModel('base-json-api-model', {
+            schema: baseJsonApiSchema,
+            contentType: "application/json",
+            description: "Base model for JSON-API specification.",
+            modelName: "BaseJsonAPI"
+        });
         const articleListModel = this.apiEndpoint.addModel('article-list-model', {
             schema: articleListSchema,
             contentType: "application/json",
@@ -157,8 +154,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
                         path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
                         roleName: "api-s3-read",
                         managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
-                            "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")]
-                    })
+                            "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")],
+                    }),
+                    requestParameters: {['integration.request.path.school']: 'method.request.path.school'}
                 }
             }
         );
@@ -176,22 +174,37 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             }]
         });
 
-        this.apiServices["syllabus"] = new SyllabusApiService(this, 'syllabus-api', {
+        this.apiServices[ApiServices.SYLLABUS] = new SyllabusApiService(this, 'syllabus-api', {
             integrations: {[HttpMethod.GET]: syllabusIntegration},
-            models: {[HttpMethod.GET]: syllabusSchoolModel}
+            models: {
+                [HttpMethod.GET]: {
+                    resp: syllabusSchoolModel
+                }
+            }
         });
-        this.apiServices["course-reviews"] = new CourseReviewsApiService(this, 'course-reviews-api', {
+        this.apiServices[ApiServices.COURSE_REVIEW] = new CourseReviewsApiService(this, 'course-reviews-api', {
             integrations: {
                 [HttpMethod.POST]: courseReviewsPostIntegration,
                 [HttpMethod.PUT]: courseReviewsPutIntegration
             },
             models: {
-                [HttpMethod.POST]: courseReviewsRespModel
+                [HttpMethod.POST]: {
+                    req: courseReviewsReqModel,
+                    resp: courseReviewsRespModel
+                },
+                [HttpMethod.PUT]: {
+                    //todo req model
+                    resp: baseJsonApiModel
+                }
             }
         });
-        this.apiServices["feeds"] = new FeedsApiService(this, 'feeds-api', {
+        this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
             integrations: {[HttpMethod.GET]: feedsIntegration},
-            models: {[HttpMethod.GET]: articleListModel}
+            models: {
+                [HttpMethod.GET]: {
+                    resp: articleListModel
+                }
+            }
         });
     }
 }

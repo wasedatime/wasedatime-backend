@@ -157,7 +157,7 @@ export const syllabusSchema: JsonSchema = {
                         "p": {
                             type: JsonSchemaType.INTEGER,
                             title: "Period",
-                            description: "The period on which the course is taught.\nstart_period := -1 others | 0 On-demand | 1 .. 9\n end_period := start_period "
+                            description: "The period on which the course is taught.\nstart_period := -1 others | 0 On-demand | 1 .. 9\nend_period := start_period "
                         },
                         "l": {
                             type: JsonSchemaType.STRING,
@@ -376,6 +376,27 @@ export const courseReviewRespSchema: JsonSchema = {
                     "comments"
                 ]
             }
+        },
+        "message": {
+            type: JsonSchemaType.STRING
+        }
+    },
+    required: [
+        "success",
+        "data",
+        "message"
+    ]
+};
+
+export const baseJsonApiSchema: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT7,
+    type: JsonSchemaType.OBJECT,
+    properties: {
+        "success": {
+            type: JsonSchemaType.BOOLEAN
+        },
+        "data": {
+            type: JsonSchemaType.NULL
         },
         "message": {
             type: JsonSchemaType.STRING

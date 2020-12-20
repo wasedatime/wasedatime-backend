@@ -9,6 +9,8 @@ import {
     UserPoolIdentityProviderGoogle
 } from "@aws-cdk/aws-cognito";
 import {CALLBACK_URLS, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, LOGOUT_URLS} from "../configs/cognito/oauth";
+import {WEBAPP_DOMAIN} from "../configs/amplify/website";
+import {Certificate} from "@aws-cdk/aws-certificatemanager";
 
 
 export interface AuthEndpointProps {
@@ -96,20 +98,13 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
             preventUserExistenceErrors: true
         });
 
-        // todo create in us-east-1
         // todo add custom ses in us-east-1
-        // const authDomainCert = new Certificate(this, 'domain-certificate', {
-        //     domainName: "auth." + WEBAPP_DOMAIN,
-        //     validation: CertificateValidation.fromEmail()
-        // });
         this.domain = this.userPool.addDomain('auth-domain', {
-            cognitoDomain: {
-                domainPrefix: 'wasedatime'
+            customDomain: {
+                domainName: "auth." + WEBAPP_DOMAIN,
+                certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert',
+                    'arn:aws:acm:us-east-1:564383102056:certificate/7e29831d-9eb9-4212-9856-4f5fd0d3cafe')
             }
-            // customDomain: {
-            //     domainName: "auth." + WEBAPP_DOMAIN,
-            //     certificate: authDomainCert
-            // }
         });
     }
 }

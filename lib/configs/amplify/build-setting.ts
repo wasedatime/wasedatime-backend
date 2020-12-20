@@ -1,10 +1,6 @@
 import {BuildSpec} from "@aws-cdk/aws-codebuild/lib/build-spec";
 
 
-export const webappEnv: { [key: string]: string; } = {
-    "REACT_APP_API_BASE_URL": "https://api.wasedatime.com/v1",
-    "NODE_OPTIONS": "--max-old-space-size=8192"
-};
 export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
     "version": 1,
     "frontend": {
