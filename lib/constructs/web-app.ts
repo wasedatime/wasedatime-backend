@@ -5,15 +5,15 @@ import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {AwsServicePrincipal} from "../configs/aws";
 import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../configs/amplify/website";
-import {webappBuildSpec, webappEnv} from "../configs/amplify/build-setting";
+import {webappBuildSpec} from "../configs/amplify/build-setting";
 import {webAppCode} from "../configs/amplify/codebase";
 
 
 export interface WebAppProps {
 
-    apiDomain?: string;
+    apiDomain: string;
 
-    authDomain?: string;
+    authDomain: string;
 }
 
 export abstract class AbstractWebApp extends cdk.Construct {
@@ -56,10 +56,13 @@ export class AmplifyWebApp extends AbstractWebApp {
             buildSpec: webappBuildSpec,
             customRules: webappSiteRules,
             description: "A web app aiming to provide better campus life at Waseda University.",
-            environmentVariables: webappEnv,
+            environmentVariables: {
+                "REACT_APP_API_BASE_URL": props.apiDomain,
+                "REACT_APP_OAUTH_URL": props.authDomain,
+                "NODE_OPTIONS": "--max-old-space-size=8192"
+            },
             role: amplifyServiceRole,
-            sourceCodeProvider: webAppCode,
-
+            sourceCodeProvider: webAppCode
         });
 
         const mainBranch: Branch = this.app.addBranch('main', {

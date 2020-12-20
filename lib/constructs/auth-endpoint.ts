@@ -2,14 +2,15 @@ import * as cdk from '@aws-cdk/core';
 import {
     AccountRecovery,
     Mfa,
+    ProviderAttribute,
     UserPool,
     UserPoolClient,
-    UserPoolClientIdentityProvider,
-    UserPoolDomain
+    UserPoolDomain,
+    UserPoolIdentityProviderGoogle
 } from "@aws-cdk/aws-cognito";
-import {CALLBACK_URLS, LOGOUT_URLS} from "../configs/cognito/oauth";
-import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
+import {CALLBACK_URLS, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, LOGOUT_URLS} from "../configs/cognito/oauth";
 import {WEBAPP_DOMAIN} from "../configs/amplify/website";
+import {Certificate} from "@aws-cdk/aws-certificatemanager";
 
 
 export interface AuthEndpointProps {
@@ -66,22 +67,22 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
             standardAttributes: {
                 email: {
                     required: true
-                },
-                preferredUsername: {
-                    mutable: true,
-                    required: true
-                },
-                profilePicture: {
-                    mutable: true,
-                    required: true
-                },
-                profilePage: {
-                    mutable: true,
-                    required: true
-                },
+                }
             },
             userPoolName: 'wasedatime-users'
         });
+
+        this.userPool.registerIdentityProvider(new UserPoolIdentityProviderGoogle(this, 'google-idp', {
+            clientId: GOOGLE_OAUTH_CLIENT_ID,
+            clientSecret: GOOGLE_OAUTH_CLIENT_SECRET,
+            userPool: this.userPool,
+            attributeMapping: {
+                email: ProviderAttribute.GOOGLE_EMAIL,
+                preferredUsername: ProviderAttribute.GOOGLE_NAME,
+                profilePicture: ProviderAttribute.GOOGLE_PICTURE
+            },
+            scopes: ['email', 'openid', 'profile']
+        }))
 
         this.clients['web-app'] = this.userPool.addClient('web-app-client', {
             userPoolClientName: "web-app",
@@ -94,18 +95,15 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
                 callbackUrls: CALLBACK_URLS,
                 logoutUrls: LOGOUT_URLS
             },
-            preventUserExistenceErrors: true,
-            supportedIdentityProviders: [UserPoolClientIdentityProvider.GOOGLE],
+            preventUserExistenceErrors: true
         });
 
-        const authDomainCert = new Certificate(this, 'domain-certificate', {
-            domainName: "auth." + WEBAPP_DOMAIN,
-            validation: CertificateValidation.fromEmail()
-        });
+        // todo add custom ses in us-east-1
         this.domain = this.userPool.addDomain('auth-domain', {
             customDomain: {
                 domainName: "auth." + WEBAPP_DOMAIN,
-                certificate: authDomainCert
+                certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert',
+                    'arn:aws:acm:us-east-1:564383102056:certificate/7e29831d-9eb9-4212-9856-4f5fd0d3cafe')
             }
         });
     }

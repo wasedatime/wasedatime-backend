@@ -10,6 +10,13 @@ export const awsEnv: StackProps = {
     }
 };
 
+export const cognitoEnv: StackProps = {
+    env: {
+        account: process.env.AWS_ACCOUNT_ID,
+        region: process.env.COGNITO_AFFILIATE_REGION
+    }
+}
+
 export enum AwsServicePrincipal {
 
     ACM = "acm.amazonaws.com",

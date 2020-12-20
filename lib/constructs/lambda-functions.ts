@@ -49,7 +49,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
             description: "Get course reviews from database.",
             functionName: "get-reviews",
             logRetention: RetentionDays.ONE_MONTH,
-            logRetentionRole: dynamoDBReadRole,
             memorySize: 128,
             role: dynamoDBReadRole,
             runtime: Runtime.PYTHON_3_8,
@@ -63,7 +62,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
             description: "Put course reviews into database.",
             functionName: "put-review",
             logRetention: RetentionDays.ONE_MONTH,
-            logRetentionRole: dynamoDBPutRole,
             memorySize: 128,
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
@@ -89,7 +87,9 @@ export class SyllabusScraper extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-        });
+        })
+            .addEnvironment('BUCKET_NAME', 'wasedatime-syllabus-prod')
+            .addEnvironment('OBJECT_PATH', 'syllabus/');
     }
 }
 

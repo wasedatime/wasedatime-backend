@@ -9,12 +9,12 @@ export interface ApiServiceProps {
 
     integrations: { [method in HttpMethod]?: Integration };
 
-    models: { [method in HttpMethod]?: IModel };
+    models: { [method in HttpMethod]?: { req?: IModel, resp?: IModel } };
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
 
-    abstract resource: Resource;
+    abstract resources: { [path: string]: Resource };
 
     abstract methods: { [method in HttpMethod]?: Method };
 
@@ -26,30 +26,33 @@ export abstract class AbstractRestApiService extends cdk.Construct {
 
 export class SyllabusApiService extends AbstractRestApiService {
 
-    readonly resource: Resource;
+    readonly resources: { [path: string]: Resource } = {};
 
     readonly methods: { [method in HttpMethod]?: Method } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
-        this.resource = new Resource(scope, 'syllabus', {
+        const root = new Resource(scope, 'syllabus', {
             parent: scope.apiEndpoint.root,
             pathPart: "syllabus"
         });
-        const syllabusSchools: Resource = this.resource.addResource("{school}");
+        this.resources["/syllabus"] = root;
+        const syllabusSchools: Resource = root.addResource("{school}");
+        this.resources["/{school}"] = syllabusSchools;
 
-        this.methods[HttpMethod.OPTIONS] = syllabusSchools.addCorsPreflight({
+        this.methods.OPTIONS = syllabusSchools.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
         });
-        this.methods[HttpMethod.GET] = syllabusSchools.addMethod(HttpMethod.GET, props.integrations[HttpMethod.GET], {
+        this.methods.GET = syllabusSchools.addMethod(HttpMethod.GET, props.integrations.GET, {
             apiKeyRequired: false,
+            requestParameters: {['method.request.path.school']: true},
             operationName: "GetSyllabusBySchool",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: props.models[HttpMethod.GET]!}
+                responseModels: {["application/json"]: props.models.GET!.resp!}
             }]
         });
     }
@@ -57,38 +60,40 @@ export class SyllabusApiService extends AbstractRestApiService {
 
 export class CourseReviewsApiService extends AbstractRestApiService {
 
-    readonly resource: Resource;
+    readonly resources: { [path: string]: Resource } = {};
 
     readonly methods: { [method in HttpMethod]?: Method } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
-        this.resource = new Resource(this, 'course-reviews', {
+        const root = new Resource(this, 'course-reviews', {
             parent: scope.apiEndpoint.root,
             pathPart: "course-reviews"
         });
+        this.resources["/course-reviews"] = root;
 
-        this.methods[HttpMethod.OPTIONS] = this.resource.addCorsPreflight({
+        this.methods.OPTIONS = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
         });
-        this.methods[HttpMethod.POST] = this.resource.addMethod(HttpMethod.POST, props.integrations[HttpMethod.POST],
+        this.methods.POST = root.addMethod(HttpMethod.POST, props.integrations.POST,
             {
                 operationName: "BatchGetReviews",
+                requestModels: {["application/json"]: props.models.POST!.req!},
                 methodResponses: [{
                     statusCode: '200',
-                    responseModels: {["application/json"]: props.models[HttpMethod.POST]!}
+                    responseModels: {["application/json"]: props.models.POST!.resp!}
                 }]
             }
         );
-        this.methods[HttpMethod.PUT] = this.resource.addMethod(HttpMethod.PUT, props.integrations[HttpMethod.PUT],
+        this.methods.PUT = root.addMethod(HttpMethod.PUT, props.integrations.PUT,
             {
                 operationName: "UpdateReview",
                 methodResponses: [{
                     statusCode: '200',
-                    // responseModels: {["application/json"]: props.models[HttpMethod.PUT]!}
+                    responseModels: {["application/json"]: props.models.PUT!.resp!}
                 }]
             });
     }
@@ -96,29 +101,34 @@ export class CourseReviewsApiService extends AbstractRestApiService {
 
 export class FeedsApiService extends AbstractRestApiService {
 
-    readonly resource: Resource;
+    readonly resources: { [path: string]: Resource } = {};
 
     readonly methods: { [method in HttpMethod]?: Method } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
-        this.resource = new Resource(scope, 'feeds', {
+        const root = new Resource(scope, 'feeds', {
             parent: scope.apiEndpoint.root,
             pathPart: "feeds"
         });
+        this.resources["/feeds"] = root;
 
-        this.methods[HttpMethod.OPTIONS] = this.resource.addCorsPreflight({
+        this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
         });
-        this.methods[HttpMethod.GET] = this.resource.addMethod(HttpMethod.GET, props.integrations[HttpMethod.GET], {
+        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, props.integrations.GET, {
             apiKeyRequired: false,
+            requestParameters: {
+                'method.request.querystring.offset': true,
+                'method.request.querystring.limit': true
+            },
             operationName: "ListArticles",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: props.models[HttpMethod.GET]!}
+                responseModels: {["application/json"]: props.models.GET!.resp!}
             }]
         });
     }

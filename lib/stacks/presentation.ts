@@ -14,7 +14,8 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         super(scope, id, serviceInterface, props);
 
         const amplifyApp = new AmplifyWebApp(this, 'amplify-web-app', {
-            apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.MAIN)
+            apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_MAIN),
+            authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH)
         });
 
         this.app = amplifyApp;

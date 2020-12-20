@@ -51,15 +51,16 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         super(scope, id);
 
         this.dataWarehouse = new Bucket(this, 'syllabus-bucket', {
-            accessControl: BucketAccessControl.PUBLIC_READ,
+            accessControl: BucketAccessControl.PRIVATE,
             blockPublicAccess: publicAccess,
             bucketName: "wasedatime-syllabus-prod",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: true,
+            publicReadAccess: false,
             removalPolicy: RemovalPolicy.DESTROY,
             versioned: true
         });
+
 
         const scraperBaseFunction: Function =
             new SyllabusScraper(this, 'scraper-base-function').baseFunction;
@@ -115,7 +116,7 @@ export class CareerDataPipeline extends AbstractDataPipeline {
 
         this.dataSource = new Bucket(this, 'career-bucket', {
             accessControl: BucketAccessControl.PRIVATE,
-            bucketName: "wasedatime-career-prod",
+            bucketName: "wasedatime-career",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: true,
