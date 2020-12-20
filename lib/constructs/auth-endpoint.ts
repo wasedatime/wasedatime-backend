@@ -2,14 +2,13 @@ import * as cdk from '@aws-cdk/core';
 import {
     AccountRecovery,
     Mfa,
+    ProviderAttribute,
     UserPool,
     UserPoolClient,
-    UserPoolClientIdentityProvider,
-    UserPoolDomain
+    UserPoolDomain,
+    UserPoolIdentityProviderGoogle
 } from "@aws-cdk/aws-cognito";
-import {CALLBACK_URLS, LOGOUT_URLS} from "../configs/cognito/oauth";
-import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
-import {WEBAPP_DOMAIN} from "../configs/amplify/website";
+import {CALLBACK_URLS, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, LOGOUT_URLS} from "../configs/cognito/oauth";
 
 
 export interface AuthEndpointProps {
@@ -83,6 +82,21 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
             userPoolName: 'wasedatime-users'
         });
 
+        this.userPool.registerIdentityProvider(new UserPoolIdentityProviderGoogle(this, 'google-idp', {
+            clientId: GOOGLE_OAUTH_CLIENT_ID,
+            clientSecret: GOOGLE_OAUTH_CLIENT_SECRET,
+            userPool: this.userPool,
+            attributeMapping: {
+                email: ProviderAttribute.GOOGLE_EMAIL,
+                preferredUsername: ProviderAttribute.GOOGLE_NAME,
+                profilePicture: ProviderAttribute.GOOGLE_PICTURE,
+                custom: {
+                    "email_verified": ProviderAttribute.other("email_verified")
+                }
+            },
+            scopes: ['email', 'openid']
+        }))
+
         this.clients['web-app'] = this.userPool.addClient('web-app-client', {
             userPoolClientName: "web-app",
             authFlows: {
@@ -94,19 +108,23 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
                 callbackUrls: CALLBACK_URLS,
                 logoutUrls: LOGOUT_URLS
             },
-            preventUserExistenceErrors: true,
-            supportedIdentityProviders: [UserPoolClientIdentityProvider.GOOGLE],
+            preventUserExistenceErrors: true
         });
 
-        const authDomainCert = new Certificate(this, 'domain-certificate', {
-            domainName: "auth." + WEBAPP_DOMAIN,
-            validation: CertificateValidation.fromEmail()
-        });
+        // todo create in us-east-1
+        // todo add custom ses in us-east-1
+        // const authDomainCert = new Certificate(this, 'domain-certificate', {
+        //     domainName: "auth." + WEBAPP_DOMAIN,
+        //     validation: CertificateValidation.fromEmail()
+        // });
         this.domain = this.userPool.addDomain('auth-domain', {
-            customDomain: {
-                domainName: "auth." + WEBAPP_DOMAIN,
-                certificate: authDomainCert
+            cognitoDomain: {
+                domainPrefix: 'wasedatime'
             }
+            // customDomain: {
+            //     domainName: "auth." + WEBAPP_DOMAIN,
+            //     certificate: authDomainCert
+            // }
         });
     }
 }

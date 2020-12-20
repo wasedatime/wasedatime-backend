@@ -3,12 +3,10 @@ import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigat
 
 export const syllabusSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
-    id: "https://api.wasedatime.com/schemas/syllabus.json",
     type: JsonSchemaType.ARRAY,
     title: "Syllabus",
     description: "The new syllabus JSON schema for each school.",
     items: {
-        id: "#/items",
         type: JsonSchemaType.OBJECT,
         title: "Items",
         description: "The schema of each course in the array.",
@@ -33,42 +31,35 @@ export const syllabusSchema: JsonSchema = {
         ],
         properties: {
             "a": {
-                id: "#/items/properties/a",
                 type: JsonSchemaType.STRING,
                 title: "Course Key",
                 description: "Course key of the course."
             },
             "b": {
-                id: "#/items/properties/b",
                 type: JsonSchemaType.STRING,
                 title: "Title",
                 description: "Course title in English."
             },
             "c": {
-                id: "#/items/properties/c",
                 type: JsonSchemaType.STRING,
                 title: "Title JP",
                 description: "Course title in Japanese."
             },
             "d": {
-                id: "#/items/properties/d",
                 type: JsonSchemaType.STRING,
                 title: "Instructor",
                 description: "Instructor's name in English."
             },
             "e": {
-                id: "#/items/properties/e",
                 type: JsonSchemaType.STRING,
                 title: "Instructor JP",
                 description: "Instructor's name in Japanese."
             },
             "f": {
-                id: "#/items/properties/f",
                 type: JsonSchemaType.ARRAY,
                 title: "Langauges",
                 description: "Languages in which the course is taught.",
                 items: {
-                    id: "#/items/properties/f/items",
                     type: JsonSchemaType.INTEGER,
                     title: "Language",
                     description: "-1 N/A | 0 Japanese | 1 English | 2 German | 3 French | 4 Chinese | 5 Spanish | 6 Korean | 7 Russia | 8 Italian | 9 other",
@@ -88,7 +79,6 @@ export const syllabusSchema: JsonSchema = {
                 }
             },
             "g": {
-                id: "#/items/properties/g",
                 type: JsonSchemaType.INTEGER,
                 title: "Type",
                 description: "Type of the course\n-1 N/A | 0 Lecture | 1 Seminar | 2 Work | 3 Foreign Langauge | 4 On-demand | 5 Thesis | 6 Graduate Research | 7 Practice | 8 Blended",
@@ -106,7 +96,6 @@ export const syllabusSchema: JsonSchema = {
                 ]
             },
             "h": {
-                id: "#/items/properties/h",
                 type: JsonSchemaType.STRING,
                 title: "Term",
                 description: "The term in which the course is taught.\nseason := 0 Spring | 1 Summer | 2 Fall | 3 Winter\nperiod := 's' Semester| 'q' Quarter | 'i' Intensive Course | 'f' Full Year | 't' Term\ndelimiter := '/' or | '&' and",
@@ -137,12 +126,10 @@ export const syllabusSchema: JsonSchema = {
                 ]
             },
             "i": {
-                id: "#/items/properties/i",
                 type: JsonSchemaType.ARRAY,
                 title: "Occurrences",
                 description: "The schedules and locations of the course.",
                 items: {
-                    id: "#/items/properties/i/items",
                     type: JsonSchemaType.OBJECT,
                     title: "Occurrence",
                     description: "Schedule and location",
@@ -153,7 +140,6 @@ export const syllabusSchema: JsonSchema = {
                     ],
                     properties: {
                         "d": {
-                            id: "#/items/properties/i/items/properties/d",
                             type: JsonSchemaType.INTEGER,
                             title: "Day",
                             description: "The day on which the course is taught.\n-1 others | 0 Mon | 1 Tues | 2 Wed | 3 Thur | 4 Fri | 5 Sat | 6 Sun",
@@ -169,13 +155,11 @@ export const syllabusSchema: JsonSchema = {
                             ]
                         },
                         "p": {
-                            id: "#/items/properties/i/items/properties/p",
                             type: JsonSchemaType.INTEGER,
                             title: "Period",
                             description: "The period on which the course is taught.\nstart_period := -1 others | 0 On-demand | 1 .. 9\n end_period := start_period "
                         },
                         "l": {
-                            id: "#/items/properties/i/items/properties/l",
                             type: JsonSchemaType.STRING,
                             title: "Loction",
                             description: "The location where the course takes place."
@@ -184,7 +168,6 @@ export const syllabusSchema: JsonSchema = {
                 }
             },
             "j": {
-                id: "#/items/properties/j",
                 type: JsonSchemaType.INTEGER,
                 title: "Minimum Eligible Year",
                 description: "Minimum eligible year.\n-1 unknown | 1 .. 4",
@@ -197,19 +180,16 @@ export const syllabusSchema: JsonSchema = {
                 ]
             },
             "k": {
-                id: "#/items/properties/k",
                 type: JsonSchemaType.STRING,
                 title: "Category",
                 description: "The category the course falls in."
             },
             "l": {
-                id: "#/items/properties/l",
                 type: JsonSchemaType.INTEGER,
                 title: "Credit",
                 description: "The credit of the course.\n -1 unknown | 0 .."
             },
             "m": {
-                id: "#/items/properties/m",
                 type: JsonSchemaType.INTEGER,
                 title: "Level",
                 description: "The level/difficulty of the course.\n-1 N/A | 0 Beginner | 1 Intermediate | 2 Advanced | 3 Final-stage | 4 Master | 5 Doctor",
@@ -224,12 +204,10 @@ export const syllabusSchema: JsonSchema = {
                 ]
             },
             "n": {
-                id: "#/items/properties/n",
                 type: JsonSchemaType.ARRAY,
                 title: "Evaluations",
                 description: "The distribution of evaluation criterion and their descriptions",
                 items: {
-                    id: "#/items/properties/n/items",
                     type: JsonSchemaType.OBJECT,
                     title: "Evaluation",
                     description: "Criteria and description",
@@ -240,7 +218,6 @@ export const syllabusSchema: JsonSchema = {
                     ],
                     properties: {
                         "t": {
-                            id: "#/items/properties/n/items/properties/t",
                             type: JsonSchemaType.INTEGER,
                             title: "Type",
                             description: "Type of the evaluation\n-1 Unknown | 0 Exam | 1 Papers | 2 Class Participation | 3 Others",
@@ -253,13 +230,11 @@ export const syllabusSchema: JsonSchema = {
                             ]
                         },
                         "p": {
-                            id: "#/items/properties/n/items/properties/p",
                             type: JsonSchemaType.INTEGER,
                             title: "Percentage",
                             description: "The percentage of this criteria in evaluation."
                         },
                         "c": {
-                            id: "#/items/properties/n/items/properties/c",
                             type: JsonSchemaType.STRING,
                             title: "Comment",
                             description: "An explanation about the criteria."
@@ -268,19 +243,16 @@ export const syllabusSchema: JsonSchema = {
                 }
             },
             "o": {
-                id: "#/items/properties/o",
                 type: JsonSchemaType.STRING,
                 title: "Code",
                 description: "Course code"
             },
             "p": {
-                id: "#/items/properties/p",
                 type: JsonSchemaType.STRING,
                 title: "Subtitle",
                 description: "Subtitle of the course (often seen in seminar courses)"
             },
             "q": {
-                id: "#/items/properties/q",
                 type: JsonSchemaType.STRING,
                 title: "CategoryJP",
                 description: "The category the course falls in.(in Japanese)"

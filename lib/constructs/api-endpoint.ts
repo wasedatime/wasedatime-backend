@@ -1,23 +1,20 @@
 import * as cdk from "@aws-cdk/core";
 import {
+    AwsIntegration,
     DomainName,
     EndpointType,
-    HttpIntegration,
     LambdaIntegration,
     LambdaRestApi,
     MockIntegration,
     Resource,
     RestApi,
-    SecurityPolicy,
     SpecRestApi,
     Stage
 } from "@aws-cdk/aws-apigateway";
-import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
 import {HttpApi, HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
 
 import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
-import {WEBAPP_DOMAIN} from "../configs/amplify/website";
 import {
     articleListSchema,
     articlePlainJson,
@@ -101,24 +98,24 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         });
 
 
-        const apiDomainCert = new Certificate(this, 'domain-certificate', {
-            domainName: "rest-api." + WEBAPP_DOMAIN,
-            validation: CertificateValidation.fromEmail()
-        });
-        const domain = this.apiEndpoint.addDomainName('domain', {
-            certificate: apiDomainCert,
-            domainName: "api." + WEBAPP_DOMAIN,
-            endpointType: EndpointType.REGIONAL,
-            securityPolicy: SecurityPolicy.TLS_1_2
-        });
-        domain.addBasePathMapping(this.apiEndpoint, {
-            basePath: 'v1',
-            stage: this.stages['prod']
-        });
-        domain.addBasePathMapping(this.apiEndpoint, {
-            basePath: 'staging',
-            stage: this.stages['dev']
-        });
+        // const apiDomainCert = new Certificate(this, 'domain-certificate', {
+        //     domainName: "api." + WEBAPP_DOMAIN,
+        //     validation: CertificateValidation.fromEmail()
+        // });
+        // const domain = this.apiEndpoint.addDomainName('domain', {
+        //     certificate: apiDomainCert,
+        //     domainName: "api." + WEBAPP_DOMAIN,
+        //     endpointType: EndpointType.REGIONAL,
+        //     securityPolicy: SecurityPolicy.TLS_1_2
+        // });
+        // domain.addBasePathMapping(this.apiEndpoint, {
+        //     basePath: 'v1',
+        //     stage: this.stages['prod']
+        // });
+        // domain.addBasePathMapping(this.apiEndpoint, {
+        //     basePath: 'staging',
+        //     stage: this.stages['dev']
+        // });
 
         const syllabusSchoolModel = this.apiEndpoint.addModel('syllabus-model', {
             schema: syllabusSchema,
@@ -145,9 +142,13 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             modelName: "ArticleList"
         });
 
-        const syllabusIntegration = new HttpIntegration(
-            `https://${props.dataSource}/syllabus/{school}.json`,
-            {httpMethod: 'GET', proxy: true}
+        const syllabusIntegration = new AwsIntegration(
+            {
+                service: 's3',
+                integrationHttpMethod: HttpMethod.GET,
+                path: "syllabus/{school}.json",
+                subdomain: props.dataSource
+            }
         );
         const courseReviewsFunctions = new CourseReviewsFunctions(this, 'handler-post');
         const courseReviewsPostIntegration = new LambdaIntegration(
@@ -172,7 +173,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
                 [HttpMethod.POST]: courseReviewsPostIntegration,
                 [HttpMethod.PUT]: courseReviewsPutIntegration
             },
-            models: {[HttpMethod.POST]: courseReviewsRespModel}
+            models: {
+                [HttpMethod.POST]: courseReviewsRespModel
+            }
         });
         this.apiServices["feeds"] = new FeedsApiService(this, 'feeds-api', {
             integrations: {[HttpMethod.GET]: feedsIntegration},
