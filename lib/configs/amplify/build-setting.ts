@@ -7,12 +7,6 @@ export const webappEnv: { [key: string]: string; } = {
 };
 export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
     "version": 1,
-    "backend": {
-        "phases": {
-            "build": "if [ \"${AWS_BRANCH}\" = \"master\" ] || [ \"${AWS_BRANCH}\" = \"develop\" ]; " +
-                "then amplifyPush --simple; fi"
-        }
-    },
     "frontend": {
         "phases": {
             "preBuild": {

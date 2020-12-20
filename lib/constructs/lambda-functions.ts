@@ -88,7 +88,7 @@ export class SyllabusScraper extends cdk.Construct {
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
         })
-            .addEnvironment('BUCKET_NAME', 'wasedatime-syllabus-dev')
+            .addEnvironment('BUCKET_NAME', 'wasedatime-syllabus-prod')
             .addEnvironment('OBJECT_PATH', 'syllabus/');
     }
 }

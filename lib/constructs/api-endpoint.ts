@@ -23,6 +23,8 @@ import {
     syllabusSchema
 } from "../configs/api/schema";
 import {CourseReviewsFunctions} from "./lambda-functions";
+import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {AwsServicePrincipal} from "../configs/aws";
 
 
 export interface ApiEndpointProps {
@@ -147,7 +149,17 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
                 service: 's3',
                 integrationHttpMethod: HttpMethod.GET,
                 path: "syllabus/{school}.json",
-                subdomain: props.dataSource
+                subdomain: props.dataSource,
+                options: {
+                    credentialsRole: new Role(this, 'rest-api-s3', {
+                        assumedBy: new ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
+                        description: "Allow API Gateway to fetch objects from s3 buckets.",
+                        path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
+                        roleName: "api-s3-read",
+                        managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
+                            "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")]
+                    })
+                }
             }
         );
         const courseReviewsFunctions = new CourseReviewsFunctions(this, 'handler-post');

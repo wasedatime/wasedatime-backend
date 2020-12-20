@@ -65,19 +65,7 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
             standardAttributes: {
                 email: {
                     required: true
-                },
-                preferredUsername: {
-                    mutable: true,
-                    required: true
-                },
-                profilePicture: {
-                    mutable: true,
-                    required: true
-                },
-                profilePage: {
-                    mutable: true,
-                    required: true
-                },
+                }
             },
             userPoolName: 'wasedatime-users'
         });
@@ -89,12 +77,9 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
             attributeMapping: {
                 email: ProviderAttribute.GOOGLE_EMAIL,
                 preferredUsername: ProviderAttribute.GOOGLE_NAME,
-                profilePicture: ProviderAttribute.GOOGLE_PICTURE,
-                custom: {
-                    "email_verified": ProviderAttribute.other("email_verified")
-                }
+                profilePicture: ProviderAttribute.GOOGLE_PICTURE
             },
-            scopes: ['email', 'openid']
+            scopes: ['email', 'openid', 'profile']
         }))
 
         this.clients['web-app'] = this.userPool.addClient('web-app-client', {
