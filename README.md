@@ -13,7 +13,7 @@ We adopted a simple serverless application architecture, consisted of four layer
 
 ### Presentation Layer
 
-![Presentation Layer](doc/pre.png)
+<img src="doc/pre.png" alt="Presentation Layer" width=30%/>
 
 ### Business Layer
 
@@ -21,11 +21,11 @@ We adopted a simple serverless application architecture, consisted of four layer
 
 ### Persistence Layer
 
-![Persistence Layer](doc/pers.png)
+<img src="doc/pers.png" alt="Persistence Layer" width=57%/>
 
 ### Admin Layer
 
-![Admin Layer](doc/admin.png)
+<img src="doc/admin.png" alt="Admin Layer" width=40%/>
 
 ## CDK Usage
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
