@@ -4,6 +4,5 @@ def handler(event, context):
 
     if domain[-9:] == "waseda.jp":
         event["response"]["autoConfirmUser"] = True
-    event["response"]["autoConfirmUser"] = False
-
-    return event
+        return event
+    raise Exception("Invalid sign-up request: identity check failed.")

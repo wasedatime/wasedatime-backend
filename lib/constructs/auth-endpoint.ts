@@ -11,6 +11,7 @@ import {
 import {CALLBACK_URLS, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, LOGOUT_URLS} from "../configs/cognito/oauth";
 import {WEBAPP_DOMAIN} from "../configs/amplify/website";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
+import {PreSignupWasedaMailValidator} from "./lambda-functions";
 
 
 export interface AuthEndpointProps {
@@ -69,7 +70,10 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
                     required: true
                 }
             },
-            userPoolName: 'wasedatime-users'
+            userPoolName: 'wasedatime-users',
+            lambdaTriggers: {
+                preSignUp: new PreSignupWasedaMailValidator(this, 'presign-up-handle').baseFunction
+            }
         });
 
         this.userPool.registerIdentityProvider(new UserPoolIdentityProviderGoogle(this, 'google-idp', {

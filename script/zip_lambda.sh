@@ -16,6 +16,14 @@ cd src/get-reviews || exit 1
 zip -r9 ./function.zip .
 cd "$TRAVIS_BUILD_DIR" || exit 1
 
+cd src/put-reviews || exit 1
+zip -r9 ./function.zip .
+cd "$TRAVIS_BUILD_DIR" || exit 1
+
 cd src/slack-webhook-publisher || exit 1
+zip -r9 ./function.zip .
+cd "$TRAVIS_BUILD_DIR" || exit 1
+
+cd src/signup-validator || exit 1
 zip -r9 ./function.zip .
 cd "$TRAVIS_BUILD_DIR" || exit 1
