@@ -1,6 +1,8 @@
 export enum ApiEndpoint {
 
-    MAIN
+    MAIN,
+
+    AUTH
 }
 
 export enum ApiServices {

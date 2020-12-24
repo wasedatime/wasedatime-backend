@@ -1,15 +1,26 @@
 import * as cdk from "@aws-cdk/core";
-import {IModel, Integration, Method, Resource} from "@aws-cdk/aws-apigateway";
+import {AwsIntegration, LambdaIntegration, Method, MockIntegration, Resource, RestApi} from "@aws-cdk/aws-apigateway";
 import {HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {AbstractRestApiEndpoint} from "./api-endpoint";
 import {allowHeaders, allowOrigins} from "../configs/api/cors";
+import {
+    articleListSchema,
+    articlePlainJson,
+    courseReviewPutReqSchema,
+    courseReviewReqSchema,
+    courseReviewRespSchema,
+    syllabusSchema
+} from "../configs/api/schema";
+import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {AwsServicePrincipal} from "../configs/aws";
+import {CourseReviewsFunctions} from "./lambda-functions";
 
 
 export interface ApiServiceProps {
 
-    integrations: { [method in HttpMethod]?: Integration };
+    apiEndpoint: RestApi
 
-    models: { [method in HttpMethod]?: { req?: IModel, resp?: IModel } };
+    dataSource?: string
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
@@ -41,18 +52,49 @@ export class SyllabusApiService extends AbstractRestApiService {
         const syllabusSchools: Resource = root.addResource("{school}");
         this.resources["/{school}"] = syllabusSchools;
 
+        const getRespModel = props.apiEndpoint.addModel('syllabus-get-resp-model', {
+            schema: syllabusSchema,
+            contentType: "application/json",
+            description: "The new syllabus JSON schema for each school.",
+            modelName: "GetSyllabusResp"
+        });
+
+        const getIntegration = new AwsIntegration(
+            {
+                service: 's3',
+                integrationHttpMethod: HttpMethod.GET,
+                path: "syllabus/{school}.json",
+                subdomain: props.dataSource,
+                options: {
+                    credentialsRole: new Role(this, 'rest-api-s3', {
+                        assumedBy: new ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
+                        description: "Allow API Gateway to fetch objects from s3 buckets.",
+                        path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
+                        roleName: "s3-apigateway-read",
+                        managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
+                            "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")],
+                    }),
+                    requestParameters: {['integration.request.path.school']: 'method.request.path.school'},
+                    integrationResponses: [{
+                        statusCode: '200',
+                        responseParameters: {}
+                    }]
+                }
+            }
+        );
+
         this.methods.OPTIONS = syllabusSchools.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
         });
-        this.methods.GET = syllabusSchools.addMethod(HttpMethod.GET, props.integrations.GET, {
+        this.methods.GET = syllabusSchools.addMethod(HttpMethod.GET, getIntegration, {
             apiKeyRequired: false,
             requestParameters: {['method.request.path.school']: true},
             operationName: "GetSyllabusBySchool",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: props.models.GET!.resp!}
+                responseModels: {["application/json"]: getRespModel}
             }]
         });
     }
@@ -73,27 +115,58 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         });
         this.resources["/course-reviews"] = root;
 
+        const postReqModel = props.apiEndpoint.addModel('review-post-req-model',{
+                schema: courseReviewReqSchema,
+                contentType: "application/json",
+                description: "HTTP POST request body schema for fetching reviews for several courses",
+                modelName: "PostReviewsReq"
+            });
+        const postRespModel = props.apiEndpoint.addModel('review-post-resp-model', {
+            schema: courseReviewRespSchema,
+            contentType: "application/json",
+            description: "HTTP POST response body schema for fetching reviews for several courses",
+            modelName: "PostReviewsResp"
+        });
+        const putReqModel = props.apiEndpoint.addModel('review-put-req-model', {
+            schema: courseReviewPutReqSchema,
+            contentType: "application/json",
+            description: "HTTP PUT request body schema for updating a review",
+            modelName: "PutReviewsReq"
+        });
+
+        const courseReviewsFunctions = new CourseReviewsFunctions(this, 'crud-functions', {
+            envvars: {
+                'TABLE_NAME': props.dataSource!
+            }
+        });
+        const postIntegration = new LambdaIntegration(
+            courseReviewsFunctions.postFunction, {proxy: true}
+        );
+        const putIntegration = new LambdaIntegration(
+            courseReviewsFunctions.putFunction, {proxy: true}
+        );
+
         this.methods.OPTIONS = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
         });
-        this.methods.POST = root.addMethod(HttpMethod.POST, props.integrations.POST,
+        this.methods.POST = root.addMethod(HttpMethod.POST, postIntegration,
             {
                 operationName: "BatchGetReviews",
-                requestModels: {["application/json"]: props.models.POST!.req!},
+                requestModels: {["application/json"]: postReqModel},
                 methodResponses: [{
                     statusCode: '200',
-                    responseModels: {["application/json"]: props.models.POST!.resp!}
+                    responseModels: {["application/json"]: postRespModel}
                 }]
             }
         );
-        this.methods.PUT = root.addMethod(HttpMethod.PUT, props.integrations.PUT,
+        this.methods.PUT = root.addMethod(HttpMethod.PUT, putIntegration,
             {
                 operationName: "UpdateReview",
+                requestModels: {["application/json"]: putReqModel},
                 methodResponses: [{
-                    statusCode: '200',
-                    responseModels: {["application/json"]: props.models.PUT!.resp!}
+                    statusCode: '200'
                 }]
             });
     }
@@ -114,12 +187,26 @@ export class FeedsApiService extends AbstractRestApiService {
         });
         this.resources["/feeds"] = root;
 
+        const getRespModel = props.apiEndpoint.addModel('feeds-get-resp-model', {
+                schema: articleListSchema,
+                contentType: "application/json",
+                description: "List of articles in feeds",
+                modelName: "GetFeedsResp"
+            });
+
+        const feedsIntegration = new MockIntegration({
+            integrationResponses: [{
+                statusCode: '200',
+                responseTemplates: {["application/json"]: articlePlainJson}
+            }]
+        });
+
         this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
         });
-        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, props.integrations.GET, {
+        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, feedsIntegration, {
             apiKeyRequired: false,
             requestParameters: {
                 'method.request.querystring.offset': true,
@@ -128,7 +215,7 @@ export class FeedsApiService extends AbstractRestApiService {
             operationName: "ListArticles",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: props.models.GET!.resp!}
+                responseModels: {["application/json"]: getRespModel}
             }]
         });
     }

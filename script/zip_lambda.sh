@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-cd src/lambda/syllabus-scraper || exit 1
+cd src/lambda || exit 1
+git clone https://github.com/wasedatime/syllabus-scraper.git
+cd syllabus-scraper || exit 1
 virtualenv myvenv
 source myvenv/bin/activate
 pip install -r requirements.txt
@@ -20,7 +22,11 @@ cd src/put-reviews || exit 1
 zip -r9 ./function.zip .
 cd "$TRAVIS_BUILD_DIR" || exit 1
 
-cd src/slack-webhook-publisher || exit 1
+cd src/amplify-status-publisher || exit 1
+zip -r9 ./function.zip .
+cd "$TRAVIS_BUILD_DIR" || exit 1
+
+cd src/sfn-status-publisher || exit 1
 zip -r9 ./function.zip .
 cd "$TRAVIS_BUILD_DIR" || exit 1
 

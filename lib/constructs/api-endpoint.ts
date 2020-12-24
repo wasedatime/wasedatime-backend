@@ -1,43 +1,36 @@
 import * as cdk from "@aws-cdk/core";
-import {
-    AwsIntegration,
-    DomainName,
-    EndpointType,
-    LambdaIntegration,
-    LambdaRestApi,
-    MockIntegration,
-    RestApi,
-    SpecRestApi,
-    Stage
-} from "@aws-cdk/aws-apigateway";
-import {HttpApi, HttpMethod} from "@aws-cdk/aws-apigatewayv2";
+import {DomainName, EndpointType, LambdaRestApi, RestApi, SpecRestApi, Stage} from "@aws-cdk/aws-apigateway";
+import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
 
 import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
-import {
-    articleListSchema,
-    articlePlainJson,
-    baseJsonApiSchema,
-    courseReviewReqSchema,
-    courseReviewRespSchema,
-    syllabusSchema
-} from "../configs/api/schema";
-import {CourseReviewsFunctions} from "./lambda-functions";
-import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
-import {AwsServicePrincipal} from "../configs/aws";
+import {baseJsonApiSchema} from "../configs/api/schema";
+import {PreSignupWasedaMailValidator} from "./lambda-functions";
 import {ApiServices} from "../configs/api/service";
+import {
+    AccountRecovery,
+    Mfa,
+    ProviderAttribute,
+    UserPool,
+    UserPoolClient,
+    UserPoolDomain,
+    UserPoolIdentityProviderGoogle
+} from "@aws-cdk/aws-cognito";
+import {CALLBACK_URLS, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, LOGOUT_URLS} from "../configs/cognito/oauth";
+import {WEBAPP_DOMAIN} from "../configs/amplify/website";
+import {Certificate} from "@aws-cdk/aws-certificatemanager";
 
 
 export interface ApiEndpointProps {
 
-    dataSource: string;
+    dataSources?: { [service in ApiServices]?: string };
 }
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
 
-    abstract readonly apiEndpoint: RestApi | LambdaRestApi | SpecRestApi | HttpApi | GraphqlApi;
+    abstract readonly apiEndpoint: RestApi | LambdaRestApi | SpecRestApi | HttpApi | GraphqlApi | UserPool;
 
-    protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
+    protected constructor(scope: cdk.Construct, id: string, props?: ApiEndpointProps) {
         super(scope, id);
     }
 }
@@ -87,13 +80,10 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
                 description: "Production stage"
             }
         });
+
         this.stages['prod'] = this.apiEndpoint.deploymentStage;
+        // this.stages['dev'] = new Stage(this, 'dev-stage', {deployment: undefined});
 
-
-        // const apiDomainCert = new Certificate(this, 'domain-certificate', {
-        //     domainName: "api." + WEBAPP_DOMAIN,
-        //     validation: CertificateValidation.fromEmail()
-        // });
         // const domain = this.apiEndpoint.addDomainName('domain', {
         //     certificate: Certificate.fromCertificateArn(this, 'api-domain',
         //         'arn:aws:acm:ap-northeast-1:564383102056:certificate/f5ae3aa1-b20c-40e5-8dfe-4baabb1540fd'),
@@ -110,100 +100,103 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         //     stage: this.stages['dev']
         // });
 
-        const syllabusSchoolModel = this.apiEndpoint.addModel('syllabus-model', {
-            schema: syllabusSchema,
-            contentType: "application/json",
-            description: "The new syllabus JSON schema for each school.",
-            modelName: "Syllabus"
-        });
-        const courseReviewsReqModel = this.apiEndpoint.addModel('course-reviews-req-model', {
-            schema: courseReviewReqSchema,
-            contentType: "application/json",
-            description: "HTTP POST request body schema for fetching reviews for several courses",
-            modelName: "ReviewsReq"
-        });
-        const courseReviewsRespModel = this.apiEndpoint.addModel('course-reviews-resp-model', {
-            schema: courseReviewRespSchema,
-            contentType: "application/json",
-            description: "HTTP POST response body schema for fetching reviews for several courses",
-            modelName: "ReviewsResp"
-        });
         const baseJsonApiModel = this.apiEndpoint.addModel('base-json-api-model', {
             schema: baseJsonApiSchema,
             contentType: "application/json",
             description: "Base model for JSON-API specification.",
             modelName: "BaseJsonAPI"
         });
-        const articleListModel = this.apiEndpoint.addModel('article-list-model', {
-            schema: articleListSchema,
-            contentType: "application/json",
-            description: "List of articles in feeds",
-            modelName: "ArticleList"
-        });
-
-        const syllabusIntegration = new AwsIntegration(
-            {
-                service: 's3',
-                integrationHttpMethod: HttpMethod.GET,
-                path: "syllabus/{school}.json",
-                subdomain: props.dataSource,
-                options: {
-                    credentialsRole: new Role(this, 'rest-api-s3', {
-                        assumedBy: new ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
-                        description: "Allow API Gateway to fetch objects from s3 buckets.",
-                        path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
-                        roleName: "api-s3-read",
-                        managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
-                            "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")],
-                    }),
-                    requestParameters: {['integration.request.path.school']: 'method.request.path.school'}
-                }
-            }
-        );
-        const courseReviewsFunctions = new CourseReviewsFunctions(this, 'handler-post');
-        const courseReviewsPostIntegration = new LambdaIntegration(
-            courseReviewsFunctions.postFunction, {proxy: true}
-        );
-        const courseReviewsPutIntegration = new LambdaIntegration(
-            courseReviewsFunctions.putFunction, {proxy: true}
-        );
-        const feedsIntegration = new MockIntegration({
-            integrationResponses: [{
-                statusCode: '200',
-                responseTemplates: {["application/json"]: articlePlainJson}
-            }]
-        });
 
         this.apiServices[ApiServices.SYLLABUS] = new SyllabusApiService(this, 'syllabus-api', {
-            integrations: {[HttpMethod.GET]: syllabusIntegration},
-            models: {
-                [HttpMethod.GET]: {
-                    resp: syllabusSchoolModel
-                }
-            }
+            apiEndpoint: this.apiEndpoint,
+            dataSource: props.dataSources![ApiServices.SYLLABUS]
         });
         this.apiServices[ApiServices.COURSE_REVIEW] = new CourseReviewsApiService(this, 'course-reviews-api', {
-            integrations: {
-                [HttpMethod.POST]: courseReviewsPostIntegration,
-                [HttpMethod.PUT]: courseReviewsPutIntegration
-            },
-            models: {
-                [HttpMethod.POST]: {
-                    req: courseReviewsReqModel,
-                    resp: courseReviewsRespModel
-                },
-                [HttpMethod.PUT]: {
-                    //todo req model
-                    resp: baseJsonApiModel
-                }
-            }
+            apiEndpoint: this.apiEndpoint,
+            dataSource: props.dataSources![ApiServices.COURSE_REVIEW]
         });
         this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
-            integrations: {[HttpMethod.GET]: feedsIntegration},
-            models: {
-                [HttpMethod.GET]: {
-                    resp: articleListModel
+            apiEndpoint: this.apiEndpoint
+        });
+    }
+}
+
+export class WasedaTimeAuthEndpoint extends AbstractApiEndpoint {
+
+    readonly apiEndpoint: UserPool;
+
+    readonly clients: { [name: string]: UserPoolClient } = {};
+
+    readonly domain: UserPoolDomain;
+
+    constructor(scope: cdk.Construct, id: string, props?: ApiEndpointProps) {
+        super(scope, id, props);
+
+        this.apiEndpoint = new UserPool(this, 'main-user-pool', {
+            accountRecovery: AccountRecovery.EMAIL_ONLY,
+            autoVerify: {email: true, phone: false},
+            emailSettings: {
+                // from: "noreply@wasedatime.com"
+            },
+            enableSmsRole: false,
+            mfa: Mfa.OFF,
+            passwordPolicy: {
+                minLength: 8,
+                requireDigits: true,
+                requireLowercase: true,
+                requireUppercase: false,
+                requireSymbols: false
+            },
+            selfSignUpEnabled: true,
+            signInAliases: {
+                email: true,
+                username: true
+            },
+            signInCaseSensitive: true,
+            smsRole: undefined,
+            standardAttributes: {
+                email: {
+                    required: true
                 }
+            },
+            userPoolName: 'wasedatime-users',
+            lambdaTriggers: {
+                preSignUp: new PreSignupWasedaMailValidator(this, 'presign-up-handle').baseFunction
+            }
+        });
+
+        this.apiEndpoint.registerIdentityProvider(new UserPoolIdentityProviderGoogle(this, 'google-idp', {
+            clientId: GOOGLE_OAUTH_CLIENT_ID,
+            clientSecret: GOOGLE_OAUTH_CLIENT_SECRET,
+            userPool: this.apiEndpoint,
+            attributeMapping: {
+                email: ProviderAttribute.GOOGLE_EMAIL,
+                preferredUsername: ProviderAttribute.GOOGLE_NAME,
+                profilePicture: ProviderAttribute.GOOGLE_PICTURE
+            },
+            scopes: ['email', 'openid', 'profile']
+        }));
+
+        this.clients['web-app'] = this.apiEndpoint.addClient('web-app-client', {
+            userPoolClientName: "web-app",
+            authFlows: {
+                custom: true,
+                userSrp: true
+            },
+            generateSecret: false,
+            oAuth: {
+                callbackUrls: CALLBACK_URLS,
+                logoutUrls: LOGOUT_URLS
+            },
+            preventUserExistenceErrors: true
+        });
+
+        // todo add custom ses in us-east-1
+        this.domain = this.apiEndpoint.addDomain('auth-domain', {
+            customDomain: {
+                domainName: "auth." + WEBAPP_DOMAIN,
+                certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert',
+                    'arn:aws:acm:us-east-1:564383102056:certificate/7e29831d-9eb9-4212-9856-4f5fd0d3cafe')
             }
         });
     }

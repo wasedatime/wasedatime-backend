@@ -5,6 +5,7 @@ import {Function} from "@aws-cdk/aws-lambda";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {SnsTopic} from "@aws-cdk/aws-events-targets";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
+import {AmplifyStatusPublisher} from "./lambda-functions";
 
 
 export enum StatusNotifier {
@@ -45,9 +46,7 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
         this.topic = new Topic(this, 'build-status-topic', {
             topicName: "amplify-build-status"
         });
-        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
-            "arn:aws:lambda:ap-northeast-1:564383102056:function:forwardAmplifyNotificationSlack"
-        );
+        const subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
         this.topic.addSubscription(new LambdaSubscription(subscriber));
 
         this.rules["on-build"] = new Rule(this, 'build-sentinel', {

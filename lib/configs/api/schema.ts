@@ -264,15 +264,23 @@ export const courseReviewReqSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     type: JsonSchemaType.OBJECT,
     properties: {
-        "course_keys": {
-            type: JsonSchemaType.ARRAY,
-            items: {
-                type: JsonSchemaType.STRING
-            }
+        "data": {
+            type: JsonSchemaType.OBJECT,
+            properties: {
+                "course_keys": {
+                    type: JsonSchemaType.ARRAY,
+                    items: {
+                        type: JsonSchemaType.STRING
+                    }
+                }
+            },
+            required: [
+                "course_keys"
+            ],
         }
     },
     required: [
-        "course_keys"
+        "data"
     ]
 };
 
@@ -347,6 +355,9 @@ export const courseReviewRespSchema: JsonSchema = {
                                 },
                                 "title": {
                                     type: JsonSchemaType.STRING
+                                },
+                                "mod": {
+                                    type: JsonSchemaType.BOOLEAN
                                 }
                             },
                             required: [
@@ -366,7 +377,8 @@ export const courseReviewRespSchema: JsonSchema = {
                                 "comment_src_lng",
                                 "comment_jp",
                                 "course_key",
-                                "title"
+                                "title",
+                                "mod"
                             ]
                         }
                     }
@@ -385,6 +397,75 @@ export const courseReviewRespSchema: JsonSchema = {
         "success",
         "data",
         "message"
+    ]
+};
+
+export const courseReviewPutReqSchema: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT7,
+    type: JsonSchemaType.OBJECT,
+    properties: {
+        "data": {
+            type: JsonSchemaType.OBJECT,
+            properties: {
+                "course_key": {
+                    type: JsonSchemaType.STRING
+                },
+                "title_jp": {
+                    type: JsonSchemaType.STRING
+                },
+                "instructor_jp": {
+                    type: JsonSchemaType.STRING
+                },
+                "created_at": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "benefit": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "difficulty": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "satisfaction": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "instructor": {
+                    type: JsonSchemaType.STRING
+                },
+                "year": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "comment_src_lng": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "comment": {
+                    type: JsonSchemaType.STRING
+                },
+                "title": {
+                    type: JsonSchemaType.STRING
+                },
+                "uid": {
+                    type: JsonSchemaType.STRING
+                }
+            },
+            required: [
+                "title_jp",
+                "instructor_jp",
+                "created_at",
+                "benefit",
+                "difficulty",
+                "satisfaction",
+                "instructor",
+                "comment",
+                "year",
+                "comment_src_lng",
+                "course_key",
+                "title",
+                "uid"
+            ]
+        }
+    },
+    required: [
+        "data"
     ]
 };
 

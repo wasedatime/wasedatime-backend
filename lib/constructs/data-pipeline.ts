@@ -9,7 +9,7 @@ import {Table} from "@aws-cdk/aws-dynamodb";
 import {allowApiGatewayPolicy} from "../configs/s3/access-setting";
 import {SyllabusScraper} from "./lambda-functions";
 import {prodCorsRule} from "../configs/s3/cors";
-import {syllabusSchedule} from "../configs/schedule";
+import {syllabusSchedule} from "../configs/event/schedule";
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
@@ -62,8 +62,12 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         });
         allowApiGatewayPolicy(this.dataWarehouse);
 
-        const scraperBaseFunction: Function =
-            new SyllabusScraper(this, 'scraper-base-function').baseFunction;
+        const scraperBaseFunction: Function = new SyllabusScraper(this, 'scraper-base-function', {
+            envvars: {
+                ["BUCKET_NAME"]: this.dataWarehouse.bucketName,
+                ["OBJECT_PATH"]: 'syllabus/'
+            }
+        }).baseFunction;
 
         function getLambdaTaskInstance(constructContext: cdk.Construct, schools: string[], num: string): LambdaInvoke {
             return new LambdaInvoke(scope, "task-" + num, {
