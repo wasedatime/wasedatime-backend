@@ -5,8 +5,8 @@ import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {AwsServicePrincipal} from "../configs/aws";
 import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../configs/amplify/website";
-import {webappBuildSpec} from "../configs/amplify/build-setting";
-import {webAppCode} from "../configs/amplify/codebase";
+import {openapiBuildSpec, webappBuildSpec} from "../configs/amplify/build-setting";
+import {apiDocCode, webAppCode} from "../configs/amplify/codebase";
 
 
 export interface WebAppProps {
@@ -18,11 +18,11 @@ export interface WebAppProps {
 
 export abstract class AbstractWebApp extends cdk.Construct {
 
-    abstract app: App;
+    abstract readonly app: App;
 
-    abstract branches?: { [env: string]: Branch };
+    abstract readonly branches?: { [env: string]: Branch };
 
-    abstract domain?: Domain;
+    abstract readonly domain?: Domain;
 
     protected constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
         super(scope, id);
@@ -51,7 +51,7 @@ export class AmplifyWebApp extends AbstractWebApp {
         });
 
         this.app = new App(this, 'app', {
-            appName: "WasedatimeWebApp",
+            appName: "wasedatime-web-app",
             autoBranchDeletion: true,
             buildSpec: webappBuildSpec,
             customRules: webappSiteRules,
@@ -84,6 +84,52 @@ export class AmplifyWebApp extends AbstractWebApp {
             subDomains: [
                 // {branch: devBranch, prefix: "dev"},
                 {branch: mainBranch, prefix: "main"}
+            ]
+        });
+    }
+}
+
+export class OpenApiWebsite extends AbstractWebApp {
+
+    readonly app: App;
+
+    readonly branches: { [key: string]: Branch } = {};
+
+    readonly domain: Domain;
+
+    constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
+        super(scope, id, props);
+
+        const amplifyServiceRole: LazyRole = new LazyRole(this, 'amplify-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.AMPLIFY),
+            description: "Allows Amplify Backend Deployment to access AWS resources on your behalf.",
+            path: `/service-role/${AwsServicePrincipal.AMPLIFY}/`,
+            maxSessionDuration: Duration.hours(1),
+            roleName: "amplify-webapp-deploy",
+            managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 'admin-access',
+                "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")]
+        });
+
+        this.app = new App(this, 'app', {
+            appName: "wasedatime-openapi",
+            autoBranchDeletion: true,
+            buildSpec: openapiBuildSpec,
+            description: "API documentation website for WasedaTime.",
+            role: amplifyServiceRole,
+            sourceCodeProvider: apiDocCode
+        });
+
+        const mainBranch: Branch = this.app.addBranch('main', {
+            autoBuild: true,
+            branchName: "main",
+            stage: "PRODUCTION"
+        });
+        this.branches["main"] = mainBranch;
+
+        this.domain = this.app.addDomain('domain', {
+            domainName: WEBAPP_DOMAIN,
+            subDomains: [
+                {branch: mainBranch, prefix: "openapi"}
             ]
         });
     }

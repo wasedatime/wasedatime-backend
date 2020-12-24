@@ -19,11 +19,11 @@ export interface AuthEndpointProps {
 
 export abstract class AuthEndpoint extends cdk.Construct {
 
-    abstract userPool: UserPool;
+    abstract readonly userPool: UserPool;
 
-    abstract clients: { [name: string]: UserPoolClient };
+    abstract readonly clients: { [name: string]: UserPoolClient };
 
-    abstract domain: UserPoolDomain;
+    abstract readonly domain: UserPoolDomain;
 
     protected constructor(scope: cdk.Construct, id: string, props: AuthEndpointProps) {
 
@@ -90,7 +90,7 @@ export class WasedaTimeAuthEndpoint extends AuthEndpoint {
                 custom: true,
                 userSrp: true
             },
-            generateSecret: true,
+            generateSecret: false,
             oAuth: {
                 callbackUrls: CALLBACK_URLS,
                 logoutUrls: LOGOUT_URLS

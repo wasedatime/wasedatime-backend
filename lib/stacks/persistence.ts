@@ -16,7 +16,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
 
     readonly dataPipelines: { [name in Worker]?: AbstractDataPipeline } = {};
 
-    readonly databases: { [name: string]: DynamoDatabase };
+    readonly databases: { [name: string]: DynamoDatabase } = {};
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
@@ -25,6 +25,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
         this.dataPipelines[Worker.SYLLABUS] = syllabusDatePipeline;
 
         const dynamoDatabase = new DynamoDatabase(this, 'dynamo-db', {});
+        this.databases["dynamo-main"] = dynamoDatabase;
 
         this.dataPipelines[Worker.CAREER] = new CareerDataPipeline(this, 'career-datapipeline', {
             dataWarehouse: dynamoDatabase.tables[Collection.CAREER]

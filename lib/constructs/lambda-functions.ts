@@ -44,7 +44,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
 
         this.postFunction = new Function(this, 'get-reviews', {
             code: Code.fromAsset('src/lambda/get-reviews/function.zip'),
-            handler: "lambda_function.lambda_handler",
+            handler: "get_reviews.handler",
             deadLetterQueueEnabled: false,
             description: "Get course reviews from database.",
             functionName: "get-reviews",
@@ -57,7 +57,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
 
         this.putFunction = new Function(this, 'put-review', {
             code: Code.fromAsset('src/lambda/put-review/function.zip'),
-            handler: "lambda_function.lambda_handler",
+            handler: "put_review.handler",
             deadLetterQueueEnabled: false,
             description: "Put course reviews into database.",
             functionName: "put-review",
@@ -102,13 +102,34 @@ export class SlackWebhookPublisher extends cdk.Construct {
 
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/slack-webhook-publisher/function.zip'),
-            handler: "syllabus_scraper.handler",
+            handler: "webhook_publisher.handler",
             deadLetterQueueEnabled: false,
             description: "Forwards message from SNS to slack webhook.",
             functionName: "slack-webhook-publisher",
             logRetention: RetentionDays.SIX_MONTHS,
             memorySize: 128,
-            runtime: Runtime.NODEJS_12_X,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3),
+        });
+    }
+}
+
+export class PreSignupWasedaMailValidator extends cdk.Construct {
+
+    readonly baseFunction: Function;
+
+    constructor(scope: cdk.Construct, id: string) {
+        super(scope, id);
+
+        this.baseFunction = new Function(this, 'signup-validator', {
+            code: Code.fromAsset('src/lambda/signup-validator/function.zip'),
+            handler: "signup_validator.handler",
+            deadLetterQueueEnabled: false,
+            description: "Validates if the user is signing up using WasedaMail",
+            functionName: "wasedamail-signup_validator",
+            logRetention: RetentionDays.SIX_MONTHS,
+            memorySize: 128,
+            runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
         });
     }

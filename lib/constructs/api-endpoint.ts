@@ -35,7 +35,7 @@ export interface ApiEndpointProps {
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
 
-    abstract apiEndpoint: RestApi | LambdaRestApi | SpecRestApi | HttpApi | GraphqlApi;
+    abstract readonly apiEndpoint: RestApi | LambdaRestApi | SpecRestApi | HttpApi | GraphqlApi;
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id);
@@ -44,11 +44,11 @@ export abstract class AbstractApiEndpoint extends cdk.Construct {
 
 export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
-    abstract apiEndpoint: RestApi;
+    abstract readonly apiEndpoint: RestApi;
 
-    abstract apiServices: { [name in ApiServices]?: AbstractRestApiService };
+    abstract readonly apiServices: { [name in ApiServices]?: AbstractRestApiService };
 
-    abstract stages: { [name: string]: Stage };
+    abstract readonly stages: { [name: string]: Stage };
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);

@@ -20,11 +20,11 @@ export interface StatusNotifierProps {
 
 export abstract class AbstractStatusNotifier extends Construct {
 
-    abstract rules: { [eventName: string]: Rule } = {};
+    abstract readonly rules: { [eventName: string]: Rule };
 
-    abstract target?: IRuleTarget | string;
+    abstract readonly target?: IRuleTarget | string;
 
-    abstract topic: ITopic;
+    abstract readonly topic: ITopic;
 
     protected constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id);

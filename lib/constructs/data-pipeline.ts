@@ -30,11 +30,11 @@ export interface DataPipelineProps {
 
 export abstract class AbstractDataPipeline extends Construct {
 
-    abstract dataSource?: Bucket;
+    abstract readonly dataSource?: Bucket;
 
-    abstract processor: Function | StateMachine;
+    abstract readonly processor: Function | StateMachine;
 
-    abstract dataWarehouse: Bucket | Table;
+    abstract readonly dataWarehouse: Bucket | Table;
 }
 
 export class SyllabusDataPipeline extends AbstractDataPipeline {
@@ -116,10 +116,11 @@ export class CareerDataPipeline extends AbstractDataPipeline {
 
         this.dataSource = new Bucket(this, 'career-bucket', {
             accessControl: BucketAccessControl.PRIVATE,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             bucketName: "wasedatime-career",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: true,
+            publicReadAccess: false,
             removalPolicy: RemovalPolicy.DESTROY,
             versioned: true
         });
@@ -138,7 +139,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
         super(scope, id);
 
         this.dataSource = new Bucket(this, 'feeds-bucket', {
-            accessControl: BucketAccessControl.PRIVATE,
+            accessControl: BucketAccessControl.PUBLIC_READ,
             bucketName: "wasedatime-feeds-prod",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
