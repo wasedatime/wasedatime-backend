@@ -5,7 +5,9 @@ import {Function} from "@aws-cdk/aws-lambda";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {SnsTopic} from "@aws-cdk/aws-events-targets";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
+
 import {AmplifyStatusPublisher} from "../common/lambda-functions";
+import {CF_NOTIF_FUNC_ARN, CF_TOPIC_ARN} from "../../configs/common/arn";
 
 
 export enum StatusNotifier {
@@ -145,6 +147,7 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
     }
 }
 
+//todo complete definition
 export class StackStatusNotifier extends AbstractStatusNotifier {
 
     readonly rules: { [eventName: string]: Rule } = {};
@@ -156,12 +159,8 @@ export class StackStatusNotifier extends AbstractStatusNotifier {
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        this.topic = Topic.fromTopicArn(this, 'stack-status-topic',
-            'arn:aws:sns:ap-northeast-1:564383102056:cfn-alert'
-        );
+        this.topic = Topic.fromTopicArn(this, 'stack-status-topic', CF_TOPIC_ARN);
 
-        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
-            'arn:aws:lambda:ap-northeast-1:564383102056:function:cf-notify-CFNotifyFunction-185B600AO8IES'
-        );
+        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher', CF_NOTIF_FUNC_ARN);
     }
 }

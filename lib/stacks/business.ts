@@ -3,7 +3,7 @@ import * as cdk from "@aws-cdk/core";
 import {
     AbstractApiEndpoint,
     AbstractRestApiEndpoint,
-    WasedaTimeAuthEndpoint,
+    WasedaTimeAuthApiEndpoint,
     WasedaTimeRestApiEndpoint
 } from "../constructs/business/api-endpoint";
 import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
@@ -27,12 +27,12 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         });
         this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
 
-        const authEndpoint = new WasedaTimeAuthEndpoint(this, 'cognito-endpoint');
+        const authEndpoint = new WasedaTimeAuthApiEndpoint(this, 'cognito-endpoint');
         this.apiEndpoints[ApiEndpoint.AUTH] = authEndpoint;
 
         // this.serviceInterface.setEndpoint(ServiceEndpoint.MAIN, mainApiEndpoint.getDomain());
         this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, 'api.wasedatime.com');
 
-        this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.domain.baseUrl());
+        this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }

@@ -7,6 +7,7 @@ import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AwsServicePrincipal} from "../../configs/common/aws";
 import {GOOGLE_API_KEY} from "../../configs/lambda/environment";
 
+
 interface FunctionsProps {
     envvars: { [name: string]: string }
 }

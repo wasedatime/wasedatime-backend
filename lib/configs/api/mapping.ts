@@ -4,7 +4,7 @@ export const s3RespMapping = {
     ['method.response.header.ETag']: 'integration.response.header.ETag',
     ['method.response.header.Last-Modified']: 'integration.response.header.Last-Modified',
     ['method.response.header.Expires']: 'integration.response.header.Expires'
-}
+};
 
 export const syllabusRespParams = {
     ['method.response.header.Access-Control-Allow-Origin']: true,
@@ -12,11 +12,11 @@ export const syllabusRespParams = {
     ['method.response.header.ETag']: true,
     ['method.response.header.Last-Modified']: true,
     ['method.response.header.Expires']: true
-}
+};
 
 export const lambdaRespParams = {
     ['method.response.header.Access-Control-Allow-Origin']: true,
     ['method.response.header.Content-Type']: true,
     ['method.response.header.Referrer-Policy']: true,
     ['method.response.header.Access-Control-Allow-Methods']: true
-}
+};

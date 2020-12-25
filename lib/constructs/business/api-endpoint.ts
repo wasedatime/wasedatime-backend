@@ -2,11 +2,6 @@ import * as cdk from "@aws-cdk/core";
 import {DomainName, EndpointType, LambdaRestApi, RestApi, SpecRestApi, Stage} from "@aws-cdk/aws-apigateway";
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
-
-import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
-import {baseJsonApiSchema} from "../../configs/api/schema";
-import {PreSignupWasedaMailValidator} from "../common/lambda-functions";
-import {ApiServices} from "../../configs/api/service";
 import {
     AccountRecovery,
     Mfa,
@@ -16,6 +11,12 @@ import {
     UserPoolDomain,
     UserPoolIdentityProviderGoogle
 } from "@aws-cdk/aws-cognito";
+import {Certificate} from "@aws-cdk/aws-certificatemanager";
+
+import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
+import {baseJsonApiSchema} from "../../configs/api/schema";
+import {PreSignupWasedaMailValidator} from "../common/lambda-functions";
+import {ApiServices} from "../../configs/api/service";
 import {
     CALLBACK_URLS,
     GOOGLE_OAUTH_CLIENT_ID,
@@ -23,7 +24,7 @@ import {
     LOGOUT_URLS
 } from "../../configs/cognito/oauth";
 import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
-import {Certificate} from "@aws-cdk/aws-certificatemanager";
+import {AUTH_CERT_ARN} from "../../configs/common/arn";
 
 
 export interface ApiEndpointProps {
@@ -62,6 +63,28 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     }
 }
 
+export abstract class AbstractAuthApiEndpoint extends AbstractApiEndpoint {
+
+    abstract readonly apiEndpoint: UserPool;
+
+    abstract readonly clients: { [name: string]: UserPoolClient } = {};
+
+    abstract readonly domain: UserPoolDomain;
+
+    protected constructor(scope: cdk.Construct, id: string) {
+        super(scope, id);
+    }
+
+    getDomain(): string {
+        const domainName: UserPoolDomain | undefined = this.domain;
+
+        if (typeof domainName === "undefined") {
+            throw RangeError("Domain not configured for this API endpoint.");
+        }
+        return domainName.domainName;
+    }
+}
+
 export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
 
     readonly apiEndpoint: RestApi;
@@ -90,8 +113,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         // this.stages['dev'] = new Stage(this, 'dev-stage', {deployment: undefined});
 
         // const domain = this.apiEndpoint.addDomainName('domain', {
-        //     certificate: Certificate.fromCertificateArn(this, 'api-domain',
-        //         'arn:aws:acm:ap-northeast-1:564383102056:certificate/f5ae3aa1-b20c-40e5-8dfe-4baabb1540fd'),
+        //     certificate: Certificate.fromCertificateArn(this, 'api-domain', API_CERT_ARN),
         //     domainName: "api." + WEBAPP_DOMAIN,
         //     endpointType: EndpointType.REGIONAL,
         //     securityPolicy: SecurityPolicy.TLS_1_2
@@ -126,7 +148,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
     }
 }
 
-export class WasedaTimeAuthEndpoint extends AbstractApiEndpoint {
+export class WasedaTimeAuthApiEndpoint extends AbstractAuthApiEndpoint {
 
     readonly apiEndpoint: UserPool;
 
@@ -134,8 +156,8 @@ export class WasedaTimeAuthEndpoint extends AbstractApiEndpoint {
 
     readonly domain: UserPoolDomain;
 
-    constructor(scope: cdk.Construct, id: string, props?: ApiEndpointProps) {
-        super(scope, id, props);
+    constructor(scope: cdk.Construct, id: string) {
+        super(scope, id);
 
         this.apiEndpoint = new UserPool(this, 'main-user-pool', {
             accountRecovery: AccountRecovery.EMAIL_ONLY,
@@ -200,8 +222,7 @@ export class WasedaTimeAuthEndpoint extends AbstractApiEndpoint {
         this.domain = this.apiEndpoint.addDomain('auth-domain', {
             customDomain: {
                 domainName: "auth." + WEBAPP_DOMAIN,
-                certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert',
-                    'arn:aws:acm:us-east-1:564383102056:certificate/7e29831d-9eb9-4212-9856-4f5fd0d3cafe')
+                certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert', AUTH_CERT_ARN)
             }
         });
     }

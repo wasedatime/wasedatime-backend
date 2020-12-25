@@ -5,13 +5,13 @@ import {StateMachine, TaskInput} from "@aws-cdk/aws-stepfunctions";
 import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tasks";
 import {Function} from "@aws-cdk/aws-lambda";
 import {Table} from "@aws-cdk/aws-dynamodb";
+import {Rule} from "@aws-cdk/aws-events";
+import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
 import {allowApiGatewayPolicy} from "../../configs/s3/access-setting";
 import {SyllabusScraper} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
-import {Rule} from "@aws-cdk/aws-events";
-import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
 
 export enum Worker {

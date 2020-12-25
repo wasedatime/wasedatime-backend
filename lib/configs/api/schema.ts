@@ -582,5 +582,6 @@ export const articlePlainJson = `
      1-markdown-test/"},{"category":"career","title":"markdown test","author":"Bob","summary":"This is a test file.","da
      te_created":"2020-09-11T08:00:00.001Z","last_modified":"2020-09-11T10:00:00.001Z","tags":["job fair","graduates","c
      ompany"],"src":"2020-09-11-markdown-test/"}],"size":5,"offset":"dfne2341tt4ebewauka34ihy23784y128"},"message":"OK"}
-     `
+     `;
+
 export const careerInfoSchema: JsonSchema = {};

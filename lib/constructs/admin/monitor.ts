@@ -2,6 +2,8 @@ import * as cdk from "@aws-cdk/core";
 import {Duration} from "@aws-cdk/core";
 import {Alarm, Metric} from "@aws-cdk/aws-cloudwatch";
 
+
+//todo add db, api, s3 alarm
 export class DynamoCapacityMonitor extends cdk.Construct {
 
     constructor(scope: cdk.Construct, id: string, table: string) {
@@ -16,8 +18,7 @@ export class DynamoCapacityMonitor extends cdk.Construct {
                 statistic: "Sum"
             }),
             threshold: 240,
-            actionsEnabled: true,
-
+            actionsEnabled: true
         })
     }
 }
