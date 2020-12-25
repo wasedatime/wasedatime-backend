@@ -41,7 +41,7 @@ def post_review(review):
     return api_response(200, body)
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     if bad_referer(event["headers"]):
         body = JsonPayloadBuilder().add_status(False).add_data(None) \
             .add_message("External request detected, related information will be reported to admin.").compile()
