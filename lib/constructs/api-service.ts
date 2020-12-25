@@ -14,6 +14,7 @@ import {
 import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AwsServicePrincipal} from "../configs/aws";
 import {CourseReviewsFunctions} from "./lambda-functions";
+import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../configs/api/mapping";
 
 
 export interface ApiServiceProps {
@@ -77,7 +78,7 @@ export class SyllabusApiService extends AbstractRestApiService {
                     requestParameters: {['integration.request.path.school']: 'method.request.path.school'},
                     integrationResponses: [{
                         statusCode: '200',
-                        responseParameters: {}
+                        responseParameters: s3RespMapping
                     }]
                 }
             }
@@ -94,7 +95,8 @@ export class SyllabusApiService extends AbstractRestApiService {
             operationName: "GetSyllabusBySchool",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: getRespModel}
+                responseModels: {["application/json"]: getRespModel},
+                responseParameters: syllabusRespParams
             }]
         });
     }
@@ -157,7 +159,8 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 requestModels: {["application/json"]: postReqModel},
                 methodResponses: [{
                     statusCode: '200',
-                    responseModels: {["application/json"]: postRespModel}
+                    responseModels: {["application/json"]: postRespModel},
+                    responseParameters: lambdaRespParams
                 }]
             }
         );
@@ -166,7 +169,8 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 operationName: "UpdateReview",
                 requestModels: {["application/json"]: putReqModel},
                 methodResponses: [{
-                    statusCode: '200'
+                    statusCode: '200',
+                    responseParameters: lambdaRespParams
                 }]
             });
     }
@@ -215,7 +219,8 @@ export class FeedsApiService extends AbstractRestApiService {
             operationName: "ListArticles",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: getRespModel}
+                responseModels: {["application/json"]: getRespModel},
+                responseParameters: lambdaRespParams
             }]
         });
     }

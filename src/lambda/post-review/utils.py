@@ -43,6 +43,12 @@ def api_response(code, body):
     }
 
 
+# todo verify the user using jwt token
+
+def verify_user():
+    pass
+
+
 def bad_referer(headers):
     if "referer" not in headers:
         return True
