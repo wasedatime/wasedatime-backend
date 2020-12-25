@@ -1,32 +1,7 @@
 import json
-import os
 from datetime import datetime
 
-import boto3
-from google.cloud import translate
-
-from utils import bad_referer, JsonPayloadBuilder, api_response
-
-db = boto3.resource("dynamodb", region_name="ap-northeast-1")
-table = db.Table(os.getenv('TABLE_NAME'))
-client = translate.TranslationServiceClient()
-
-langs = ['en', 'zh-CN', 'jp', 'zh-TW', 'ko']
-parent = "projects/wasedatime/locations/global"
-
-
-def translate_text(text, src_lang, target_langs):
-    results = dict()
-    for lang in target_langs:
-        response = client.translate_text(
-            parent=parent,
-            contents=[text],
-            mime_type="text/plain",
-            source_language_code=src_lang,
-            target_language_code=lang)
-        results[lang] = response
-
-    return results
+from utils import bad_referer, JsonPayloadBuilder, api_response, translate_text, client, parent, langs, table
 
 
 def post_review(review):

@@ -6,7 +6,7 @@ import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {SnsTopic} from "@aws-cdk/aws-events-targets";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 
-import {AmplifyStatusPublisher} from "../common/lambda-functions";
+import {AmplifyStatusPublisher, ScraperStatusPublisher} from "../common/lambda-functions";
 import {CF_NOTIF_FUNC_ARN, CF_TOPIC_ARN} from "../../configs/common/arn";
 
 
@@ -103,9 +103,7 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
         this.topic = new Topic(this, 'scraper-status-topic', {
             topicName: "scraper-task-status"
         });
-        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
-            "arn:aws:lambda:ap-northeast-1:564383102056:function:lambda-publish-notification"
-        );
+        const subscriber = new ScraperStatusPublisher(this, 'subscriber-function').baseFunction;
         this.topic.addSubscription(new LambdaSubscription(subscriber));
 
         this.rules["task-status"] = new Rule(this, 'scraper-status', {

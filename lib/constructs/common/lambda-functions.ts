@@ -5,7 +5,7 @@ import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {GOOGLE_API_KEY} from "../../configs/lambda/environment";
+import {GOOGLE_API_KEY, SLACK_WEBHOOK_AMP, SLACK_WEBHOOK_SFN} from "../../configs/lambda/environment";
 
 
 interface FunctionsProps {
@@ -124,15 +124,36 @@ export class AmplifyStatusPublisher extends cdk.Construct {
 
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/amplify-status-publisher/function.zip'),
-            handler: "webhook_publisher.handler",
+            handler: "amplify_status_publisher.handler",
             deadLetterQueueEnabled: false,
-            description: "Forwards amplify build status message from SNS to slack webhook.",
-            functionName: "slack-webhook-publisher",
+            description: "Forwards Amplify build status message from SNS to Slack Webhook.",
+            functionName: "amplify-status-publisher",
             logRetention: RetentionDays.SIX_MONTHS,
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3)
-        });
+        }).addEnvironment("SLACK_WEBHOOK_AMP", SLACK_WEBHOOK_AMP);
+    }
+}
+
+export class ScraperStatusPublisher extends cdk.Construct {
+
+    readonly baseFunction: Function;
+
+    constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
+        super(scope, id);
+
+        this.baseFunction = new Function(this, 'base-function', {
+            code: Code.fromAsset('src/lambda/scraper-status-publisher/function.zip'),
+            handler: "scraper_status_publisher.handler",
+            deadLetterQueueEnabled: false,
+            description: "Forwards scraper execution status message from SNS to Slack Webhook.",
+            functionName: "scraper-status-publisher",
+            logRetention: RetentionDays.SIX_MONTHS,
+            memorySize: 128,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3)
+        }).addEnvironment("SLACK_WEBHOOK_SFN", SLACK_WEBHOOK_SFN);
     }
 }
 

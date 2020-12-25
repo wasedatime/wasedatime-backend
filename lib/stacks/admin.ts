@@ -16,7 +16,7 @@ export class WasedaTimeAdminLayer extends AdminLayer {
 
     readonly statusNotifiers: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
 
-    // readonly alarmNotifiers: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
+    // readonly monitors: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
 
     constructor(scope: cdk.Construct, id: string, operationInterface: OperationInterface, props: cdk.StackProps) {
 

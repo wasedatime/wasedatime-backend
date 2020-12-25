@@ -15,7 +15,7 @@ export const cognitoEnv: StackProps = {
         account: process.env.AWS_ACCOUNT_ID,
         region: process.env.COGNITO_AFFILIATE_REGION
     }
-}
+};
 
 export enum AwsServicePrincipal {
 

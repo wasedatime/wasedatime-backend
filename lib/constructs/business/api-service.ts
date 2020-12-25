@@ -118,12 +118,12 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         });
         this.resources["/course-reviews"] = root;
 
-        const postReqModel = props.apiEndpoint.addModel('review-post-req-model',{
-                schema: courseReviewReqSchema,
-                contentType: "application/json",
-                description: "HTTP POST request body schema for fetching reviews for several courses",
-                modelName: "PostReviewsReq"
-            });
+        const postReqModel = props.apiEndpoint.addModel('review-post-req-model', {
+            schema: courseReviewReqSchema,
+            contentType: "application/json",
+            description: "HTTP POST request body schema for fetching reviews for several courses",
+            modelName: "PostReviewsReq"
+        });
         const postRespModel = props.apiEndpoint.addModel('review-post-resp-model', {
             schema: courseReviewRespSchema,
             contentType: "application/json",
@@ -193,11 +193,11 @@ export class FeedsApiService extends AbstractRestApiService {
         this.resources["/feeds"] = root;
 
         const getRespModel = props.apiEndpoint.addModel('feeds-get-resp-model', {
-                schema: articleListSchema,
-                contentType: "application/json",
-                description: "List of articles in feeds",
-                modelName: "GetFeedsResp"
-            });
+            schema: articleListSchema,
+            contentType: "application/json",
+            description: "List of articles in feeds",
+            modelName: "GetFeedsResp"
+        });
 
         const feedsIntegration = new MockIntegration({
             integrationResponses: [{

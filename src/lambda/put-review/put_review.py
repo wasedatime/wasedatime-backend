@@ -1,3 +1,4 @@
+import json
 import os
 
 import boto3
@@ -69,4 +70,4 @@ def lambda_handler(event, context):
         body = JsonPayloadBuilder().add_status(False).add_data(None) \
             .add_message("External request detected, related information will be reported to admin.").compile()
         return api_response(403, body)
-    # return post_review(json.loads(event['body']))
+    return put_review(json.loads(event['body']))

@@ -1,6 +1,17 @@
 import json
+import os
 from decimal import Decimal
 from re import fullmatch
+
+import boto3
+from google.cloud import translate
+
+db = boto3.resource("dynamodb", region_name="ap-northeast-1")
+table = db.Table(os.getenv('TABLE_NAME'))
+client = translate.TranslationServiceClient()
+
+langs = ['en', 'zh-CN', 'jp', 'zh-TW', 'ko']
+parent = "projects/wasedatime/locations/global"
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -43,6 +54,12 @@ def api_response(code, body):
     }
 
 
+# todo verify the user using jwt token
+
+def verify_user():
+    pass
+
+
 def bad_referer(headers):
     if "referer" not in headers:
         return True
@@ -50,3 +67,17 @@ def bad_referer(headers):
         return True
     else:
         return False
+
+
+def translate_text(text, src_lang, target_langs):
+    results = dict()
+    for lang in target_langs:
+        response = client.translate_text(
+            parent=parent,
+            contents=[text],
+            mime_type="text/plain",
+            source_language_code=src_lang,
+            target_language_code=lang)
+        results[lang] = response
+
+    return results
