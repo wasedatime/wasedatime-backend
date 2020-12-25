@@ -2,14 +2,14 @@ import * as cdk from "@aws-cdk/core";
 
 import {AdminLayer} from "../architecture/layers";
 import {OperationInterface} from "../architecture/interfaces";
-import {OperationEndpoint} from "../configs/registry";
+import {OperationEndpoint} from "../configs/common/registry";
 import {
     AbstractStatusNotifier,
     AmplifyBuildStatusNotifier,
     StackStatusNotifier,
     StatusNotifier,
     SyllabusScraperStatusNotifier
-} from "../constructs/status-notifier";
+} from "../constructs/admin/status-notifier";
 
 export class WasedaTimeAdminLayer extends AdminLayer {
 

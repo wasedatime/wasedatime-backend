@@ -1,8 +1,8 @@
 import * as cdk from '@aws-cdk/core';
 
-import {AbstractWebApp, AmplifyWebApp} from "../constructs/web-app";
+import {AbstractWebApp, AmplifyWebApp} from "../constructs/presentation/web-app";
 import {PresentationLayer} from "../architecture/layers";
-import {OperationEndpoint, ServiceEndpoint} from "../configs/registry";
+import {OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ServiceInterface} from "../architecture/interfaces";
 
 

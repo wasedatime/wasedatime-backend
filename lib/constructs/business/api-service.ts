@@ -2,7 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import {AwsIntegration, LambdaIntegration, Method, MockIntegration, Resource, RestApi} from "@aws-cdk/aws-apigateway";
 import {HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {AbstractRestApiEndpoint} from "./api-endpoint";
-import {allowHeaders, allowOrigins} from "../configs/api/cors";
+import {allowHeaders, allowOrigins} from "../../configs/api/cors";
 import {
     articleListSchema,
     articlePlainJson,
@@ -10,11 +10,11 @@ import {
     courseReviewReqSchema,
     courseReviewRespSchema,
     syllabusSchema
-} from "../configs/api/schema";
+} from "../../configs/api/schema";
 import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
-import {AwsServicePrincipal} from "../configs/aws";
-import {CourseReviewsFunctions} from "./lambda-functions";
-import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../configs/api/mapping";
+import {AwsServicePrincipal} from "../../configs/common/aws";
+import {CourseReviewsFunctions} from "../common/lambda-functions";
+import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../../configs/api/mapping";
 
 
 export interface ApiServiceProps {

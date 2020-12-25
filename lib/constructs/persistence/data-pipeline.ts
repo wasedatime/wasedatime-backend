@@ -6,10 +6,10 @@ import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tas
 import {Function} from "@aws-cdk/aws-lambda";
 import {Table} from "@aws-cdk/aws-dynamodb";
 
-import {allowApiGatewayPolicy} from "../configs/s3/access-setting";
-import {SyllabusScraper} from "./lambda-functions";
-import {prodCorsRule} from "../configs/s3/cors";
-import {syllabusSchedule} from "../configs/event/schedule";
+import {allowApiGatewayPolicy} from "../../configs/s3/access-setting";
+import {SyllabusScraper} from "../common/lambda-functions";
+import {prodCorsRule} from "../../configs/s3/cors";
+import {syllabusSchedule} from "../../configs/event/schedule";
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 

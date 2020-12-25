@@ -4,8 +4,8 @@ import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
-import {AwsServicePrincipal} from "../configs/aws";
-import {GOOGLE_API_KEY} from "../configs/lambda/environment";
+import {AwsServicePrincipal} from "../../configs/common/aws";
+import {GOOGLE_API_KEY} from "../../configs/lambda/environment";
 
 interface FunctionsProps {
     envvars: { [name: string]: string }

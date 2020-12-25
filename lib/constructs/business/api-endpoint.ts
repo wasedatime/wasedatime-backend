@@ -4,9 +4,9 @@ import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
 
 import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
-import {baseJsonApiSchema} from "../configs/api/schema";
-import {PreSignupWasedaMailValidator} from "./lambda-functions";
-import {ApiServices} from "../configs/api/service";
+import {baseJsonApiSchema} from "../../configs/api/schema";
+import {PreSignupWasedaMailValidator} from "../common/lambda-functions";
+import {ApiServices} from "../../configs/api/service";
 import {
     AccountRecovery,
     Mfa,
@@ -16,8 +16,13 @@ import {
     UserPoolDomain,
     UserPoolIdentityProviderGoogle
 } from "@aws-cdk/aws-cognito";
-import {CALLBACK_URLS, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, LOGOUT_URLS} from "../configs/cognito/oauth";
-import {WEBAPP_DOMAIN} from "../configs/amplify/website";
+import {
+    CALLBACK_URLS,
+    GOOGLE_OAUTH_CLIENT_ID,
+    GOOGLE_OAUTH_CLIENT_SECRET,
+    LOGOUT_URLS
+} from "../../configs/cognito/oauth";
+import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
 
 

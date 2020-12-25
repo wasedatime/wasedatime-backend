@@ -5,7 +5,7 @@ import {Function} from "@aws-cdk/aws-lambda";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {SnsTopic} from "@aws-cdk/aws-events-targets";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
-import {AmplifyStatusPublisher} from "./lambda-functions";
+import {AmplifyStatusPublisher} from "../common/lambda-functions";
 
 
 export enum StatusNotifier {

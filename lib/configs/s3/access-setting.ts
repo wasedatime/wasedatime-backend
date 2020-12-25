@@ -1,6 +1,6 @@
 import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 import {Effect, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
-import {AwsServicePrincipal} from "../aws";
+import {AwsServicePrincipal} from "../common/aws";
 
 
 export const publicAccess: BlockPublicAccess = new BlockPublicAccess({

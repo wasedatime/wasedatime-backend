@@ -5,8 +5,8 @@ import {
     AbstractRestApiEndpoint,
     WasedaTimeAuthEndpoint,
     WasedaTimeRestApiEndpoint
-} from "../constructs/api-endpoint";
-import {DataEndpoint, ServiceEndpoint} from "../configs/registry";
+} from "../constructs/business/api-endpoint";
+import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ApiEndpoint, ApiServices} from "../configs/api/service";
 import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";

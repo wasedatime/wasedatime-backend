@@ -3,10 +3,10 @@ import * as cdk from "@aws-cdk/core";
 import {Duration} from "@aws-cdk/core/lib/duration";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
-import {AwsServicePrincipal} from "../configs/aws";
-import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../configs/amplify/website";
-import {openapiBuildSpec, webappBuildSpec} from "../configs/amplify/build-setting";
-import {apiDocCode, webAppCode} from "../configs/amplify/codebase";
+import {AwsServicePrincipal} from "../../configs/common/aws";
+import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../../configs/amplify/website";
+import {openapiBuildSpec, webappBuildSpec} from "../../configs/amplify/build-setting";
+import {apiDocCode, webAppCode} from "../../configs/amplify/codebase";
 
 
 export interface WebAppProps {

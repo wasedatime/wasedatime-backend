@@ -6,10 +6,10 @@ import {
     FeedsDataPipeline,
     SyllabusDataPipeline,
     Worker
-} from "../constructs/data-pipeline";
-import {DataEndpoint, OperationEndpoint} from "../configs/registry";
+} from "../constructs/persistence/data-pipeline";
+import {DataEndpoint, OperationEndpoint} from "../configs/common/registry";
 import {PersistenceLayer} from "../architecture/layers";
-import {Collection, DynamoDatabase} from "../constructs/database";
+import {Collection, DynamoDatabase} from "../constructs/persistence/database";
 
 
 export class WasedaTimePersistenceLayer extends PersistenceLayer {
