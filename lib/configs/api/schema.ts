@@ -417,9 +417,6 @@ export const courseReviewPostReqSchema: JsonSchema = {
                 "instructor_jp": {
                     type: JsonSchemaType.STRING
                 },
-                "created_at": {
-                    type: JsonSchemaType.INTEGER
-                },
                 "benefit": {
                     type: JsonSchemaType.INTEGER
                 },
@@ -448,7 +445,6 @@ export const courseReviewPostReqSchema: JsonSchema = {
             required: [
                 "title_jp",
                 "instructor_jp",
-                "created_at",
                 "benefit",
                 "difficulty",
                 "satisfaction",

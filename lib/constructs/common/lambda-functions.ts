@@ -1,6 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import {Duration} from "@aws-cdk/core";
-import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
+import {Alias, Code, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
@@ -90,6 +90,22 @@ export class CourseReviewsFunctions extends cdk.Construct {
             timeout: Duration.seconds(5),
             environment: props.envvars
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
+    }
+
+    deploy(func: Function) {
+        let devVer = func.currentVersion;
+        let prodVer = func.currentVersion;
+        new Alias(this, 'alias-dev', {
+            aliasName: 'dev',
+            version: devVer,
+            description: "Develop stage"
+        });
+        new Alias(this, 'alias-prod', {
+            aliasName: 'prod',
+            version: prodVer,
+            description: "Production stage"
+        });
+        return this;
     }
 }
 

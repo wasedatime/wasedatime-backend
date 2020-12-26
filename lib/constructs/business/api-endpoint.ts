@@ -1,5 +1,13 @@
 import * as cdk from "@aws-cdk/core";
-import {DomainName, EndpointType, LambdaRestApi, RestApi, SpecRestApi, Stage} from "@aws-cdk/aws-apigateway";
+import {
+    Deployment,
+    DomainName,
+    EndpointType,
+    LambdaRestApi,
+    RestApi,
+    SpecRestApi,
+    Stage
+} from "@aws-cdk/aws-apigateway";
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
 import {
@@ -12,6 +20,7 @@ import {
     UserPoolIdentityProviderGoogle
 } from "@aws-cdk/aws-cognito";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
+import * as uuid from "uuid";
 
 import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
 import {baseJsonApiSchema} from "../../configs/api/schema";
@@ -25,6 +34,7 @@ import {
 } from "../../configs/cognito/oauth";
 import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
 import {AUTH_CERT_ARN} from "../../configs/common/arn";
+import {STAGE} from "../../configs/common/aws";
 
 
 export interface ApiEndpointProps {
@@ -100,17 +110,39 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             restApiName: "wasedatime-rest-api",
             endpointTypes: [EndpointType.REGIONAL],
             cloudWatchRole: false,
-            deploy: true,
-            deployOptions: {
-                throttlingBurstLimit: 10,
-                throttlingRateLimit: 10,
-                stageName: 'prod',
-                description: "Production stage"
-            }
+            deploy: false
         });
 
-        this.stages['prod'] = this.apiEndpoint.deploymentStage;
-        // this.stages['dev'] = new Stage(this, 'dev-stage', {deployment: undefined});
+        const prodDeployment = new Deployment(this, 'prod-deployment', {
+            api: this.apiEndpoint,
+            retainDeployments: false
+        });
+        const devDeployment = new Deployment(this, 'dev-deployment', {
+            api: this.apiEndpoint,
+            retainDeployments: false
+        });
+        if (STAGE === 'dev') {
+            devDeployment.addToLogicalId(uuid.v4());
+        } else if (STAGE === 'prod') {
+            prodDeployment.addToLogicalId(uuid.v4());
+        }
+
+        this.stages['prod'] = new Stage(this, 'prod-stage', {
+            stageName: 'prod',
+            deployment: prodDeployment,
+            description: "Production stage",
+            throttlingRateLimit: 10,
+            throttlingBurstLimit: 10,
+            variables: {["STAGE"]: STAGE}
+        });
+        this.stages['dev'] = new Stage(this, 'dev-stage', {
+            stageName: 'dev',
+            deployment: devDeployment,
+            description: "Develop stage",
+            throttlingRateLimit: 10,
+            throttlingBurstLimit: 10,
+            variables: {["STAGE"]: STAGE}
+        });
 
         // const domain = this.apiEndpoint.addDomainName('domain', {
         //     certificate: Certificate.fromCertificateArn(this, 'api-domain', API_CERT_ARN),
