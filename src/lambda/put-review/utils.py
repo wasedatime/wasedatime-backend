@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from decimal import Decimal
@@ -12,13 +13,13 @@ db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
 
 # Google Translation client and configs
-acct_info = json.loads(os.environ.get('GOOGLE_API_SERVICE_ACCOUNT_INFO'))
+acct_info = json.loads(base64.b64decode(os.environ.get('GOOGLE_API_SERVICE_ACCOUNT_INFO')))
 credentials = service_account.Credentials.from_service_account_info(acct_info)
 client = translate.TranslationServiceClient(credentials=credentials)
 parent = "projects/wasedatime/locations/global"
 
 # Supported languages
-langs = ['en', 'zh-CN', 'jp', 'zh-TW', 'ko']
+langs = ['en', 'ja', 'ko', 'zh-CN', 'zh-TW']
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -32,11 +33,11 @@ class JsonPayloadBuilder:
     payload = {}
 
     def add_status(self, success):
-        self.payload['data'] = success
+        self.payload['success'] = success
         return self
 
     def add_data(self, data):
-        self.payload['success'] = data
+        self.payload['data'] = data
         return self
 
     def add_message(self, msg):
@@ -44,7 +45,7 @@ class JsonPayloadBuilder:
         return self
 
     def compile(self):
-        json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
+        return json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
 
 
 def api_response(code, body):
@@ -76,15 +77,25 @@ def bad_referer(headers):
         return False
 
 
-def translate_text(text, src_lang, target_langs):
-    results = dict()
-    for lang in target_langs:
-        response = client.translate_text(
-            parent=parent,
-            contents=[text],
-            mime_type="text/plain",
-            source_language_code=src_lang,
-            target_language_code=lang)
+def translate_text(text):
+    src_lang = client.detect_language(request={
+        "parent": parent,
+        "content": text,
+        "mime_type": "text/plain"
+    }).languages[0].language_code
+    langs.remove(src_lang)
+
+    results = {
+        "src": src_lang
+    }
+    for lang in langs:
+        response = client.translate_text(request={
+            "parent": parent,
+            "contents": [text],
+            "mime_type": "text/plain",
+            "source_language_code": src_lang,
+            "target_language_code": lang
+        })
         results[lang] = response.translations[0].translated_text
 
     return results

@@ -1,15 +1,14 @@
 import json
 from datetime import datetime
 
-from utils import bad_referer, JsonPayloadBuilder, api_response, translate_text, client, parent, langs, table
+from utils import bad_referer, JsonPayloadBuilder, api_response, translate_text, langs, table
 
 
-def post_review(review):
+def post_review(course_key, review):
     text = review["comment"]
 
-    src_lang = client.detect_language(parent, content=text).languages[0].language_code
-    langs.remove(src_lang)
-    translated = translate_text(text, src_lang, langs)
+    translated = translate_text(text)
+    src_lang = translated['src']
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -44,10 +43,12 @@ def handler(event, context):
             .add_message("External request detected, related information will be reported to admin.").compile()
         return api_response(403, body)
 
-    # try:
-    resp = post_review(json.loads(event['body']))
-    # except Exception:
-    #     error = JsonPayloadBuilder().add_status(False).add_data(None) \
-    #         .add_message("Internal error, please contact admin@wasedatime.com.").compile()
-    #     return api_response(500, error)
+    try:
+        course_key = event["queryStringParameters"]["key"]
+        review = json.loads(event['body'])
+        resp = post_review(course_key, review)
+    except Exception:
+        error = JsonPayloadBuilder().add_status(False).add_data(None) \
+            .add_message("Internal error, please contact admin@wasedatime.com.").compile()
+        return api_response(500, error)
     return api_response(200, resp)

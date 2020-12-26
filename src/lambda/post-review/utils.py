@@ -19,7 +19,7 @@ client = translate.TranslationServiceClient(credentials=credentials)
 parent = "projects/wasedatime/locations/global"
 
 # Supported languages
-langs = ['en', 'zh-CN', 'jp', 'zh-TW', 'ko']
+langs = ['en', 'ja', 'ko', 'zh-CN', 'zh-TW']
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -30,7 +30,6 @@ class DecimalEncoder(json.JSONEncoder):
 
 
 class JsonPayloadBuilder:
-
     payload = {}
 
     def add_status(self, success):
@@ -78,15 +77,25 @@ def bad_referer(headers):
         return False
 
 
-def translate_text(text, src_lang, target_langs):
-    results = dict()
-    for lang in target_langs:
-        response = client.translate_text(
-            parent=parent,
-            contents=[text],
-            mime_type="text/plain",
-            source_language_code=src_lang,
-            target_language_code=lang)
+def translate_text(text):
+    src_lang = client.detect_language(request={
+        "parent": parent,
+        "content": text,
+        "mime_type": "text/plain"
+    }).languages[0].language_code
+    langs.remove(src_lang)
+
+    results = {
+        "src": src_lang
+    }
+    for lang in langs:
+        response = client.translate_text(request={
+            "parent": parent,
+            "contents": [text],
+            "mime_type": "text/plain",
+            "source_language_code": src_lang,
+            "target_language_code": lang
+        })
         results[lang] = response.translations[0].translated_text
 
     return results

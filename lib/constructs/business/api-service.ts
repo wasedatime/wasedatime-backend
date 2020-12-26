@@ -1,5 +1,13 @@
 import * as cdk from "@aws-cdk/core";
-import {AwsIntegration, LambdaIntegration, Method, MockIntegration, Resource, RestApi} from "@aws-cdk/aws-apigateway";
+import {
+    AwsIntegration,
+    LambdaIntegration,
+    Method,
+    MockIntegration,
+    PassthroughBehavior,
+    Resource,
+    RestApi
+} from "@aws-cdk/aws-apigateway";
 import {HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 
@@ -211,6 +219,8 @@ export class FeedsApiService extends AbstractRestApiService {
         });
 
         const feedsIntegration = new MockIntegration({
+            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
             integrationResponses: [{
                 statusCode: '200',
                 responseTemplates: {["application/json"]: articlePlainJson}
@@ -231,8 +241,7 @@ export class FeedsApiService extends AbstractRestApiService {
             operationName: "ListArticles",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: getRespModel},
-                responseParameters: lambdaRespParams
+                responseModels: {["application/json"]: getRespModel}
             }]
         });
     }

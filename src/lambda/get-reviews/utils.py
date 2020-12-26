@@ -14,11 +14,11 @@ class JsonPayloadBuilder:
     payload = {}
 
     def add_status(self, success):
-        self.payload['data'] = success
+        self.payload['success'] = success
         return self
 
     def add_data(self, data):
-        self.payload['success'] = data
+        self.payload['data'] = data
         return self
 
     def add_message(self, msg):
@@ -26,7 +26,7 @@ class JsonPayloadBuilder:
         return self
 
     def compile(self):
-        json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
+        return json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
 
 
 def api_response(code, body):

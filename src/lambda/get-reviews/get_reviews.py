@@ -1,4 +1,3 @@
-import json
 import os
 
 import boto3
@@ -13,6 +12,10 @@ table = db.Table(os.getenv('TABLE_NAME'))
 def get_reviews(course_key, uid):
     results = table.query(KeyConditionExpression=Key("course_key").eq(course_key))["Items"]
     for r in results:
+        r["benefit"] = int(r["benefit"])
+        r["difficulty"] = int(r["difficulty"])
+        r["satisfaction"] = int(r["satisfaction"])
+        r["year"] = int(r["year"])
         r["mod"] = False
         if r["uid"] == uid:
             r["mod"] = True
@@ -28,8 +31,8 @@ def handler(event, context):
             .add_message("External request detected, related information will be reported to admin.").compile()
         return api_response(403, resp)
 
-    course_key = json.loads(event["queryStringParameters"])["key"]
-    uid = json.loads(event["queryStringParameters"])["uid"]
+    course_key = event["queryStringParameters"]["key"]
+    uid = event["queryStringParameters"]["uid"]
     try:
         resp = get_reviews(course_key, uid)
     except Exception:

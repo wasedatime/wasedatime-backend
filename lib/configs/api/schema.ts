@@ -320,7 +320,7 @@ export const courseReviewGetRespSchema: JsonSchema = {
                                 "src_lang": {
                                     type: JsonSchemaType.STRING
                                 },
-                                "comment_jp": {
+                                "comment_ja": {
                                     type: JsonSchemaType.STRING
                                 },
                                 "course_key": {
@@ -351,7 +351,7 @@ export const courseReviewGetRespSchema: JsonSchema = {
                                 "comment_en",
                                 "year",
                                 "src_lang",
-                                "comment_jp",
+                                "comment_ja",
                                 "course_key",
                                 "title",
                                 "mod"
