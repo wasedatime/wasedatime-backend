@@ -10,8 +10,9 @@ table = db.Table(os.getenv('TABLE_NAME'))
 
 
 def get_reviews(course_key, uid):
-    results = table.query(KeyConditionExpression=Key("course_key").eq(course_key))["Items"]
+    results = table.query(KeyConditionExpression=Key("course_key").eq(course_key), ScanIndexForward=False)["Items"]
     for r in results:
+        r.pop("course_key")
         r["benefit"] = int(r["benefit"])
         r["difficulty"] = int(r["difficulty"])
         r["satisfaction"] = int(r["satisfaction"])
@@ -33,10 +34,11 @@ def handler(event, context):
 
     course_key = event["queryStringParameters"]["key"]
     uid = event["queryStringParameters"]["uid"]
+
     try:
         resp = get_reviews(course_key, uid)
+        return api_response(200, resp)
     except Exception:
         resp = JsonPayloadBuilder().add_status(False).add_data(None) \
             .add_message("Internal error, please contact admin@wasedatime.com.").compile()
         return api_response(500, resp)
-    return api_response(200, resp)

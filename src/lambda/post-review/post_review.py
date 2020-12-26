@@ -4,7 +4,7 @@ from datetime import datetime
 from utils import bad_referer, JsonPayloadBuilder, api_response, translate_text, langs, table
 
 
-def post_review(course_key, review):
+def post_review(review):
     text = review["comment"]
 
     translated = translate_text(text)
@@ -39,16 +39,20 @@ def post_review(course_key, review):
 
 def handler(event, context):
     if bad_referer(event["headers"]):
-        body = JsonPayloadBuilder().add_status(False).add_data(None) \
+        resp = JsonPayloadBuilder().add_status(False).add_data(None) \
             .add_message("External request detected, related information will be reported to admin.").compile()
-        return api_response(403, body)
+        return api_response(403, resp)
+
+    req = json.loads(event['body'])
+    # todo verify user
+    # token = req["token"]
+
+    review = req["data"]
 
     try:
-        course_key = event["queryStringParameters"]["key"]
-        review = json.loads(event['body'])
-        resp = post_review(course_key, review)
+        resp = post_review(review)
+        return api_response(200, resp)
     except Exception:
-        error = JsonPayloadBuilder().add_status(False).add_data(None) \
+        resp = JsonPayloadBuilder().add_status(False).add_data(None) \
             .add_message("Internal error, please contact admin@wasedatime.com.").compile()
-        return api_response(500, error)
-    return api_response(200, resp)
+        return api_response(500, resp)
