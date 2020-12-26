@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from decimal import Decimal
@@ -12,7 +13,7 @@ db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
 
 # Google Translation client and configs
-acct_info = json.loads(os.environ.get('GOOGLE_API_SERVICE_ACCOUNT_INFO'))
+acct_info = json.loads(base64.b64decode(os.environ.get('GOOGLE_API_SERVICE_ACCOUNT_INFO')))
 credentials = service_account.Credentials.from_service_account_info(acct_info)
 client = translate.TranslationServiceClient(credentials=credentials)
 parent = "projects/wasedatime/locations/global"
@@ -29,14 +30,15 @@ class DecimalEncoder(json.JSONEncoder):
 
 
 class JsonPayloadBuilder:
+
     payload = {}
 
     def add_status(self, success):
-        self.payload['data'] = success
+        self.payload['success'] = success
         return self
 
     def add_data(self, data):
-        self.payload['success'] = data
+        self.payload['data'] = data
         return self
 
     def add_message(self, msg):
@@ -44,7 +46,7 @@ class JsonPayloadBuilder:
         return self
 
     def compile(self):
-        json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
+        return json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
 
 
 def api_response(code, body):

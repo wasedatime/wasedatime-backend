@@ -8,9 +8,8 @@ import {allowHeaders, allowOrigins} from "../../configs/api/cors";
 import {
     articleListSchema,
     articlePlainJson,
+    courseReviewGetRespSchema,
     courseReviewPostReqSchema,
-    courseReviewReqSchema,
-    courseReviewRespSchema,
     syllabusSchema
 } from "../../configs/api/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
@@ -118,23 +117,23 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         });
         this.resources["/course-reviews"] = root;
 
-        const postReqModel = props.apiEndpoint.addModel('review-post-req-model', {
-            schema: courseReviewReqSchema,
+        const getRespModel = props.apiEndpoint.addModel('review-get-resp-model', {
+            schema: courseReviewGetRespSchema,
             contentType: "application/json",
-            description: "HTTP POST request body schema for fetching reviews for several courses",
-            modelName: "PostReviewsReq"
+            description: "HTTP GET response body schema for fetching reviews.",
+            modelName: "GetReviewsResp"
         });
-        const postRespModel = props.apiEndpoint.addModel('review-post-resp-model', {
-            schema: courseReviewRespSchema,
+        const postReqModel = props.apiEndpoint.addModel('review-post-req-model', {
+            schema: courseReviewPostReqSchema,
             contentType: "application/json",
-            description: "HTTP POST response body schema for fetching reviews for several courses",
-            modelName: "PostReviewsResp"
+            description: "HTTP POST request body schema for submitting the review.",
+            modelName: "PostReviewReq"
         });
         const putReqModel = props.apiEndpoint.addModel('review-put-req-model', {
             schema: courseReviewPostReqSchema,
             contentType: "application/json",
             description: "HTTP PUT request body schema for updating a review",
-            modelName: "PutReviewsReq"
+            modelName: "PutReviewReq"
         });
 
         const courseReviewsFunctions = new CourseReviewsFunctions(this, 'crud-functions', {
@@ -142,6 +141,9 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 'TABLE_NAME': props.dataSource!
             }
         });
+        const getIntegration = new LambdaIntegration(
+            courseReviewsFunctions.getFunction, {proxy: true}
+        );
         const postIntegration = new LambdaIntegration(
             courseReviewsFunctions.postFunction, {proxy: true}
         );
@@ -154,13 +156,22 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
         });
+        this.methods.GET = root.addMethod(HttpMethod.GET, getIntegration,
+            {
+                operationName: "GetReviews",
+                methodResponses: [{
+                    statusCode: '200',
+                    responseModels: {["application/json"]: getRespModel},
+                    responseParameters: lambdaRespParams
+                }]
+            }
+        );
         this.methods.POST = root.addMethod(HttpMethod.POST, postIntegration,
             {
-                operationName: "BatchGetReviews",
+                operationName: "PostReview",
                 requestModels: {["application/json"]: postReqModel},
                 methodResponses: [{
                     statusCode: '200',
-                    responseModels: {["application/json"]: postRespModel},
                     responseParameters: lambdaRespParams
                 }]
             }

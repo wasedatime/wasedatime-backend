@@ -261,32 +261,7 @@ export const syllabusSchema: JsonSchema = {
     }
 };
 
-export const courseReviewReqSchema: JsonSchema = {
-    schema: JsonSchemaVersion.DRAFT7,
-    type: JsonSchemaType.OBJECT,
-    properties: {
-        "data": {
-            type: JsonSchemaType.OBJECT,
-            properties: {
-                "course_keys": {
-                    type: JsonSchemaType.ARRAY,
-                    items: {
-                        type: JsonSchemaType.STRING
-                    }
-                }
-            },
-            required: [
-                "course_keys"
-            ],
-        }
-    },
-    required: [
-        "data"
-    ]
-};
-
-// todo
-export const courseReviewRespSchema: JsonSchema = {
+export const courseReviewGetRespSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     type: JsonSchemaType.OBJECT,
     properties: {

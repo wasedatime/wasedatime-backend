@@ -66,13 +66,13 @@ export class AmplifyWebApp extends AbstractWebApp {
         });
 
         const mainBranch: Branch = this.app.addBranch('main', {
-            autoBuild: true,
+            autoBuild: false,
             branchName: "main",
             stage: "PRODUCTION"
         });
         this.branches["main"] = mainBranch;
         const devBranch: Branch = this.app.addBranch('dev', {
-            autoBuild: true,
+            autoBuild: false,
             basicAuth: developerAuth,
             branchName: "develop",
             stage: "DEVELOPMENT"

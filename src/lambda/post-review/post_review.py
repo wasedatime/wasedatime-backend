@@ -22,7 +22,7 @@ def post_review(review):
         "difficulty": review["difficulty"],
         "satisfaction": review["satisfaction"],
         "instructor": review["instructor"],
-        "year": review["instructor"],
+        "year": review["year"],
         f"comment_{src_lang}": text,
         "src_lang": src_lang,
         "course_key": review["course_key"],
@@ -44,10 +44,10 @@ def handler(event, context):
             .add_message("External request detected, related information will be reported to admin.").compile()
         return api_response(403, body)
 
-    try:
-        resp = post_review(json.loads(event['body']))
-    except Exception:
-        error = JsonPayloadBuilder().add_status(False).add_data(None) \
-            .add_message("Internal error, please contact admin@wasedatime.com.").compile()
-        return api_response(500, error)
+    # try:
+    resp = post_review(json.loads(event['body']))
+    # except Exception:
+    #     error = JsonPayloadBuilder().add_status(False).add_data(None) \
+    #         .add_message("Internal error, please contact admin@wasedatime.com.").compile()
+    #     return api_response(500, error)
     return api_response(200, resp)
