@@ -260,6 +260,7 @@ export const syllabusSchema: JsonSchema = {
         }
     }
 };
+
 export const courseReviewReqSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     type: JsonSchemaType.OBJECT,
@@ -311,14 +312,11 @@ export const courseReviewRespSchema: JsonSchema = {
                                 "instructor_jp": {
                                     type: JsonSchemaType.STRING
                                 },
-                                "course_code": {
+                                "updated_at": {
                                     type: JsonSchemaType.STRING
                                 },
-                                "updated_at": {
-                                    type: JsonSchemaType.INTEGER
-                                },
                                 "created_at": {
-                                    type: JsonSchemaType.INTEGER
+                                    type: JsonSchemaType.STRING
                                 },
                                 "benefit": {
                                     type: JsonSchemaType.INTEGER
@@ -338,11 +336,14 @@ export const courseReviewRespSchema: JsonSchema = {
                                 "comment_en": {
                                     type: JsonSchemaType.STRING
                                 },
+                                "comment_ko": {
+                                    type: JsonSchemaType.STRING
+                                },
                                 "year": {
                                     type: JsonSchemaType.INTEGER
                                 },
-                                "comment_src_lng": {
-                                    type: JsonSchemaType.INTEGER
+                                "src_lang": {
+                                    type: JsonSchemaType.STRING
                                 },
                                 "comment_jp": {
                                     type: JsonSchemaType.STRING
@@ -363,18 +364,18 @@ export const courseReviewRespSchema: JsonSchema = {
                             required: [
                                 "title_jp",
                                 "instructor_jp",
-                                "course_code",
                                 "updated_at",
                                 "created_at",
                                 "benefit",
                                 "difficulty",
                                 "satisfaction",
                                 "instructor",
-                                "comment_zh_CN",
-                                "comment_zh_TW",
+                                "comment_zh-CN",
+                                "comment_zh-TW",
+                                "comment_ko",
                                 "comment_en",
                                 "year",
-                                "comment_src_lng",
+                                "src_lang",
                                 "comment_jp",
                                 "course_key",
                                 "title",
@@ -400,7 +401,7 @@ export const courseReviewRespSchema: JsonSchema = {
     ]
 };
 
-export const courseReviewPutReqSchema: JsonSchema = {
+export const courseReviewPostReqSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     type: JsonSchemaType.OBJECT,
     properties: {
@@ -434,9 +435,6 @@ export const courseReviewPutReqSchema: JsonSchema = {
                 "year": {
                     type: JsonSchemaType.INTEGER
                 },
-                "comment_src_lng": {
-                    type: JsonSchemaType.INTEGER
-                },
                 "comment": {
                     type: JsonSchemaType.STRING
                 },
@@ -457,15 +455,18 @@ export const courseReviewPutReqSchema: JsonSchema = {
                 "instructor",
                 "comment",
                 "year",
-                "comment_src_lng",
                 "course_key",
                 "title",
                 "uid"
             ]
+        },
+        "token": {
+            type: JsonSchemaType.STRING
         }
     },
     required: [
-        "data"
+        "data",
+        "token"
     ]
 };
 

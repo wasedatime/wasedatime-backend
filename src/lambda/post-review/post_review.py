@@ -7,22 +7,24 @@ from utils import bad_referer, JsonPayloadBuilder, api_response, translate_text,
 def post_review(review):
     text = review["comment"]
 
-    lang = client.detect_language(parent, content=text).languages[0].language_code
-    langs.remove(lang)
-    translated = translate_text(text, lang, langs)
+    src_lang = client.detect_language(parent, content=text).languages[0].language_code
+    langs.remove(src_lang)
+    translated = translate_text(text, src_lang, langs)
+
+    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     review_item = {
         "title_jp": review["title_jp"],
         "instructor_jp": review["instructor_jp"],
-        "created_at": datetime.now().timestamp(),
-        "updated_at": '',
+        "created_at": dt_now,
+        "updated_at": dt_now,
         "benefit": review["benefit"],
         "difficulty": review["difficulty"],
         "satisfaction": review["satisfaction"],
         "instructor": review["instructor"],
         "year": review["instructor"],
-        f"comment_{lang}": text,
-        "comment_src_lng": lang,
+        f"comment_{src_lang}": text,
+        "src_lang": src_lang,
         "course_key": review["course_key"],
         "title": review["title"],
         "uid": review["uid"]

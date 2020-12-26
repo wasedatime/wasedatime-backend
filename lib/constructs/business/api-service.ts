@@ -8,7 +8,7 @@ import {allowHeaders, allowOrigins} from "../../configs/api/cors";
 import {
     articleListSchema,
     articlePlainJson,
-    courseReviewPutReqSchema,
+    courseReviewPostReqSchema,
     courseReviewReqSchema,
     courseReviewRespSchema,
     syllabusSchema
@@ -131,7 +131,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             modelName: "PostReviewsResp"
         });
         const putReqModel = props.apiEndpoint.addModel('review-put-req-model', {
-            schema: courseReviewPutReqSchema,
+            schema: courseReviewPostReqSchema,
             contentType: "application/json",
             description: "HTTP PUT request body schema for updating a review",
             modelName: "PutReviewsReq"

@@ -57,8 +57,8 @@ export class AmplifyWebApp extends AbstractWebApp {
             customRules: webappSiteRules,
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: {
-                "REACT_APP_API_BASE_URL": props.apiDomain,
-                "REACT_APP_OAUTH_URL": props.authDomain,
+                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}`,
+                "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192"
             },
             role: amplifyServiceRole,

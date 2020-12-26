@@ -5,7 +5,7 @@ import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {GOOGLE_API_KEY, SLACK_WEBHOOK_AMP, SLACK_WEBHOOK_SFN} from "../../configs/lambda/environment";
+import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_AMP, SLACK_WEBHOOK_SFN} from "../../configs/lambda/environment";
 
 
 interface FunctionsProps {
@@ -75,7 +75,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(5),
             environment: props.envvars
-        }).addEnvironment("GOOGLE_API_KEY", GOOGLE_API_KEY);
+        }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
 
         this.putFunction = new Function(this, 'put-review', {
             code: Code.fromAsset('src/lambda/put-review/function.zip'),
@@ -89,7 +89,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(5),
             environment: props.envvars
-        }).addEnvironment("GOOGLE_API_KEY", GOOGLE_API_KEY);
+        }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
     }
 }
 
@@ -144,7 +144,7 @@ export class ScraperStatusPublisher extends cdk.Construct {
         super(scope, id);
 
         this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('src/lambda/scraper-status-publisher/function.zip'),
+            code: Code.fromAsset('src/lambda/sfn-status-publisher/function.zip'),
             handler: "scraper_status_publisher.handler",
             deadLetterQueueEnabled: false,
             description: "Forwards scraper execution status message from SNS to Slack Webhook.",

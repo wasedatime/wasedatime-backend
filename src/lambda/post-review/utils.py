@@ -5,13 +5,20 @@ from re import fullmatch
 
 import boto3
 from google.cloud import translate
+from google.oauth2 import service_account
 
+# AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
-client = translate.TranslationServiceClient()
 
-langs = ['en', 'zh-CN', 'jp', 'zh-TW', 'ko']
+# Google Translation client and configs
+acct_info = json.loads(os.environ.get('GOOGLE_API_SERVICE_ACCOUNT_INFO'))
+credentials = service_account.Credentials.from_service_account_info(acct_info)
+client = translate.TranslationServiceClient(credentials=credentials)
 parent = "projects/wasedatime/locations/global"
+
+# Supported languages
+langs = ['en', 'zh-CN', 'jp', 'zh-TW', 'ko']
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -78,6 +85,6 @@ def translate_text(text, src_lang, target_langs):
             mime_type="text/plain",
             source_language_code=src_lang,
             target_language_code=lang)
-        results[lang] = response
+        results[lang] = response.translations[0].translated_text
 
     return results

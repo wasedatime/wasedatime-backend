@@ -5,7 +5,8 @@ import * as cdk from "@aws-cdk/core";
 export enum Collection {
     COURSE_REVIEW,
     CAREER,
-    FEEDS
+    FEEDS,
+    SYLLABUS
 }
 
 export interface DatabaseProps {
@@ -24,8 +25,8 @@ export class DynamoDatabase extends cdk.Construct {
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
-            sortKey: {name: "timestamp", type: AttributeType.STRING},
-            tableName: "course-reviews",
+            sortKey: {name: "created_at", type: AttributeType.STRING},
+            tableName: "course-review",
             readCapacity: 5,
             writeCapacity: 5
         });
@@ -35,8 +36,8 @@ export class DynamoDatabase extends cdk.Construct {
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
-            sortKey: {name: "date_updated", type: AttributeType.STRING},
-            tableName: "career-info",
+            sortKey: {name: "created_at", type: AttributeType.STRING},
+            tableName: "career",
             readCapacity: 1,
             writeCapacity: 1
         });
@@ -46,13 +47,13 @@ export class DynamoDatabase extends cdk.Construct {
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
-            sortKey: {name: "date_updated", type: AttributeType.STRING},
-            tableName: "article-info",
+            sortKey: {name: "created_at", type: AttributeType.STRING},
+            tableName: "feeds",
             readCapacity: 1,
             writeCapacity: 1
         });
 
-        this.tables[Collection.COURSE_REVIEW] = new Table(this, 'dynamodb-syllabus-table', {
+        this.tables[Collection.SYLLABUS] = new Table(this, 'dynamodb-syllabus-table', {
             partitionKey: {name: "dept", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
