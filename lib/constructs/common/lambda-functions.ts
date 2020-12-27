@@ -140,7 +140,7 @@ export class AmplifyStatusPublisher extends cdk.Construct {
 
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/amplify-status-publisher/function.zip'),
-            handler: "amplify_status_publisher.handler",
+            handler: "amplify-status-publisher.handler",
             deadLetterQueueEnabled: false,
             description: "Forwards Amplify build status message from SNS to Slack Webhook.",
             functionName: "amplify-status-publisher",
@@ -161,7 +161,7 @@ export class ScraperStatusPublisher extends cdk.Construct {
 
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/sfn-status-publisher/function.zip'),
-            handler: "scraper_status_publisher.handler",
+            handler: "scraper-status-publisher.handler",
             deadLetterQueueEnabled: false,
             description: "Forwards scraper execution status message from SNS to Slack Webhook.",
             functionName: "scraper-status-publisher",
