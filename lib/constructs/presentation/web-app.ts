@@ -43,7 +43,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             customRules: webappSiteRules,
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}`,
+                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/staging`,
                 "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192"
             },
@@ -54,7 +54,8 @@ export class AmplifyWebApp extends AbstractWebApp {
             autoBuild: false,
             branchName: "main",
             stage: "PRODUCTION"
-        });
+        }).addEnvironment("REACT_APP_API_BASE_URL", "https://api.wasedatime.com/v1");
+
         this.branches["main"] = mainBranch;
         const devBranch: Branch = this.app.addBranch('dev', {
             autoBuild: false,
@@ -105,7 +106,7 @@ export class OpenApiWebsite extends AbstractWebApp {
         this.domain = this.app.addDomain('domain', {
             domainName: "openapi." + WEBAPP_DOMAIN,
             subDomains: [
-                {branch: mainBranch}
+                {branch: mainBranch, prefix: ''}
             ]
         });
     }
