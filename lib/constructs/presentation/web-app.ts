@@ -64,11 +64,12 @@ export class AmplifyWebApp extends AbstractWebApp {
         });
         this.branches["dev"] = devBranch;
 
+        // fixme migration
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
-                {branch: devBranch, prefix: "dev"},
-                {branch: mainBranch}
+                {branch: devBranch, prefix: "develop"},
+                {branch: mainBranch, prefix: "main"}
             ]
         });
     }
@@ -104,7 +105,7 @@ export class OpenApiWebsite extends AbstractWebApp {
         this.domain = this.app.addDomain('domain', {
             domainName: "openapi." + WEBAPP_DOMAIN,
             subDomains: [
-                {branch: mainBranch, prefix: "openapi"}
+                {branch: mainBranch}
             ]
         });
     }

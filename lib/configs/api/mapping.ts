@@ -1,3 +1,4 @@
+// fixme migration
 export const s3RespMapping = {
     ['method.response.header.Access-Control-Allow-Origin']: "'*'",
     ['method.response.header.Cache-Control']: 'integration.response.header.Cache-Control',
