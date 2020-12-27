@@ -6,17 +6,17 @@ import {
     FeedsDataPipeline,
     SyllabusDataPipeline,
     Worker
-} from "../constructs/data-pipeline";
-import {DataEndpoint, OperationEndpoint} from "../configs/registry";
+} from "../constructs/persistence/data-pipeline";
+import {DataEndpoint, OperationEndpoint} from "../configs/common/registry";
 import {PersistenceLayer} from "../architecture/layers";
-import {Collection, DynamoDatabase} from "../constructs/database";
+import {Collection, DynamoDatabase} from "../constructs/persistence/database";
 
 
 export class WasedaTimePersistenceLayer extends PersistenceLayer {
 
     readonly dataPipelines: { [name in Worker]?: AbstractDataPipeline } = {};
 
-    readonly databases: { [name: string]: DynamoDatabase };
+    readonly databases: { [name: string]: DynamoDatabase } = {};
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
@@ -25,6 +25,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
         this.dataPipelines[Worker.SYLLABUS] = syllabusDatePipeline;
 
         const dynamoDatabase = new DynamoDatabase(this, 'dynamo-db', {});
+        this.databases["dynamo-main"] = dynamoDatabase;
 
         this.dataPipelines[Worker.CAREER] = new CareerDataPipeline(this, 'career-datapipeline', {
             dataWarehouse: dynamoDatabase.tables[Collection.CAREER]
@@ -35,7 +36,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
 
         this.dataInterface.setEndpoint(
             DataEndpoint.COURSE_REVIEWS,
-            dynamoDatabase.tables[Collection.COURSE_REVIEW].tableArn
+            dynamoDatabase.tables[Collection.COURSE_REVIEW].tableName
         );
         this.dataInterface.setEndpoint(
             DataEndpoint.FEEDS,

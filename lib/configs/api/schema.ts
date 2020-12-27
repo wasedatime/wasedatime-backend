@@ -260,24 +260,8 @@ export const syllabusSchema: JsonSchema = {
         }
     }
 };
-export const courseReviewReqSchema: JsonSchema = {
-    schema: JsonSchemaVersion.DRAFT7,
-    type: JsonSchemaType.OBJECT,
-    properties: {
-        "course_keys": {
-            type: JsonSchemaType.ARRAY,
-            items: {
-                type: JsonSchemaType.STRING
-            }
-        }
-    },
-    required: [
-        "course_keys"
-    ]
-};
 
-// todo
-export const courseReviewRespSchema: JsonSchema = {
+export const courseReviewGetRespSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     type: JsonSchemaType.OBJECT,
     properties: {
@@ -303,14 +287,11 @@ export const courseReviewRespSchema: JsonSchema = {
                                 "instructor_jp": {
                                     type: JsonSchemaType.STRING
                                 },
-                                "course_code": {
+                                "updated_at": {
                                     type: JsonSchemaType.STRING
                                 },
-                                "updated_at": {
-                                    type: JsonSchemaType.INTEGER
-                                },
                                 "created_at": {
-                                    type: JsonSchemaType.INTEGER
+                                    type: JsonSchemaType.STRING
                                 },
                                 "benefit": {
                                     type: JsonSchemaType.INTEGER
@@ -330,16 +311,16 @@ export const courseReviewRespSchema: JsonSchema = {
                                 "comment_en": {
                                     type: JsonSchemaType.STRING
                                 },
+                                "comment_ko": {
+                                    type: JsonSchemaType.STRING
+                                },
                                 "year": {
                                     type: JsonSchemaType.INTEGER
                                 },
-                                "comment_src_lng": {
-                                    type: JsonSchemaType.INTEGER
-                                },
-                                "comment_jp": {
+                                "src_lang": {
                                     type: JsonSchemaType.STRING
                                 },
-                                "course_key": {
+                                "comment_ja": {
                                     type: JsonSchemaType.STRING
                                 },
                                 "comment_zh_TW": {
@@ -347,26 +328,29 @@ export const courseReviewRespSchema: JsonSchema = {
                                 },
                                 "title": {
                                     type: JsonSchemaType.STRING
+                                },
+                                "mod": {
+                                    type: JsonSchemaType.BOOLEAN
                                 }
                             },
                             required: [
                                 "title_jp",
                                 "instructor_jp",
-                                "course_code",
                                 "updated_at",
                                 "created_at",
                                 "benefit",
                                 "difficulty",
                                 "satisfaction",
                                 "instructor",
-                                "comment_zh_CN",
-                                "comment_zh_TW",
+                                "comment_zh-CN",
+                                "comment_zh-TW",
+                                "comment_ko",
                                 "comment_en",
                                 "year",
-                                "comment_src_lng",
-                                "comment_jp",
-                                "course_key",
-                                "title"
+                                "src_lang",
+                                "comment_ja",
+                                "title",
+                                "mod"
                             ]
                         }
                     }
@@ -385,6 +369,71 @@ export const courseReviewRespSchema: JsonSchema = {
         "success",
         "data",
         "message"
+    ]
+};
+
+export const courseReviewPostReqSchema: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT7,
+    type: JsonSchemaType.OBJECT,
+    properties: {
+        "data": {
+            type: JsonSchemaType.OBJECT,
+            properties: {
+                "course_key": {
+                    type: JsonSchemaType.STRING
+                },
+                "title_jp": {
+                    type: JsonSchemaType.STRING
+                },
+                "instructor_jp": {
+                    type: JsonSchemaType.STRING
+                },
+                "benefit": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "difficulty": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "satisfaction": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "instructor": {
+                    type: JsonSchemaType.STRING
+                },
+                "year": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "comment": {
+                    type: JsonSchemaType.STRING
+                },
+                "title": {
+                    type: JsonSchemaType.STRING
+                },
+                "uid": {
+                    type: JsonSchemaType.STRING
+                }
+            },
+            required: [
+                "title_jp",
+                "instructor_jp",
+                "benefit",
+                "difficulty",
+                "satisfaction",
+                "instructor",
+                "comment",
+                "year",
+                "course_key",
+                "title",
+                "uid"
+            ]
+        },
+        "token": {
+            type: JsonSchemaType.STRING
+        }
+    },
+    required: [
+        "data",
+        "token"
     ]
 };
 
@@ -436,10 +485,10 @@ export const articleListSchema: JsonSchema = {
                             "summary": {
                                 type: JsonSchemaType.STRING
                             },
-                            "date_created": {
+                            "created_at": {
                                 type: JsonSchemaType.STRING
                             },
-                            "last_modified": {
+                            "updated_at": {
                                 type: JsonSchemaType.STRING
                             },
                             "tags": {
@@ -457,8 +506,8 @@ export const articleListSchema: JsonSchema = {
                             "title",
                             "author",
                             "summary",
-                            "date_created",
-                            "last_modified",
+                            "created_at",
+                            "updated_at",
                             "tags",
                             "src"
                         ]
@@ -488,18 +537,6 @@ export const articleListSchema: JsonSchema = {
     ]
 };
 
-export const articlePlainJson = `
-    {"success":true,"data":{"articles":[{"category":"career","title":"markdown test","author":"Bob","summary":"This is a
-     test file.","date_created":"2020-09-11T08:00:00.001Z","last_modified":"2020-09-11T10:00:00.001Z","tags":["job fair"
-     ,"graduates","company"],"src":"2020-09-11-markdown-test/"},{"category":"career","title":"markdown test","author":"B
-     ob","summary":"This is a test file.","date_created":"2020-09-11T08:00:00.001Z","last_modified":"2020-09-11T10:00:00
-     .001Z","tags":["job fair","graduates","company"],"src":"2020-09-11-markdown-test/"},{"category":"career","title":"m
-     arkdown test","author":"Bob","summary":"This is a test file.","date_created":"2020-09-11T08:00:00.001Z","last_modif
-     ied":"2020-09-11T10:00:00.001Z","tags":["job fair","graduates","company"],"src":"2020-09-11-markdown-test/"},{"cate
-     gory":"career","title":"markdown test","author":"Bob","summary":"This is a test file.","date_created":"2020-09-11T0
-     8:00:00.001Z","last_modified":"2020-09-11T10:00:00.001Z","tags":["job fair","graduates","company"],"src":"2020-09-1
-     1-markdown-test/"},{"category":"career","title":"markdown test","author":"Bob","summary":"This is a test file.","da
-     te_created":"2020-09-11T08:00:00.001Z","last_modified":"2020-09-11T10:00:00.001Z","tags":["job fair","graduates","c
-     ompany"],"src":"2020-09-11-markdown-test/"}],"size":5,"offset":"dfne2341tt4ebewauka34ihy23784y128"},"message":"OK"}
-     `
+export const articlePlainJson = '{ "success": true, "data": { "articles": [ { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is atest file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" } ], "size": 5, "offset": "dfne2341tt4ebewauka34ihy23784y128" }, "message": "OK" }';
+
 export const careerInfoSchema: JsonSchema = {};

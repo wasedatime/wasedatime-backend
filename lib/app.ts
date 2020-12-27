@@ -1,12 +1,12 @@
 import {WasedaTimePresentationLayer} from "./stacks/presentation";
-import {awsEnv} from "./configs/aws";
+import {awsEnv} from "./configs/common/aws";
 import {AbstractServerlessApp} from "./architecture/patterns";
 import {WasedaTimeBusinessLayer} from "./stacks/business";
 import {WasedaTimePersistenceLayer} from "./stacks/persistence";
 import {AdminLayer, BusinessLayer, PersistenceLayer, PresentationLayer} from "./architecture/layers";
 import {WasedaTimeAdminLayer} from "./stacks/admin";
 import {OperationInterface} from "./architecture/interfaces";
-import {OperationEndpoint} from "./configs/registry";
+import {OperationEndpoint} from "./configs/common/registry";
 
 
 export class WasedaTime extends AbstractServerlessApp {

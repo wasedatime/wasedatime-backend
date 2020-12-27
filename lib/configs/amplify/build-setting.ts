@@ -125,3 +125,23 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
         ]
     }
 });
+
+export const openapiBuildSpec: BuildSpec = BuildSpec.fromObject({
+    "version": 1,
+    "frontend": {
+        "phases": {
+            "build": {
+                "commands": []
+            }
+        },
+        "artifacts": {
+            "baseDirectory": "/",
+            "files": [
+                "**/*"
+            ]
+        },
+        "cache": {
+            "paths": []
+        }
+    }
+});

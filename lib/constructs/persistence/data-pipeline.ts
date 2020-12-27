@@ -1,17 +1,17 @@
 import * as cdk from '@aws-cdk/core';
 import {Construct, RemovalPolicy} from '@aws-cdk/core';
-import {Bucket, BucketAccessControl, BucketEncryption} from '@aws-cdk/aws-s3';
+import {BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption} from '@aws-cdk/aws-s3';
 import {StateMachine, TaskInput} from "@aws-cdk/aws-stepfunctions";
 import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tasks";
 import {Function} from "@aws-cdk/aws-lambda";
 import {Table} from "@aws-cdk/aws-dynamodb";
-
-import {publicAccess} from "../configs/s3/access-setting";
-import {SyllabusScraper} from "./lambda-functions";
-import {prodCorsRule} from "../configs/s3/cors";
-import {syllabusSchedule} from "../configs/schedule";
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
+
+import {allowApiGatewayPolicy} from "../../configs/s3/access-setting";
+import {SyllabusScraper} from "../common/lambda-functions";
+import {prodCorsRule} from "../../configs/s3/cors";
+import {syllabusSchedule} from "../../configs/event/schedule";
 
 
 export enum Worker {
@@ -30,11 +30,11 @@ export interface DataPipelineProps {
 
 export abstract class AbstractDataPipeline extends Construct {
 
-    abstract dataSource?: Bucket;
+    abstract readonly dataSource?: Bucket;
 
-    abstract processor: Function | StateMachine;
+    abstract readonly processor: Function | StateMachine;
 
-    abstract dataWarehouse: Bucket | Table;
+    abstract readonly dataWarehouse: Bucket | Table;
 }
 
 export class SyllabusDataPipeline extends AbstractDataPipeline {
@@ -52,7 +52,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
 
         this.dataWarehouse = new Bucket(this, 'syllabus-bucket', {
             accessControl: BucketAccessControl.PRIVATE,
-            blockPublicAccess: publicAccess,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             bucketName: "wasedatime-syllabus-prod",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
@@ -60,10 +60,14 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             removalPolicy: RemovalPolicy.DESTROY,
             versioned: true
         });
+        allowApiGatewayPolicy(this.dataWarehouse);
 
-
-        const scraperBaseFunction: Function =
-            new SyllabusScraper(this, 'scraper-base-function').baseFunction;
+        const scraperBaseFunction: Function = new SyllabusScraper(this, 'scraper-base-function', {
+            envvars: {
+                ["BUCKET_NAME"]: this.dataWarehouse.bucketName,
+                ["OBJECT_PATH"]: 'syllabus/'
+            }
+        }).baseFunction;
 
         function getLambdaTaskInstance(constructContext: cdk.Construct, schools: string[], num: string): LambdaInvoke {
             return new LambdaInvoke(scope, "task-" + num, {
@@ -116,10 +120,11 @@ export class CareerDataPipeline extends AbstractDataPipeline {
 
         this.dataSource = new Bucket(this, 'career-bucket', {
             accessControl: BucketAccessControl.PRIVATE,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             bucketName: "wasedatime-career",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: true,
+            publicReadAccess: false,
             removalPolicy: RemovalPolicy.DESTROY,
             versioned: true
         });
@@ -138,7 +143,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
         super(scope, id);
 
         this.dataSource = new Bucket(this, 'feeds-bucket', {
-            accessControl: BucketAccessControl.PRIVATE,
+            accessControl: BucketAccessControl.PUBLIC_READ,
             bucketName: "wasedatime-feeds-prod",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,

@@ -2,31 +2,35 @@ import * as cdk from "@aws-cdk/core";
 
 import {AdminLayer} from "../architecture/layers";
 import {OperationInterface} from "../architecture/interfaces";
-import {OperationEndpoint} from "../configs/registry";
+import {OperationEndpoint} from "../configs/common/registry";
 import {
     AbstractStatusNotifier,
     AmplifyBuildStatusNotifier,
     StackStatusNotifier,
     StatusNotifier,
     SyllabusScraperStatusNotifier
-} from "../constructs/status-notifier";
+} from "../constructs/admin/status-notifier";
+import {AbstractMonitor} from "../constructs/admin/monitor";
+
 
 export class WasedaTimeAdminLayer extends AdminLayer {
 
-    readonly taskManagers: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
+    readonly statusNotifiers: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
+
+    readonly monitors: { [name: string]: AbstractMonitor } = {};
 
     constructor(scope: cdk.Construct, id: string, operationInterface: OperationInterface, props: cdk.StackProps) {
 
         super(scope, id, operationInterface, props);
 
-        this.taskManagers[StatusNotifier.BUILD_STATUS] = new AmplifyBuildStatusNotifier(this, 'build-notifier', {
+        this.statusNotifiers[StatusNotifier.BUILD_STATUS] = new AmplifyBuildStatusNotifier(this, 'build-notifier', {
             target: this.operationInterface.getEndpoint(OperationEndpoint.APP)
         });
 
-        this.taskManagers[StatusNotifier.SCRAPER_STATUS] = new SyllabusScraperStatusNotifier(this, 'scraper-notifier', {
+        this.statusNotifiers[StatusNotifier.SCRAPER_STATUS] = new SyllabusScraperStatusNotifier(this, 'scraper-notifier', {
             target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
         });
 
-        this.taskManagers[StatusNotifier.CFN_STATUS] = new StackStatusNotifier(this, 'cfn-notifier', {});
+        this.statusNotifiers[StatusNotifier.CFN_STATUS] = new StackStatusNotifier(this, 'cfn-notifier', {});
     }
 }

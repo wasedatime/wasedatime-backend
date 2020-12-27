@@ -1,10 +1,14 @@
 import * as cdk from '@aws-cdk/core';
 import {Construct} from '@aws-cdk/core';
-import {EventField, IRuleTarget, Rule, RuleTargetInput} from "@aws-cdk/aws-events";
+import {IRuleTarget, Rule, RuleTargetInput} from "@aws-cdk/aws-events";
 import {Function} from "@aws-cdk/aws-lambda";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {SnsTopic} from "@aws-cdk/aws-events-targets";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
+
+import {AmplifyStatusPublisher, ScraperStatusPublisher} from "../common/lambda-functions";
+import {CF_NOTIF_FUNC_ARN, CF_TOPIC_ARN} from "../../configs/common/arn";
+import {AMPLIFY_MESSAGE, SFN_MESSAGE} from "../../configs/event/message";
 
 
 export enum StatusNotifier {
@@ -20,11 +24,11 @@ export interface StatusNotifierProps {
 
 export abstract class AbstractStatusNotifier extends Construct {
 
-    abstract rules: { [eventName: string]: Rule } = {};
+    abstract readonly rules: { [eventName: string]: Rule };
 
-    abstract target?: IRuleTarget | string;
+    abstract readonly target?: IRuleTarget | string;
 
-    abstract topic: ITopic;
+    abstract readonly topic: ITopic;
 
     protected constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id);
@@ -45,9 +49,7 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
         this.topic = new Topic(this, 'build-status-topic', {
             topicName: "amplify-build-status"
         });
-        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
-            "arn:aws:lambda:ap-northeast-1:564383102056:function:forwardAmplifyNotificationSlack"
-        );
+        const subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
         this.topic.addSubscription(new LambdaSubscription(subscriber));
 
         this.rules["on-build"] = new Rule(this, 'build-sentinel', {
@@ -71,19 +73,8 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
             }
         });
 
-        const appId: string = EventField.fromPath("$.detail.appId");
-        const branch: string = EventField.fromPath("$.detail.branchName");
-        const jobStat: string = EventField.fromPath("$.detail.jobStatus");
-        const jobId: string = EventField.fromPath("$.detail.jobId");
-        const region: string = EventField.fromPath("$.region");
-        const buildMessage: string = `
-        Build notification from the AWS Amplify Console for app: https://${branch}.${appId}.amplifyapp.com/. 
-        Your build status is ${jobStat}. 
-        Go to https://${region}.console.aws.amazon.com/amplify/home?region=${region}#${appId}/${branch}/${jobId} 
-        to view details on your build.`;
-
         this.rules["on-build"].addTarget(new SnsTopic(this.topic, {
-            message: RuleTargetInput.fromText(buildMessage)
+            message: RuleTargetInput.fromText(AMPLIFY_MESSAGE)
         }));
     }
 }
@@ -102,9 +93,7 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
         this.topic = new Topic(this, 'scraper-status-topic', {
             topicName: "scraper-task-status"
         });
-        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
-            "arn:aws:lambda:ap-northeast-1:564383102056:function:lambda-publish-notification"
-        );
+        const subscriber = new ScraperStatusPublisher(this, 'subscriber-function').baseFunction;
         this.topic.addSubscription(new LambdaSubscription(subscriber));
 
         this.rules["task-status"] = new Rule(this, 'scraper-status', {
@@ -130,22 +119,13 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
             }
         });
 
-        const execName: string = EventField.fromPath("$.detail.name");
-        const execArn: string = EventField.fromPath("$.detail.executionArn");
-        const jobStat: string = EventField.fromPath("$.detail.status");
-        const region: string = EventField.fromPath("$.region");
-        const taskMessage: string = `
-        Task status notification from the AWS StepFunction for execution name: ${execName}. 
-        The task status is ${jobStat}. 
-        Go to https://${region}.console.aws.amazon.com/states/home?region=${region}#/executions/details/${execArn}
-        to view details on the execution.`;
-
         this.rules["task-status"].addTarget(new SnsTopic(this.topic, {
-            message: RuleTargetInput.fromText(taskMessage)
+            message: RuleTargetInput.fromText(SFN_MESSAGE)
         }));
     }
 }
 
+//todo complete definition
 export class StackStatusNotifier extends AbstractStatusNotifier {
 
     readonly rules: { [eventName: string]: Rule } = {};
@@ -157,12 +137,8 @@ export class StackStatusNotifier extends AbstractStatusNotifier {
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        this.topic = Topic.fromTopicArn(this, 'stack-status-topic',
-            'arn:aws:sns:ap-northeast-1:564383102056:cfn-alert'
-        );
+        this.topic = Topic.fromTopicArn(this, 'stack-status-topic', CF_TOPIC_ARN);
 
-        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher',
-            'arn:aws:lambda:ap-northeast-1:564383102056:function:cf-notify-CFNotifyFunction-185B600AO8IES'
-        );
+        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher', CF_NOTIF_FUNC_ARN);
     }
 }

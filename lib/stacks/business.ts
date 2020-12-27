@@ -1,11 +1,15 @@
 import * as cdk from "@aws-cdk/core";
 
-import {AbstractApiEndpoint, AbstractRestApiEndpoint, WasedaTimeRestApiEndpoint} from "../constructs/api-endpoint";
-import {DataEndpoint, ServiceEndpoint} from "../configs/registry";
-import {ApiEndpoint} from "../configs/api/service";
+import {
+    AbstractApiEndpoint,
+    AbstractRestApiEndpoint,
+    WasedaTimeAuthApiEndpoint,
+    WasedaTimeRestApiEndpoint
+} from "../constructs/business/api-endpoint";
+import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
+import {ApiEndpoint, ApiServices} from "../configs/api/service";
 import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";
-import {WasedaTimeAuthEndpoint} from "../constructs/auth-endpoint";
 
 
 export class WasedaTimeBusinessLayer extends BusinessLayer {
@@ -16,15 +20,19 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         super(scope, id, dataInterface, props);
 
         const mainApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
-            dataSource: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS)
+            dataSources: {
+                [ApiServices.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
+                [ApiServices.COURSE_REVIEW]: this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS)
+            }
         });
         this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
 
-        const authEndpoint = new WasedaTimeAuthEndpoint(this, 'cognito-endpoint', {});
+        const authEndpoint = new WasedaTimeAuthApiEndpoint(this, 'cognito-endpoint');
+        this.apiEndpoints[ApiEndpoint.AUTH] = authEndpoint;
 
         // this.serviceInterface.setEndpoint(ServiceEndpoint.MAIN, mainApiEndpoint.getDomain());
         this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, 'api.wasedatime.com');
 
-        this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.domain.baseUrl());
+        this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }

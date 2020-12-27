@@ -1,4 +1,4 @@
-import {DataEndpoint, OperationEndpoint, ServiceEndpoint} from "../configs/registry";
+import {DataEndpoint, OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {Protocol, Registry} from "./protocols";
 
 
