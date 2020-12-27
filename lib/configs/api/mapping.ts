@@ -1,5 +1,5 @@
 export const s3RespMapping = {
-    ['method.response.header.Access-Control-Allow-Origin']: '\'*\'',
+    ['method.response.header.Access-Control-Allow-Origin']: "'*'",
     ['method.response.header.Cache-Control']: 'integration.response.header.Cache-Control',
     ['method.response.header.ETag']: 'integration.response.header.ETag',
     ['method.response.header.Last-Modified']: 'integration.response.header.Last-Modified',
@@ -19,4 +19,9 @@ export const lambdaRespParams = {
     ['method.response.header.Content-Type']: true,
     ['method.response.header.Referrer-Policy']: true,
     ['method.response.header.Access-Control-Allow-Methods']: true
+};
+
+export const mockRespMapping = {
+    ['method.response.header.Access-Control-Allow-Origin']: "'*'",
+    ['method.response.header.Content-Type']: "'application/json'"
 };

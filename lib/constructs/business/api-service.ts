@@ -95,7 +95,7 @@ export class SyllabusApiService extends AbstractRestApiService {
         this.methods.OPTIONS = syllabusSchools.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
         });
         this.methods.GET = syllabusSchools.addMethod(HttpMethod.GET, getIntegration, {
             apiKeyRequired: false,
@@ -162,7 +162,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         this.methods.OPTIONS = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
+            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS]
         });
         this.methods.GET = root.addMethod(HttpMethod.GET, getIntegration,
             {
@@ -218,7 +218,76 @@ export class FeedsApiService extends AbstractRestApiService {
             modelName: "GetFeedsResp"
         });
 
-        const feedsIntegration = new MockIntegration({
+        const getIntegration = new MockIntegration({
+            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            integrationResponses: [{
+                statusCode: '200',
+                responseTemplates: {["application/json"]: articlePlainJson}
+            }]
+        });
+        const postIntegration = new MockIntegration({
+            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            integrationResponses: [{
+                statusCode: '200'
+            }]
+        });
+
+        this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
+        });
+        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
+            apiKeyRequired: false,
+            requestParameters: {
+                'method.request.querystring.offset': true,
+                'method.request.querystring.limit': true
+            },
+            operationName: "ListArticles",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: getRespModel}
+            }]
+        });
+        this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
+            apiKeyRequired: false,
+            operationName: "PostArticles",
+            methodResponses: [{
+                statusCode: '200'
+            }]
+        });
+    }
+}
+
+//todo career api
+export class CareerApiService extends AbstractRestApiService {
+
+    readonly resources: { [path: string]: Resource } = {};
+
+    readonly methods: { [method in HttpMethod]?: Method } = {};
+
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+        super(scope, id, props);
+
+        const root = new Resource(scope, 'career', {
+            parent: scope.apiEndpoint.root,
+            pathPart: "career"
+        });
+        this.resources["/career"] = root;
+        this.resources["/career/intern"] = root.addResource("intern");
+        this.resources["/career/part-time"] = root.addResource("part-time");
+        this.resources["/career/seminar"] = root.addResource("seminar");
+
+        const getRespModel = props.apiEndpoint.addModel('careeer-get-resp-model', {
+            schema: articleListSchema,
+            contentType: "application/json",
+            description: "List of articles in feeds",
+            modelName: "GetFeedsResp"
+        });
+
+        const getIntegration = new MockIntegration({
             requestTemplates: {["application/json"]: '{"statusCode": 200}'},
             passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
             integrationResponses: [{
@@ -232,7 +301,7 @@ export class FeedsApiService extends AbstractRestApiService {
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
         });
-        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, feedsIntegration, {
+        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
             apiKeyRequired: false,
             requestParameters: {
                 'method.request.querystring.offset': true,
@@ -246,5 +315,3 @@ export class FeedsApiService extends AbstractRestApiService {
         });
     }
 }
-
-//todo career api

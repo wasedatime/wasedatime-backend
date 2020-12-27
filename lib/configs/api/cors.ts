@@ -1,4 +1,5 @@
 export const allowOrigins: string[] = [
+    '*',
     "https://wasedatime.com",
     "https://www.wasedatime.com",
     "https://dev.wasedatime.com",
