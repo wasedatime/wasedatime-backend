@@ -146,7 +146,7 @@ export class AmplifyStatusPublisher extends cdk.Construct {
             functionName: "amplify-status-publisher",
             logRetention: RetentionDays.SIX_MONTHS,
             memorySize: 128,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3)
         }).addEnvironment("SLACK_WEBHOOK_AMP", SLACK_WEBHOOK_AMP);
     }
@@ -167,7 +167,7 @@ export class ScraperStatusPublisher extends cdk.Construct {
             functionName: "scraper-status-publisher",
             logRetention: RetentionDays.SIX_MONTHS,
             memorySize: 128,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3)
         }).addEnvironment("SLACK_WEBHOOK_SFN", SLACK_WEBHOOK_SFN);
     }

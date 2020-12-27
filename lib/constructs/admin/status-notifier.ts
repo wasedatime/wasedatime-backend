@@ -1,6 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import {Construct} from '@aws-cdk/core';
-import {EventField, IRuleTarget, Rule, RuleTargetInput} from "@aws-cdk/aws-events";
+import {IRuleTarget, Rule, RuleTargetInput} from "@aws-cdk/aws-events";
 import {Function} from "@aws-cdk/aws-lambda";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {SnsTopic} from "@aws-cdk/aws-events-targets";
@@ -8,6 +8,7 @@ import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 
 import {AmplifyStatusPublisher, ScraperStatusPublisher} from "../common/lambda-functions";
 import {CF_NOTIF_FUNC_ARN, CF_TOPIC_ARN} from "../../configs/common/arn";
+import {AMPLIFY_MESSAGE, SFN_MESSAGE} from "../../configs/event/message";
 
 
 export enum StatusNotifier {
@@ -72,19 +73,8 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
             }
         });
 
-        const appId: string = EventField.fromPath("$.detail.appId");
-        const branch: string = EventField.fromPath("$.detail.branchName");
-        const jobStat: string = EventField.fromPath("$.detail.jobStatus");
-        const jobId: string = EventField.fromPath("$.detail.jobId");
-        const region: string = EventField.fromPath("$.region");
-        const buildMessage: string = `
-        Build notification from the AWS Amplify Console for app: https://${branch}.${appId}.amplifyapp.com/. 
-        Your build status is ${jobStat}. 
-        Go to https://${region}.console.aws.amazon.com/amplify/home?region=${region}#${appId}/${branch}/${jobId} 
-        to view details on your build.`;
-
         this.rules["on-build"].addTarget(new SnsTopic(this.topic, {
-            message: RuleTargetInput.fromText(buildMessage)
+            message: RuleTargetInput.fromText(AMPLIFY_MESSAGE)
         }));
     }
 }
@@ -129,18 +119,8 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
             }
         });
 
-        const execName: string = EventField.fromPath("$.detail.name");
-        const execArn: string = EventField.fromPath("$.detail.executionArn");
-        const jobStat: string = EventField.fromPath("$.detail.status");
-        const region: string = EventField.fromPath("$.region");
-        const taskMessage: string = `
-        Task status notification from the AWS StepFunction for execution name: ${execName}. 
-        The task status is ${jobStat}. 
-        Go to https://${region}.console.aws.amazon.com/states/home?region=${region}#/executions/details/${execArn}
-        to view details on the execution.`;
-
         this.rules["task-status"].addTarget(new SnsTopic(this.topic, {
-            message: RuleTargetInput.fromText(taskMessage)
+            message: RuleTargetInput.fromText(SFN_MESSAGE)
         }));
     }
 }
