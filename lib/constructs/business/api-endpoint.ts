@@ -40,6 +40,8 @@ import {STAGE} from "../../configs/common/aws";
 export interface ApiEndpointProps {
 
     dataSources?: { [service in ApiServices]?: string };
+
+    authorizer?: string
 }
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
@@ -172,7 +174,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         });
         this.apiServices[ApiServices.COURSE_REVIEW] = new CourseReviewsApiService(this, 'course-reviews-api', {
             apiEndpoint: this.apiEndpoint,
-            dataSource: props.dataSources![ApiServices.COURSE_REVIEW]
+            dataSource: props.dataSources![ApiServices.COURSE_REVIEW],
+            authorizer: props.authorizer
         });
         this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
             apiEndpoint: this.apiEndpoint

@@ -1,7 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import {Construct, RemovalPolicy} from '@aws-cdk/core';
 import {BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption} from '@aws-cdk/aws-s3';
-import {StateMachine, TaskInput} from "@aws-cdk/aws-stepfunctions";
+import {StateMachine, Succeed, TaskInput} from "@aws-cdk/aws-stepfunctions";
 import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tasks";
 import {Function} from "@aws-cdk/aws-lambda";
 import {Table} from "@aws-cdk/aws-dynamodb";
@@ -80,6 +80,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         }
 
         this.processor = new StateMachine(this, 'state-machine', {
+            stateMachineName: 'syllabus-scraper',
             definition: getLambdaTaskInstance(this, ["GEC"], "0")
                 .next(getLambdaTaskInstance(this, ["CMS", "HSS"], "1"))
                 .next(getLambdaTaskInstance(this, ["EDU", "FSE"], "2"))
@@ -90,6 +91,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
                 .next(getLambdaTaskInstance(this, ["SILS", "G_HUM", "CJL", "SPS", "G_WBS", "G_PS"], "7"))
                 .next(getLambdaTaskInstance(this, ["G_SPS", "G_IPS", "G_WLS", "G_E", "G_SSS", "G_SC", "G_LAW",
                     "G_SAPS", "G_SA", "G_SJAL", "G_SICCS", "G_SEEE", "EHUM", "ART", "CIE", "G_ITS"], "8"))
+                .next(new Succeed(this, 'success', {}))
         });
 
         for (const name in syllabusSchedule) {

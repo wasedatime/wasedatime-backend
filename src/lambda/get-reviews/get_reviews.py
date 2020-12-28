@@ -3,7 +3,7 @@ import os
 import boto3
 from boto3.dynamodb.conditions import Key
 
-from utils import JsonPayloadBuilder, api_response, bad_referer
+from utils import JsonPayloadBuilder, api_response
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
@@ -27,10 +27,10 @@ def get_reviews(course_key, uid):
 
 
 def handler(event, context):
-    if bad_referer(event["headers"]):
-        resp = JsonPayloadBuilder().add_status(False).add_data(None) \
-            .add_message("External request detected, related information will be reported to admin.").compile()
-        return api_response(403, resp)
+    # if bad_referer(event["headers"]):
+    #     resp = JsonPayloadBuilder().add_status(False).add_data(None) \
+    #         .add_message("External request detected, related information will be reported to admin.").compile()
+    #     return api_response(403, resp)
 
     course_key = event["queryStringParameters"]["key"]
     uid = event["queryStringParameters"]["uid"]
