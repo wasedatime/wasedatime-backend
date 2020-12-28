@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# todo make function for different deploy methods
+
 cd src/lambda || exit 1
 git clone https://github.com/wasedatime/syllabus-scraper.git
 cd syllabus-scraper || exit 1

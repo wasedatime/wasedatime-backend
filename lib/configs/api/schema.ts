@@ -408,9 +408,6 @@ export const courseReviewPostReqSchema: JsonSchema = {
                 },
                 "title": {
                     type: JsonSchemaType.STRING
-                },
-                "uid": {
-                    type: JsonSchemaType.STRING
                 }
             },
             required: [
@@ -423,17 +420,12 @@ export const courseReviewPostReqSchema: JsonSchema = {
                 "comment",
                 "year",
                 "course_key",
-                "title",
-                "uid"
+                "title"
             ]
-        },
-        "token": {
-            type: JsonSchemaType.STRING
         }
     },
     required: [
-        "data",
-        "token"
+        "data"
     ]
 };
 
