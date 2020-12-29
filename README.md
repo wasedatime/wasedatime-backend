@@ -3,31 +3,53 @@
 ![](https://travis-ci.com/wasedatime/wasedatime-backend.svg?branch=develop)
 ![](https://img.shields.io/website?up_color=green&up_message=online&url=https%3A%2F%2Fwasedatime.com)
 
+
+
+## About The Project
+
 This repository defines the serverless application architecture, resource configuration and infrastructure provision strategy of 
 [wasedatime.com](https://wasedatime.com).
 
-## Architecture
+### Architecture
 
 We adopted a simple serverless application architecture, consisted of four layers: *Presentation Layer*, *Business Layer*, 
 *Persistence Layer* and *Admin Layer*.
 
-### Presentation Layer
+#### Presentation Layer
 
 <img src="doc/pre.png" alt="Presentation Layer" width=35%/>
 
-### Business Layer
+#### Business Layer
 
 ![Business Layer](doc/biz.png)
 
-### Persistence Layer
+#### Persistence Layer
 
 <img src="doc/pers.png" alt="Persistence Layer" width=57%/>
 
-### Admin Layer
+#### Admin Layer
 
 <img src="doc/admin.png" alt="Admin Layer" width=45%/>
 
-## CDK Usage
+## Getting Started
+
+### Prerequisites
+
+This project uses AWS CDK as the IaC Framework. You need to install some modules of aws-cdk.
+
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/wasedatime/wasedatime-backend.git
+   ```
+3. Install NPM packages
+   ```sh
+   npm install
+   ```
+4. Obtain a .env file from the administrator and put it into the root directory.
+
+## Usage
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 ### Useful commands
