@@ -1,5 +1,5 @@
-import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
 import * as cdk from "@aws-cdk/core";
+import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
 
 
 export enum Collection {

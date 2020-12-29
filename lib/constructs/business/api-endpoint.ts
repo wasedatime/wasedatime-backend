@@ -10,30 +10,11 @@ import {
 } from "@aws-cdk/aws-apigateway";
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
-import {
-    AccountRecovery,
-    Mfa,
-    ProviderAttribute,
-    UserPool,
-    UserPoolClient,
-    UserPoolDomain,
-    UserPoolIdentityProviderGoogle
-} from "@aws-cdk/aws-cognito";
-import {Certificate} from "@aws-cdk/aws-certificatemanager";
 import * as uuid from "uuid";
 
 import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
 import {baseJsonApiSchema} from "../../configs/api/schema";
-import {PreSignupWasedaMailValidator} from "../common/lambda-functions";
 import {ApiServices} from "../../configs/api/service";
-import {
-    CALLBACK_URLS,
-    GOOGLE_OAUTH_CLIENT_ID,
-    GOOGLE_OAUTH_CLIENT_SECRET,
-    LOGOUT_URLS
-} from "../../configs/cognito/oauth";
-import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
-import {AUTH_CERT_ARN} from "../../configs/common/arn";
 import {STAGE} from "../../configs/common/aws";
 
 
@@ -46,7 +27,7 @@ export interface ApiEndpointProps {
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
 
-    abstract readonly apiEndpoint: RestApi | LambdaRestApi | SpecRestApi | HttpApi | GraphqlApi | UserPool;
+    abstract readonly apiEndpoint: RestApi | LambdaRestApi | SpecRestApi | HttpApi | GraphqlApi;
 
     protected constructor(scope: cdk.Construct, id: string, props?: ApiEndpointProps) {
         super(scope, id);
@@ -67,28 +48,6 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
     getDomain(): string {
         const domainName: DomainName | undefined = this.apiEndpoint.domainName;
-
-        if (typeof domainName === "undefined") {
-            throw RangeError("Domain not configured for this API endpoint.");
-        }
-        return domainName.domainName;
-    }
-}
-
-export abstract class AbstractAuthApiEndpoint extends AbstractApiEndpoint {
-
-    abstract readonly apiEndpoint: UserPool;
-
-    abstract readonly clients: { [name: string]: UserPoolClient } = {};
-
-    abstract readonly domain: UserPoolDomain;
-
-    protected constructor(scope: cdk.Construct, id: string) {
-        super(scope, id);
-    }
-
-    getDomain(): string {
-        const domainName: UserPoolDomain | undefined = this.domain;
 
         if (typeof domainName === "undefined") {
             throw RangeError("Domain not configured for this API endpoint.");
@@ -179,86 +138,6 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         });
         this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
             apiEndpoint: this.apiEndpoint
-        });
-    }
-}
-
-export class WasedaTimeAuthApiEndpoint extends AbstractAuthApiEndpoint {
-
-    readonly apiEndpoint: UserPool;
-
-    readonly clients: { [name: string]: UserPoolClient } = {};
-
-    readonly domain: UserPoolDomain;
-
-    constructor(scope: cdk.Construct, id: string) {
-        super(scope, id);
-
-        this.apiEndpoint = new UserPool(this, 'main-user-pool', {
-            accountRecovery: AccountRecovery.EMAIL_ONLY,
-            autoVerify: {email: true, phone: false},
-            emailSettings: {
-                // from: "noreply@wasedatime.com"
-            },
-            enableSmsRole: false,
-            mfa: Mfa.OFF,
-            passwordPolicy: {
-                minLength: 8,
-                requireDigits: true,
-                requireLowercase: true,
-                requireUppercase: false,
-                requireSymbols: false
-            },
-            selfSignUpEnabled: true,
-            signInAliases: {
-                email: true,
-                username: true
-            },
-            signInCaseSensitive: true,
-            smsRole: undefined,
-            standardAttributes: {
-                email: {
-                    required: true
-                }
-            },
-            userPoolName: 'wasedatime-users',
-            lambdaTriggers: {
-                preSignUp: new PreSignupWasedaMailValidator(this, 'presign-up-handle').baseFunction
-            }
-        });
-
-        this.apiEndpoint.registerIdentityProvider(new UserPoolIdentityProviderGoogle(this, 'google-idp', {
-            clientId: GOOGLE_OAUTH_CLIENT_ID,
-            clientSecret: GOOGLE_OAUTH_CLIENT_SECRET,
-            userPool: this.apiEndpoint,
-            attributeMapping: {
-                email: ProviderAttribute.GOOGLE_EMAIL,
-                preferredUsername: ProviderAttribute.GOOGLE_NAME,
-                profilePicture: ProviderAttribute.GOOGLE_PICTURE
-            },
-            scopes: ['email', 'openid', 'profile']
-        }));
-
-        this.clients['web-app'] = this.apiEndpoint.addClient('web-app-client', {
-            userPoolClientName: "web-app",
-            authFlows: {
-                custom: true,
-                userSrp: true
-            },
-            generateSecret: false,
-            oAuth: {
-                callbackUrls: CALLBACK_URLS,
-                logoutUrls: LOGOUT_URLS
-            },
-            preventUserExistenceErrors: true
-        });
-
-        // todo add custom ses in us-east-1
-        this.domain = this.apiEndpoint.addDomain('auth-domain', {
-            customDomain: {
-                domainName: "auth." + WEBAPP_DOMAIN,
-                certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert', AUTH_CERT_ARN)
-            }
         });
     }
 }

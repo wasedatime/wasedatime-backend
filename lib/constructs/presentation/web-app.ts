@@ -1,5 +1,6 @@
 import {App, Branch, Domain} from "@aws-cdk/aws-amplify";
 import * as cdk from "@aws-cdk/core";
+
 import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../../configs/amplify/website";
 import {openapiBuildSpec, webappBuildSpec} from "../../configs/amplify/build-setting";
 import {apiDocCode, webAppCode} from "../../configs/amplify/codebase";
