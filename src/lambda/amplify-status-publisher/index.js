@@ -2,7 +2,7 @@ const https = require('https');
 
 exports.handler = async (event) => {
     const msg = event.Records[0].Sns.Message;
-    const matched = msg.match('"Build notification from the AWS Amplify Console for app: https:\/\/(.*)\..*\.amplifyapp\.com\/\. Your build status is (.*)\. Go to (.*) to view details on your build\."');
+    const matched = msg.match(/Build notification from the AWS Amplify Console for app: https:\/\/(.*)\..*\.amplifyapp\.com\/\. Your build status is (.*)\. Go to (.*) to view details on your build\./);
 
     const colors = {
         'SUCCEED': 'good',
