@@ -192,9 +192,6 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         );
         this.methods.POST = root.addMethod(HttpMethod.POST, postIntegration,
             {
-                requestParameters: {
-                    'method.request.header.Authorization': true
-                },
                 operationName: "PostReview",
                 requestModels: {["application/json"]: postReqModel},
                 methodResponses: [{
@@ -207,9 +204,6 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         );
         this.methods.PUT = root.addMethod(HttpMethod.PUT, putIntegration,
             {
-                requestParameters: {
-                    'method.request.header.Authorization': true
-                },
                 operationName: "UpdateReview",
                 requestModels: {["application/json"]: putReqModel},
                 methodResponses: [{
