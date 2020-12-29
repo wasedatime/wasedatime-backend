@@ -28,6 +28,6 @@ before_deploy:
 deploy:
   skip_cleanup: true
   provider: script
-  script: cdk deploy --all --require-approval "never"
+  script: bash script/deploy.sh
   on:
     branch: main
