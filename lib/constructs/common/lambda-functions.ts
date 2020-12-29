@@ -6,6 +6,7 @@ import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {AwsServicePrincipal} from "../../configs/common/aws";
 import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_AMP, SLACK_WEBHOOK_SFN} from "../../configs/lambda/environment";
+import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 
 
 interface FunctionsProps {
@@ -50,8 +51,8 @@ export class CourseReviewsFunctions extends cdk.Construct {
         });
 
         this.getFunction = new Function(this, 'get-reviews', {
-            code: Code.fromAsset('src/lambda/get-reviews/function.zip'),
-            handler: "get_reviews.handler",
+            code: Code.fromAsset('src/lambda/get-reviews'),
+            handler: "index.handler",
             deadLetterQueueEnabled: false,
             description: "Get course reviews from the database.",
             functionName: "get-course-reviews",
@@ -63,9 +64,8 @@ export class CourseReviewsFunctions extends cdk.Construct {
             environment: props.envvars
         });
 
-        this.postFunction = new Function(this, 'post-review', {
-            code: Code.fromAsset('src/lambda/post-review/function.zip'),
-            handler: "post_review.handler",
+        this.postFunction = new PythonFunction(this, 'post-review', {
+            entry: 'src/lambda/post-review',
             deadLetterQueueEnabled: false,
             description: "Save course reviews into the database.",
             functionName: "post-course-review",
@@ -77,9 +77,8 @@ export class CourseReviewsFunctions extends cdk.Construct {
             environment: props.envvars
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
 
-        this.putFunction = new Function(this, 'put-review', {
-            code: Code.fromAsset('src/lambda/put-review/function.zip'),
-            handler: "put_review.handler",
+        this.putFunction = new PythonFunction(this, 'put-review', {
+            entry: 'src/lambda/put-review',
             deadLetterQueueEnabled: false,
             description: "Update course reviews in the database.",
             functionName: "put-course-review",
@@ -116,9 +115,8 @@ export class SyllabusScraper extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
         super(scope, id);
 
-        this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('src/lambda/syllabus-scraper/function.zip'),
-            handler: "syllabus_scraper.handler",
+        this.baseFunction = new PythonFunction(this, 'base-function', {
+            entry: 'src/lambda/syllabus-scraper',
             deadLetterQueueEnabled: false,
             description: "Base function for scraping syllabus data from Waseda University.",
             functionName: "syllabus-scraper",
@@ -139,8 +137,8 @@ export class AmplifyStatusPublisher extends cdk.Construct {
         super(scope, id);
 
         this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('src/lambda/amplify-status-publisher/function.zip'),
-            handler: "amplify-status-publisher.handler",
+            code: Code.fromAsset('src/lambda/amplify-status-publisher'),
+            handler: "index.handler",
             deadLetterQueueEnabled: false,
             description: "Forwards Amplify build status message from SNS to Slack Webhook.",
             functionName: "amplify-status-publisher",
@@ -160,8 +158,8 @@ export class ScraperStatusPublisher extends cdk.Construct {
         super(scope, id);
 
         this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('src/lambda/sfn-status-publisher/function.zip'),
-            handler: "scraper-status-publisher.handler",
+            code: Code.fromAsset('src/lambda/sfn-status-publisher'),
+            handler: "index.handler",
             deadLetterQueueEnabled: false,
             description: "Forwards scraper execution status message from SNS to Slack Webhook.",
             functionName: "scraper-status-publisher",
@@ -181,8 +179,8 @@ export class PreSignupWasedaMailValidator extends cdk.Construct {
         super(scope, id);
 
         this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('src/lambda/signup-validator/function.zip'),
-            handler: "signup_validator.handler",
+            code: Code.fromAsset('src/lambda/signup-validator'),
+            handler: "index.handler",
             deadLetterQueueEnabled: false,
             description: "Validates if the user is signing up using WasedaMail",
             functionName: "wasedamail-signup-validator",
