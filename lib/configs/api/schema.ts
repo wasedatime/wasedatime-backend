@@ -273,91 +273,76 @@ export const courseReviewGetRespSchema: JsonSchema = {
             items: {
                 type: JsonSchemaType.OBJECT,
                 properties: {
-                    "course_key": {
+                    "title_jp": {
                         type: JsonSchemaType.STRING
                     },
-                    "comments": {
-                        type: JsonSchemaType.ARRAY,
-                        items: {
-                            type: JsonSchemaType.OBJECT,
-                            properties: {
-                                "title_jp": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "instructor_jp": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "updated_at": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "created_at": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "benefit": {
-                                    type: JsonSchemaType.INTEGER
-                                },
-                                "difficulty": {
-                                    type: JsonSchemaType.INTEGER
-                                },
-                                "satisfaction": {
-                                    type: JsonSchemaType.INTEGER
-                                },
-                                "instructor": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "comment_zh_CN": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "comment_en": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "comment_ko": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "year": {
-                                    type: JsonSchemaType.INTEGER
-                                },
-                                "src_lang": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "comment_ja": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "comment_zh_TW": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "title": {
-                                    type: JsonSchemaType.STRING
-                                },
-                                "mod": {
-                                    type: JsonSchemaType.BOOLEAN
-                                }
-                            },
-                            required: [
-                                "title_jp",
-                                "instructor_jp",
-                                "updated_at",
-                                "created_at",
-                                "benefit",
-                                "difficulty",
-                                "satisfaction",
-                                "instructor",
-                                "comment_zh-CN",
-                                "comment_zh-TW",
-                                "comment_ko",
-                                "comment_en",
-                                "year",
-                                "src_lang",
-                                "comment_ja",
-                                "title",
-                                "mod"
-                            ]
-                        }
+                    "instructor_jp": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "updated_at": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "created_at": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "benefit": {
+                        type: JsonSchemaType.INTEGER
+                    },
+                    "difficulty": {
+                        type: JsonSchemaType.INTEGER
+                    },
+                    "satisfaction": {
+                        type: JsonSchemaType.INTEGER
+                    },
+                    "instructor": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "comment_zh_CN": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "comment_en": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "comment_ko": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "year": {
+                        type: JsonSchemaType.INTEGER
+                    },
+                    "src_lang": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "comment_ja": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "comment_zh_TW": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "title": {
+                        type: JsonSchemaType.STRING
+                    },
+                    "mod": {
+                        type: JsonSchemaType.BOOLEAN
                     }
                 },
                 required: [
-                    "course_key",
-                    "comments"
+                    "title_jp",
+                    "instructor_jp",
+                    "updated_at",
+                    "created_at",
+                    "benefit",
+                    "difficulty",
+                    "satisfaction",
+                    "instructor",
+                    "comment_zh-CN",
+                    "comment_zh-TW",
+                    "comment_ko",
+                    "comment_en",
+                    "year",
+                    "src_lang",
+                    "comment_ja",
+                    "title",
+                    "mod"
                 ]
             }
         },
@@ -408,9 +393,6 @@ export const courseReviewPostReqSchema: JsonSchema = {
                 },
                 "title": {
                     type: JsonSchemaType.STRING
-                },
-                "uid": {
-                    type: JsonSchemaType.STRING
                 }
             },
             required: [
@@ -423,17 +405,12 @@ export const courseReviewPostReqSchema: JsonSchema = {
                 "comment",
                 "year",
                 "course_key",
-                "title",
-                "uid"
+                "title"
             ]
-        },
-        "token": {
-            type: JsonSchemaType.STRING
         }
     },
     required: [
-        "data",
-        "token"
+        "data"
     ]
 };
 

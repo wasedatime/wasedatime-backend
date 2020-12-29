@@ -1,6 +1,8 @@
 import * as cdk from "@aws-cdk/core";
 import {
+    AuthorizationType,
     AwsIntegration,
+    CfnAuthorizer,
     LambdaIntegration,
     Method,
     MockIntegration,
@@ -30,6 +32,8 @@ export interface ApiServiceProps {
     apiEndpoint: RestApi
 
     dataSource?: string
+
+    authorizer?: string
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
@@ -159,6 +163,14 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             courseReviewsFunctions.putFunction, {proxy: true}
         );
 
+        const userPoolAuth = new CfnAuthorizer(this, 'cognito-authorizer', {
+            name: 'user-pool-authorizer',
+            identitySource: 'method.request.header.Authorization',
+            providerArns: [props.authorizer!],
+            restApiId: props.apiEndpoint.restApiId,
+            type: AuthorizationType.COGNITO
+        });
+
         this.methods.OPTIONS = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
@@ -166,6 +178,10 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         });
         this.methods.GET = root.addMethod(HttpMethod.GET, getIntegration,
             {
+                requestParameters: {
+                    'method.request.querystring.key': true,
+                    'method.request.querystring.uid': true
+                },
                 operationName: "GetReviews",
                 methodResponses: [{
                     statusCode: '200',
@@ -176,22 +192,32 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         );
         this.methods.POST = root.addMethod(HttpMethod.POST, postIntegration,
             {
+                requestParameters: {
+                    'method.request.header.Authorization': true
+                },
                 operationName: "PostReview",
                 requestModels: {["application/json"]: postReqModel},
                 methodResponses: [{
                     statusCode: '200',
                     responseParameters: lambdaRespParams
-                }]
+                }],
+                authorizer: {authorizerId: userPoolAuth.ref},
+                authorizationType: AuthorizationType.COGNITO
             }
         );
         this.methods.PUT = root.addMethod(HttpMethod.PUT, putIntegration,
             {
+                requestParameters: {
+                    'method.request.header.Authorization': true
+                },
                 operationName: "UpdateReview",
                 requestModels: {["application/json"]: putReqModel},
                 methodResponses: [{
                     statusCode: '200',
                     responseParameters: lambdaRespParams
-                }]
+                }],
+                authorizer: {authorizerId: userPoolAuth.ref},
+                authorizationType: AuthorizationType.COGNITO
             });
     }
 }
