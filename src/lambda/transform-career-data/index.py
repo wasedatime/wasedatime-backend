@@ -4,6 +4,11 @@ import sys
 from io import StringIO
 from transform_career_data import transformer
 
+
+def handler(event, context):
+    pass
+
+
 if __name__ == '__main__':
     # Read CSV String-Input
     print('Input the CSV string (press ENTER after inserted all string):')

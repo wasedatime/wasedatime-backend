@@ -10,7 +10,7 @@ def post_review(review, uid):
 
     src_lang, translated = translate_text(text)
 
-    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
     review_item = {
         "title_jp": review["title_jp"],
