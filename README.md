@@ -3,12 +3,10 @@
 ![](https://travis-ci.com/wasedatime/wasedatime-backend.svg?branch=develop)
 ![](https://img.shields.io/website?up_color=green&up_message=online&url=https%3A%2F%2Fwasedatime.com)
 
-
-
-## About The Project
-
 This repository defines the serverless application architecture, resource configuration and infrastructure provision strategy of 
 [wasedatime.com](https://wasedatime.com).
+
+## About The Project
 
 ### Architecture
 
