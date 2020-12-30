@@ -1,11 +1,33 @@
 language: node_js
+
 node_js:
   - lts/*
+
+services:
+  - docker
+
+before_install:
+  - bash script/create_aws_profile.sh
+
 install:
   - npm ci
+
 script:
   - npm test
   - npm run build
-#after_success:
-#  - cdk synth
-#  - cdk deploy
+
+after_success:
+  - cdk diff
+
+after_script:
+  - cdk synth
+
+before_deploy:
+  - cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_REGION}
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: bash script/deploy.sh
+  on:
+    branch: main
