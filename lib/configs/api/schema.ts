@@ -364,9 +364,6 @@ export const courseReviewPostReqSchema: JsonSchema = {
         "data": {
             type: JsonSchemaType.OBJECT,
             properties: {
-                "course_key": {
-                    type: JsonSchemaType.STRING
-                },
                 "title_jp": {
                     type: JsonSchemaType.STRING
                 },
@@ -404,8 +401,40 @@ export const courseReviewPostReqSchema: JsonSchema = {
                 "instructor",
                 "comment",
                 "year",
-                "course_key",
                 "title"
+            ]
+        }
+    },
+    required: [
+        "data"
+    ]
+};
+
+export const courseReviewPatchReqSchema: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT7,
+    type: JsonSchemaType.OBJECT,
+    properties: {
+        "data": {
+            type: JsonSchemaType.OBJECT,
+            properties: {
+                "benefit": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "difficulty": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "satisfaction": {
+                    type: JsonSchemaType.INTEGER
+                },
+                "comment": {
+                    type: JsonSchemaType.STRING
+                },
+            },
+            required: [
+                "benefit",
+                "difficulty",
+                "satisfaction",
+                "comment"
             ]
         }
     },

@@ -2,7 +2,7 @@ const https = require('https');
 
 exports.handler = async (event) => {
     const msg = event.Records[0].Sns.Message;
-    const matched = msg.match('"Task status notification from the AWS StepFunction for execution name: (.*)\. The task status is (.*)\. Go to (.*) to view details on the execution\."');
+    const matched = msg.match(/Task status notification from the AWS StepFunction for execution name: (.*)\. The task status is (.*)\. Go to (.*) to view details on the execution\./);
 
     const colors = {
         'RUNNING': 'good',
@@ -24,11 +24,18 @@ exports.handler = async (event) => {
                 fallback: msg,
                 title: `Execution ${exec} is now status ${stat}`,
                 color: colors[stat],
-                fields: [{title: 'Timestamp', value: ts, short: true}, {
-                    title: 'ExecutionName',
-                    value: exec,
-                    short: true
-                }]
+                fields: [
+                    {
+                        title: 'Timestamp',
+                        value: ts,
+                        short: true
+                    },
+                    {
+                        title: 'Execution',
+                        value: exec,
+                        short: true
+                    }
+                ]
             }
         ]
     });

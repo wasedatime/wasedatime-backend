@@ -30,7 +30,7 @@ def handler(event, context):
     #         .add_message("External request detected, related information will be reported to admin.").compile()
     #     return api_response(403, resp)
 
-    course_key = event["queryStringParameters"]["key"]
+    course_key = event["pathParameters"]["key"]
     uid = event["queryStringParameters"]["uid"]
 
     try:

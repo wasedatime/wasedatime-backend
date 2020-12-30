@@ -2,7 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import {App, Branch, Domain} from "@aws-cdk/aws-amplify";
 
 import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../../configs/amplify/website";
-import {openapiBuildSpec, webappBuildSpec} from "../../configs/amplify/build-setting";
+import {openapiBuildSpec, webappBuildSpec, webappDevBuildSpec} from "../../configs/amplify/build-setting";
 import {apiDocCode, webAppCode} from "../../configs/amplify/codebase";
 
 
@@ -48,30 +48,44 @@ export class AmplifyWebApp extends AbstractWebApp {
                 "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192"
             },
-            sourceCodeProvider: webAppCode
+            sourceCodeProvider: webAppCode,
+            autoBranchCreation: {
+                autoBuild: true,
+                patterns: ['feature/*'],
+                basicAuth: developerAuth,
+                pullRequestPreview: false,
+                buildSpec: webappDevBuildSpec,
+                environmentVariables: {
+                    ["REACT_APP_API_BASE_URL"]: `https://${props.apiDomain}/staging`
+                }
+            }
         });
 
-        const mainBranch: Branch = this.app.addBranch('main', {
+        const masterBranch: Branch = this.app.addBranch('master', {
             autoBuild: false,
-            branchName: "main",
-            stage: "PRODUCTION"
-        }).addEnvironment("REACT_APP_API_BASE_URL", "https://api.wasedatime.com/v1");
+            branchName: "master",
+            stage: "PRODUCTION",
+            buildSpec: webappBuildSpec
+        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`)
+            .addEnvironment("REACT_APP_S3_BASE_URL", "https://wasedatime-syllabus.s3-ap-northeast-1.amazonaws.com/2020-2021/");
 
-        this.branches["main"] = mainBranch;
+        this.branches["main"] = masterBranch;
         const devBranch: Branch = this.app.addBranch('dev', {
             autoBuild: false,
             basicAuth: developerAuth,
             branchName: "develop",
-            stage: "DEVELOPMENT"
-        });
+            stage: "DEVELOPMENT",
+            buildSpec: webappDevBuildSpec
+        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
         this.branches["dev"] = devBranch;
 
         // fixme migration
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
-                {branch: devBranch, prefix: "develop"},
-                {branch: mainBranch, prefix: "main"}
+                {branch: devBranch, prefix: "dev"},
+                {branch: masterBranch, prefix: ''},
+                {branch: masterBranch, prefix: 'www'}
             ]
         });
     }
