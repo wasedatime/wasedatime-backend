@@ -1,11 +1,12 @@
 import json
 import logging
+from boto3.dynamodb.conditions import Attr
 from datetime import datetime
 
 from utils import JsonPayloadBuilder, api_response, translate_text, langs, table
 
 
-def patch_review(key, ts, review):
+def patch_review(key, ts, review, uid):
     resp_body = JsonPayloadBuilder().add_status(True).add_data(None).add_message('').compile()
 
     if "comment" not in review:
@@ -15,6 +16,7 @@ def patch_review(key, ts, review):
                 "course_key": key,
                 "created_at": ts
             },
+            ConditionExpression=Attr('uid').eq(uid),
             UpdateExpression="SET updated_at = :ts, benefit = :ben, difficulty = :diff, satisfaction = :sat",
             ExpressionAttributeValues={
                 ":ts": dt_now,
@@ -26,11 +28,11 @@ def patch_review(key, ts, review):
         return resp_body
 
     text = review["comment"]
-
     src_lang, translated = translate_text(text)
 
-    expr_attr_name = {}
-    expr_attr_val = {}
+    expr_attr_name = dict()
+    expr_attr_val = dict()
+
     for l in langs:
         expr_attr_name[f'#{l[-2:]}'] = f'comment_{l}'
         expr_attr_val[f':{l[-2:]}'] = translated[l]
@@ -38,8 +40,8 @@ def patch_review(key, ts, review):
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     expr_attr_val[":ts"] = dt_now
-    expr_attr_val[":ben"] = review["benefit"],
-    expr_attr_val[":diff"] = review["difficulty"],
+    expr_attr_val[":ben"] = review["benefit"]
+    expr_attr_val[":diff"] = review["difficulty"]
     expr_attr_val[":sat"] = review["satisfaction"]
 
     table.update_item(
@@ -72,20 +74,10 @@ def handler(event, context):
     uid = event['requestContext']['authorizer']['claims']['sub']
 
     try:
-        resp = patch_review(key, create_time, review)
+        resp = patch_review(key, create_time, review, uid)
         return api_response(200, resp)
     except Exception as e:
         logging.error(str(e))
         resp = JsonPayloadBuilder().add_status(False).add_data(None) \
             .add_message("Internal error, please contact admin@wasedatime.com.").compile()
         return api_response(500, resp)
-
-
-if __name__ == '__main__':
-    review = {
-        "benefit": 5,
-        "comment": "This is a nice course! you can learn practical experience",
-        "difficulty": 5,
-        "satisfaction": 5
-    }
-    resp = patch_review('26GF02200201', '2020-12-30T14:58:25.221Z', review)

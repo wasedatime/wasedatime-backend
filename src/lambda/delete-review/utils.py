@@ -1,24 +1,11 @@
-import base64
 import boto3
 import json
 import os
 from decimal import Decimal
-from google.cloud import translate
-from google.oauth2 import service_account
-from re import fullmatch
 
 # AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
-
-# Google Translation client and configs
-acct_info = json.loads(base64.b64decode(os.environ.get('GOOGLE_API_SERVICE_ACCOUNT_INFO')))
-credentials = service_account.Credentials.from_service_account_info(acct_info)
-client = translate.TranslationServiceClient(credentials=credentials)
-parent = "projects/wasedatime/locations/global"
-
-# Supported languages
-langs = ['en', 'ja', 'ko', 'zh-CN', 'zh-TW']
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -61,12 +48,6 @@ def api_response(code, body):
     }
 
 
-# todo verify the user using jwt token
-
-def verify_user():
-    pass
-
-
 def bad_referer(headers):
     if "referer" not in headers:
         return True
@@ -74,27 +55,3 @@ def bad_referer(headers):
         return True
     else:
         return False
-
-
-def translate_text(text):
-    src_lang = client.detect_language(request={
-        "parent": parent,
-        "content": text,
-        "mime_type": "text/plain"
-    }).languages[0].language_code
-    langs.remove(src_lang)
-
-    results = {
-        "src": src_lang
-    }
-    for lang in langs:
-        response = client.translate_text(request={
-            "parent": parent,
-            "contents": [text],
-            "mime_type": "text/plain",
-            "source_language_code": src_lang,
-            "target_language_code": lang
-        })
-        results[lang] = response.translations[0].translated_text
-
-    return results

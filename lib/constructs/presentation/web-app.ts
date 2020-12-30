@@ -56,7 +56,7 @@ export class AmplifyWebApp extends AbstractWebApp {
                 pullRequestPreview: false,
                 buildSpec: webappDevBuildSpec,
                 environmentVariables: {
-                    ["REACT_APP_API_BASE_URL"]: "https://api.wasedatime.com/staging"
+                    ["REACT_APP_API_BASE_URL"]: `https://${props.apiDomain}/staging`
                 }
             }
         });
@@ -66,7 +66,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             branchName: "master",
             stage: "PRODUCTION",
             buildSpec: webappBuildSpec
-        }).addEnvironment("REACT_APP_API_BASE_URL", "https://api.wasedatime.com/v1");
+        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
 
         this.branches["main"] = masterBranch;
         const devBranch: Branch = this.app.addBranch('dev', {
@@ -75,7 +75,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             branchName: "develop",
             stage: "DEVELOPMENT",
             buildSpec: webappDevBuildSpec
-        }).addEnvironment("REACT_APP_API_BASE_URL", "https://api.wasedatime.com/staging");
+        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
         this.branches["dev"] = devBranch;
 
         // fixme migration

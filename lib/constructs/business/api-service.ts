@@ -179,7 +179,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         this.methods.OPTIONS = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.OPTIONS]
+            allowMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.DELETE, HttpMethod.OPTIONS]
         });
         this.methods.GET = root.addMethod(HttpMethod.GET, getIntegration,
             {

@@ -5,6 +5,7 @@ import {
     EndpointType,
     LambdaRestApi,
     RestApi,
+    SecurityPolicy,
     SpecRestApi,
     Stage
 } from "@aws-cdk/aws-apigateway";
@@ -16,6 +17,9 @@ import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, Syllab
 import {baseJsonApiSchema} from "../../configs/api/schema";
 import {ApiServices} from "../../configs/api/service";
 import {STAGE} from "../../configs/common/aws";
+import {Certificate} from "@aws-cdk/aws-certificatemanager";
+import {API_CERT_ARN} from "../../configs/common/arn";
+import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
 
 
 export interface ApiEndpointProps {
@@ -105,19 +109,25 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             variables: {["STAGE"]: STAGE}
         });
 
-        // const domain = this.apiEndpoint.addDomainName('domain', {
-        //     certificate: Certificate.fromCertificateArn(this, 'api-domain', API_CERT_ARN),
-        //     domainName: "api." + WEBAPP_DOMAIN,
-        //     endpointType: EndpointType.REGIONAL,
-        //     securityPolicy: SecurityPolicy.TLS_1_2
-        // });
-        // domain.addBasePathMapping(this.apiEndpoint, {
-        //     basePath: 'v1',
-        //     stage: this.stages['prod']
-        // });
-        // domain.addBasePathMapping(this.apiEndpoint, {
+        const domain = this.apiEndpoint.addDomainName('domain', {
+            certificate: Certificate.fromCertificateArn(this, 'api-domain', API_CERT_ARN),
+            domainName: "api." + WEBAPP_DOMAIN,
+            endpointType: EndpointType.REGIONAL,
+            securityPolicy: SecurityPolicy.TLS_1_2
+        });
+
+        // domain.addBasePathMapping(this.apiEndpoint,{
+        //     // domainName: domain,
+        //     // restApi: this.apiEndpoint,
         //     basePath: 'staging',
         //     stage: this.stages['dev']
+        // });
+
+        // new CfnApiMapping(this, 'http-api-mapping-prod', {
+        //     apiId: 'biq3vr83u0',
+        //     domainName: domain.domainName,
+        //     stage: 'prod',
+        //     apiMappingKey: 'v1'
         // });
 
         const baseJsonApiModel = this.apiEndpoint.addModel('base-json-api-model', {
