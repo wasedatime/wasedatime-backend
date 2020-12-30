@@ -66,7 +66,8 @@ export class AmplifyWebApp extends AbstractWebApp {
             branchName: "master",
             stage: "PRODUCTION",
             buildSpec: webappBuildSpec
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
+        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`)
+            .addEnvironment("REACT_APP_S3_BASE_URL", "https://wasedatime-syllabus.s3-ap-northeast-1.amazonaws.com/2020-2021/");
 
         this.branches["main"] = masterBranch;
         const devBranch: Branch = this.app.addBranch('dev', {
@@ -82,8 +83,9 @@ export class AmplifyWebApp extends AbstractWebApp {
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
-                {branch: devBranch, prefix: "develop"},
-                {branch: masterBranch, prefix: "main"}
+                {branch: devBranch, prefix: "dev"},
+                {branch: masterBranch, prefix: ''},
+                {branch: masterBranch, prefix: 'www'}
             ]
         });
     }
