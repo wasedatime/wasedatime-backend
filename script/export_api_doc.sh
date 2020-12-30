@@ -9,7 +9,7 @@ setup_git() {
   cd "$TRAVIS_BUILD_DIR" || exit 1
   git config --global user.email "travis@travis-ci.com"
   git config --global user.name "Travis CI"
-  git clone https://github.com/wasedatime/wasedatime-openapi.git
+  git clone https://"${TRAVIS_GITHUB_TOKEN}"github.com/wasedatime/wasedatime-openapi.git
   cd wasedatime-openapi/openapi || exit 1
 }
 
