@@ -19,6 +19,7 @@ import {
     articleListSchema,
     articlePlainJson,
     courseReviewGetRespSchema,
+    courseReviewPatchReqSchema,
     courseReviewPostReqSchema,
     syllabusSchema
 } from "../../configs/api/schema";
@@ -126,8 +127,9 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         const root = new Resource(this, 'course-reviews', {
             parent: scope.apiEndpoint.root,
             pathPart: "course-reviews"
-        });
+        }).addResource('{key}');
         this.resources["/course-reviews"] = root;
+
 
         const getRespModel = props.apiEndpoint.addModel('review-get-resp-model', {
             schema: courseReviewGetRespSchema,
@@ -141,11 +143,11 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             description: "HTTP POST request body schema for submitting the review.",
             modelName: "PostReviewReq"
         });
-        const putReqModel = props.apiEndpoint.addModel('review-put-req-model', {
-            schema: courseReviewPostReqSchema,
+        const patchReqModel = props.apiEndpoint.addModel('review-patch-req-model', {
+            schema: courseReviewPatchReqSchema,
             contentType: "application/json",
-            description: "HTTP PUT request body schema for updating a review",
-            modelName: "PutReviewReq"
+            description: "HTTP PATCH request body schema for updating a review",
+            modelName: "PatchReviewReq"
         });
 
         const courseReviewsFunctions = new CourseReviewsFunctions(this, 'crud-functions', {
@@ -159,8 +161,11 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         const postIntegration = new LambdaIntegration(
             courseReviewsFunctions.postFunction, {proxy: true}
         );
-        const putIntegration = new LambdaIntegration(
-            courseReviewsFunctions.putFunction, {proxy: true}
+        const patchIntegration = new LambdaIntegration(
+            courseReviewsFunctions.patchFunction, {proxy: true}
+        );
+        const deleteIntegration = new LambdaIntegration(
+            courseReviewsFunctions.deleteFunction, {proxy: true}
         );
 
         const userPoolAuth = new CfnAuthorizer(this, 'cognito-authorizer', {
@@ -174,12 +179,11 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         this.methods.OPTIONS = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS]
+            allowMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.OPTIONS]
         });
         this.methods.GET = root.addMethod(HttpMethod.GET, getIntegration,
             {
                 requestParameters: {
-                    'method.request.querystring.key': true,
                     'method.request.querystring.uid': true
                 },
                 operationName: "GetReviews",
@@ -202,17 +206,35 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 authorizationType: AuthorizationType.COGNITO
             }
         );
-        this.methods.PUT = root.addMethod(HttpMethod.PUT, putIntegration,
+        this.methods.PATCH = root.addMethod(HttpMethod.PATCH, patchIntegration,
             {
                 operationName: "UpdateReview",
-                requestModels: {["application/json"]: putReqModel},
+                requestParameters: {
+                    'method.request.querystring.ts': true
+                },
+                requestModels: {["application/json"]: patchReqModel},
                 methodResponses: [{
                     statusCode: '200',
                     responseParameters: lambdaRespParams
                 }],
                 authorizer: {authorizerId: userPoolAuth.ref},
                 authorizationType: AuthorizationType.COGNITO
-            });
+            }
+        );
+        this.methods.DELETE = root.addMethod(HttpMethod.DELETE, deleteIntegration,
+            {
+                operationName: "DeleteReview",
+                requestParameters: {
+                    'method.request.querystring.ts': true
+                },
+                methodResponses: [{
+                    statusCode: '200',
+                    responseParameters: lambdaRespParams
+                }],
+                authorizer: {authorizerId: userPoolAuth.ref},
+                authorizationType: AuthorizationType.COGNITO
+            }
+        );
     }
 }
 

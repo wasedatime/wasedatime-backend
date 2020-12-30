@@ -21,7 +21,7 @@ exports.handler = async (event) => {
     } else if (branch === 'master') {
         url = "https://wasedatime.com/";
     } else {
-        url = `https://${branch.replaceAll('/', '-').replaceAll('_', '-')}.${appId}.amplifyapp.com/`;
+        url = `https://${branch.replace(/\//g, '-').replace(/_/g, '-')}.${appId}.amplifyapp.com/`;
     }
 
     const data = JSON.stringify({

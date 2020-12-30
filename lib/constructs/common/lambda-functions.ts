@@ -19,7 +19,9 @@ export class CourseReviewsFunctions extends cdk.Construct {
 
     readonly postFunction: Function;
 
-    readonly putFunction: Function;
+    readonly patchFunction: Function;
+
+    readonly deleteFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
         super(scope, id);
@@ -77,11 +79,11 @@ export class CourseReviewsFunctions extends cdk.Construct {
             environment: props.envvars
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
 
-        this.putFunction = new PythonFunction(this, 'put-review', {
-            entry: 'src/lambda/put-review',
+        this.patchFunction = new PythonFunction(this, 'patch-review', {
+            entry: 'src/lambda/patch-review',
             deadLetterQueueEnabled: false,
             description: "Update course reviews in the database.",
-            functionName: "put-course-review",
+            functionName: "patch-course-review",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             role: dynamoDBPutRole,
@@ -89,6 +91,19 @@ export class CourseReviewsFunctions extends cdk.Construct {
             timeout: Duration.seconds(5),
             environment: props.envvars
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
+
+        this.deleteFunction = new PythonFunction(this, 'delete-review', {
+            entry: 'src/lambda/delete-review',
+            deadLetterQueueEnabled: false,
+            description: "Delete course reviews in the database.",
+            functionName: "delete-course-review",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 128,
+            role: dynamoDBPutRole,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3),
+            environment: props.envvars
+        });
     }
 
     deploy(func: Function) {

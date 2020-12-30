@@ -33,48 +33,6 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
             ]
         },
         "customHeaders": [
-            {
-                // Security policies
-                "pattern": "**/*",
-                "headers": [
-                    {
-                        "key": "Strict-Transport-Security",
-                        "value": "max-age=15552000; includeSubDomains"
-                    },
-                    {
-                        "key": "X-Frame-Options",
-                        "value": "SAMEORIGIN"
-                    },
-                    {
-                        "key": "X-XSS-Protection",
-                        "value": "1; mode=block"
-                    },
-                    {
-                        "key": "X-Content-Type-Options",
-                        "value": "nosniff"
-                    },
-                    {
-                        "key": "Content-Security-Policy",
-                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
-                    },
-                    {
-                        "key": "X-Content-Security-Policy",
-                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
-                    },
-                    {
-                        "key": "X-WebKit-CSP",
-                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
-                    },
-                    {
-                        "key": "X-Download-Options",
-                        "value": "noopen"
-                    },
-                    {
-                        "key": "X-DNS-Prefetch-Control",
-                        "value": "off"
-                    }
-                ]
-            },
             // Response caching
             {
                 "pattern": "**/*.js",
@@ -127,6 +85,48 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
                     {
                         "key": "Cache-Control",
                         "value": "public,max-age=2592000,immutable"
+                    }
+                ]
+            },
+            {
+                // Security policies
+                "pattern": "**/*",
+                "headers": [
+                    {
+                        "key": "Strict-Transport-Security",
+                        "value": "max-age=15552000; includeSubDomains"
+                    },
+                    {
+                        "key": "X-Frame-Options",
+                        "value": "SAMEORIGIN"
+                    },
+                    {
+                        "key": "X-XSS-Protection",
+                        "value": "1; mode=block"
+                    },
+                    {
+                        "key": "X-Content-Type-Options",
+                        "value": "nosniff"
+                    },
+                    {
+                        "key": "Content-Security-Policy",
+                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
+                    },
+                    {
+                        "key": "X-Content-Security-Policy",
+                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
+                    },
+                    {
+                        "key": "X-WebKit-CSP",
+                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
+                    },
+                    {
+                        "key": "X-Download-Options",
+                        "value": "noopen"
+                    },
+                    {
+                        "key": "X-DNS-Prefetch-Control",
+                        "value": "off"
                     }
                 ]
             }

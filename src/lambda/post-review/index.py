@@ -5,7 +5,7 @@ from datetime import datetime
 from utils import JsonPayloadBuilder, api_response, translate_text, langs, table
 
 
-def post_review(review, uid):
+def post_review(key, review, uid):
     text = review["comment"]
 
     src_lang, translated = translate_text(text)
@@ -23,7 +23,7 @@ def post_review(review, uid):
         "instructor": review["instructor"],
         "year": review["year"],
         "src_lang": src_lang,
-        "course_key": review["course_key"],
+        "course_key": key,
         "title": review["title"],
         "uid": uid
     }
@@ -47,12 +47,12 @@ def handler(event, context):
 
     req = json.loads(event['body'])
 
+    key = event["pathParameters"]["key"]
+    review = req["data"]
     uid = event['requestContext']['authorizer']['claims']['sub']
 
-    review = req["data"]
-
     try:
-        resp = post_review(review, uid)
+        resp = post_review(key, review, uid)
         return api_response(200, resp)
     except Exception as e:
         logging.error(str(e))
