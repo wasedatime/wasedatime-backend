@@ -76,19 +76,22 @@ def translate_text(text):
         "content": text,
         "mime_type": "text/plain"
     }).languages[0].language_code
-    langs.remove(src_lang)
 
-    results = {
-        "src": src_lang
-    }
+    translations = {}
+
     for lang in langs:
-        response = client.translate_text(request={
+        if lang == src_lang:
+            translations[lang] = text
+            continue
+
+        translated = client.translate_text(request={
             "parent": parent,
             "contents": [text],
             "mime_type": "text/plain",
             "source_language_code": src_lang,
             "target_language_code": lang
-        })
-        results[lang] = response.translations[0].translated_text
+        }).translations[0].translated_text
 
-    return results
+        translations[lang] = translated or ''
+
+    return src_lang, translations

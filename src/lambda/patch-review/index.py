@@ -79,3 +79,13 @@ def handler(event, context):
         resp = JsonPayloadBuilder().add_status(False).add_data(None) \
             .add_message("Internal error, please contact admin@wasedatime.com.").compile()
         return api_response(500, resp)
+
+
+if __name__ == '__main__':
+    review = {
+        "benefit": 5,
+        "comment": "This is a nice course! you can learn practical experience",
+        "difficulty": 5,
+        "satisfaction": 5
+    }
+    resp = patch_review('26GF02200201', '2020-12-30T14:58:25.221Z', review)
