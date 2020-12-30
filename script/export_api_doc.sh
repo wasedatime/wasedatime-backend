@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 export_api_doc() {
+  pyenv global 3.7.1
+  pip install -U pip
+  pip install awscli
   aws apigateway --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
   aws apigateway --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
 }
