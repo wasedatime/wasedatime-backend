@@ -33,8 +33,7 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         });
         this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
 
-        // this.serviceInterface.setEndpoint(ServiceEndpoint.MAIN, mainApiEndpoint.getDomain());
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, 'api.wasedatime.com');
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, mainApiEndpoint.getDomain());
 
         this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
