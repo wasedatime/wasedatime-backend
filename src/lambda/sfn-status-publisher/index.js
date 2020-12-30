@@ -24,11 +24,18 @@ exports.handler = async (event) => {
                 fallback: msg,
                 title: `Execution ${exec} is now status ${stat}`,
                 color: colors[stat],
-                fields: [{title: 'Timestamp', value: ts, short: true}, {
-                    title: 'ExecutionName',
-                    value: exec,
-                    short: true
-                }]
+                fields: [
+                    {
+                        title: 'Timestamp',
+                        value: ts,
+                        short: true
+                    },
+                    {
+                        title: 'Execution',
+                        value: exec,
+                        short: true
+                    }
+                ]
             }
         ]
     });

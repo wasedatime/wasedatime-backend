@@ -58,6 +58,14 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
                         "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
                     },
                     {
+                        "key": "X-Content-Security-Policy",
+                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
+                    },
+                    {
+                        "key": "X-WebKit-CSP",
+                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
+                    },
+                    {
                         "key": "X-Download-Options",
                         "value": "noopen"
                     },
@@ -123,6 +131,29 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
                 ]
             }
         ]
+    }
+});
+
+export const webappDevBuildSpec: BuildSpec = BuildSpec.fromObject({
+    "version": 1,
+    "frontend": {
+        "phases": {
+            "preBuild": {
+                "commands": ["npm ci"]
+            },
+            // IMPORTANT - Please verify your build commands
+            "build": {
+                "commands": ["npm run build-dev"]
+            }
+        },
+        "artifacts": {
+            // IMPORTANT - Please verify your build output directory
+            "baseDirectory": "/build",
+            "files": ["**/*"]
+        },
+        "cache": {
+            "paths": ["node_modules/**/*"]
+        }
     }
 });
 

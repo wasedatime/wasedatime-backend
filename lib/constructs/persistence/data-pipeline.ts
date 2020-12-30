@@ -58,7 +58,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: false,
             removalPolicy: RemovalPolicy.DESTROY,
-            versioned: true
+            versioned: false
         });
         allowApiGatewayPolicy(this.dataWarehouse);
 
