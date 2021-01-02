@@ -34,31 +34,33 @@ exports.handler = async (event) => {
                 fields: [
                     {
                         title: 'Website',
-                        value: `<${url}|Click to view the branch>`,
-                        short: true
+                      value: `<${url}|Click to view the branch>`,
+                      short: true
                     },
-                    {
-                        title: 'Branch',
-                        value: branch,
-                        short: true
-                    }
+                  {
+                    title: 'Branch',
+                    value: branch,
+                    short: true
+                  }
                 ]
             }
-        ]
+        ],
+      icon_url: "https://i.ibb.co/8r3mDbY/AWS-Amplify-3.png",
+      username: "aws-amplify"
     });
 
     return new Promise((resolve, reject) => {
-        const request = https.request(process.env.SLACK_WEBHOOK_AMP, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': data.length,
-            }
-        }, (res) => {
-            console.log(`statusCode: ${res.statusCode}`);
-            res.on('data', (d) => process.stdout.write(d));
-            res.on('end', () => resolve());
-        });
+      const request = https.request(process.env.SLACK_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': data.length,
+        }
+      }, (res) => {
+        console.log(`statusCode: ${res.statusCode}`);
+        res.on('data', (d) => process.stdout.write(d));
+        res.on('end', () => resolve());
+      });
         request.write(data);
         request.end();
     });

@@ -357,3 +357,69 @@ export class CareerApiService extends AbstractRestApiService {
         });
     }
 }
+
+// todo
+export class TimetableApiService extends AbstractRestApiService {
+
+    readonly resources: { [path: string]: Resource } = {};
+
+    readonly methods: { [method in HttpMethod]?: Method } = {};
+
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+        super(scope, id, props);
+
+        const root = new Resource(scope, 'timetable', {
+            parent: scope.apiEndpoint.root,
+            pathPart: "timetable"
+        });
+        this.resources["/timetable"] = root;
+
+        const getRespModel = props.apiEndpoint.addModel('timetable-get-resp-model', {
+            schema: articleListSchema,
+            contentType: "application/json",
+            description: "List of articles in feeds",
+            modelName: "GetFeedsResp"
+        });
+
+        const getIntegration = new MockIntegration({
+            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            integrationResponses: [{
+                statusCode: '200',
+                responseTemplates: {["application/json"]: articlePlainJson}
+            }]
+        });
+        const postIntegration = new MockIntegration({
+            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            integrationResponses: [{
+                statusCode: '200'
+            }]
+        });
+
+        this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
+        });
+        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
+            apiKeyRequired: false,
+            requestParameters: {
+                'method.request.querystring.offset': true,
+                'method.request.querystring.limit': true
+            },
+            operationName: "ListArticles",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: getRespModel}
+            }]
+        });
+        this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
+            apiKeyRequired: false,
+            operationName: "PostArticles",
+            methodResponses: [{
+                statusCode: '200'
+            }]
+        });
+    }
+}

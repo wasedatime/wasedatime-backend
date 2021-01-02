@@ -8,7 +8,7 @@ import {Table} from "@aws-cdk/aws-dynamodb";
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
-import {allowApiGatewayPolicy} from "../../configs/s3/access-setting";
+import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../configs/s3/access-setting";
 import {SyllabusScraper} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
@@ -57,10 +57,11 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: false,
-            removalPolicy: RemovalPolicy.DESTROY,
-            versioned: false
+            removalPolicy: RemovalPolicy.RETAIN,
+            versioned: true
         });
         allowApiGatewayPolicy(this.dataWarehouse);
+        allowLambdaPolicy(this.dataWarehouse);
 
         const scraperBaseFunction: Function = new SyllabusScraper(this, 'scraper-base-function', {
             envvars: {
@@ -79,6 +80,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             });
         }
 
+        // todo sync to table
         this.processor = new StateMachine(this, 'state-machine', {
             stateMachineName: 'syllabus-scraper',
             definition: getLambdaTaskInstance(this, ["GEC"], "0")
@@ -127,7 +129,7 @@ export class CareerDataPipeline extends AbstractDataPipeline {
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: false,
-            removalPolicy: RemovalPolicy.DESTROY,
+            removalPolicy: RemovalPolicy.RETAIN,
             versioned: true
         });
     }
@@ -150,7 +152,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: true,
-            removalPolicy: RemovalPolicy.DESTROY,
+            removalPolicy: RemovalPolicy.RETAIN,
             versioned: true
         });
     }

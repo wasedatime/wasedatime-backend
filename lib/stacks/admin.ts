@@ -6,7 +6,6 @@ import {OperationEndpoint} from "../configs/common/registry";
 import {
     AbstractStatusNotifier,
     AmplifyBuildStatusNotifier,
-    StackStatusNotifier,
     StatusNotifier,
     SyllabusScraperStatusNotifier
 } from "../constructs/admin/status-notifier";
@@ -30,7 +29,5 @@ export class WasedaTimeAdminLayer extends AdminLayer {
         this.statusNotifiers[StatusNotifier.SCRAPER_STATUS] = new SyllabusScraperStatusNotifier(this, 'scraper-notifier', {
             target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
         });
-
-        this.statusNotifiers[StatusNotifier.CFN_STATUS] = new StackStatusNotifier(this, 'cfn-notifier', {});
     }
 }

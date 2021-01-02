@@ -27,31 +27,33 @@ exports.handler = async (event) => {
                 fields: [
                     {
                         title: 'Timestamp',
-                        value: ts,
-                        short: true
+                      value: ts,
+                      short: true
                     },
-                    {
-                        title: 'Execution',
-                        value: exec,
-                        short: true
-                    }
+                  {
+                    title: 'Execution',
+                    value: exec,
+                    short: true
+                  }
                 ]
             }
-        ]
+        ],
+      icon_url: "https://i.ibb.co/zZrG2fN/AWS-Lambda-light-bg-2.png",
+      username: "aws-stepfunctions"
     });
 
     return new Promise((resolve, reject) => {
-        const request = https.request(process.env.SLACK_WEBHOOK_AMP, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': data.length,
-            }
-        }, (res) => {
-            console.log(`statusCode: ${res.statusCode}`);
-            res.on('data', (d) => process.stdout.write(d));
-            res.on('end', () => resolve());
-        });
+      const request = https.request(process.env.SLACK_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': data.length,
+        }
+      }, (res) => {
+        console.log(`statusCode: ${res.statusCode}`);
+        res.on('data', (d) => process.stdout.write(d));
+        res.on('end', () => resolve());
+      });
         request.write(data);
         request.end();
     });

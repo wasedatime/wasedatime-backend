@@ -5,7 +5,7 @@ import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_AMP, SLACK_WEBHOOK_SFN} from "../../configs/lambda/environment";
+import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL} from "../../configs/lambda/environment";
 import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 
 
@@ -161,7 +161,7 @@ export class AmplifyStatusPublisher extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3)
-        }).addEnvironment("SLACK_WEBHOOK_AMP", SLACK_WEBHOOK_AMP);
+        }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
     }
 }
 
@@ -182,7 +182,7 @@ export class ScraperStatusPublisher extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3)
-        }).addEnvironment("SLACK_WEBHOOK_SFN", SLACK_WEBHOOK_SFN);
+        }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
     }
 }
 
