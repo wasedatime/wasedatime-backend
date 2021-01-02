@@ -130,16 +130,30 @@ export class SyllabusScraper extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
         super(scope, id);
 
+        const s3AccessRole: LazyRole = new LazyRole(this, 's3-access-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
+            description: "Allow lambda function to access s3 buckets",
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+            roleName: "s3-lambda-full-access",
+            managedPolicies: [
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 's3-full-access',
+                    "arn:aws:iam::aws:policy/AmazonS3FullAccess")
+            ]
+        });
+
         this.baseFunction = new PythonFunction(this, 'base-function', {
             entry: 'src/lambda/syllabus-scraper',
             deadLetterQueueEnabled: false,
             description: "Base function for scraping syllabus data from Waseda University.",
             functionName: "syllabus-scraper",
             logRetention: RetentionDays.SIX_MONTHS,
-            memorySize: 128,
+            memorySize: 4096,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envvars
+            environment: props.envvars,
+            role: s3AccessRole
         });
     }
 }
