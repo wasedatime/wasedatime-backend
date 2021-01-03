@@ -10,7 +10,7 @@ import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 
 
 interface FunctionsProps {
-    envvars: { [name: string]: string }
+    envVars: { [name: string]: string }
 }
 
 export class CourseReviewsFunctions extends cdk.Construct {
@@ -63,7 +63,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             role: dynamoDBReadRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envvars
+            environment: props.envVars
         });
 
         this.postFunction = new PythonFunction(this, 'post-review', {
@@ -76,7 +76,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(5),
-            environment: props.envvars
+            environment: props.envVars
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
 
         this.patchFunction = new PythonFunction(this, 'patch-review', {
@@ -89,7 +89,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(5),
-            environment: props.envvars
+            environment: props.envVars
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
 
         this.deleteFunction = new PythonFunction(this, 'delete-review', {
@@ -102,7 +102,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envvars
+            environment: props.envVars
         });
     }
 
@@ -152,7 +152,7 @@ export class SyllabusScraper extends cdk.Construct {
             memorySize: 4096,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(210),
-            environment: props.envvars,
+            environment: props.envVars,
             role: s3AccessRole
         });
     }

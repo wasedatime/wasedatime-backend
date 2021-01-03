@@ -64,7 +64,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         allowLambdaPolicy(this.dataWarehouse);
 
         const scraperBaseFunction: Function = new SyllabusScraper(this, 'scraper-base-function', {
-            envvars: {
+            envVars: {
                 ["BUCKET_NAME"]: this.dataWarehouse.bucketName,
                 ["OBJECT_PATH"]: 'syllabus/'
             }

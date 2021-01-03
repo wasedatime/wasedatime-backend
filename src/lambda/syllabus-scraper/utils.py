@@ -303,7 +303,7 @@ def upload_to_s3(syllabus, school):
         ACL='private',
         Body=body,
         ContentType='application/json; charset=utf-8',
-        CacheControl='public, max-age=86400, must-revalidate'
+        CacheControl='public, max-age=2592000, must-revalidate'
     )
     return resp
 

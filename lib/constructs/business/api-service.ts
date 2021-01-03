@@ -150,7 +150,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         });
 
         const courseReviewsFunctions = new CourseReviewsFunctions(this, 'crud-functions', {
-            envvars: {
+            envVars: {
                 'TABLE_NAME': props.dataSource!
             }
         });
