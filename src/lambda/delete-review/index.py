@@ -24,4 +24,4 @@ def handler(event, context):
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 
-    return resp_handler(func=delete_review, params=headers)(**params)
+    return resp_handler(func=delete_review, headers=headers)(**params)

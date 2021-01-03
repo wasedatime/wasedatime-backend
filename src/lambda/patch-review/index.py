@@ -68,4 +68,4 @@ def handler(event, context):
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 
-    return resp_handler(func=patch_review, params=headers)(**params)
+    return resp_handler(func=patch_review, headers=headers)(**params)

@@ -31,4 +31,4 @@ def handler(event, context):
         "uid": event["queryStringParameters"]["uid"]
     }
 
-    return resp_handler(func=get_reviews, params=headers)(**params)
+    return resp_handler(func=get_reviews, headers=headers)(**params)

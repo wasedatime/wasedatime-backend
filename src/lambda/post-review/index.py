@@ -46,4 +46,4 @@ def handler(event, context):
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 
-    return resp_handler(func=post_review, params=headers)(**params)
+    return resp_handler(func=post_review, headers=headers)(**params)
