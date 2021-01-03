@@ -30,7 +30,6 @@ exports.handler = async (event) => {
     text: `Branch: ${branch} has entered status: ${stat} <${link}|(view in web console)>`,
     attachments: [
       {
-        fallback: msg,
         title: `Branch ${branch} is now status ${stat}`,
         color: colors[stat],
         fields: [

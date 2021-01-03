@@ -22,7 +22,6 @@ exports.handler = async (event) => {
     text: `Execution: ${exec} has entered status: ${stat} <${link}|(view in web console)>`,
     attachments: [
       {
-        fallback: msg,
         title: `Execution ${exec} is now status ${stat}`,
         color: colors[stat],
         fields: [
