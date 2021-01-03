@@ -130,7 +130,6 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         }).addResource('{key}');
         this.resources["/course-reviews"] = root;
 
-
         const getRespModel = props.apiEndpoint.addModel('review-get-resp-model', {
             schema: courseReviewGetRespSchema,
             contentType: "application/json",
