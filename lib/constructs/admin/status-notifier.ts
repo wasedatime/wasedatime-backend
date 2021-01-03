@@ -3,6 +3,7 @@ import {Construct} from '@aws-cdk/core';
 import {Rule} from "@aws-cdk/aws-events";
 import {Topic} from "@aws-cdk/aws-sns";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import {Function} from '@aws-cdk/aws-lambda';
 
 import {AmplifyStatusPublisher, ScraperStatusPublisher} from "../common/lambda-functions";
 
@@ -19,9 +20,11 @@ export interface StatusNotifierProps {
 
 export abstract class AbstractStatusNotifier extends Construct {
 
-    abstract readonly rule: Rule;
+    abstract readonly publisher: Rule;
 
-    abstract readonly topic?: Topic;
+    abstract readonly topic: Topic;
+
+    abstract readonly subscriber: Function;
 
     protected constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id);
@@ -30,16 +33,18 @@ export abstract class AbstractStatusNotifier extends Construct {
 
 export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
 
-    readonly rule: Rule;
+    readonly publisher: Rule;
 
-    readonly topic?: Topic;
+    readonly topic: Topic;
+
+    readonly subscriber: Function;
 
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        const subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
+        this.subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
 
-        this.rule = new Rule(this, 'build-sentinel', {
+        this.publisher = new Rule(this, 'build-sentinel', {
             ruleName: "amplify-build-event",
             description: "Triggered on Amplify build",
             enabled: true,
@@ -61,22 +66,24 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
             }
         });
 
-        this.rule.addTarget(new LambdaFunction(subscriber));
+        this.publisher.addTarget(new LambdaFunction(this.subscriber));
     }
 }
 
 export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
 
-    readonly rule: Rule;
+    readonly publisher: Rule;
 
-    readonly topic?: Topic;
+    readonly topic: Topic;
+
+    readonly subscriber: Function;
 
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        const subscriber = new ScraperStatusPublisher(this, 'subscriber-function').baseFunction;
+        this.subscriber = new ScraperStatusPublisher(this, 'subscriber-function').baseFunction;
 
-        this.rule = new Rule(this, 'scraper-status', {
+        this.publisher = new Rule(this, 'scraper-status', {
             ruleName: "scraper-exec-event",
             description: "Scraper Status",
             enabled: true,
@@ -100,6 +107,6 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
             }
         });
 
-        this.rule.addTarget(new LambdaFunction(subscriber));
+        this.publisher.addTarget(new LambdaFunction(this.subscriber));
     }
 }
