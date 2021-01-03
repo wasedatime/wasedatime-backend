@@ -70,6 +70,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             }
         }).baseFunction;
 
+        //todo use reduce
         function getLambdaTaskInstance(constructContext: cdk.Construct, schools: string[], num: string): LambdaInvoke {
             return new LambdaInvoke(scope, "task-" + num, {
                 lambdaFunction: scraperBaseFunction,
@@ -130,7 +131,7 @@ export class CareerDataPipeline extends AbstractDataPipeline {
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: false,
             removalPolicy: RemovalPolicy.RETAIN,
-            versioned: true
+            versioned: false
         });
     }
 }

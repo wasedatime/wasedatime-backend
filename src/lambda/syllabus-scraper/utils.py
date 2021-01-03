@@ -1,5 +1,4 @@
 import boto3
-import datetime
 import itertools
 import json
 import logging
@@ -10,6 +9,7 @@ from botocore.config import Config
 from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from const import *
+from datetime import datetime
 
 
 def scrape_info(parsed, key, fn):
@@ -37,7 +37,11 @@ def build_url(dept=None, page=1, lang="en", course_id=None):
     if course_id:
         return f"https://www.wsl.waseda.jp/syllabus/JAA104.php?pKey={course_id}&pLng={lang}"
     param = school_name_map[dept]["param"]
-    year = datetime.datetime.now().year
+    now = datetime.now()
+    if now.month < 3:
+        year = now.year - 1
+    else:
+        year = now.year
     return f"https://www.wsl.waseda.jp/syllabus/JAA103.php?pYear={year}&p_gakubu={param}&p_page={page}&p_number=100" \
            f"&pLng={lang} "
 
@@ -195,6 +199,8 @@ def parse_location(loc):
 
 
 def parse_lang(lang):
+    if lang == "N/A":
+        return [-1]
     langs = lang.split('/')
     lang_list = [to_enum(lang_enum_map)(l) for l in langs]
     return lang_list
