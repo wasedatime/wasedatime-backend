@@ -1,8 +1,7 @@
 import json
-import logging
 from datetime import datetime
 
-from utils import JsonPayloadBuilder, api_response, translate_text, langs, table
+from utils import JsonPayloadBuilder, translate_text, langs, table, resp_handler
 
 
 def post_review(key, review, uid):
@@ -39,23 +38,12 @@ def post_review(key, review, uid):
 
 def handler(event, context):
     headers = event["headers"]
-    # if bad_referer(headers):
-    #     logging.warning(f"External Request from {headers['X-Forwarded-For']}:headers['X-Forwarded-Port']")
-    #     resp = JsonPayloadBuilder().add_status(False).add_data(None) \
-    #         .add_message("External request detected, related information will be reported to admin.").compile()
-    #     return api_response(403, resp)
 
     req = json.loads(event['body'])
+    params = {
+        "key": event["pathParameters"]["key"],
+        "review": req["data"],
+        "uid": event['requestContext']['authorizer']['claims']['sub']
+    }
 
-    key = event["pathParameters"]["key"]
-    review = req["data"]
-    uid = event['requestContext']['authorizer']['claims']['sub']
-
-    try:
-        resp = post_review(key, review, uid)
-        return api_response(200, resp)
-    except Exception as e:
-        logging.error(str(e))
-        resp = JsonPayloadBuilder().add_status(False).add_data(None) \
-            .add_message("Internal error, please contact admin@wasedatime.com.").compile()
-        return api_response(500, resp)
+    return resp_handler(func=post_review, params=headers)(**params)

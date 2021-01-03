@@ -71,7 +71,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         }).baseFunction;
 
         //todo use reduce
-        function getLambdaTaskInstance(constructContext: cdk.Construct, schools: string[], num: string): LambdaInvoke {
+        function getLambdaTaskInstance(schools: string[], num: string): LambdaInvoke {
             return new LambdaInvoke(scope, "task-" + num, {
                 lambdaFunction: scraperBaseFunction,
                 comment: "Scrape the syllabus info of school(s).",
@@ -84,15 +84,15 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         // todo sync to table
         this.processor = new StateMachine(this, 'state-machine', {
             stateMachineName: 'syllabus-scraper',
-            definition: getLambdaTaskInstance(this, ["GEC"], "0")
-                .next(getLambdaTaskInstance(this, ["CMS", "HSS"], "1"))
-                .next(getLambdaTaskInstance(this, ["EDU", "FSE"], "2"))
-                .next(getLambdaTaskInstance(this, ["ASE", "CSE"], "3"))
-                .next(getLambdaTaskInstance(this, ["PSE", "G_ASE", "LAW"], "4"))
-                .next(getLambdaTaskInstance(this, ["G_FSE", "SOC", "SSS"], "5"))
-                .next(getLambdaTaskInstance(this, ["G_LAS", "G_CSE", "G_EDU", "HUM"], "6"))
-                .next(getLambdaTaskInstance(this, ["SILS", "G_HUM", "CJL", "SPS", "G_WBS", "G_PS"], "7"))
-                .next(getLambdaTaskInstance(this, ["G_SPS", "G_IPS", "G_WLS", "G_E", "G_SSS", "G_SC", "G_LAW",
+            definition: getLambdaTaskInstance(["GEC"], "0")
+                .next(getLambdaTaskInstance(["CMS", "HSS"], "1"))
+                .next(getLambdaTaskInstance(["EDU", "FSE"], "2"))
+                .next(getLambdaTaskInstance(["ASE", "CSE"], "3"))
+                .next(getLambdaTaskInstance(["PSE", "G_ASE", "LAW"], "4"))
+                .next(getLambdaTaskInstance(["G_FSE", "SOC", "SSS"], "5"))
+                .next(getLambdaTaskInstance(["G_LAS", "G_CSE", "G_EDU", "HUM"], "6"))
+                .next(getLambdaTaskInstance(["SILS", "G_HUM", "CJL", "SPS", "G_WBS", "G_PS"], "7"))
+                .next(getLambdaTaskInstance(["G_SPS", "G_IPS", "G_WLS", "G_E", "G_SSS", "G_SC", "G_LAW",
                     "G_SAPS", "G_SA", "G_SJAL", "G_SICCS", "G_SEEE", "EHUM", "ART", "CIE", "G_ITS"], "8"))
                 .next(new Succeed(this, 'success', {}))
         });

@@ -1,4 +1,5 @@
 import json
+import logging
 from decimal import Decimal
 from re import fullmatch
 
@@ -43,10 +44,21 @@ def api_response(code, body):
     }
 
 
-def bad_referer(headers):
-    if "referer" not in headers:
-        return True
-    elif fullmatch(r'https://(\w+\.|)wasedatime\.com/.*', headers["referer"]) is None:
-        return True
-    else:
-        return False
+def resp_handler(func=None, headers=None):
+    def handle(*args, **kwargs):
+        if "referer" not in headers or fullmatch(r'https://(\w+\.|)wasedatime\.com/.*', headers["referer"]) is None:
+            logging.warning(f"External Request from {headers['X-Forwarded-For']}:headers['X-Forwarded-Port']")
+            resp = JsonPayloadBuilder().add_status(False).add_data(None) \
+                .add_message("External request detected, related information will be reported to admin.").compile()
+            return api_response(403, resp)
+        else:
+            try:
+                resp = func(*args, **kwargs)
+                return api_response(200, resp)
+            except Exception as e:
+                logging.error(str(e))
+                resp = JsonPayloadBuilder().add_status(False).add_data(None) \
+                    .add_message("Internal error, please contact bugs@wasedatime.com.").compile()
+                return api_response(500, resp)
+
+    return handle

@@ -151,7 +151,7 @@ export class SyllabusScraper extends cdk.Construct {
             logRetention: RetentionDays.SIX_MONTHS,
             memorySize: 4096,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(900),
+            timeout: Duration.seconds(210),
             environment: props.envvars,
             role: s3AccessRole
         });
