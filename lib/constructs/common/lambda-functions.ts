@@ -1,6 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import {Duration} from "@aws-cdk/core";
-import {Alias, Code, Function, Runtime} from "@aws-cdk/aws-lambda";
+import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 
@@ -105,22 +105,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
             environment: props.envVars
         });
     }
-
-    deploy(func: Function) {
-        let devVer = func.currentVersion;
-        let prodVer = func.currentVersion;
-        new Alias(this, 'alias-dev', {
-            aliasName: 'dev',
-            version: devVer,
-            description: "Develop stage"
-        });
-        new Alias(this, 'alias-prod', {
-            aliasName: 'prod',
-            version: prodVer,
-            description: "Production stage"
-        });
-        return this;
-    }
 }
 
 export class SyllabusScraper extends cdk.Construct {
@@ -217,6 +201,74 @@ export class PreSignupWasedaMailValidator extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3)
+        });
+    }
+}
+
+export class TimetableFunctions extends cdk.Construct {
+
+    readonly getFunction: Function;
+
+    readonly postFunction: Function;
+
+    readonly patchFunction: Function;
+
+    readonly deleteFunction: Function;
+
+    constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
+        super(scope, id);
+
+        const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
+            description: "Allow lambda function to perform crud operation on dynamodb",
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+            roleName: "dynamodb-lambda-read-timetable",
+            managedPolicies: [
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
+            ]
+        });
+
+        const dynamoDBPutRole: LazyRole = new LazyRole(this, 'dynamo-put-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
+            description: "Allow lambda function to perform crud operation on dynamodb",
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+            roleName: "dynamodb-lambda-write-timetable",
+            managedPolicies: [
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec1',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")
+            ]
+        });
+
+        this.getFunction = new Function(this, 'get-timetable', {
+            code: Code.fromAsset('src/lambda/get-timetable'),
+            handler: "index.handler",
+            deadLetterQueueEnabled: false,
+            description: "Get timetable from the database.",
+            functionName: "get-timetable",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 128,
+            role: dynamoDBReadRole,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3),
+            environment: props.envVars
+        });
+
+        this.postFunction = new PythonFunction(this, 'post-timetable', {
+            entry: 'src/lambda/post-timetable',
+            deadLetterQueueEnabled: false,
+            description: "Save timetable into the database.",
+            functionName: "post-timetable",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 128,
+            role: dynamoDBPutRole,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(5),
+            environment: props.envVars
         });
     }
 }

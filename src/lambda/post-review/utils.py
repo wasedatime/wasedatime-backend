@@ -63,11 +63,6 @@ def api_response(code, body):
 
 def resp_handler(func=None, headers=None):
     def handle(*args, **kwargs):
-        # if "referer" not in headers or fullmatch(r'https://(\w+\.|)wasedatime\.com/.*', headers["referer"]) is None:
-        #     logging.warning(f"External Request from {headers['X-Forwarded-For']}:headers['X-Forwarded-Port']")
-        #     resp = JsonPayloadBuilder().add_status(False).add_data(None) \
-        #         .add_message("External request detected, related information will be reported to admin.").compile()
-        #     return api_response(403, resp)
         try:
             resp = func(*args, **kwargs)
             return api_response(200, resp)

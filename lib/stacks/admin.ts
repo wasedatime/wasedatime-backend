@@ -12,6 +12,8 @@ import {
 } from "../constructs/admin/status-notifier";
 import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../configs/chatbot/slack";
 import {FreeTierUsageBudget} from "../constructs/admin/budget";
+import {Topic} from "@aws-cdk/aws-sns";
+import {CF_TOPIC_ARN} from "../configs/common/arn";
 
 
 export class WasedaTimeAdminLayer extends AdminLayer {
@@ -32,13 +34,16 @@ export class WasedaTimeAdminLayer extends AdminLayer {
             target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
         });
 
-        const freeTierBudgetTopic = new FreeTierUsageBudget(this, 'free-tier-budget');
+        const freeTierBudget = new FreeTierUsageBudget(this, 'free-tier-budget');
 
         this.chatbot = new SlackChannelConfiguration(this, 'chatbot-slack-config', {
             slackChannelConfigurationName: 'aws-alert',
             slackChannelId: SLACK_CHANNEL_ID,
             slackWorkspaceId: SLACK_WORKSPACE_ID,
-            notificationTopics: [freeTierBudgetTopic.notification]
+            notificationTopics: [
+                freeTierBudget.notification,
+                Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN)
+            ]
         });
     }
 }

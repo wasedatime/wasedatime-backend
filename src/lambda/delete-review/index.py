@@ -3,6 +3,7 @@ from boto3.dynamodb.conditions import Attr
 from utils import JsonPayloadBuilder, table, resp_handler
 
 
+@resp_handler
 def delete_review(key, ts, uid):
     table.delete_item(
         Key={
@@ -17,11 +18,10 @@ def delete_review(key, ts, uid):
 
 
 def handler(event, context):
-    headers = event["headers"]
     params = {
         "key": event["pathParameters"]["key"],
         "create_time": event["queryStringParameters"]["ts"],
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 
-    return resp_handler(func=delete_review, headers=headers)(**params)
+    return delete_review(**params)

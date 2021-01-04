@@ -40,11 +40,16 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
         );
         this.dataInterface.setEndpoint(
             DataEndpoint.FEEDS,
-            dynamoDatabase.tables[Collection.FEEDS].tableArn
+            dynamoDatabase.tables[Collection.FEEDS].tableName
         );
         this.dataInterface.setEndpoint(
             DataEndpoint.CAREER,
-            dynamoDatabase.tables[Collection.CAREER].tableArn
+            dynamoDatabase.tables[Collection.CAREER].tableName
+        );
+
+        this.dataInterface.setEndpoint(
+            DataEndpoint.TIMETABLE,
+            dynamoDatabase.tables[Collection.TIMETABLE].tableName
         );
 
         this.dataInterface.setEndpoint(

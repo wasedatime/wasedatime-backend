@@ -1,7 +1,5 @@
-import boto3
 import json
 import logging
-import os
 from decimal import Decimal
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")

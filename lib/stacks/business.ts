@@ -27,9 +27,10 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         const mainApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
             dataSources: {
                 [ApiServices.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
-                [ApiServices.COURSE_REVIEW]: this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS)
+                [ApiServices.COURSE_REVIEW]: this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),
+                [ApiServices.TIMETABLE]: this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE)
             },
-            authorizer: authEndpoint.pool.userPoolArn
+            authProvider: authEndpoint.pool.userPoolArn
         });
         this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
 

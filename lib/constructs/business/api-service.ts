@@ -24,7 +24,7 @@ import {
     syllabusSchema
 } from "../../configs/api/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {CourseReviewsFunctions} from "../common/lambda-functions";
+import {CourseReviewsFunctions, TimetableFunctions} from "../common/lambda-functions";
 import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../../configs/api/mapping";
 
 
@@ -34,7 +34,7 @@ export interface ApiServiceProps {
 
     dataSource?: string
 
-    authorizer?: string
+    authorizer?: CfnAuthorizer
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
@@ -167,13 +167,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             courseReviewsFunctions.deleteFunction, {proxy: true}
         );
 
-        const userPoolAuth = new CfnAuthorizer(this, 'cognito-authorizer', {
-            name: 'user-pool-authorizer',
-            identitySource: 'method.request.header.Authorization',
-            providerArns: [props.authorizer!],
-            restApiId: props.apiEndpoint.restApiId,
-            type: AuthorizationType.COGNITO
-        });
+        const userPoolAuth = props.authorizer!;
 
         this.methods.OPTIONS = root.addCorsPreflight({
             allowOrigins: allowOrigins,
@@ -373,28 +367,17 @@ export class TimetableApiService extends AbstractRestApiService {
         });
         this.resources["/timetable"] = root;
 
-        const getRespModel = props.apiEndpoint.addModel('timetable-get-resp-model', {
-            schema: articleListSchema,
-            contentType: "application/json",
-            description: "List of articles in feeds",
-            modelName: "GetFeedsResp"
+        const courseReviewsFunctions = new TimetableFunctions(this, 'crud-functions', {
+            envVars: {
+                'TABLE_NAME': props.dataSource!
+            }
         });
-
-        const getIntegration = new MockIntegration({
-            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            integrationResponses: [{
-                statusCode: '200',
-                responseTemplates: {["application/json"]: articlePlainJson}
-            }]
-        });
-        const postIntegration = new MockIntegration({
-            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            integrationResponses: [{
-                statusCode: '200'
-            }]
-        });
+        const getIntegration = new LambdaIntegration(
+            courseReviewsFunctions.getFunction, {proxy: true}
+        );
+        const postIntegration = new LambdaIntegration(
+            courseReviewsFunctions.postFunction, {proxy: true}
+        );
 
         this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
             allowOrigins: allowOrigins,
@@ -403,19 +386,14 @@ export class TimetableApiService extends AbstractRestApiService {
         });
         this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
             apiKeyRequired: false,
-            requestParameters: {
-                'method.request.querystring.offset': true,
-                'method.request.querystring.limit': true
-            },
-            operationName: "ListArticles",
+            operationName: "GetTimetable",
             methodResponses: [{
-                statusCode: '200',
-                responseModels: {["application/json"]: getRespModel}
+                statusCode: '200'
             }]
         });
         this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
             apiKeyRequired: false,
-            operationName: "PostArticles",
+            operationName: "PostTimetable",
             methodResponses: [{
                 statusCode: '200'
             }]

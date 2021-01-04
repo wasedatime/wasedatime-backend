@@ -5,6 +5,7 @@ from datetime import datetime
 from utils import JsonPayloadBuilder, translate_text, langs, table, resp_handler
 
 
+@resp_handler
 def patch_review(key, ts, review, uid):
     resp_body = JsonPayloadBuilder().add_status(True).add_data(None).add_message('').compile()
 
@@ -58,7 +59,6 @@ def patch_review(key, ts, review, uid):
 
 
 def handler(event, context):
-    headers = event["headers"]
     req = json.loads(event['body'])
 
     params = {
@@ -68,4 +68,4 @@ def handler(event, context):
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 
-    return resp_handler(func=patch_review, headers=headers)(**params)
+    return patch_review(**params)

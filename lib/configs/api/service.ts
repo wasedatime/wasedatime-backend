@@ -12,5 +12,7 @@ export enum ApiServices {
 
     CAREER,
 
-    FEEDS
+    FEEDS,
+
+    TIMETABLE
 }

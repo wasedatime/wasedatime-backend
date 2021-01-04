@@ -4,9 +4,9 @@ from datetime import datetime
 from utils import JsonPayloadBuilder, translate_text, langs, table, resp_handler
 
 
+@resp_handler
 def post_review(key, review, uid):
     text = review["comment"]
-
     src_lang, translated = translate_text(text)
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
@@ -37,8 +37,6 @@ def post_review(key, review, uid):
 
 
 def handler(event, context):
-    headers = event["headers"]
-
     req = json.loads(event['body'])
     params = {
         "key": event["pathParameters"]["key"],
@@ -46,4 +44,4 @@ def handler(event, context):
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 
-    return resp_handler(func=post_review, headers=headers)(**params)
+    return post_review(**params)
