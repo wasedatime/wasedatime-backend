@@ -309,45 +309,7 @@ export class CareerApiService extends AbstractRestApiService {
         const root = new Resource(scope, 'career', {
             parent: scope.apiEndpoint.root,
             pathPart: "career"
-        });
-        this.resources["/career"] = root;
-        this.resources["/career/intern"] = root.addResource("intern");
-        this.resources["/career/part-time"] = root.addResource("part-time");
-        this.resources["/career/seminar"] = root.addResource("seminar");
-
-        const getRespModel = props.apiEndpoint.addModel('careeer-get-resp-model', {
-            schema: articleListSchema,
-            contentType: "application/json",
-            description: "List of articles in feeds",
-            modelName: "GetFeedsResp"
-        });
-
-        const getIntegration = new MockIntegration({
-            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            integrationResponses: [{
-                statusCode: '200',
-                responseTemplates: {["application/json"]: articlePlainJson}
-            }]
-        });
-
-        this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
-            allowOrigins: allowOrigins,
-            allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
-        });
-        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
-            apiKeyRequired: false,
-            requestParameters: {
-                'method.request.querystring.offset': true,
-                'method.request.querystring.limit': true
-            },
-            operationName: "ListArticles",
-            methodResponses: [{
-                statusCode: '200',
-                responseModels: {["application/json"]: getRespModel}
-            }]
-        });
+        }).addResource("{category}");
     }
 }
 
