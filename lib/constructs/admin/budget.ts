@@ -3,6 +3,8 @@ import {CfnBudget} from '@aws-cdk/aws-budgets';
 import {Topic} from "@aws-cdk/aws-sns";
 
 import {BudgetType, ComparisonOperator, NotificationType, SubscriptionType, TimeUnit} from "../../configs/budgets/enum";
+import {Effect, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {AwsServicePrincipal} from "../../configs/common/aws";
 
 
 export abstract class AbstractBudgetGroup extends cdk.Construct {
@@ -24,6 +26,13 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
         this.notification = new Topic(this, 'budget-notification-topic', {
             topicName: "free-tier-budgets"
         });
+        this.notification.addToResourcePolicy(new PolicyStatement({
+            sid: "AWSBudgetsSNSPublishingPermissions",
+            effect: Effect.ALLOW,
+            principals: [new ServicePrincipal(AwsServicePrincipal.BUDGET)],
+            actions: ["SNS:Publish"],
+            resources: [this.notification.topicArn]
+        }));
 
         new CfnBudget(this, 'amplify-build-time', {
             budget: {
@@ -33,6 +42,9 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                 budgetLimit: {
                     amount: 1000,
                     unit: 'Minutes'
+                },
+                costFilters: {
+                    Amplify: "APN1-BuildDuration (Minutes)"
                 }
             },
             notificationsWithSubscribers: [{
