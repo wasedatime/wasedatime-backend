@@ -61,7 +61,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Minutes'
                 },
                 costFilters: {
-                    "UsageType:AWS Amplify": ["Global-BuildDuration"]
+                    "UsageType:AWS Amplify": ["APN1-BuildDuration"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -77,7 +77,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Second'
                 },
                 costFilters: {
-                    "UsageType:AWS Lambda": ["Global-Lambda-GB-Second"]
+                    "UsageType:AWS Lambda": ["APN1-Lambda-GB-Second"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -93,7 +93,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:AWS Lambda": ["Global-Request"]
+                    "UsageType:AWS Lambda": ["APN1-Request"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -109,7 +109,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'GB'
                 },
                 costFilters: {
-                    "UsageType": ["Global-DataTransfer-Out-Bytes",]
+                    "UsageType": ["APN1-DataTransfer-Out-Bytes",]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -122,10 +122,10 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                 timeUnit: TimeUnit.MONTHLY,
                 budgetLimit: {
                     amount: 1000000,
-                    unit: 'Requests'
+                    unit: 'APN1-ApiGatewayRequest'
                 },
                 costFilters: {
-                    "UsageType:Amazon API Gateway": ["Global-ApiGatewayRequest"]
+                    "UsageType:Amazon API Gateway": ["APN1-ApiGatewayRequest"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -141,7 +141,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'GB'
                 },
                 costFilters: {
-                    "UsageType:Amazon Simple Storage Service": ["Global-TimedStorage-ByteHrs"]
+                    "UsageType:Amazon Simple Storage Service": ["APN1-TimedStorage-ByteHrs"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -157,7 +157,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:Amazon Simple Storage Service": ["Global-Requests-Tier1"]
+                    "UsageType:Amazon Simple Storage Service": ["APN1-Requests-Tier1"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -173,7 +173,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:Amazon Simple Storage Service": ["Global-Requests-Tier2"]
+                    "UsageType:Amazon Simple Storage Service": ["APN1-Requests-Tier2"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -189,7 +189,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'GB-Month'
                 },
                 costFilters: {
-                    "UsageType:Amazon DynamoDB": ["TimedStorage-ByteHrs"]
+                    "UsageType:Amazon DynamoDB": ["APN1-TimedStorage-ByteHrs"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -205,7 +205,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:Amazon Cognito": ["Global-CognitoUserPoolsMAU"]
+                    "UsageType:Amazon Cognito": ["APN1-CognitoUserPoolsMAU"]
                 }
             },
             notificationsWithSubscribers: criteria
