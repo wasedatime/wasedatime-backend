@@ -329,17 +329,19 @@ export class TimetableApiService extends AbstractRestApiService {
         });
         this.resources["/timetable"] = root;
 
-        const courseReviewsFunctions = new TimetableFunctions(this, 'crud-functions', {
+        const timetableFunctions = new TimetableFunctions(this, 'crud-functions', {
             envVars: {
                 'TABLE_NAME': props.dataSource!
             }
         });
         const getIntegration = new LambdaIntegration(
-            courseReviewsFunctions.getFunction, {proxy: true}
+            timetableFunctions.getFunction, {proxy: true}
         );
         const postIntegration = new LambdaIntegration(
-            courseReviewsFunctions.postFunction, {proxy: true}
+            timetableFunctions.postFunction, {proxy: true}
         );
+
+        const userPoolAuth = props.authorizer!;
 
         this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
             allowOrigins: allowOrigins,
@@ -351,14 +353,18 @@ export class TimetableApiService extends AbstractRestApiService {
             operationName: "GetTimetable",
             methodResponses: [{
                 statusCode: '200'
-            }]
+            }],
+            authorizer: {authorizerId: userPoolAuth.ref},
+            authorizationType: AuthorizationType.COGNITO
         });
         this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
             apiKeyRequired: false,
             operationName: "PostTimetable",
             methodResponses: [{
                 statusCode: '200'
-            }]
+            }],
+            authorizer: {authorizerId: userPoolAuth.ref},
+            authorizationType: AuthorizationType.COGNITO
         });
     }
 }
