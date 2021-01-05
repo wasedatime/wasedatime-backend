@@ -25,6 +25,8 @@ export enum Worker {
 
 export interface DataPipelineProps {
 
+    dataSource?: Bucket;
+
     dataWarehouse?: Table;
 }
 
@@ -155,6 +157,31 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
             publicReadAccess: true,
             removalPolicy: RemovalPolicy.RETAIN,
             versioned: true
+        });
+    }
+}
+
+// todo sync syllabus on notification
+export class SyllabusSyncPipeline extends AbstractDataPipeline {
+
+    readonly dataSource?: Bucket;
+
+    readonly processor: Function;
+
+    readonly dataWarehouse: Table;
+
+    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
+        super(scope, id);
+
+        this.dataSource = new Bucket(this, 'career-bucket', {
+            accessControl: BucketAccessControl.PRIVATE,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            bucketName: "wasedatime-career",
+            cors: prodCorsRule,
+            encryption: BucketEncryption.S3_MANAGED,
+            publicReadAccess: false,
+            removalPolicy: RemovalPolicy.RETAIN,
+            versioned: false
         });
     }
 }

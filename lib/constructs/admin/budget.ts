@@ -210,5 +210,53 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
             },
             notificationsWithSubscribers: criteria
         });
+
+        new CfnBudget(this, 'kms-request', {
+            budget: {
+                budgetName: "KMS Requests",
+                budgetType: BudgetType.USAGE,
+                timeUnit: TimeUnit.MONTHLY,
+                budgetLimit: {
+                    amount: 20000,
+                    unit: 'Requests'
+                },
+                costFilters: {
+                    "UsageType:AWS Key Management Service": ["ap-northeast-1-KMS-Requests"]
+                }
+            },
+            notificationsWithSubscribers: criteria
+        });
+
+        new CfnBudget(this, 'sns-http-notification', {
+            budget: {
+                budgetName: "SNS Notifications",
+                budgetType: BudgetType.USAGE,
+                timeUnit: TimeUnit.MONTHLY,
+                budgetLimit: {
+                    amount: 20000,
+                    unit: 'Notifications'
+                },
+                costFilters: {
+                    "UsageType:Amazon Simple Notification Service": ["APN1-DeliveryAttempts-HTTP"]
+                }
+            },
+            notificationsWithSubscribers: criteria
+        });
+
+        new CfnBudget(this, 'state-machine-transitions', {
+            budget: {
+                budgetName: "State Transitions",
+                budgetType: BudgetType.USAGE,
+                timeUnit: TimeUnit.MONTHLY,
+                budgetLimit: {
+                    amount: 4000,
+                    unit: 'StateTransitions'
+                },
+                costFilters: {
+                    "UsageType:AWS Step Functions": ["APN1-StateTransition"]
+                }
+            },
+            notificationsWithSubscribers: criteria
+        });
     }
 }
