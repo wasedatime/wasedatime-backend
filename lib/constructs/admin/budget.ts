@@ -109,7 +109,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'GB'
                 },
                 costFilters: {
-                    "UsageType:": [
+                    "UsageType": [
                         "APN1-DataTransfer-Out-Bytes",
                         "DataTransfer-Out-Bytes",
                         "APN1-APS1-AWS-Out-Bytes",
