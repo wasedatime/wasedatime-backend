@@ -61,7 +61,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Minutes'
                 },
                 costFilters: {
-                    "UsageType:Amplify": ["APN1-BuildDuration"]
+                    "UsageType:AWS Amplify": ["Global-BuildDuration"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -77,7 +77,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Second'
                 },
                 costFilters: {
-                    "UsageType:Lambda": ["APN1-Lambda-GB-Second"]
+                    "UsageType:AWS Lambda": ["Global-Lambda-GB-Second"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -93,7 +93,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:Lambda": ["APN1-Request"]
+                    "UsageType:AWS Lambda": ["Global-Request"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -109,22 +109,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'GB'
                 },
                 costFilters: {
-                    "UsageType": [
-                        "APN1-DataTransfer-Out-Bytes",
-                        "DataTransfer-Out-Bytes",
-                        "APN1-APS1-AWS-Out-Bytes",
-                        "APN1-APS3-AWS-Out-Bytes",
-                        "APN1-CloudFront-Out-Bytes",
-                        "APN1-USE1-AWS-Out-Bytes",
-                        "APN2-DataTransfer-Out-Bytes",
-                        "APS2-DataTransfer-Out-Bytes",
-                        "EU-DataTransfer-Out-Bytes",
-                        "EUC1-DataTransfer-Out-Bytes",
-                        "EUW2-DataTransfer-Out-Bytes",
-                        "USE1-APE1-AWS-Out-Bytes",
-                        "USE1-APN1-AWS-Out-Bytes",
-                        "USW2-DataTransfer-Out-Bytes"
-                    ]
+                    "UsageType": ["Global-DataTransfer-Out-Bytes",]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -137,10 +122,10 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                 timeUnit: TimeUnit.MONTHLY,
                 budgetLimit: {
                     amount: 1000000,
-                    unit: 'APN1-ApiGatewayRequest'
+                    unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:API Gateway": ["APN1-ApiGatewayRequest"]
+                    "UsageType:Amazon API Gateway": ["Global-ApiGatewayRequest"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -156,7 +141,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'GB'
                 },
                 costFilters: {
-                    "UsageType:S3 (Simple Storage Service)": ["APN1-TimedStorage-ByteHrs"]
+                    "UsageType:Amazon Simple Storage Service": ["Global-TimedStorage-ByteHrs"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -172,7 +157,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:S3 (Simple Storage Service)": ["APN1-Requests-Tier1", "Requests-Tier1"]
+                    "UsageType:Amazon Simple Storage Service": ["Global-Requests-Tier1"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -188,7 +173,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:S3 (Simple Storage Service)": ["APN1-Requests-Tier2", "Requests-Tier2"]
+                    "UsageType:Amazon Simple Storage Service": ["Global-Requests-Tier2"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -204,7 +189,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'GB-Month'
                 },
                 costFilters: {
-                    "UsageType:DynamoDB": ["APN1-TimedStorage-ByteHrs"]
+                    "UsageType:Amazon DynamoDB": ["TimedStorage-ByteHrs"]
                 }
             },
             notificationsWithSubscribers: criteria
@@ -220,7 +205,7 @@ export class FreeTierUsageBudget extends AbstractBudgetGroup {
                     unit: 'Requests'
                 },
                 costFilters: {
-                    "UsageType:Cognito": ["APN1-CognitoUserPoolsMAU"]
+                    "UsageType:Amazon Cognito": ["Global-CognitoUserPoolsMAU"]
                 }
             },
             notificationsWithSubscribers: criteria
