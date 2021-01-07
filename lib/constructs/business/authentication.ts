@@ -43,7 +43,9 @@ export abstract class AbstractAuthProvider extends cdk.Construct {
     }
 }
 
-
+/**
+ * User authentication service for WasedaTime
+ */
 export class WasedaTimeUserAuth extends AbstractAuthProvider {
 
     readonly pool: UserPool;

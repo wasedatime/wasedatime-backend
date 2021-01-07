@@ -6,6 +6,7 @@ import {
     LambdaIntegration,
     Method,
     MockIntegration,
+    Model,
     PassthroughBehavior,
     Resource,
     RestApi
@@ -73,6 +74,15 @@ export class SyllabusApiService extends AbstractRestApiService {
             modelName: "GetSyllabusResp"
         });
 
+        const apiGatewayRole = new Role(this, 'rest-api-s3', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
+            description: "Allow API Gateway to fetch objects from s3 buckets.",
+            path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
+            roleName: "s3-apigateway-read",
+            managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
+                "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")],
+        });
+
         const getIntegration = new AwsIntegration(
             {
                 service: 's3',
@@ -80,14 +90,24 @@ export class SyllabusApiService extends AbstractRestApiService {
                 path: "syllabus/{school}.json",
                 subdomain: props.dataSource,
                 options: {
-                    credentialsRole: new Role(this, 'rest-api-s3', {
-                        assumedBy: new ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
-                        description: "Allow API Gateway to fetch objects from s3 buckets.",
-                        path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
-                        roleName: "s3-apigateway-read",
-                        managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
-                            "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")],
-                    }),
+                    credentialsRole: apiGatewayRole,
+                    requestParameters: {['integration.request.path.school']: 'method.request.path.school'},
+                    integrationResponses: [{
+                        statusCode: '200',
+                        responseParameters: s3RespMapping
+                    }]
+                }
+            }
+        );
+
+        const headIntegration = new AwsIntegration(
+            {
+                service: 's3',
+                integrationHttpMethod: HttpMethod.HEAD,
+                path: "syllabus/{school}.json",
+                subdomain: props.dataSource,
+                options: {
+                    credentialsRole: apiGatewayRole,
                     requestParameters: {['integration.request.path.school']: 'method.request.path.school'},
                     integrationResponses: [{
                         statusCode: '200',
@@ -109,6 +129,16 @@ export class SyllabusApiService extends AbstractRestApiService {
             methodResponses: [{
                 statusCode: '200',
                 responseModels: {["application/json"]: getRespModel},
+                responseParameters: syllabusRespParams
+            }]
+        });
+        this.methods.HEAD = syllabusSchools.addMethod(HttpMethod.HEAD, headIntegration, {
+            apiKeyRequired: false,
+            requestParameters: {['method.request.path.school']: true},
+            operationName: "GetSyllabusMetadataBySchool",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: Model.EMPTY_MODEL},
                 responseParameters: syllabusRespParams
             }]
         });

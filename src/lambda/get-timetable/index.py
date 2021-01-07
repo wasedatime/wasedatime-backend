@@ -6,7 +6,10 @@ from utils import JsonPayloadBuilder, table, resp_handler
 @resp_handler
 def get_timetable(uid):
     result = table.query(KeyConditionExpression=Key("uid").eq(uid))["Items"]
-    result.pop("uid")
+    if not result:
+        raise LookupError
+    for r in result:
+        r.pop("uid")
 
     body = JsonPayloadBuilder().add_status(True).add_data(result).add_message('').compile()
     return body

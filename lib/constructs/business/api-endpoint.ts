@@ -67,12 +67,21 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     }
 }
 
+/**
+ * The REST API Endpoint of WasedaTime
+ */
 export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
-
+    /**
+     * REST API Gateway entity
+     */
     readonly apiEndpoint: RestApi;
-
+    /**
+     * Services provided by this API
+     */
     readonly apiServices: { [name in ApiServices]?: AbstractRestApiService } = {};
-
+    /**
+     * Stages of this API
+     */
     readonly stages: { [name: string]: Stage } = {};
 
     constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
@@ -99,7 +108,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         } else if (STAGE === 'prod') {
             prodDeployment.addToLogicalId(uuid.v4());
         }
-
+        // Stages
         this.stages['prod'] = new Stage(this, 'prod-stage', {
             stageName: 'prod',
             deployment: prodDeployment,
@@ -116,14 +125,14 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             throttlingBurstLimit: 10,
             variables: {["STAGE"]: STAGE}
         });
-
+        // API Domain
         const domain = this.apiEndpoint.addDomainName('domain', {
             certificate: Certificate.fromCertificateArn(this, 'api-domain', API_CERT_ARN),
             domainName: "api." + WEBAPP_DOMAIN,
             endpointType: EndpointType.REGIONAL,
             securityPolicy: SecurityPolicy.TLS_1_2
         });
-
+        // Mapping from URL path to stages
         domain.addBasePathMapping(this.apiEndpoint, {
             basePath: 'staging',
             stage: this.stages['dev']
@@ -132,7 +141,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             basePath: 'v2',
             stage: this.stages['prod']
         });
-
+        // Authorizer for methods that requires user login
         const authorizer = new CfnAuthorizer(this, 'cognito-authorizer', {
             name: 'cognito-authorizer',
             identitySource: 'method.request.header.Authorization',
@@ -140,7 +149,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             restApiId: this.apiEndpoint.restApiId,
             type: AuthorizationType.COGNITO
         });
-
+        // API Services
         this.apiServices[ApiServices.SYLLABUS] = new SyllabusApiService(this, 'syllabus-api', {
             apiEndpoint: this.apiEndpoint,
             dataSource: props.dataSources![ApiServices.SYLLABUS]
