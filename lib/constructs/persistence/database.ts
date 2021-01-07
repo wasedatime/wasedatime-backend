@@ -60,7 +60,8 @@ export class DynamoDatabase extends cdk.Construct {
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "a", type: AttributeType.STRING},
+            sortKey: {name: "id", type: AttributeType.STRING},
+            timeToLiveAttribute: "ttl",
             tableName: "waseda-syllabus",
             readCapacity: 5,
             writeCapacity: 5
@@ -71,10 +72,9 @@ export class DynamoDatabase extends cdk.Construct {
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "semester", type: AttributeType.STRING},
             tableName: "timetable",
-            readCapacity: 5,
-            writeCapacity: 5,
+            readCapacity: 2,
+            writeCapacity: 2,
             pointInTimeRecovery: true
         });
     }
