@@ -1,9 +1,12 @@
 import * as cdk from "@aws-cdk/core";
 import {
+    AuthorizationType,
+    CfnAuthorizer,
     Deployment,
     DomainName,
     EndpointType,
     LambdaRestApi,
+    ResponseType,
     RestApi,
     SecurityPolicy,
     SpecRestApi,
@@ -13,20 +16,26 @@ import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
 import * as uuid from "uuid";
 
-import {AbstractRestApiService, CourseReviewsApiService, FeedsApiService, SyllabusApiService} from "./api-service";
-import {baseJsonApiSchema} from "../../configs/api/schema";
+import {
+    AbstractRestApiService,
+    CourseReviewsApiService,
+    FeedsApiService,
+    SyllabusApiService,
+    TimetableApiService
+} from "./api-service";
 import {ApiServices} from "../../configs/api/service";
 import {STAGE} from "../../configs/common/aws";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
 import {API_CERT_ARN} from "../../configs/common/arn";
 import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
+import {defaultHeaders} from "../../configs/api/cors";
 
 
 export interface ApiEndpointProps {
 
     dataSources?: { [service in ApiServices]?: string };
 
-    authorizer?: string
+    authProvider?: string
 }
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
@@ -60,12 +69,21 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     }
 }
 
+/**
+ * The REST API Endpoint of WasedaTime
+ */
 export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
-
+    /**
+     * REST API Gateway entity
+     */
     readonly apiEndpoint: RestApi;
-
+    /**
+     * Services provided by this API
+     */
     readonly apiServices: { [name in ApiServices]?: AbstractRestApiService } = {};
-
+    /**
+     * Stages of this API
+     */
     readonly stages: { [name: string]: Stage } = {};
 
     constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
@@ -73,9 +91,18 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
 
         this.apiEndpoint = new RestApi(this, 'rest-api', {
             restApiName: "wasedatime-rest-api",
+            description: "The main API endpoint for WasedaTime Web App.",
             endpointTypes: [EndpointType.REGIONAL],
             cloudWatchRole: false,
             deploy: false
+        });
+        this.apiEndpoint.addGatewayResponse('4xx-resp', {
+            type: ResponseType.DEFAULT_4XX,
+            responseHeaders: defaultHeaders
+        });
+        this.apiEndpoint.addGatewayResponse('5xx-resp', {
+            type: ResponseType.DEFAULT_5XX,
+            responseHeaders: defaultHeaders
         });
 
         const prodDeployment = new Deployment(this, 'prod-deployment', {
@@ -91,7 +118,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         } else if (STAGE === 'prod') {
             prodDeployment.addToLogicalId(uuid.v4());
         }
-
+        // Stages
         this.stages['prod'] = new Stage(this, 'prod-stage', {
             stageName: 'prod',
             deployment: prodDeployment,
@@ -108,35 +135,31 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             throttlingBurstLimit: 10,
             variables: {["STAGE"]: STAGE}
         });
-
+        // API Domain
         const domain = this.apiEndpoint.addDomainName('domain', {
             certificate: Certificate.fromCertificateArn(this, 'api-domain', API_CERT_ARN),
             domainName: "api." + WEBAPP_DOMAIN,
             endpointType: EndpointType.REGIONAL,
             securityPolicy: SecurityPolicy.TLS_1_2
         });
-
-        // domain.addBasePathMapping(this.apiEndpoint,{
-        //     // domainName: domain,
-        //     // restApi: this.apiEndpoint,
-        //     basePath: 'staging',
-        //     stage: this.stages['dev']
-        // });
-
-        // new CfnApiMapping(this, 'http-api-mapping-prod', {
-        //     apiId: 'biq3vr83u0',
-        //     domainName: domain.domainName,
-        //     stage: 'prod',
-        //     apiMappingKey: 'v1'
-        // });
-
-        const baseJsonApiModel = this.apiEndpoint.addModel('base-json-api-model', {
-            schema: baseJsonApiSchema,
-            contentType: "application/json",
-            description: "Base model for JSON-API specification.",
-            modelName: "BaseJsonAPI"
+        // Mapping from URL path to stages
+        domain.addBasePathMapping(this.apiEndpoint, {
+            basePath: 'staging',
+            stage: this.stages['dev']
         });
-
+        domain.addBasePathMapping(this.apiEndpoint, {
+            basePath: 'v2',
+            stage: this.stages['prod']
+        });
+        // Authorizer for methods that requires user login
+        const authorizer = new CfnAuthorizer(this, 'cognito-authorizer', {
+            name: 'cognito-authorizer',
+            identitySource: 'method.request.header.Authorization',
+            providerArns: [props.authProvider!],
+            restApiId: this.apiEndpoint.restApiId,
+            type: AuthorizationType.COGNITO
+        });
+        // API Services
         this.apiServices[ApiServices.SYLLABUS] = new SyllabusApiService(this, 'syllabus-api', {
             apiEndpoint: this.apiEndpoint,
             dataSource: props.dataSources![ApiServices.SYLLABUS]
@@ -144,10 +167,15 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         this.apiServices[ApiServices.COURSE_REVIEW] = new CourseReviewsApiService(this, 'course-reviews-api', {
             apiEndpoint: this.apiEndpoint,
             dataSource: props.dataSources![ApiServices.COURSE_REVIEW],
-            authorizer: props.authorizer
+            authorizer: authorizer
         });
         this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
             apiEndpoint: this.apiEndpoint
+        });
+        this.apiServices[ApiServices.TIMETABLE] = new TimetableApiService(this, 'timetable-api', {
+            apiEndpoint: this.apiEndpoint,
+            dataSource: props.dataSources![ApiServices.TIMETABLE],
+            authorizer: authorizer
         });
     }
 }

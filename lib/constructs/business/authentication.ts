@@ -43,7 +43,9 @@ export abstract class AbstractAuthProvider extends cdk.Construct {
     }
 }
 
-
+/**
+ * User authentication service for WasedaTime
+ */
 export class WasedaTimeUserAuth extends AbstractAuthProvider {
 
     readonly pool: UserPool;
@@ -56,8 +58,8 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
         super(scope, id);
 
         this.pool = new UserPool(this, 'main-user-pool', {
-            accountRecovery: AccountRecovery.EMAIL_ONLY,
-            autoVerify: {email: true, phone: false},
+            accountRecovery: AccountRecovery.NONE,
+            autoVerify: {email: false, phone: false},
             emailSettings: {
                 // from: "noreply@wasedatime.com"
             },
