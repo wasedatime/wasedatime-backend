@@ -6,6 +6,7 @@ import {
     LambdaIntegration,
     Method,
     MockIntegration,
+    Model,
     PassthroughBehavior,
     Resource,
     RestApi
@@ -24,7 +25,7 @@ import {
     syllabusSchema
 } from "../../configs/api/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {CourseReviewsFunctions} from "../common/lambda-functions";
+import {CourseReviewsFunctions, TimetableFunctions} from "../common/lambda-functions";
 import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../../configs/api/mapping";
 
 
@@ -34,7 +35,7 @@ export interface ApiServiceProps {
 
     dataSource?: string
 
-    authorizer?: string
+    authorizer?: CfnAuthorizer
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
@@ -73,6 +74,15 @@ export class SyllabusApiService extends AbstractRestApiService {
             modelName: "GetSyllabusResp"
         });
 
+        const apiGatewayRole = new Role(this, 'rest-api-s3', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
+            description: "Allow API Gateway to fetch objects from s3 buckets.",
+            path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
+            roleName: "s3-apigateway-read",
+            managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
+                "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")],
+        });
+
         const getIntegration = new AwsIntegration(
             {
                 service: 's3',
@@ -80,14 +90,24 @@ export class SyllabusApiService extends AbstractRestApiService {
                 path: "syllabus/{school}.json",
                 subdomain: props.dataSource,
                 options: {
-                    credentialsRole: new Role(this, 'rest-api-s3', {
-                        assumedBy: new ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
-                        description: "Allow API Gateway to fetch objects from s3 buckets.",
-                        path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
-                        roleName: "s3-apigateway-read",
-                        managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
-                            "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")],
-                    }),
+                    credentialsRole: apiGatewayRole,
+                    requestParameters: {['integration.request.path.school']: 'method.request.path.school'},
+                    integrationResponses: [{
+                        statusCode: '200',
+                        responseParameters: s3RespMapping
+                    }]
+                }
+            }
+        );
+
+        const headIntegration = new AwsIntegration(
+            {
+                service: 's3',
+                integrationHttpMethod: HttpMethod.HEAD,
+                path: "syllabus/{school}.json",
+                subdomain: props.dataSource,
+                options: {
+                    credentialsRole: apiGatewayRole,
                     requestParameters: {['integration.request.path.school']: 'method.request.path.school'},
                     integrationResponses: [{
                         statusCode: '200',
@@ -112,6 +132,16 @@ export class SyllabusApiService extends AbstractRestApiService {
                 responseParameters: syllabusRespParams
             }]
         });
+        this.methods.HEAD = syllabusSchools.addMethod(HttpMethod.HEAD, headIntegration, {
+            apiKeyRequired: false,
+            requestParameters: {['method.request.path.school']: true},
+            operationName: "GetSyllabusMetadataBySchool",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: Model.EMPTY_MODEL},
+                responseParameters: syllabusRespParams
+            }]
+        });
     }
 }
 
@@ -129,7 +159,6 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             pathPart: "course-reviews"
         }).addResource('{key}');
         this.resources["/course-reviews"] = root;
-
 
         const getRespModel = props.apiEndpoint.addModel('review-get-resp-model', {
             schema: courseReviewGetRespSchema,
@@ -151,7 +180,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         });
 
         const courseReviewsFunctions = new CourseReviewsFunctions(this, 'crud-functions', {
-            envvars: {
+            envVars: {
                 'TABLE_NAME': props.dataSource!
             }
         });
@@ -168,13 +197,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             courseReviewsFunctions.deleteFunction, {proxy: true}
         );
 
-        const userPoolAuth = new CfnAuthorizer(this, 'cognito-authorizer', {
-            name: 'user-pool-authorizer',
-            identitySource: 'method.request.header.Authorization',
-            providerArns: [props.authorizer!],
-            restApiId: props.apiEndpoint.restApiId,
-            type: AuthorizationType.COGNITO
-        });
+        const userPoolAuth = props.authorizer!;
 
         this.methods.OPTIONS = root.addCorsPreflight({
             allowOrigins: allowOrigins,
@@ -290,14 +313,16 @@ export class FeedsApiService extends AbstractRestApiService {
             operationName: "ListArticles",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: getRespModel}
+                responseModels: {["application/json"]: getRespModel},
+                responseParameters: lambdaRespParams
             }]
         });
         this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
             apiKeyRequired: false,
             operationName: "PostArticles",
             methodResponses: [{
-                statusCode: '200'
+                statusCode: '200',
+                responseParameters: lambdaRespParams
             }]
         });
     }
@@ -316,44 +341,77 @@ export class CareerApiService extends AbstractRestApiService {
         const root = new Resource(scope, 'career', {
             parent: scope.apiEndpoint.root,
             pathPart: "career"
-        });
-        this.resources["/career"] = root;
-        this.resources["/career/intern"] = root.addResource("intern");
-        this.resources["/career/part-time"] = root.addResource("part-time");
-        this.resources["/career/seminar"] = root.addResource("seminar");
+        }).addResource("{category}");
+    }
+}
 
-        const getRespModel = props.apiEndpoint.addModel('careeer-get-resp-model', {
-            schema: articleListSchema,
-            contentType: "application/json",
-            description: "List of articles in feeds",
-            modelName: "GetFeedsResp"
-        });
+// todo
+export class TimetableApiService extends AbstractRestApiService {
 
-        const getIntegration = new MockIntegration({
-            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            integrationResponses: [{
-                statusCode: '200',
-                responseTemplates: {["application/json"]: articlePlainJson}
-            }]
+    readonly resources: { [path: string]: Resource } = {};
+
+    readonly methods: { [method in HttpMethod]?: Method } = {};
+
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+        super(scope, id, props);
+
+        const root = new Resource(scope, 'timetable', {
+            parent: scope.apiEndpoint.root,
+            pathPart: "timetable"
         });
+        this.resources["/timetable"] = root;
+
+        const timetableFunctions = new TimetableFunctions(this, 'crud-functions', {
+            envVars: {
+                'TABLE_NAME': props.dataSource!
+            }
+        });
+        const getIntegration = new LambdaIntegration(
+            timetableFunctions.getFunction, {proxy: true}
+        );
+        const postIntegration = new LambdaIntegration(
+            timetableFunctions.postFunction, {proxy: true}
+        );
+        const patchIntegration = new LambdaIntegration(
+            timetableFunctions.patchFunction, {proxy: true}
+        );
+
+        const userPoolAuth = props.authorizer!;
 
         this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
         });
         this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
             apiKeyRequired: false,
-            requestParameters: {
-                'method.request.querystring.offset': true,
-                'method.request.querystring.limit': true
-            },
-            operationName: "ListArticles",
+            operationName: "GetTimetable",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: getRespModel}
-            }]
+                responseParameters: lambdaRespParams
+            }],
+            authorizer: {authorizerId: userPoolAuth.ref},
+            authorizationType: AuthorizationType.COGNITO
+        });
+        this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
+            apiKeyRequired: false,
+            operationName: "PostTimetable",
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams
+            }],
+            authorizer: {authorizerId: userPoolAuth.ref},
+            authorizationType: AuthorizationType.COGNITO
+        });
+        this.methods[HttpMethod.PATCH] = root.addMethod(HttpMethod.PATCH, patchIntegration, {
+            apiKeyRequired: false,
+            operationName: "UpdateTimetable",
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams
+            }],
+            authorizer: {authorizerId: userPoolAuth.ref},
+            authorizationType: AuthorizationType.COGNITO
         });
     }
 }

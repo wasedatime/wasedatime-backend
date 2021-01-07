@@ -1,17 +1,11 @@
-import re
 import urllib.request as requests
-
+from const import *
 from lxml import html
-
-from scraper import hybrid, thread_only
-from scraper.const import query, header, level_enum_map, type_enum_map, school_name_map
-from scraper.utils import build_url, parse_period, to_half_width, parse_min_year, \
-    get_eval_criteria, to_enum, scrape_info, parse_term, parse_location, merge_period_location, scrape_text, parse_lang, \
-    parse_credit
+from utils import *
 
 
 class SyllabusCrawler:
-    def __init__(self, school, task=None, engine="thread-only", worker=8):
+    def __init__(self, school, worker=8):
         """
         :param school: department name
         :param task: tasks to execute
@@ -21,8 +15,6 @@ class SyllabusCrawler:
         if school not in school_name_map.keys():
             raise ValueError
         self.school = school
-        self.task = task
-        self.engine = engine
         self.worker = worker
 
     def execute(self):
@@ -31,14 +23,10 @@ class SyllabusCrawler:
         :return: list of courses
         """
         pages = self.get_max_page()
-        course_pages = thread_only.run_concurrently(self.scrape_catalog, range(pages), self.worker)
-        if self.engine == "hybrid":
-            results = hybrid.run_concurrently_async(course_pages, self.worker)
-            return (course_info for page in results for course_info in page)
-        else:
-            course_ids = (course_id for page in course_pages for course_id in page)
-            results = thread_only.run_concurrently(self.scrape_course, course_ids, self.worker)
-            return results
+        course_pages = run_concurrently(self.scrape_catalog, range(pages), self.worker)
+        course_ids = (course_id for page in course_pages for course_id in page)
+        results = run_concurrently(self.scrape_course, course_ids, self.worker)
+        return results
 
     def get_max_page(self):
         """

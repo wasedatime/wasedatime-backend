@@ -1,10 +1,7 @@
-import boto3
 import json
 import logging
-import os
 from decimal import Decimal
 
-# AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
 

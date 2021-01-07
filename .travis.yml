@@ -26,8 +26,13 @@ before_deploy:
   - cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_REGION}
 
 deploy:
-  skip_cleanup: true
-  provider: script
-  script: bash script/deploy.sh
-  on:
-    branch: main
+  - provider: script
+    skip_cleanup: true
+    script: bash script/deploy.sh
+    on:
+      branch: main
+  - provider: script
+    skip_cleanup: true
+    script: bash script/deploy.sh
+    on:
+      branch: develop

@@ -1,13 +1,15 @@
-import datetime
+import boto3
 import itertools
+import json
 import logging
+import os
 import re
 import unicodedata
-from scraper.const import location_name_map, school_name_map, query, eval_type_map, weekday_enum_map, term_enum_map, \
-    lang_enum_map
-
-logger = logging.getLogger()
-logger.setLevel(logging.WARNING)
+from botocore.config import Config
+from concurrent.futures import as_completed
+from concurrent.futures.thread import ThreadPoolExecutor
+from const import *
+from datetime import datetime
 
 
 def scrape_info(parsed, key, fn):
@@ -35,7 +37,11 @@ def build_url(dept=None, page=1, lang="en", course_id=None):
     if course_id:
         return f"https://www.wsl.waseda.jp/syllabus/JAA104.php?pKey={course_id}&pLng={lang}"
     param = school_name_map[dept]["param"]
-    year = datetime.datetime.now().year
+    now = datetime.now()
+    if now.month < 3:
+        year = now.year - 1
+    else:
+        year = now.year
     return f"https://www.wsl.waseda.jp/syllabus/JAA103.php?pYear={year}&p_gakubu={param}&p_page={page}&p_number=100" \
            f"&pLng={lang} "
 
@@ -77,7 +83,7 @@ def get_eval_criteria(parsed):
         try:
             percent = int(percent)
         except ValueError:
-            logger.warning(f"Unable to parse percent: {percent}")
+            logging.warning(f"Unable to parse percent: {percent}")
         criteria = to_half_width(elem[2].text)
         evals.append({
             "t": to_enum(eval_type_map)(kind),
@@ -161,7 +167,7 @@ def rename_location(loc):
     elif loc in location_name_map.keys():
         return location_name_map[loc]
     else:
-        logger.warning(f"Unable to parse location: {loc}")
+        logging.warning(f"Unable to parse location: {loc}")
         return to_half_width(loc)
 
 
@@ -193,6 +199,8 @@ def parse_location(loc):
 
 
 def parse_lang(lang):
+    if lang == "N/A":
+        return [-1]
     langs = lang.split('/')
     lang_list = [to_enum(lang_enum_map)(l) for l in langs]
     return lang_list
@@ -205,12 +213,12 @@ def parse_term(schedule):
     :return: string(encoded_term)
     """
     try:
-        (term, _) = schedule.split(u'\xa0'u'\xa0', 1)
+        (term, _) = schedule.split(u'\xa0\xa0', 1)
     except ValueError:
-        logger.warning(f"Unable to parse term from '{schedule}'")
+        logging.warning(f"Unable to parse term from '{schedule}'")
         return "undecided"
     if term not in term_enum_map.keys():
-        logger.error(f"Unknown term '{term}'")
+        logging.error(f"Unknown term '{term}'")
         return ""
     return to_enum(term_enum_map)(term)
 
@@ -223,9 +231,9 @@ def parse_period(schedule):
     """
     # TODO optimize code structure
     try:
-        (_, occ) = schedule.split(u'\xa0'u'\xa0', 1)
+        (_, occ) = schedule.split(u'\xa0\xa0', 1)
     except ValueError:
-        logger.warning(f"Unable to parse period: {schedule}")
+        logging.warning(f"Unable to parse period: {schedule}")
         return []
     if occ == "othersothers":
         return [{"d": -1, "p": -1}]
@@ -264,7 +272,50 @@ def to_enum(enum_map):
         try:
             return enum_map[data]
         except KeyError:
-            logger.warning(f"Unable to map '{data}' to integer")
+            logging.warning(f"Unable to map '{data}' to integer")
             return -1
 
     return map_to_int
+
+
+def upload_to_s3(syllabus, school):
+    """
+    Upload the syllabus info of the department to s3
+    :param syllabus: iterator of course info
+    :param school: abbr of the department. e.g. "PSE"
+    :return: dict :=
+        {
+            'Expiration': 'string',
+            'ETag': 'string',
+            'ServerSideEncryption': 'AES256'|'aws:kms',
+            'VersionId': 'string',
+            'SSECustomerAlgorithm': 'string',
+            'SSECustomerKeyMD5': 'string',
+            'SSEKMSKeyId': 'string',
+            'SSEKMSEncryptionContext': 'string',
+            'RequestCharged': 'requester'
+        }
+    """
+    s3 = boto3.resource('s3', region_name="ap-northeast-1", verify=False, config=Config(signature_version='s3v4'))
+    syllabus_object = s3.Object(os.getenv('BUCKET_NAME'), os.getenv('OBJECT_PATH') + school + '.json')
+    body = bytes(json.dumps(list(syllabus)).encode('UTF-8'))
+    resp = syllabus_object.put(
+        ACL='private',
+        Body=body,
+        ContentType='application/json; charset=utf-8',
+        CacheControl='public, max-age=2592000, must-revalidate'
+    )
+    return resp
+
+
+def run_concurrently(func, tasks, n):
+    """
+    Run tasks using multiple threads
+    :param func: function to run, type: a -> b
+    :param tasks: list of tasks to perform, type: [a]
+    :param n: number of worker threads
+    :return: generator of results, type: [b]
+    """
+    with ThreadPoolExecutor(max_workers=n) as executor:
+        wait_list = [executor.submit(func, t) for t in tasks]
+    return (page.result() for page in as_completed(wait_list))

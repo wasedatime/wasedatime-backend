@@ -8,7 +8,7 @@ import {Table} from "@aws-cdk/aws-dynamodb";
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
-import {allowApiGatewayPolicy} from "../../configs/s3/access-setting";
+import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../configs/s3/access-setting";
 import {SyllabusScraper} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
@@ -24,6 +24,8 @@ export enum Worker {
 }
 
 export interface DataPipelineProps {
+
+    dataSource?: Bucket;
 
     dataWarehouse?: Table;
 }
@@ -57,19 +59,21 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: false,
-            removalPolicy: RemovalPolicy.DESTROY,
-            versioned: false
+            removalPolicy: RemovalPolicy.RETAIN,
+            versioned: true
         });
         allowApiGatewayPolicy(this.dataWarehouse);
+        allowLambdaPolicy(this.dataWarehouse);
 
         const scraperBaseFunction: Function = new SyllabusScraper(this, 'scraper-base-function', {
-            envvars: {
+            envVars: {
                 ["BUCKET_NAME"]: this.dataWarehouse.bucketName,
                 ["OBJECT_PATH"]: 'syllabus/'
             }
         }).baseFunction;
 
-        function getLambdaTaskInstance(constructContext: cdk.Construct, schools: string[], num: string): LambdaInvoke {
+        //todo use reduce
+        function getLambdaTaskInstance(schools: string[], num: string): LambdaInvoke {
             return new LambdaInvoke(scope, "task-" + num, {
                 lambdaFunction: scraperBaseFunction,
                 comment: "Scrape the syllabus info of school(s).",
@@ -79,17 +83,18 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             });
         }
 
+        // todo sync to table
         this.processor = new StateMachine(this, 'state-machine', {
             stateMachineName: 'syllabus-scraper',
-            definition: getLambdaTaskInstance(this, ["GEC"], "0")
-                .next(getLambdaTaskInstance(this, ["CMS", "HSS"], "1"))
-                .next(getLambdaTaskInstance(this, ["EDU", "FSE"], "2"))
-                .next(getLambdaTaskInstance(this, ["ASE", "CSE"], "3"))
-                .next(getLambdaTaskInstance(this, ["PSE", "G_ASE", "LAW"], "4"))
-                .next(getLambdaTaskInstance(this, ["G_FSE", "SOC", "SSS"], "5"))
-                .next(getLambdaTaskInstance(this, ["G_LAS", "G_CSE", "G_EDU", "HUM"], "6"))
-                .next(getLambdaTaskInstance(this, ["SILS", "G_HUM", "CJL", "SPS", "G_WBS", "G_PS"], "7"))
-                .next(getLambdaTaskInstance(this, ["G_SPS", "G_IPS", "G_WLS", "G_E", "G_SSS", "G_SC", "G_LAW",
+            definition: getLambdaTaskInstance(["GEC"], "0")
+                .next(getLambdaTaskInstance(["CMS", "HSS"], "1"))
+                .next(getLambdaTaskInstance(["EDU", "FSE"], "2"))
+                .next(getLambdaTaskInstance(["ASE", "CSE"], "3"))
+                .next(getLambdaTaskInstance(["PSE", "G_ASE", "LAW"], "4"))
+                .next(getLambdaTaskInstance(["G_FSE", "SOC", "SSS"], "5"))
+                .next(getLambdaTaskInstance(["G_LAS", "G_CSE", "G_EDU", "HUM"], "6"))
+                .next(getLambdaTaskInstance(["SILS", "G_HUM", "CJL", "SPS", "G_WBS", "G_PS"], "7"))
+                .next(getLambdaTaskInstance(["G_SPS", "G_IPS", "G_WLS", "G_E", "G_SSS", "G_SC", "G_LAW",
                     "G_SAPS", "G_SA", "G_SJAL", "G_SICCS", "G_SEEE", "EHUM", "ART", "CIE", "G_ITS"], "8"))
                 .next(new Succeed(this, 'success', {}))
         });
@@ -127,8 +132,8 @@ export class CareerDataPipeline extends AbstractDataPipeline {
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: false,
-            removalPolicy: RemovalPolicy.DESTROY,
-            versioned: true
+            removalPolicy: RemovalPolicy.RETAIN,
+            versioned: false
         });
     }
 }
@@ -150,8 +155,33 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: true,
-            removalPolicy: RemovalPolicy.DESTROY,
+            removalPolicy: RemovalPolicy.RETAIN,
             versioned: true
+        });
+    }
+}
+
+// todo sync syllabus on notification
+export class SyllabusSyncPipeline extends AbstractDataPipeline {
+
+    readonly dataSource?: Bucket;
+
+    readonly processor: Function;
+
+    readonly dataWarehouse: Table;
+
+    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
+        super(scope, id);
+
+        this.dataSource = new Bucket(this, 'career-bucket', {
+            accessControl: BucketAccessControl.PRIVATE,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            bucketName: "wasedatime-career",
+            cors: prodCorsRule,
+            encryption: BucketEncryption.S3_MANAGED,
+            publicReadAccess: false,
+            removalPolicy: RemovalPolicy.RETAIN,
+            versioned: false
         });
     }
 }

@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 
+install_awscliv2() {
+  cd "$TRAVIS_BUILD_DIR" || exit 1
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  sudo ./aws/install
+}
+
 export_api_doc() {
   aws apigateway --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
   aws apigateway --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
 }
 
 setup_git() {
-  cd "$TRAVIS_BUILD_DIR" || exit 1
   git config --global user.email "travis@travis-ci.com"
   git config --global user.name "Travis CI"
   git clone https://"${TRAVIS_GITHUB_TOKEN}"@github.com/wasedatime/wasedatime-openapi.git
@@ -19,6 +25,7 @@ upload_doc() {
   git push --quiet
 }
 
+install_awscliv2
 setup_git
 export_api_doc
 upload_doc
