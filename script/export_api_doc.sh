@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 export_api_doc() {
-  aws apigateway --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
-  aws apigateway --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
+  aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
+  aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
 }
 
 setup_git() {
