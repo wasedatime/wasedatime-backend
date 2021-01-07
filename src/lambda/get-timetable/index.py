@@ -5,13 +5,13 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 @resp_handler
 def get_timetable(uid):
-    result = table.query(KeyConditionExpression=Key("uid").eq(uid))["Items"]
-    if not result:
+    results = table.query(KeyConditionExpression=Key("uid").eq(uid))["Items"]
+    if not results:
         raise LookupError
-    for r in result:
-        r.pop("uid")
+    data = results[0]
+    data.pop("uid")
 
-    body = JsonPayloadBuilder().add_status(True).add_data(result).add_message('').compile()
+    body = JsonPayloadBuilder().add_status(True).add_data(data).add_message('').compile()
     return body
 
 
