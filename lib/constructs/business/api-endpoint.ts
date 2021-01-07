@@ -6,6 +6,7 @@ import {
     DomainName,
     EndpointType,
     LambdaRestApi,
+    ResponseType,
     RestApi,
     SecurityPolicy,
     SpecRestApi,
@@ -27,6 +28,7 @@ import {STAGE} from "../../configs/common/aws";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
 import {API_CERT_ARN} from "../../configs/common/arn";
 import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
+import {defaultHeaders} from "../../configs/api/cors";
 
 
 export interface ApiEndpointProps {
@@ -93,6 +95,14 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             endpointTypes: [EndpointType.REGIONAL],
             cloudWatchRole: false,
             deploy: false
+        });
+        this.apiEndpoint.addGatewayResponse('4xx-resp', {
+            type: ResponseType.DEFAULT_4XX,
+            responseHeaders: defaultHeaders
+        });
+        this.apiEndpoint.addGatewayResponse('5xx-resp', {
+            type: ResponseType.DEFAULT_5XX,
+            responseHeaders: defaultHeaders
         });
 
         const prodDeployment = new Deployment(this, 'prod-deployment', {

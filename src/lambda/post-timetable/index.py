@@ -6,12 +6,11 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 @resp_handler
 def post_timetable(uid, content):
-    for c in content:
-        dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-        c["created_at"] = dt_now
-        c["updated_at"] = dt_now
-        c["uid"] = uid
-        table.put_item(Item=c)
+    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+    content["created_at"] = dt_now
+    content["updated_at"] = dt_now
+    content["uid"] = uid
+    table.put_item(Item=content)
 
     body = JsonPayloadBuilder().add_status(True).add_data(None).add_message('').compile()
     return body

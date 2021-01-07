@@ -6,11 +6,23 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 @resp_handler
 def patch_timetable(uid, content):
-    for c in content:
-        dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-        c["updated_at"] = dt_now
-        c["uid"] = uid
-        table.put_item(Item=c)
+    op = content.pop("operation")
+    if op == "remove":
+        i = content.pop("index")
+        expr = f'REMOVE courses[{i}]'
+        val = None
+    else:
+        expr = f'SET courses = list_append(courses, :info)'
+        val = {":info": content["course"]}
+    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+    content["updated_at"] = dt_now
+    table.update_item(
+        Key={
+            "uid": uid
+        },
+        UpdateExpression=expr,
+        ExpressionAttributeValues=val
+    )
 
     body = JsonPayloadBuilder().add_status(True).add_data(None).add_message('').compile()
     return body

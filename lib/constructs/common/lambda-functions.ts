@@ -267,7 +267,20 @@ export class TimetableFunctions extends cdk.Construct {
             memorySize: 128,
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(5),
+            timeout: Duration.seconds(3),
+            environment: props.envVars
+        });
+
+        this.patchFunction = new PythonFunction(this, 'patch-timetable', {
+            entry: 'src/lambda/patch-timetable',
+            deadLetterQueueEnabled: false,
+            description: "Update timetable in the database.",
+            functionName: "patch-timetable",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 128,
+            role: dynamoDBPutRole,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3),
             environment: props.envVars
         });
     }

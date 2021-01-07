@@ -313,14 +313,16 @@ export class FeedsApiService extends AbstractRestApiService {
             operationName: "ListArticles",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: getRespModel}
+                responseModels: {["application/json"]: getRespModel},
+                responseParameters: lambdaRespParams
             }]
         });
         this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
             apiKeyRequired: false,
             operationName: "PostArticles",
             methodResponses: [{
-                statusCode: '200'
+                statusCode: '200',
+                responseParameters: lambdaRespParams
             }]
         });
     }
@@ -370,6 +372,9 @@ export class TimetableApiService extends AbstractRestApiService {
         const postIntegration = new LambdaIntegration(
             timetableFunctions.postFunction, {proxy: true}
         );
+        const patchIntegration = new LambdaIntegration(
+            timetableFunctions.patchFunction, {proxy: true}
+        );
 
         const userPoolAuth = props.authorizer!;
 
@@ -382,7 +387,8 @@ export class TimetableApiService extends AbstractRestApiService {
             apiKeyRequired: false,
             operationName: "GetTimetable",
             methodResponses: [{
-                statusCode: '200'
+                statusCode: '200',
+                responseParameters: lambdaRespParams
             }],
             authorizer: {authorizerId: userPoolAuth.ref},
             authorizationType: AuthorizationType.COGNITO
@@ -391,7 +397,18 @@ export class TimetableApiService extends AbstractRestApiService {
             apiKeyRequired: false,
             operationName: "PostTimetable",
             methodResponses: [{
-                statusCode: '200'
+                statusCode: '200',
+                responseParameters: lambdaRespParams
+            }],
+            authorizer: {authorizerId: userPoolAuth.ref},
+            authorizationType: AuthorizationType.COGNITO
+        });
+        this.methods[HttpMethod.PATCH] = root.addMethod(HttpMethod.PATCH, patchIntegration, {
+            apiKeyRequired: false,
+            operationName: "UpdateTimetable",
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams
             }],
             authorizer: {authorizerId: userPoolAuth.ref},
             authorizationType: AuthorizationType.COGNITO
