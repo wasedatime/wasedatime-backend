@@ -5,8 +5,6 @@ from utils import JsonPayloadBuilder, resp_handler, table
 @resp_handler
 def get_reviews(course_key, uid):
     results = table.query(KeyConditionExpression=Key("course_key").eq(course_key), ScanIndexForward=False)["Items"]
-    if not results:
-        raise LookupError
     for r in results:
         r.pop("course_key")
         r["benefit"] = int(r["benefit"])

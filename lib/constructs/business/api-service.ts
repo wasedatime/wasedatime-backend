@@ -6,7 +6,6 @@ import {
     LambdaIntegration,
     Method,
     MockIntegration,
-    Model,
     PassthroughBehavior,
     Resource,
     RestApi
@@ -138,7 +137,6 @@ export class SyllabusApiService extends AbstractRestApiService {
             operationName: "GetSyllabusMetadataBySchool",
             methodResponses: [{
                 statusCode: '200',
-                responseModels: {["application/json"]: Model.EMPTY_MODEL},
                 responseParameters: syllabusRespParams
             }]
         });

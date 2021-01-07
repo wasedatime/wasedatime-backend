@@ -106,7 +106,7 @@ def translate_text(text):
     return src_lang, translations
 
 
-def format_update_expr(src_lang, translated, review):
+def format_update_expr(src_lang, translated, review, dt_now):
     expr_attr_name = dict()
     expr_attr_val = dict()
 
@@ -114,8 +114,6 @@ def format_update_expr(src_lang, translated, review):
         expr_attr_name[f'#{l[-2:]}'] = f'comment_{l}'
         expr_attr_val[f':{l[-2:]}'] = translated[l]
     expr_attr_val[":src"] = src_lang
-
-    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     expr_attr_val[":ts"] = dt_now
     expr_attr_val[":ben"] = review["benefit"]
     expr_attr_val[":diff"] = review["difficulty"]
