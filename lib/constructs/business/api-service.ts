@@ -520,6 +520,12 @@ export class TimetableApiService extends AbstractRestApiService {
             authorizer: {authorizerId: userPoolAuth.ref},
             authorizationType: AuthorizationType.COGNITO
         });
+
+        [timetableImport, timetableExport].forEach(value => value.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS]
+        }));
         timetableImport.addMethod(HttpMethod.POST, importIntegration, {
             operationName: "ImportTimetable",
             methodResponses: [{

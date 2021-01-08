@@ -4,7 +4,7 @@ import {BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption} from '
 import {StateMachine, Succeed, TaskInput} from "@aws-cdk/aws-stepfunctions";
 import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tasks";
 import {Function} from "@aws-cdk/aws-lambda";
-import {Table} from "@aws-cdk/aws-dynamodb";
+import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
@@ -173,15 +173,17 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
 
-        this.dataSource = new Bucket(this, 'career-bucket', {
-            accessControl: BucketAccessControl.PRIVATE,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-            bucketName: "wasedatime-career",
-            cors: prodCorsRule,
-            encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: false,
-            removalPolicy: RemovalPolicy.RETAIN,
-            versioned: false
+        this.dataSource = props?.dataSource;
+
+        this.dataWarehouse = new Table(this, 'dynamodb-syllabus-table', {
+            partitionKey: {name: "id", type: AttributeType.STRING},
+            billingMode: BillingMode.PROVISIONED,
+            encryption: TableEncryption.DEFAULT,
+            removalPolicy: cdk.RemovalPolicy.RETAIN,
+            timeToLiveAttribute: "ttl",
+            tableName: "syllabus",
+            readCapacity: 5,
+            writeCapacity: 5
         });
     }
 }

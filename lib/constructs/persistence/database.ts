@@ -55,18 +55,6 @@ export class DynamoDatabase extends cdk.Construct {
             writeCapacity: 1
         });
 
-        this.tables[Collection.SYLLABUS] = new Table(this, 'dynamodb-syllabus-table', {
-            partitionKey: {name: "dept", type: AttributeType.STRING},
-            billingMode: BillingMode.PROVISIONED,
-            encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "id", type: AttributeType.STRING},
-            timeToLiveAttribute: "ttl",
-            tableName: "waseda-syllabus",
-            readCapacity: 5,
-            writeCapacity: 5
-        });
-
         this.tables[Collection.TIMETABLE] = new Table(this, 'dynamodb-timetable-table', {
             partitionKey: {name: "uid", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
