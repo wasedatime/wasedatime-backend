@@ -25,7 +25,7 @@ import {
     syllabusSchema
 } from "../../configs/api/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {CourseReviewsFunctions, TimetableFunctions} from "../common/lambda-functions";
+import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions} from "../common/lambda-functions";
 import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../../configs/api/mapping";
 
 
@@ -116,11 +116,19 @@ export class SyllabusApiService extends AbstractRestApiService {
                 }
             }
         );
+        const syllabusFunctions = new SyllabusFunctions(this, 'syllabus-function', {
+            envVars: {
+                'TABLE_NAME': "waseda-syllabus"
+            }
+        });
+        const courseGetIntegration = new LambdaIntegration(
+            syllabusFunctions.getFunction, {proxy: true}
+        );
 
         this.methods.OPTIONS = syllabusSchools.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.HEAD]
         });
         this.methods.GET = syllabusSchools.addMethod(HttpMethod.GET, getIntegration, {
             requestParameters: {['method.request.path.school']: true},
@@ -137,6 +145,24 @@ export class SyllabusApiService extends AbstractRestApiService {
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: syllabusRespParams
+            }]
+        });
+
+        root.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
+        });
+        root.addMethod(HttpMethod.GET, courseGetIntegration, {
+            operationName: "GetCourses",
+            requestParameters: {
+                'method.request.querystring.offset': true,
+                'method.request.querystring.limit': true,
+                'method.request.querystring.id': false
+            },
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams
             }]
         });
     }
@@ -323,7 +349,6 @@ export class FeedsApiService extends AbstractRestApiService {
     }
 }
 
-//todo career api
 export class CareerApiService extends AbstractRestApiService {
 
     readonly resources: { [path: string]: Resource } = {};
@@ -423,7 +448,6 @@ export class CareerApiService extends AbstractRestApiService {
     }
 }
 
-// todo
 export class TimetableApiService extends AbstractRestApiService {
 
     readonly resources: { [path: string]: Resource } = {};
@@ -467,7 +491,7 @@ export class TimetableApiService extends AbstractRestApiService {
         this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.OPTIONS]
+            allowMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.OPTIONS, HttpMethod.DELETE]
         });
         this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
             operationName: "GetTimetable",
