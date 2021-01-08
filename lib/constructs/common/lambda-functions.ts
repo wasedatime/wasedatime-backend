@@ -55,7 +55,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
         this.getFunction = new Function(this, 'get-reviews', {
             code: Code.fromAsset('src/lambda/get-reviews'),
             handler: "index.handler",
-            deadLetterQueueEnabled: false,
             description: "Get course reviews from the database.",
             functionName: "get-course-reviews",
             logRetention: RetentionDays.ONE_MONTH,
@@ -68,7 +67,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
 
         this.postFunction = new PythonFunction(this, 'post-review', {
             entry: 'src/lambda/post-review',
-            deadLetterQueueEnabled: false,
             description: "Save course reviews into the database.",
             functionName: "post-course-review",
             logRetention: RetentionDays.ONE_MONTH,
@@ -81,7 +79,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
 
         this.patchFunction = new PythonFunction(this, 'patch-review', {
             entry: 'src/lambda/patch-review',
-            deadLetterQueueEnabled: false,
             description: "Update course reviews in the database.",
             functionName: "patch-course-review",
             logRetention: RetentionDays.ONE_MONTH,
@@ -94,7 +91,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
 
         this.deleteFunction = new PythonFunction(this, 'delete-review', {
             entry: 'src/lambda/delete-review',
-            deadLetterQueueEnabled: false,
             description: "Delete course reviews in the database.",
             functionName: "delete-course-review",
             logRetention: RetentionDays.ONE_MONTH,
@@ -129,7 +125,6 @@ export class SyllabusScraper extends cdk.Construct {
 
         this.baseFunction = new PythonFunction(this, 'base-function', {
             entry: 'src/lambda/syllabus-scraper',
-            deadLetterQueueEnabled: false,
             description: "Base function for scraping syllabus data from Waseda University.",
             functionName: "syllabus-scraper",
             logRetention: RetentionDays.SIX_MONTHS,
@@ -152,7 +147,6 @@ export class AmplifyStatusPublisher extends cdk.Construct {
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/amplify-status-publisher'),
             handler: "index.handler",
-            deadLetterQueueEnabled: false,
             description: "Forwards Amplify build status message from SNS to Slack Webhook.",
             functionName: "amplify-status-publisher",
             logRetention: RetentionDays.SIX_MONTHS,
@@ -173,7 +167,6 @@ export class ScraperStatusPublisher extends cdk.Construct {
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/sfn-status-publisher'),
             handler: "index.handler",
-            deadLetterQueueEnabled: false,
             description: "Forwards scraper execution status message from SNS to Slack Webhook.",
             functionName: "scraper-status-publisher",
             logRetention: RetentionDays.SIX_MONTHS,
@@ -194,7 +187,6 @@ export class PreSignupWasedaMailValidator extends cdk.Construct {
         this.baseFunction = new Function(this, 'base-function', {
             code: Code.fromAsset('src/lambda/signup-validator'),
             handler: "index.handler",
-            deadLetterQueueEnabled: false,
             description: "Validates if the user is signing up using WasedaMail",
             functionName: "wasedamail-signup-validator",
             logRetention: RetentionDays.SIX_MONTHS,
@@ -214,6 +206,10 @@ export class TimetableFunctions extends cdk.Construct {
     readonly patchFunction: Function;
 
     readonly deleteFunction: Function;
+
+    readonly importFunction: Function;
+
+    readonly exportFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
         super(scope, id);
@@ -247,7 +243,6 @@ export class TimetableFunctions extends cdk.Construct {
         this.getFunction = new Function(this, 'get-timetable', {
             code: Code.fromAsset('src/lambda/get-timetable'),
             handler: "index.handler",
-            deadLetterQueueEnabled: false,
             description: "Get timetable from the database.",
             functionName: "get-timetable",
             logRetention: RetentionDays.ONE_MONTH,
@@ -260,7 +255,6 @@ export class TimetableFunctions extends cdk.Construct {
 
         this.postFunction = new PythonFunction(this, 'post-timetable', {
             entry: 'src/lambda/post-timetable',
-            deadLetterQueueEnabled: false,
             description: "Save timetable into the database.",
             functionName: "post-timetable",
             logRetention: RetentionDays.ONE_MONTH,
@@ -273,7 +267,6 @@ export class TimetableFunctions extends cdk.Construct {
 
         this.patchFunction = new PythonFunction(this, 'patch-timetable', {
             entry: 'src/lambda/patch-timetable',
-            deadLetterQueueEnabled: false,
             description: "Update timetable in the database.",
             functionName: "patch-timetable",
             logRetention: RetentionDays.ONE_MONTH,
@@ -282,6 +275,26 @@ export class TimetableFunctions extends cdk.Construct {
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
             environment: props.envVars
+        });
+
+        this.importFunction = new PythonFunction(this, 'import-timetable', {
+            entry: 'src/lambda/import-timetable',
+            description: "Import timetable from pdf.",
+            functionName: "import-timetable",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 256,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(5)
+        });
+
+        this.exportFunction = new PythonFunction(this, 'export-timetable', {
+            entry: 'src/lambda/export-timetable',
+            description: "Export timetable as image.",
+            functionName: "export-timetable",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 512,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(5)
         });
     }
 }

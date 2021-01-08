@@ -6,6 +6,7 @@ import {
     LambdaIntegration,
     Method,
     MockIntegration,
+    Model,
     PassthroughBehavior,
     Resource,
     RestApi
@@ -122,7 +123,6 @@ export class SyllabusApiService extends AbstractRestApiService {
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
         });
         this.methods.GET = syllabusSchools.addMethod(HttpMethod.GET, getIntegration, {
-            apiKeyRequired: false,
             requestParameters: {['method.request.path.school']: true},
             operationName: "GetSyllabusBySchool",
             methodResponses: [{
@@ -132,7 +132,6 @@ export class SyllabusApiService extends AbstractRestApiService {
             }]
         });
         this.methods.HEAD = syllabusSchools.addMethod(HttpMethod.HEAD, headIntegration, {
-            apiKeyRequired: false,
             requestParameters: {['method.request.path.school']: true},
             operationName: "GetSyllabusMetadataBySchool",
             methodResponses: [{
@@ -303,7 +302,6 @@ export class FeedsApiService extends AbstractRestApiService {
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
         });
         this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
-            apiKeyRequired: false,
             requestParameters: {
                 'method.request.querystring.offset': true,
                 'method.request.querystring.limit': true
@@ -316,7 +314,6 @@ export class FeedsApiService extends AbstractRestApiService {
             }]
         });
         this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
-            apiKeyRequired: false,
             operationName: "PostArticles",
             methodResponses: [{
                 statusCode: '200',
@@ -339,7 +336,90 @@ export class CareerApiService extends AbstractRestApiService {
         const root = new Resource(scope, 'career', {
             parent: scope.apiEndpoint.root,
             pathPart: "career"
-        }).addResource("{category}");
+        });
+        const intern = root.addResource('intern');
+        const part = root.addResource('part-time');
+        const seminar = root.addResource('seminar');
+
+        const internGetIntegration = new MockIntegration({
+            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            integrationResponses: [{
+                statusCode: '200',
+                responseTemplates: {["application/json"]: "{}"}
+            }]
+        });
+        const partGetIntegration = new MockIntegration({
+            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            integrationResponses: [{
+                statusCode: '200',
+                responseTemplates: {["application/json"]: "{}"}
+            }]
+        });
+        const seminarGetIntegration = new MockIntegration({
+            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            integrationResponses: [{
+                statusCode: '200',
+                responseTemplates: {["application/json"]: "{}"}
+            }]
+        });
+
+        [intern, part, seminar].forEach((value => value.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
+        })));
+        intern.addMethod(HttpMethod.GET, internGetIntegration, {
+            requestParameters: {
+                'method.request.querystring.offset': true,
+                'method.request.querystring.limit': true,
+                'method.request.querystring.ind': false,
+                'method.request.querystring.dl': false,
+                'method.request.querystring.lang': false
+            },
+            operationName: "GetInternInfo",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: Model.EMPTY_MODEL},
+                responseParameters: lambdaRespParams
+            }]
+        });
+        part.addMethod(HttpMethod.GET, partGetIntegration, {
+            requestParameters: {
+                'method.request.querystring.offset': true,
+                'method.request.querystring.limit': true,
+                'method.request.querystring.loc': false,
+                'method.request.querystring.dl': false,
+                'method.request.querystring.lang': false,
+                'method.request.querystring.pay': false,
+                'method.request.querystring.freq': false,
+            },
+            operationName: "GetParttimeInfo",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: Model.EMPTY_MODEL},
+                responseParameters: lambdaRespParams
+            }]
+        });
+        seminar.addMethod(HttpMethod.GET, seminarGetIntegration, {
+            requestParameters: {
+                'method.request.querystring.offset': true,
+                'method.request.querystring.limit': true,
+                'method.request.querystring.ind': false,
+                'method.request.querystring.duration': false,
+                'method.request.querystring.lang': false,
+                'method.request.querystring.dl': false,
+                'method.request.querystring.major': false,
+            },
+            operationName: "GetSeminarInfo",
+            methodResponses: [{
+                statusCode: '200',
+                responseModels: {["application/json"]: Model.EMPTY_MODEL},
+                responseParameters: lambdaRespParams
+            }]
+        });
     }
 }
 
@@ -358,6 +438,8 @@ export class TimetableApiService extends AbstractRestApiService {
             pathPart: "timetable"
         });
         this.resources["/timetable"] = root;
+        const timetableImport = root.addResource('import');
+        const timetableExport = root.addResource('export');
 
         const timetableFunctions = new TimetableFunctions(this, 'crud-functions', {
             envVars: {
@@ -373,16 +455,21 @@ export class TimetableApiService extends AbstractRestApiService {
         const patchIntegration = new LambdaIntegration(
             timetableFunctions.patchFunction, {proxy: true}
         );
+        const importIntegration = new LambdaIntegration(
+            timetableFunctions.importFunction, {proxy: true}
+        );
+        const exportIntegration = new LambdaIntegration(
+            timetableFunctions.exportFunction, {proxy: true}
+        );
 
         const userPoolAuth = props.authorizer!;
 
         this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
+            allowMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.OPTIONS]
         });
         this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
-            apiKeyRequired: false,
             operationName: "GetTimetable",
             methodResponses: [{
                 statusCode: '200',
@@ -392,7 +479,6 @@ export class TimetableApiService extends AbstractRestApiService {
             authorizationType: AuthorizationType.COGNITO
         });
         this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
-            apiKeyRequired: false,
             operationName: "PostTimetable",
             methodResponses: [{
                 statusCode: '200',
@@ -402,7 +488,6 @@ export class TimetableApiService extends AbstractRestApiService {
             authorizationType: AuthorizationType.COGNITO
         });
         this.methods[HttpMethod.PATCH] = root.addMethod(HttpMethod.PATCH, patchIntegration, {
-            apiKeyRequired: false,
             operationName: "UpdateTimetable",
             methodResponses: [{
                 statusCode: '200',
@@ -410,6 +495,20 @@ export class TimetableApiService extends AbstractRestApiService {
             }],
             authorizer: {authorizerId: userPoolAuth.ref},
             authorizationType: AuthorizationType.COGNITO
+        });
+        timetableImport.addMethod(HttpMethod.POST, importIntegration, {
+            operationName: "ImportTimetable",
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams
+            }]
+        });
+        timetableExport.addMethod(HttpMethod.POST, exportIntegration, {
+            operationName: "ExportTimetable",
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams
+            }]
         });
     }
 }

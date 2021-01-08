@@ -18,6 +18,7 @@ import * as uuid from "uuid";
 
 import {
     AbstractRestApiService,
+    CareerApiService,
     CourseReviewsApiService,
     FeedsApiService,
     SyllabusApiService,
@@ -94,7 +95,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "The main API endpoint for WasedaTime Web App.",
             endpointTypes: [EndpointType.REGIONAL],
             cloudWatchRole: false,
-            deploy: false
+            deploy: false,
+            binaryMediaTypes: ['application/pdf', 'image/png']
         });
         this.apiEndpoint.addGatewayResponse('4xx-resp', {
             type: ResponseType.DEFAULT_4XX,
@@ -170,6 +172,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             authorizer: authorizer
         });
         this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
+            apiEndpoint: this.apiEndpoint
+        });
+        this.apiServices[ApiServices.CAREER] = new CareerApiService(this, 'career-api', {
             apiEndpoint: this.apiEndpoint
         });
         this.apiServices[ApiServices.TIMETABLE] = new TimetableApiService(this, 'timetable-api', {
