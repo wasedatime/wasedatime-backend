@@ -14,6 +14,7 @@ import {
 } from "@aws-cdk/aws-apigateway";
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
+import {Certificate} from "@aws-cdk/aws-certificatemanager";
 import * as uuid from "uuid";
 
 import {
@@ -26,7 +27,6 @@ import {
 } from "./api-service";
 import {ApiServices} from "../../configs/api/service";
 import {STAGE} from "../../configs/common/aws";
-import {Certificate} from "@aws-cdk/aws-certificatemanager";
 import {API_CERT_ARN} from "../../configs/common/arn";
 import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
 import {defaultHeaders} from "../../configs/api/cors";

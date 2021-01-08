@@ -3,10 +3,10 @@ import {Duration} from "@aws-cdk/core";
 import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 
 import {AwsServicePrincipal} from "../../configs/common/aws";
 import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL} from "../../configs/lambda/environment";
-import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 
 
 interface FunctionsProps {
