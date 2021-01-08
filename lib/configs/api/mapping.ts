@@ -1,6 +1,7 @@
 // fixme migration
 export const s3RespMapping = {
     ['method.response.header.Access-Control-Allow-Origin']: "'*'",
+    ['method.response.header.Access-Control-Allow-Methods']: 'integration.response.header.Access-Control-Allow-Methods',
     ['method.response.header.Cache-Control']: 'integration.response.header.Cache-Control',
     ['method.response.header.ETag']: 'integration.response.header.ETag',
     ['method.response.header.Last-Modified']: 'integration.response.header.Last-Modified',
@@ -9,6 +10,7 @@ export const s3RespMapping = {
 
 export const syllabusRespParams = {
     ['method.response.header.Access-Control-Allow-Origin']: true,
+    ['method.response.header.Access-Control-Allow-Methods']: true,
     ['method.response.header.Cache-Control']: true,
     ['method.response.header.ETag']: true,
     ['method.response.header.Last-Modified']: true,
