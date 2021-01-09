@@ -325,9 +325,9 @@ export class SyllabusFunctions extends cdk.Construct {
             functionName: "get-courses",
             role: dynamoDBReadRole,
             logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 512,
+            memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(5),
+            timeout: Duration.seconds(3),
             environment: props.envVars
         });
     }

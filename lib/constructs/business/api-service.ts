@@ -40,9 +40,7 @@ export interface ApiServiceProps {
 
 export abstract class AbstractRestApiService extends cdk.Construct {
 
-    abstract readonly resources: { [path: string]: Resource };
-
-    abstract readonly methods: { [method in HttpMethod]?: Method };
+    abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     protected constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
 
@@ -52,9 +50,7 @@ export abstract class AbstractRestApiService extends cdk.Construct {
 
 export class SyllabusApiService extends AbstractRestApiService {
 
-    readonly resources: { [path: string]: Resource } = {};
-
-    readonly methods: { [method in HttpMethod]?: Method } = {};
+    readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
@@ -63,9 +59,7 @@ export class SyllabusApiService extends AbstractRestApiService {
             parent: scope.apiEndpoint.root,
             pathPart: "syllabus"
         });
-        this.resources["/syllabus"] = root;
         const syllabusSchools: Resource = root.addResource("{school}");
-        this.resources["/{school}"] = syllabusSchools;
 
         const getRespModel = props.apiEndpoint.addModel('syllabus-get-resp-model', {
             schema: syllabusSchema,
@@ -118,19 +112,19 @@ export class SyllabusApiService extends AbstractRestApiService {
         );
         const syllabusFunctions = new SyllabusFunctions(this, 'syllabus-function', {
             envVars: {
-                'TABLE_NAME': "waseda-syllabus"
+                'TABLE_NAME': "syllabus"
             }
         });
         const courseGetIntegration = new LambdaIntegration(
             syllabusFunctions.getFunction, {proxy: true}
         );
 
-        this.methods.OPTIONS = syllabusSchools.addCorsPreflight({
+        const optionsSyllabusSchools = syllabusSchools.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.HEAD]
         });
-        this.methods.GET = syllabusSchools.addMethod(HttpMethod.GET, getIntegration, {
+        const getSyllabusSchools = syllabusSchools.addMethod(HttpMethod.GET, getIntegration, {
             requestParameters: {['method.request.path.school']: true},
             operationName: "GetSyllabusBySchool",
             methodResponses: [{
@@ -139,7 +133,7 @@ export class SyllabusApiService extends AbstractRestApiService {
                 responseParameters: syllabusRespParams
             }]
         });
-        this.methods.HEAD = syllabusSchools.addMethod(HttpMethod.HEAD, headIntegration, {
+        const headSyllabusSchools = syllabusSchools.addMethod(HttpMethod.HEAD, headIntegration, {
             requestParameters: {['method.request.path.school']: true},
             operationName: "GetSyllabusMetadataBySchool",
             methodResponses: [{
@@ -148,12 +142,12 @@ export class SyllabusApiService extends AbstractRestApiService {
             }]
         });
 
-        root.addCorsPreflight({
+        const optionsSyllabusCourses = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
         });
-        root.addMethod(HttpMethod.GET, courseGetIntegration, {
+        const getSyllabusCourses = root.addMethod(HttpMethod.GET, courseGetIntegration, {
             operationName: "GetCourses",
             requestParameters: {
                 'method.request.querystring.offset': true,
@@ -165,14 +159,24 @@ export class SyllabusApiService extends AbstractRestApiService {
                 responseParameters: lambdaRespParams
             }]
         });
+
+        this.resourceMapping = {
+            "/syllabus": {
+                [HttpMethod.GET]: getSyllabusCourses,
+                [HttpMethod.OPTIONS]: optionsSyllabusCourses
+            },
+            "/syllabus/{school}": {
+                [HttpMethod.GET]: getSyllabusSchools,
+                [HttpMethod.OPTIONS]: optionsSyllabusSchools,
+                [HttpMethod.HEAD]: headSyllabusSchools
+            }
+        };
     }
 }
 
 export class CourseReviewsApiService extends AbstractRestApiService {
 
-    readonly resources: { [path: string]: Resource } = {};
-
-    readonly methods: { [method in HttpMethod]?: Method } = {};
+    readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
@@ -181,7 +185,6 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             parent: scope.apiEndpoint.root,
             pathPart: "course-reviews"
         }).addResource('{key}');
-        this.resources["/course-reviews"] = root;
 
         const getRespModel = props.apiEndpoint.addModel('review-get-resp-model', {
             schema: courseReviewGetRespSchema,
@@ -222,12 +225,12 @@ export class CourseReviewsApiService extends AbstractRestApiService {
 
         const userPoolAuth = props.authorizer!;
 
-        this.methods.OPTIONS = root.addCorsPreflight({
+        const optionsCourseReviews = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.DELETE, HttpMethod.OPTIONS]
         });
-        this.methods.GET = root.addMethod(HttpMethod.GET, getIntegration,
+        const getCourseReviews = root.addMethod(HttpMethod.GET, getIntegration,
             {
                 requestParameters: {
                     'method.request.querystring.uid': true
@@ -240,7 +243,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 }]
             }
         );
-        this.methods.POST = root.addMethod(HttpMethod.POST, postIntegration,
+        const postCourseReviews = root.addMethod(HttpMethod.POST, postIntegration,
             {
                 operationName: "PostReview",
                 requestModels: {["application/json"]: postReqModel},
@@ -252,7 +255,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 authorizationType: AuthorizationType.COGNITO
             }
         );
-        this.methods.PATCH = root.addMethod(HttpMethod.PATCH, patchIntegration,
+        const patchCourseReviews = root.addMethod(HttpMethod.PATCH, patchIntegration,
             {
                 operationName: "UpdateReview",
                 requestParameters: {
@@ -267,7 +270,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 authorizationType: AuthorizationType.COGNITO
             }
         );
-        this.methods.DELETE = root.addMethod(HttpMethod.DELETE, deleteIntegration,
+        const deleteCourseReviews = root.addMethod(HttpMethod.DELETE, deleteIntegration,
             {
                 operationName: "DeleteReview",
                 requestParameters: {
@@ -281,14 +284,22 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 authorizationType: AuthorizationType.COGNITO
             }
         );
+
+        this.resourceMapping = {
+            "/course-reviews/{key}": {
+                [HttpMethod.GET]: getCourseReviews,
+                [HttpMethod.OPTIONS]: optionsCourseReviews,
+                [HttpMethod.PATCH]: patchCourseReviews,
+                [HttpMethod.POST]: postCourseReviews,
+                [HttpMethod.DELETE]: deleteCourseReviews
+            }
+        };
     }
 }
 
 export class FeedsApiService extends AbstractRestApiService {
 
-    readonly resources: { [path: string]: Resource } = {};
-
-    readonly methods: { [method in HttpMethod]?: Method } = {};
+    readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
@@ -297,7 +308,6 @@ export class FeedsApiService extends AbstractRestApiService {
             parent: scope.apiEndpoint.root,
             pathPart: "feeds"
         });
-        this.resources["/feeds"] = root;
 
         const getRespModel = props.apiEndpoint.addModel('feeds-get-resp-model', {
             schema: articleListSchema,
@@ -322,12 +332,12 @@ export class FeedsApiService extends AbstractRestApiService {
             }]
         });
 
-        this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
+        const optionsFeeds = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS]
         });
-        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
+        const getFeeds = root.addMethod(HttpMethod.GET, getIntegration, {
             requestParameters: {
                 'method.request.querystring.offset': true,
                 'method.request.querystring.limit': true
@@ -339,21 +349,27 @@ export class FeedsApiService extends AbstractRestApiService {
                 responseParameters: lambdaRespParams
             }]
         });
-        this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
+        const postFeeds = root.addMethod(HttpMethod.POST, postIntegration, {
             operationName: "PostArticles",
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: lambdaRespParams
             }]
         });
+
+        this.resourceMapping = {
+            "/feeds": {
+                [HttpMethod.OPTIONS]: optionsFeeds,
+                [HttpMethod.GET]: getFeeds,
+                [HttpMethod.POST]: postFeeds
+            }
+        };
     }
 }
 
 export class CareerApiService extends AbstractRestApiService {
 
-    readonly resources: { [path: string]: Resource } = {};
-
-    readonly methods: { [method in HttpMethod]?: Method } = {};
+    readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
@@ -450,9 +466,7 @@ export class CareerApiService extends AbstractRestApiService {
 
 export class TimetableApiService extends AbstractRestApiService {
 
-    readonly resources: { [path: string]: Resource } = {};
-
-    readonly methods: { [method in HttpMethod]?: Method } = {};
+    readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
@@ -461,7 +475,6 @@ export class TimetableApiService extends AbstractRestApiService {
             parent: scope.apiEndpoint.root,
             pathPart: "timetable"
         });
-        this.resources["/timetable"] = root;
         const timetableImport = root.addResource('import');
         const timetableExport = root.addResource('export');
 
@@ -488,12 +501,12 @@ export class TimetableApiService extends AbstractRestApiService {
 
         const userPoolAuth = props.authorizer!;
 
-        this.methods[HttpMethod.OPTIONS] = root.addCorsPreflight({
+        const optionsTimetable = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.PATCH, HttpMethod.OPTIONS, HttpMethod.DELETE]
         });
-        this.methods[HttpMethod.GET] = root.addMethod(HttpMethod.GET, getIntegration, {
+        const getTimetable = root.addMethod(HttpMethod.GET, getIntegration, {
             operationName: "GetTimetable",
             methodResponses: [{
                 statusCode: '200',
@@ -502,7 +515,7 @@ export class TimetableApiService extends AbstractRestApiService {
             authorizer: {authorizerId: userPoolAuth.ref},
             authorizationType: AuthorizationType.COGNITO
         });
-        this.methods[HttpMethod.POST] = root.addMethod(HttpMethod.POST, postIntegration, {
+        const postTimetable = root.addMethod(HttpMethod.POST, postIntegration, {
             operationName: "PostTimetable",
             methodResponses: [{
                 statusCode: '200',
@@ -511,7 +524,7 @@ export class TimetableApiService extends AbstractRestApiService {
             authorizer: {authorizerId: userPoolAuth.ref},
             authorizationType: AuthorizationType.COGNITO
         });
-        this.methods[HttpMethod.PATCH] = root.addMethod(HttpMethod.PATCH, patchIntegration, {
+        const patchTimetable = root.addMethod(HttpMethod.PATCH, patchIntegration, {
             operationName: "UpdateTimetable",
             methodResponses: [{
                 statusCode: '200',
@@ -526,19 +539,34 @@ export class TimetableApiService extends AbstractRestApiService {
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS]
         }));
-        timetableImport.addMethod(HttpMethod.POST, importIntegration, {
+        const importTimetable = timetableImport.addMethod(HttpMethod.POST, importIntegration, {
             operationName: "ImportTimetable",
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: lambdaRespParams
             }]
         });
-        timetableExport.addMethod(HttpMethod.POST, exportIntegration, {
+        const exportTimetable = timetableExport.addMethod(HttpMethod.POST, exportIntegration, {
             operationName: "ExportTimetable",
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: lambdaRespParams
             }]
         });
+
+        this.resourceMapping = {
+            "/timetable": {
+                [HttpMethod.OPTIONS]: optionsTimetable,
+                [HttpMethod.GET]: getTimetable,
+                [HttpMethod.PATCH]: patchTimetable,
+                [HttpMethod.POST]: postTimetable
+            },
+            "/timetable/export": {
+                [HttpMethod.POST]: exportTimetable
+            },
+            "/timetable/import": {
+                [HttpMethod.POST]: importTimetable
+            }
+        };
     }
 }
