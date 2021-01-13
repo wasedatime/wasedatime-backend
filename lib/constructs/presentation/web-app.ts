@@ -79,7 +79,6 @@ export class AmplifyWebApp extends AbstractWebApp {
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
         this.branches["dev"] = devBranch;
 
-        // fixme migration
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
