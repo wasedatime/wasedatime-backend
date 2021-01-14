@@ -26,5 +26,6 @@ export const lambdaRespParams = {
 
 export const mockRespMapping = {
     ['method.response.header.Access-Control-Allow-Origin']: "'*'",
-    ['method.response.header.Content-Type']: "'application/json'"
+    ['method.response.header.Content-Type']: "'application/json'",
+    ['method.response.header.Referrer-Policy']: "'origin'"
 };

@@ -26,7 +26,7 @@ import {
 } from "../../configs/api/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
 import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions} from "../common/lambda-functions";
-import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../../configs/api/mapping";
+import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} from "../../configs/api/mapping";
 
 
 export interface ApiServiceProps {
@@ -321,7 +321,8 @@ export class FeedsApiService extends AbstractRestApiService {
             passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
             integrationResponses: [{
                 statusCode: '200',
-                responseTemplates: {["application/json"]: articlePlainJson}
+                responseTemplates: {["application/json"]: articlePlainJson},
+                responseParameters: mockRespMapping
             }]
         });
         const postIntegration = new MockIntegration({
