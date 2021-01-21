@@ -105,7 +105,7 @@ jobs:
       - name: Push
         uses: EndBug/add-and-commit@v7
         with:
-          add: "['dev.yml', 'prod.yml']"
+          add: "['./openapi/dev.yml', './openapi/prod.yml']"
           author_name: GitHub Actions
           author_email: actions@github.com
           branch: main
