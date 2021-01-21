@@ -63,7 +63,9 @@ jobs:
           secret: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Setup CDK
-        run: npm install -g aws-cdk
+        run: |
+          npm install -g aws-cdk
+          npm ci
 
       - name: Deploy
         run: cdk deploy --all --require-approval "never"
