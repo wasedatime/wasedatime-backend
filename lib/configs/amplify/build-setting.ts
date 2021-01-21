@@ -55,15 +55,15 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
                     },
                     {
                         "key": "Content-Security-Policy",
-                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
+                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://www.google-analytics.com/;"
                     },
                     {
                         "key": "X-Content-Security-Policy",
-                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
+                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://www.google-analytics.com/;"
                     },
                     {
                         "key": "X-WebKit-CSP",
-                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' https://*.wasedatime.com/static/js/ https://wasedatime.com/static/js/ https://www.google-analytics.com/;"
+                        "value": "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://www.google-analytics.com/;"
                     },
                     {
                         "key": "X-Download-Options",
