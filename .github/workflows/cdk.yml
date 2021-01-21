@@ -6,7 +6,7 @@ name: AWS CDK CI/CD
 on: pull_request
 
 env:
-  GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_OAUTH_TOKEN }}
+  GITHUB_OAUTH_TOKEN: ${{ secrets.PROVIDER_OAUTH_TOKEN }}
   WEBSITE_DEV_PASS: ${{ secrets.WEBSITE_DEV_PASS }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
