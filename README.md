@@ -1,6 +1,6 @@
 # WasedaTime Backend
 
-![](https://travis-ci.com/wasedatime/wasedatime-backend.svg?branch=develop)
+![AWS CDK CI/CD](https://github.com/wasedatime/wasedatime-backend/workflows/AWS%20CDK%20CI/CD/badge.svg)
 ![](https://img.shields.io/website?up_color=green&up_message=online&url=https%3A%2F%2Fwasedatime.com)
 
 This repository defines the serverless application architecture, resource configuration and infrastructure provision strategy of 
