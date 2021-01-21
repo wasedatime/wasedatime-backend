@@ -236,7 +236,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
         const getCourseReviews = root.addMethod(HttpMethod.GET, getIntegration,
             {
                 requestParameters: {
-                    'method.request.querystring.uid': true
+                    'method.request.querystring.uid': false
                 },
                 operationName: "GetReviews",
                 methodResponses: [{

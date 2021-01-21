@@ -126,8 +126,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             stageName: 'prod',
             deployment: prodDeployment,
             description: "Production stage",
-            throttlingRateLimit: 10,
-            throttlingBurstLimit: 10,
+            throttlingRateLimit: 50,
+            throttlingBurstLimit: 50,
             variables: {["STAGE"]: STAGE}
         });
         this.stages['dev'] = new Stage(this, 'dev-stage', {
