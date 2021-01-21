@@ -151,7 +151,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             stage: this.stages['dev']
         });
         domain.addBasePathMapping(this.apiEndpoint, {
-            basePath: 'v2',
+            basePath: 'v1',
             stage: this.stages['prod']
         });
         // Authorizer for methods that requires user login
