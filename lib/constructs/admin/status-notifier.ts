@@ -9,7 +9,9 @@ import {AmplifyStatusPublisher, ScraperStatusPublisher} from "../common/lambda-f
 
 
 export enum StatusNotifier {
+
     BUILD_STATUS,
+
     SCRAPER_STATUS
 }
 

@@ -1,5 +1,7 @@
+import boto3
 import json
 import logging
+import os
 from decimal import Decimal
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
@@ -41,7 +43,7 @@ def api_response(code, body):
             "Content-Type": "application/json",
             "Referrer-Policy": "origin"
         },
-        "multiValueHeaders": {"Access-Control-Allow-Methods": ["POST", "OPTIONS", "GET", "PUT"]},
+        "multiValueHeaders": {"Access-Control-Allow-Methods": ["POST", "OPTIONS", "GET", "PATCH", "DELETE"]},
         "body": body
     }
 

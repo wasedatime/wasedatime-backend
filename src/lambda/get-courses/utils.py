@@ -43,7 +43,7 @@ def api_response(code, body):
             "Content-Type": "application/json",
             "Referrer-Policy": "origin"
         },
-        "multiValueHeaders": {"Access-Control-Allow-Methods": ["POST", "OPTIONS", "GET", "PATCH", "DELETE"]},
+        "multiValueHeaders": {"Access-Control-Allow-Methods": ["OPTIONS", "GET"]},
         "body": body
     }
 

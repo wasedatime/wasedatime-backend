@@ -20,7 +20,7 @@ def delete_review(key, ts, uid):
 def handler(event, context):
     params = {
         "key": event["pathParameters"]["key"],
-        "create_time": event["queryStringParameters"]["ts"],
+        "ts": event["queryStringParameters"]["ts"],
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 

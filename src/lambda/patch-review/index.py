@@ -30,8 +30,8 @@ def patch_review(key, ts, review, uid):
 
     text = review["comment"]
     src_lang, translated = translate_text(text)
-
-    expr, expr_attr_name, expr_attr_val = format_update_expr(src_lang, translated, review)
+    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+    expr, expr_attr_name, expr_attr_val = format_update_expr(src_lang, translated, review, dt_now)
     table.update_item(
         Key=primary_key,
         ConditionExpression=Attr('uid').eq(uid),
@@ -48,7 +48,7 @@ def handler(event, context):
 
     params = {
         "key": event["pathParameters"]["key"],
-        "create_time": event["queryStringParameters"]["ts"],
+        "ts": event["queryStringParameters"]["ts"],
         "review": req["data"],
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }

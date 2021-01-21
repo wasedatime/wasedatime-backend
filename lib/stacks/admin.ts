@@ -1,5 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import {SlackChannelConfiguration} from "@aws-cdk/aws-chatbot/lib/slack-channel-configuration";
+import {Topic} from "@aws-cdk/aws-sns";
 
 import {AdminLayer} from "../architecture/layers";
 import {OperationInterface} from "../architecture/interfaces";
@@ -12,7 +13,6 @@ import {
 } from "../constructs/admin/status-notifier";
 import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../configs/chatbot/slack";
 import {FreeTierUsageBudget} from "../constructs/admin/budget";
-import {Topic} from "@aws-cdk/aws-sns";
 import {CF_TOPIC_ARN} from "../configs/common/arn";
 
 
