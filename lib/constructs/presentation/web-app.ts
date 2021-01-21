@@ -2,8 +2,8 @@ import * as cdk from "@aws-cdk/core";
 import {App, Branch, Domain} from "@aws-cdk/aws-amplify";
 
 import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../../configs/amplify/website";
-import {openapiBuildSpec, webappBuildSpec, webappDevBuildSpec} from "../../configs/amplify/build-setting";
-import {apiDocCode, webAppCode} from "../../configs/amplify/codebase";
+import {webappBuildSpec, webappDevBuildSpec} from "../../configs/amplify/build-setting";
+import {webAppCode} from "../../configs/amplify/codebase";
 
 
 export interface WebAppProps {
@@ -85,42 +85,6 @@ export class AmplifyWebApp extends AbstractWebApp {
                 {branch: devBranch, prefix: "dev"},
                 {branch: masterBranch, prefix: ''},
                 {branch: masterBranch, prefix: 'www'}
-            ]
-        });
-    }
-}
-
-export class OpenApiWebsite extends AbstractWebApp {
-
-    readonly app: App;
-
-    readonly branches: { [key: string]: Branch } = {};
-
-    readonly domain: Domain;
-
-    constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
-        super(scope, id, props);
-
-        this.app = new App(this, 'app', {
-            appName: "wasedatime-openapi",
-            autoBranchDeletion: true,
-            buildSpec: openapiBuildSpec,
-            description: "API documentation website for WasedaTime.",
-            sourceCodeProvider: apiDocCode
-        });
-
-        const mainBranch: Branch = this.app.addBranch('main', {
-            autoBuild: true,
-            branchName: "main",
-            stage: "PRODUCTION",
-            basicAuth: developerAuth
-        });
-        this.branches["main"] = mainBranch;
-
-        this.domain = this.app.addDomain('domain', {
-            domainName: "openapi." + WEBAPP_DOMAIN,
-            subDomains: [
-                {branch: mainBranch, prefix: ''}
             ]
         });
     }
