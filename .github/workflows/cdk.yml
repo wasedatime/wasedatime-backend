@@ -78,7 +78,6 @@ jobs:
         with:
           repository: my-org/my-private-tools
           token: ${{ secrets.GIT_TOKEN }}
-          path: '../wasedatime-openapi'
 
       - name: Setup
         run: |
