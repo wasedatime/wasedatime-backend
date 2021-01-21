@@ -85,12 +85,12 @@ jobs:
           git clone https://github.com/wasedatime/wasedatime-openapi.git
           cd wasedatime-openapi/openapi
 
+      - uses: chrislennon/action-aws-cli@v1.1
+
       - name: Export
-        uses: ItsKarma/aws-cli@v1.70.0
-        with:
-          args: |
-            aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
-            aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
+        run: |
+          aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
+          aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
