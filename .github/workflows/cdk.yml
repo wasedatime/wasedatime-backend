@@ -98,10 +98,11 @@ jobs:
           AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
 
       - name: Push
-        uses: actions-x/commit@v2
+        uses: EndBug/add-and-commit@v7
         with:
-          email: actions@github.com
-          name: GitHub Actions Autocommitter
-          branch: master
-          files: dev.yml prod.yml
-          repository: https://github.com/wasedatime/wasedatime-openapi
+          add: '*.yml'
+          author_name: GitHub Actions
+          author_email: actions@github.com
+          branch: main
+          message: 'API Documentation update from GitHub Actions'
+          push: true
