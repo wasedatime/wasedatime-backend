@@ -51,7 +51,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {
                 autoBuild: true,
-                patterns: ['feature/*'],
+                patterns: ['release/*'],
                 basicAuth: developerAuth,
                 pullRequestPreview: false,
                 buildSpec: webappDevBuildSpec,
