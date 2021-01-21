@@ -37,7 +37,7 @@ export interface ApiEndpointProps {
 
     dataSources?: { [service in ApiServices]?: string };
 
-    authProvider?: string
+    authProvider?: string;
 }
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
