@@ -1,13 +1,13 @@
 import * as cdk from "@aws-cdk/core";
 import {
-    AuthorizationType,
     AwsIntegration,
-    CfnAuthorizer,
+    IAuthorizer,
     LambdaIntegration,
     Method,
     MockIntegration,
     Model,
     PassthroughBehavior,
+    RequestValidator,
     Resource,
     RestApi
 } from "@aws-cdk/aws-apigateway";
@@ -31,11 +31,13 @@ import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} fr
 
 export interface ApiServiceProps {
 
-    apiEndpoint: RestApi
+    apiEndpoint: RestApi;
 
-    dataSource?: string
+    dataSource?: string;
 
-    authorizer?: CfnAuthorizer
+    authorizer?: IAuthorizer;
+
+    validator?: RequestValidator;
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
@@ -131,7 +133,8 @@ export class SyllabusApiService extends AbstractRestApiService {
                 statusCode: '200',
                 responseModels: {["application/json"]: getRespModel},
                 responseParameters: syllabusRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
         const headSyllabusSchools = syllabusSchools.addMethod(HttpMethod.HEAD, headIntegration, {
             requestParameters: {['method.request.path.school']: true},
@@ -139,7 +142,8 @@ export class SyllabusApiService extends AbstractRestApiService {
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: syllabusRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
 
         const optionsSyllabusCourses = root.addCorsPreflight({
@@ -157,7 +161,8 @@ export class SyllabusApiService extends AbstractRestApiService {
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: lambdaRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
 
         this.resourceMapping = {
@@ -223,8 +228,6 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             courseReviewsFunctions.deleteFunction, {proxy: true}
         );
 
-        const userPoolAuth = props.authorizer!;
-
         const optionsCourseReviews = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
@@ -240,7 +243,8 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                     statusCode: '200',
                     responseModels: {["application/json"]: getRespModel},
                     responseParameters: lambdaRespParams
-                }]
+                }],
+                requestValidator: props.validator
             }
         );
         const postCourseReviews = root.addMethod(HttpMethod.POST, postIntegration,
@@ -251,8 +255,8 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                     statusCode: '200',
                     responseParameters: lambdaRespParams
                 }],
-                authorizer: {authorizerId: userPoolAuth.ref},
-                authorizationType: AuthorizationType.COGNITO
+                authorizer: props.authorizer,
+                requestValidator: props.validator
             }
         );
         const patchCourseReviews = root.addMethod(HttpMethod.PATCH, patchIntegration,
@@ -266,8 +270,8 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                     statusCode: '200',
                     responseParameters: lambdaRespParams
                 }],
-                authorizer: {authorizerId: userPoolAuth.ref},
-                authorizationType: AuthorizationType.COGNITO
+                authorizer: props.authorizer,
+                requestValidator: props.validator
             }
         );
         const deleteCourseReviews = root.addMethod(HttpMethod.DELETE, deleteIntegration,
@@ -280,8 +284,8 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                     statusCode: '200',
                     responseParameters: lambdaRespParams
                 }],
-                authorizer: {authorizerId: userPoolAuth.ref},
-                authorizationType: AuthorizationType.COGNITO
+                authorizer: props.authorizer,
+                requestValidator: props.validator
             }
         );
 
@@ -348,14 +352,16 @@ export class FeedsApiService extends AbstractRestApiService {
                 statusCode: '200',
                 responseModels: {["application/json"]: getRespModel},
                 responseParameters: lambdaRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
         const postFeeds = root.addMethod(HttpMethod.POST, postIntegration, {
             operationName: "PostArticles",
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: lambdaRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
 
         this.resourceMapping = {
@@ -426,7 +432,8 @@ export class CareerApiService extends AbstractRestApiService {
                 statusCode: '200',
                 responseModels: {["application/json"]: Model.EMPTY_MODEL},
                 responseParameters: lambdaRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
         part.addMethod(HttpMethod.GET, partGetIntegration, {
             requestParameters: {
@@ -443,7 +450,8 @@ export class CareerApiService extends AbstractRestApiService {
                 statusCode: '200',
                 responseModels: {["application/json"]: Model.EMPTY_MODEL},
                 responseParameters: lambdaRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
         seminar.addMethod(HttpMethod.GET, seminarGetIntegration, {
             requestParameters: {
@@ -460,7 +468,8 @@ export class CareerApiService extends AbstractRestApiService {
                 statusCode: '200',
                 responseModels: {["application/json"]: Model.EMPTY_MODEL},
                 responseParameters: lambdaRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
     }
 }
@@ -500,8 +509,6 @@ export class TimetableApiService extends AbstractRestApiService {
             timetableFunctions.exportFunction, {proxy: true}
         );
 
-        const userPoolAuth = props.authorizer!;
-
         const optionsTimetable = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
@@ -513,8 +520,8 @@ export class TimetableApiService extends AbstractRestApiService {
                 statusCode: '200',
                 responseParameters: lambdaRespParams
             }],
-            authorizer: {authorizerId: userPoolAuth.ref},
-            authorizationType: AuthorizationType.COGNITO
+            authorizer: props.authorizer,
+            requestValidator: props.validator
         });
         const postTimetable = root.addMethod(HttpMethod.POST, postIntegration, {
             operationName: "PostTimetable",
@@ -522,8 +529,8 @@ export class TimetableApiService extends AbstractRestApiService {
                 statusCode: '200',
                 responseParameters: lambdaRespParams
             }],
-            authorizer: {authorizerId: userPoolAuth.ref},
-            authorizationType: AuthorizationType.COGNITO
+            authorizer: props.authorizer,
+            requestValidator: props.validator
         });
         const patchTimetable = root.addMethod(HttpMethod.PATCH, patchIntegration, {
             operationName: "UpdateTimetable",
@@ -531,8 +538,8 @@ export class TimetableApiService extends AbstractRestApiService {
                 statusCode: '200',
                 responseParameters: lambdaRespParams
             }],
-            authorizer: {authorizerId: userPoolAuth.ref},
-            authorizationType: AuthorizationType.COGNITO
+            authorizer: props.authorizer,
+            requestValidator: props.validator
         });
 
         [timetableImport, timetableExport].forEach(value => value.addCorsPreflight({
@@ -545,14 +552,16 @@ export class TimetableApiService extends AbstractRestApiService {
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: lambdaRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
         const exportTimetable = timetableExport.addMethod(HttpMethod.POST, exportIntegration, {
             operationName: "ExportTimetable",
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: lambdaRespParams
-            }]
+            }],
+            requestValidator: props.validator
         });
 
         this.resourceMapping = {
