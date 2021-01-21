@@ -1,20 +1,18 @@
 import * as cdk from '@aws-cdk/core';
 import {Construct} from '@aws-cdk/core';
-import {IRuleTarget, Rule, RuleTargetInput} from "@aws-cdk/aws-events";
-import {Function} from "@aws-cdk/aws-lambda";
-import {ITopic, Topic} from "@aws-cdk/aws-sns";
-import {SnsTopic} from "@aws-cdk/aws-events-targets";
-import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
+import {Rule} from "@aws-cdk/aws-events";
+import {Topic} from "@aws-cdk/aws-sns";
+import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import {Function} from '@aws-cdk/aws-lambda';
 
 import {AmplifyStatusPublisher, ScraperStatusPublisher} from "../common/lambda-functions";
-import {CF_NOTIF_FUNC_ARN, CF_TOPIC_ARN} from "../../configs/common/arn";
-import {AMPLIFY_MESSAGE, SFN_MESSAGE} from "../../configs/event/message";
 
 
 export enum StatusNotifier {
+
     BUILD_STATUS,
-    SCRAPER_STATUS,
-    CFN_STATUS
+
+    SCRAPER_STATUS
 }
 
 export interface StatusNotifierProps {
@@ -24,11 +22,11 @@ export interface StatusNotifierProps {
 
 export abstract class AbstractStatusNotifier extends Construct {
 
-    abstract readonly rules: { [eventName: string]: Rule };
+    abstract readonly publisher: Rule;
 
-    abstract readonly target?: IRuleTarget | string;
+    abstract readonly topic: Topic;
 
-    abstract readonly topic: ITopic;
+    abstract readonly subscriber: Function;
 
     protected constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id);
@@ -37,22 +35,19 @@ export abstract class AbstractStatusNotifier extends Construct {
 
 export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
 
-    readonly rules: { [eventName: string]: Rule } = {};
-
-    readonly target?: string;
+    readonly publisher: Rule;
 
     readonly topic: Topic;
+
+    readonly subscriber: Function;
 
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        this.topic = new Topic(this, 'build-status-topic', {
-            topicName: "amplify-build-status"
-        });
-        const subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
-        this.topic.addSubscription(new LambdaSubscription(subscriber));
+        this.subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
 
-        this.rules["on-build"] = new Rule(this, 'build-sentinel', {
+        this.publisher = new Rule(this, 'build-sentinel', {
+            ruleName: "amplify-build-event",
             description: "Triggered on Amplify build",
             enabled: true,
             eventPattern: {
@@ -73,30 +68,25 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
             }
         });
 
-        this.rules["on-build"].addTarget(new SnsTopic(this.topic, {
-            message: RuleTargetInput.fromText(AMPLIFY_MESSAGE)
-        }));
+        this.publisher.addTarget(new LambdaFunction(this.subscriber));
     }
 }
 
 export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
 
-    readonly rules: { [eventName: string]: Rule } = {};
-
-    readonly target?: string;
+    readonly publisher: Rule;
 
     readonly topic: Topic;
+
+    readonly subscriber: Function;
 
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        this.topic = new Topic(this, 'scraper-status-topic', {
-            topicName: "scraper-task-status"
-        });
-        const subscriber = new ScraperStatusPublisher(this, 'subscriber-function').baseFunction;
-        this.topic.addSubscription(new LambdaSubscription(subscriber));
+        this.subscriber = new ScraperStatusPublisher(this, 'subscriber-function').baseFunction;
 
-        this.rules["task-status"] = new Rule(this, 'scraper-status', {
+        this.publisher = new Rule(this, 'scraper-status', {
+            ruleName: "scraper-exec-event",
             description: "Scraper Status",
             enabled: true,
             eventPattern: {
@@ -119,26 +109,6 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
             }
         });
 
-        this.rules["task-status"].addTarget(new SnsTopic(this.topic, {
-            message: RuleTargetInput.fromText(SFN_MESSAGE)
-        }));
-    }
-}
-
-//todo complete definition
-export class StackStatusNotifier extends AbstractStatusNotifier {
-
-    readonly rules: { [eventName: string]: Rule } = {};
-
-    readonly target?: string;
-
-    readonly topic: ITopic;
-
-    constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
-        super(scope, id, props);
-
-        this.topic = Topic.fromTopicArn(this, 'stack-status-topic', CF_TOPIC_ARN);
-
-        const subscriber = Function.fromFunctionArn(this, 'slack-webhook-publisher', CF_NOTIF_FUNC_ARN);
+        this.publisher.addTarget(new LambdaFunction(this.subscriber));
     }
 }

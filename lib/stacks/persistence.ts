@@ -5,6 +5,7 @@ import {
     CareerDataPipeline,
     FeedsDataPipeline,
     SyllabusDataPipeline,
+    SyllabusSyncPipeline,
     Worker
 } from "../constructs/persistence/data-pipeline";
 import {DataEndpoint, OperationEndpoint} from "../configs/common/registry";
@@ -21,8 +22,12 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const syllabusDatePipeline = new SyllabusDataPipeline(this, 'syllabus-datapipeline', {});
-        this.dataPipelines[Worker.SYLLABUS] = syllabusDatePipeline;
+        const syllabusDataPipeline = new SyllabusDataPipeline(this, 'syllabus-datapipeline', {});
+        this.dataPipelines[Worker.SYLLABUS] = syllabusDataPipeline;
+
+        const syllabusSyncPipeline = new SyllabusSyncPipeline(this, 'syllabus-sync', {
+            dataSource: syllabusDataPipeline.dataWarehouse
+        });
 
         const dynamoDatabase = new DynamoDatabase(this, 'dynamo-db', {});
         this.databases["dynamo-main"] = dynamoDatabase;
@@ -40,21 +45,26 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
         );
         this.dataInterface.setEndpoint(
             DataEndpoint.FEEDS,
-            dynamoDatabase.tables[Collection.FEEDS].tableArn
+            dynamoDatabase.tables[Collection.FEEDS].tableName
         );
         this.dataInterface.setEndpoint(
             DataEndpoint.CAREER,
-            dynamoDatabase.tables[Collection.CAREER].tableArn
+            dynamoDatabase.tables[Collection.CAREER].tableName
+        );
+
+        this.dataInterface.setEndpoint(
+            DataEndpoint.TIMETABLE,
+            dynamoDatabase.tables[Collection.TIMETABLE].tableName
         );
 
         this.dataInterface.setEndpoint(
             DataEndpoint.SYLLABUS,
-            syllabusDatePipeline.dataWarehouse.bucketName
+            syllabusDataPipeline.dataWarehouse.bucketName
         );
 
         this.operationInterface.setEndpoint(
             OperationEndpoint.SYLLABUS,
-            syllabusDatePipeline.processor.stateMachineArn
+            syllabusDataPipeline.processor.stateMachineArn
         );
     }
 }

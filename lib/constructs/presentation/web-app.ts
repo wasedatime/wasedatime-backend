@@ -51,7 +51,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {
                 autoBuild: true,
-                patterns: ['feature/*'],
+                patterns: ['release/*'],
                 basicAuth: developerAuth,
                 pullRequestPreview: false,
                 buildSpec: webappDevBuildSpec,
@@ -62,7 +62,7 @@ export class AmplifyWebApp extends AbstractWebApp {
         });
 
         const masterBranch: Branch = this.app.addBranch('master', {
-            autoBuild: false,
+            autoBuild: true,
             branchName: "master",
             stage: "PRODUCTION",
             buildSpec: webappBuildSpec
@@ -71,7 +71,7 @@ export class AmplifyWebApp extends AbstractWebApp {
 
         this.branches["main"] = masterBranch;
         const devBranch: Branch = this.app.addBranch('dev', {
-            autoBuild: false,
+            autoBuild: true,
             basicAuth: developerAuth,
             branchName: "develop",
             stage: "DEVELOPMENT",
@@ -79,7 +79,6 @@ export class AmplifyWebApp extends AbstractWebApp {
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
         this.branches["dev"] = devBranch;
 
-        // fixme migration
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [

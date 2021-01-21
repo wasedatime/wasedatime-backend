@@ -1,4 +1,6 @@
 import * as cdk from "@aws-cdk/core";
+import {SlackChannelConfiguration} from "@aws-cdk/aws-chatbot/lib/slack-channel-configuration";
+import {Topic} from "@aws-cdk/aws-sns";
 
 import {AdminLayer} from "../architecture/layers";
 import {OperationInterface} from "../architecture/interfaces";
@@ -6,18 +8,19 @@ import {OperationEndpoint} from "../configs/common/registry";
 import {
     AbstractStatusNotifier,
     AmplifyBuildStatusNotifier,
-    StackStatusNotifier,
     StatusNotifier,
     SyllabusScraperStatusNotifier
 } from "../constructs/admin/status-notifier";
-import {AbstractMonitor} from "../constructs/admin/monitor";
+import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../configs/chatbot/slack";
+import {FreeTierUsageBudget} from "../constructs/admin/budget";
+import {CF_TOPIC_ARN} from "../configs/common/arn";
 
 
 export class WasedaTimeAdminLayer extends AdminLayer {
 
     readonly statusNotifiers: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
 
-    readonly monitors: { [name: string]: AbstractMonitor } = {};
+    readonly chatbot: SlackChannelConfiguration;
 
     constructor(scope: cdk.Construct, id: string, operationInterface: OperationInterface, props: cdk.StackProps) {
 
@@ -31,6 +34,16 @@ export class WasedaTimeAdminLayer extends AdminLayer {
             target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
         });
 
-        this.statusNotifiers[StatusNotifier.CFN_STATUS] = new StackStatusNotifier(this, 'cfn-notifier', {});
+        const freeTierBudget = new FreeTierUsageBudget(this, 'free-tier-budget');
+
+        this.chatbot = new SlackChannelConfiguration(this, 'chatbot-slack-config', {
+            slackChannelConfigurationName: 'aws-alert',
+            slackChannelId: SLACK_CHANNEL_ID,
+            slackWorkspaceId: SLACK_WORKSPACE_ID,
+            notificationTopics: [
+                freeTierBudget.notification,
+                Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN)
+            ]
+        });
     }
 }

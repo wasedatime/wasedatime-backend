@@ -34,6 +34,8 @@ export enum AwsServicePrincipal {
 
     AUTOSCALING = "autoscaling.amazonaws.com",
 
+    BUDGET = "budgets.amazonaws.com",
+
     CLOUDFORMATION = "cloudformation.amazonaws.com",
 
     CLOUDFRONT = "cloudfront.amazonaws.com",

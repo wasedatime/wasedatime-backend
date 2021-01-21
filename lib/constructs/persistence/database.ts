@@ -6,7 +6,8 @@ export enum Collection {
     COURSE_REVIEW,
     CAREER,
     FEEDS,
-    SYLLABUS
+    SYLLABUS,
+    TIMETABLE
 }
 
 export interface DatabaseProps {
@@ -24,18 +25,19 @@ export class DynamoDatabase extends cdk.Construct {
             partitionKey: {name: "course_key", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            removalPolicy: cdk.RemovalPolicy.RETAIN,
             sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "course-review",
             readCapacity: 5,
-            writeCapacity: 5
+            writeCapacity: 5,
+            pointInTimeRecovery: true
         });
 
         this.tables[Collection.CAREER] = new Table(this, 'dynamodb-career-table', {
             partitionKey: {name: "type", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            removalPolicy: cdk.RemovalPolicy.RETAIN,
             sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "career",
             readCapacity: 1,
@@ -46,22 +48,22 @@ export class DynamoDatabase extends cdk.Construct {
             partitionKey: {name: "category", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            removalPolicy: cdk.RemovalPolicy.RETAIN,
             sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "feeds",
             readCapacity: 1,
             writeCapacity: 1
         });
 
-        this.tables[Collection.SYLLABUS] = new Table(this, 'dynamodb-syllabus-table', {
-            partitionKey: {name: "dept", type: AttributeType.STRING},
+        this.tables[Collection.TIMETABLE] = new Table(this, 'dynamodb-timetable-table', {
+            partitionKey: {name: "uid", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.DESTROY,
-            sortKey: {name: "a", type: AttributeType.STRING},
-            tableName: "waseda-syllabus",
-            readCapacity: 5,
-            writeCapacity: 5
+            removalPolicy: cdk.RemovalPolicy.RETAIN,
+            tableName: "timetable",
+            readCapacity: 2,
+            writeCapacity: 2,
+            pointInTimeRecovery: true
         });
     }
 }

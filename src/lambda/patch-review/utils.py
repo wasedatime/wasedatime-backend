@@ -1,11 +1,11 @@
 import base64
 import boto3
 import json
+import logging
 import os
 from decimal import Decimal
 from google.cloud import translate
 from google.oauth2 import service_account
-from re import fullmatch
 
 # AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
@@ -56,18 +56,27 @@ def api_response(code, body):
             "Content-Type": "application/json",
             "Referrer-Policy": "origin"
         },
-        "multiValueHeaders": {"Access-Control-Allow-Methods": ["POST", "OPTIONS", "GET", "PUT"]},
+        "multiValueHeaders": {"Access-Control-Allow-Methods": ["POST", "OPTIONS", "GET", "PATCH", "DELETE"]},
         "body": body
     }
 
 
-def bad_referer(headers):
-    if "referer" not in headers:
-        return True
-    elif fullmatch(r'https://(\w+\.|)wasedatime\.com/.*', headers["referer"]) is None:
-        return True
-    else:
-        return False
+def resp_handler(func):
+    def handle(*args, **kwargs):
+        try:
+            resp = func(*args, **kwargs)
+            return api_response(200, resp)
+        except LookupError:
+            resp = JsonPayloadBuilder().add_status(False).add_data(None) \
+                .add_message("Not found").compile()
+            return api_response(404, resp)
+        except Exception as e:
+            logging.error(str(e))
+            resp = JsonPayloadBuilder().add_status(False).add_data(None) \
+                .add_message("Internal error, please contact bugs@wasedatime.com.").compile()
+            return api_response(500, resp)
+
+    return handle
 
 
 def translate_text(text):
@@ -95,3 +104,21 @@ def translate_text(text):
         translations[lang] = translated or ''
 
     return src_lang, translations
+
+
+def format_update_expr(src_lang, translated, review, dt_now):
+    expr_attr_name = dict()
+    expr_attr_val = dict()
+
+    for l in langs:
+        expr_attr_name[f'#{l[-2:]}'] = f'comment_{l}'
+        expr_attr_val[f':{l[-2:]}'] = translated[l]
+    expr_attr_val[":src"] = src_lang
+    expr_attr_val[":ts"] = dt_now
+    expr_attr_val[":ben"] = review["benefit"]
+    expr_attr_val[":diff"] = review["difficulty"]
+    expr_attr_val[":sat"] = review["satisfaction"]
+
+    expr = "SET updated_at = :ts, benefit = :ben, difficulty = :diff, satisfaction = :sat, " \
+           "#en = :en, #CN = :CN, #TW = :TW, #ja = :ja, #ko = :ko, src_lang = :src"
+    return expr, expr_attr_name, expr_attr_val
