@@ -14,6 +14,7 @@ import {
 import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../configs/chatbot/slack";
 import {FreeTierUsageBudget} from "../constructs/admin/budget";
 import {CF_TOPIC_ARN} from "../configs/common/arn";
+import {GlobalTrailLogs} from "../constructs/admin/log";
 
 
 export class WasedaTimeAdminLayer extends AdminLayer {
@@ -36,6 +37,12 @@ export class WasedaTimeAdminLayer extends AdminLayer {
 
         const freeTierBudget = new FreeTierUsageBudget(this, 'free-tier-budget');
 
+        // todo re-deploy
+        // this.chatbot = new SlackChatbot(this, 'slack-chatbot', [
+        //     freeTierBudget.notification,
+        //     Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN)
+        // ]);
+
         this.chatbot = new SlackChannelConfiguration(this, 'chatbot-slack-config', {
             slackChannelConfigurationName: 'aws-alert',
             slackChannelId: SLACK_CHANNEL_ID,
@@ -45,5 +52,7 @@ export class WasedaTimeAdminLayer extends AdminLayer {
                 Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN)
             ]
         });
+
+        new GlobalTrailLogs(this, 'cloudtrail-logs');
     }
 }
