@@ -74,61 +74,6 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
                         "value": "off"
                     }
                 ]
-            },
-            // Response caching
-            {
-                "pattern": "**/*.js",
-                "headers": [
-                    {
-                        "key": "Cache-Control",
-                        "value": "public,max-age=86400,immutable"
-                    }
-                ]
-            },
-            {
-                "pattern": "**/*.css",
-                "headers": [
-                    {
-                        "key": "Cache-Control",
-                        "value": "public,max-age=86400,immutable"
-                    }
-                ]
-            },
-            {
-                "pattern": "**/*.png",
-                "headers": [
-                    {
-                        "key": "Cache-Control",
-                        "value": "public,max-age=2592000,immutable"
-                    }
-                ]
-            },
-            {
-                "pattern": "**/*.jpg",
-                "headers": [
-                    {
-                        "key": "Cache-Control",
-                        "value": "public,max-age=2592000,immutable"
-                    }
-                ]
-            },
-            {
-                "pattern": "**/*.ico",
-                "headers": [
-                    {
-                        "key": "Cache-Control",
-                        "value": "public,max-age=31536000,immutable"
-                    }
-                ]
-            },
-            {
-                "pattern": "**/*.svg",
-                "headers": [
-                    {
-                        "key": "Cache-Control",
-                        "value": "public,max-age=2592000,immutable"
-                    }
-                ]
             }
         ]
     }
