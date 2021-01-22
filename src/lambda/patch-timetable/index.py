@@ -10,7 +10,7 @@ def patch_timetable(uid, content):
     op = content.pop("operation")
     if op == "remove":
         i = content.pop("index")
-        expr = f'REMOVE courses[{i}], SET updated_at = :time'
+        expr = f'REMOVE courses[{i}] SET updated_at = :time'
         val = {":time": dt_now}
         table.update_item(
             Key={
