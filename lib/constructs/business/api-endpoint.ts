@@ -6,6 +6,7 @@ import {
     DomainName,
     EndpointType,
     LambdaRestApi,
+    MethodLoggingLevel,
     RequestValidator,
     ResponseType,
     RestApi,
@@ -95,7 +96,6 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             restApiName: "wasedatime-rest-api",
             description: "The main API endpoint for WasedaTime Web App.",
             endpointTypes: [EndpointType.REGIONAL],
-            cloudWatchRole: false,
             deploy: false,
             binaryMediaTypes: ['application/pdf', 'image/png']
         });
@@ -128,7 +128,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "Production stage",
             throttlingRateLimit: 50,
             throttlingBurstLimit: 50,
-            variables: {["STAGE"]: STAGE}
+            variables: {["STAGE"]: STAGE},
+            loggingLevel: MethodLoggingLevel.ERROR,
+            dataTraceEnabled: true
         });
         this.stages['dev'] = new Stage(this, 'dev-stage', {
             stageName: 'dev',
@@ -136,7 +138,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "Develop stage",
             throttlingRateLimit: 10,
             throttlingBurstLimit: 10,
-            variables: {["STAGE"]: STAGE}
+            variables: {["STAGE"]: STAGE},
+            loggingLevel: MethodLoggingLevel.ERROR,
+            dataTraceEnabled: true
         });
         // API Domain
         const domain = this.apiEndpoint.addDomainName('domain', {
