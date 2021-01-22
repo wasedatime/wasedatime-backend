@@ -95,7 +95,6 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             restApiName: "wasedatime-rest-api",
             description: "The main API endpoint for WasedaTime Web App.",
             endpointTypes: [EndpointType.REGIONAL],
-            cloudWatchRole: false,
             deploy: false,
             binaryMediaTypes: ['application/pdf', 'image/png']
         });
