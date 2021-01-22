@@ -98,6 +98,7 @@ jobs:
           unzip awscliv2.zip
           sudo ./aws/install
           rm -r ./aws
+          rm -r ./awscliv2.zip
 
       - name: Export
         run: |
