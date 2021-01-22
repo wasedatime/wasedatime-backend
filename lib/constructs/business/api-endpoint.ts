@@ -6,6 +6,7 @@ import {
     DomainName,
     EndpointType,
     LambdaRestApi,
+    MethodLoggingLevel,
     RequestValidator,
     ResponseType,
     RestApi,
@@ -127,7 +128,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "Production stage",
             throttlingRateLimit: 50,
             throttlingBurstLimit: 50,
-            variables: {["STAGE"]: STAGE}
+            variables: {["STAGE"]: STAGE},
+            loggingLevel: MethodLoggingLevel.ERROR
         });
         this.stages['dev'] = new Stage(this, 'dev-stage', {
             stageName: 'dev',
@@ -135,7 +137,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "Develop stage",
             throttlingRateLimit: 10,
             throttlingBurstLimit: 10,
-            variables: {["STAGE"]: STAGE}
+            variables: {["STAGE"]: STAGE},
+            loggingLevel: MethodLoggingLevel.ERROR
         });
         // API Domain
         const domain = this.apiEndpoint.addDomainName('domain', {
