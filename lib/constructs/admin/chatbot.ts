@@ -4,6 +4,7 @@ import {ITopic} from "@aws-cdk/aws-sns";
 
 import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../../configs/chatbot/slack";
 
+
 export class SlackChatbot extends cdk.Construct {
 
     readonly chatbot: SlackChannelConfiguration;
