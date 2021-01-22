@@ -127,7 +127,7 @@ export class SyllabusScraper extends cdk.Construct {
             entry: 'src/lambda/syllabus-scraper',
             description: "Base function for scraping syllabus data from Waseda University.",
             functionName: "syllabus-scraper",
-            logRetention: RetentionDays.SIX_MONTHS,
+            logRetention: RetentionDays.ONE_MONTH,
             memorySize: 4096,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(210),
@@ -149,7 +149,7 @@ export class AmplifyStatusPublisher extends cdk.Construct {
             handler: "index.handler",
             description: "Forwards Amplify build status message from SNS to Slack Webhook.",
             functionName: "amplify-status-publisher",
-            logRetention: RetentionDays.SIX_MONTHS,
+            logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3)
@@ -169,7 +169,7 @@ export class ScraperStatusPublisher extends cdk.Construct {
             handler: "index.handler",
             description: "Forwards scraper execution status message from SNS to Slack Webhook.",
             functionName: "scraper-status-publisher",
-            logRetention: RetentionDays.SIX_MONTHS,
+            logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3)
@@ -189,7 +189,7 @@ export class PreSignupWasedaMailValidator extends cdk.Construct {
             handler: "index.handler",
             description: "Validates if the user is signing up using WasedaMail",
             functionName: "wasedamail-signup-validator",
-            logRetention: RetentionDays.SIX_MONTHS,
+            logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3)
