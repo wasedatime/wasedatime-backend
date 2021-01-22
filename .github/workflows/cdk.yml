@@ -89,16 +89,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          repository: wasedatime/wasedatime-openapi
-          token: ${{ secrets.GIT_TOKEN }}
+          repository: wasedatime/wasedatime.github.io
 
       - name: Setup
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           sudo ./aws/install
-          rm -r ./aws
-          rm -r ./awscliv2.zip
 
       - name: Export
         run: |
@@ -110,12 +107,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
 
-      - run: git checkout main
       - name: Push
         uses: EndBug/add-and-commit@v7
         with:
           author_name: GitHub Actions
           author_email: actions@github.com
+          add: "['./openapi/dev.yml', './openapi/prod.yml']"
           branch: main
           message: 'API Documentation update from GitHub Actions'
           push: true
