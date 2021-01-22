@@ -129,7 +129,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             throttlingRateLimit: 50,
             throttlingBurstLimit: 50,
             variables: {["STAGE"]: STAGE},
-            loggingLevel: MethodLoggingLevel.ERROR
+            loggingLevel: MethodLoggingLevel.ERROR,
+            dataTraceEnabled: true
         });
         this.stages['dev'] = new Stage(this, 'dev-stage', {
             stageName: 'dev',
@@ -138,7 +139,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             throttlingRateLimit: 10,
             throttlingBurstLimit: 10,
             variables: {["STAGE"]: STAGE},
-            loggingLevel: MethodLoggingLevel.ERROR
+            loggingLevel: MethodLoggingLevel.ERROR,
+            dataTraceEnabled: true
         });
         // API Domain
         const domain = this.apiEndpoint.addDomainName('domain', {
