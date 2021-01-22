@@ -85,7 +85,7 @@ jobs:
 
   update_doc:
     runs-on: ubuntu-latest
-    needs: [ deploy ]
+#    needs: [ deploy ]
     steps:
       - uses: actions/checkout@v2
         with:
