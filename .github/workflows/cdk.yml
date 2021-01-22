@@ -49,39 +49,39 @@ jobs:
       - name: Build
         run: npm run build
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-node@v2.1.4
-        with:
-          node-version: 14.x
-
-      - uses: Fooji/create-aws-profile-action@v1
-        with:
-          profile: default
-          region: ${{ env.AWS_REGION }}
-          key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Setup CDK
-        run: |
-          npm install -g aws-cdk
-          npm ci
-
-      - name: Deploy dev
-        if: github.ref != 'refs/heads/main'
-        env:
-          STAGE: dev
-        run: cdk deploy --all --require-approval "never"
-
-      - name: Deploy prod
-        if: github.ref == 'refs/heads/main'
-        env:
-          STAGE: prod
-        run: cdk deploy --all --require-approval "never"
+  #  deploy:
+  #    runs-on: ubuntu-latest
+  #    needs: [ build ]
+  #    steps:
+  #      - uses: actions/checkout@v2
+  #
+  #      - uses: actions/setup-node@v2.1.4
+  #        with:
+  #          node-version: 14.x
+  #
+  #      - uses: Fooji/create-aws-profile-action@v1
+  #        with:
+  #          profile: default
+  #          region: ${{ env.AWS_REGION }}
+  #          key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #          secret: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #
+  #      - name: Setup CDK
+  #        run: |
+  #          npm install -g aws-cdk
+  #          npm ci
+  #
+  #      - name: Deploy dev
+  #        if: github.ref != 'refs/heads/main'
+  #        env:
+  #          STAGE: dev
+  #        run: cdk deploy --all --require-approval "never"
+  #
+  #      - name: Deploy prod
+  #        if: github.ref == 'refs/heads/main'
+  #        env:
+  #          STAGE: prod
+  #        run: cdk deploy --all --require-approval "never"
 
   update_doc:
     runs-on: ubuntu-latest
