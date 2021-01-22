@@ -71,7 +71,16 @@ jobs:
           npm install -g aws-cdk
           npm ci
 
-      - name: Deploy
+      - name: Deploy dev
+        if: github.ref != 'refs/heads/main'
+        env:
+          STAGE: dev
+        run: cdk deploy --all --require-approval "never"
+
+      - name: Deploy prod
+        if: github.ref == 'refs/heads/main'
+        env:
+          STAGE: prod
         run: cdk deploy --all --require-approval "never"
 
   update_doc:
@@ -88,6 +97,8 @@ jobs:
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           sudo ./aws/install
+          rm -r ./aws
+          rm -r ./awscliv2.zip
 
       - name: Export
         run: |
@@ -103,7 +114,6 @@ jobs:
       - name: Push
         uses: EndBug/add-and-commit@v7
         with:
-          add: "['./openapi/dev.yml', './openapi/prod.yml']"
           author_name: GitHub Actions
           author_email: actions@github.com
           branch: main
