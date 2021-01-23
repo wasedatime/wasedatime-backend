@@ -45,7 +45,6 @@ export abstract class AbstractRestApiService extends cdk.Construct {
     abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     protected constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
-
         super(scope, id);
     }
 }

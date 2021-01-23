@@ -26,12 +26,13 @@ import {
     FeedsApiService,
     SyllabusApiService,
     TimetableApiService
-} from "./api-service";
+} from "./rest-api-service";
 import {ApiServices} from "../../configs/api/service";
 import {STAGE} from "../../configs/common/aws";
 import {API_CERT_ARN} from "../../configs/common/arn";
 import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
 import {defaultHeaders} from "../../configs/api/cors";
+import {AbstractGraphqlService} from "./graphql-api-service";
 
 
 export interface ApiEndpointProps {
@@ -69,6 +70,17 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
             throw RangeError("Domain not configured for this API endpoint.");
         }
         return domainName.domainName;
+    }
+}
+
+export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
+
+    abstract readonly apiEndpoint: GraphqlApi;
+
+    abstract readonly apiServices: { [name in ApiServices]?: AbstractGraphqlService };
+
+    protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
+        super(scope, id, props);
     }
 }
 
@@ -202,5 +214,18 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             authorizer: authorizer,
             validator: reqValidator
         });
+    }
+}
+
+
+export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
+
+    readonly apiEndpoint: GraphqlApi;
+
+    readonly apiServices: { [name in ApiServices]?: AbstractGraphqlService };
+
+    constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
+
+        super(scope, id, props);
     }
 }
