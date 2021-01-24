@@ -140,23 +140,23 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
 
         this.branches["main"] = masterBranch;
-        const devBranch: Branch = this.app.addBranch('dev', {
-            autoBuild: true,
-            basicAuth: developerAuth,
-            branchName: "develop",
-            stage: "DEVELOPMENT",
-            buildSpec: webappDevBuildSpec
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
-        this.branches["dev"] = devBranch;
+        // const devBranch: Branch = this.app.addBranch('dev', {
+        //     autoBuild: true,
+        //     basicAuth: developerAuth,
+        //     branchName: "develop",
+        //     stage: "DEVELOPMENT",
+        //     buildSpec: webappDevBuildSpec
+        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
+        // this.branches["dev"] = devBranch;
 
-        this.domain = this.app.addDomain('domain', {
-            domainName: WEBAPP_DOMAIN,
-            subDomains: [
-                {branch: devBranch, prefix: "dev"},
-                {branch: masterBranch, prefix: ''},
-                {branch: masterBranch, prefix: 'www'}
-            ]
-        });
+        // this.domain = this.app.addDomain('domain', {
+        //     domainName: WEBAPP_DOMAIN,
+        //     subDomains: [
+        //         {branch: devBranch, prefix: "dev"},
+        //         {branch: masterBranch, prefix: ''},
+        //         {branch: masterBranch, prefix: 'www'}
+        //     ]
+        // });
     }
 
     public addMicroApp(name: string): AmplifyMonoWebApp {
@@ -190,12 +190,12 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             buildSpec: microAppBuildSpec(name)
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/v1`);
 
-        microApp.addBranch('dev', {
-            autoBuild: true,
-            branchName: "feature/micro-frontends",
-            stage: "DEVELOPMENT",
-            buildSpec: microAppDevBuildSpec(name)
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
+        // microApp.addBranch('dev', {
+        //     autoBuild: true,
+        //     branchName: "develop",
+        //     stage: "DEVELOPMENT",
+        //     buildSpec: microAppDevBuildSpec(name)
+        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
 
         this.app.addCustomRule(new CustomRule({
             source: `/${name}/<*>`,
