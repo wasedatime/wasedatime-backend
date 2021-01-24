@@ -112,7 +112,6 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             appName: "wasedatime-web-root",
             autoBranchDeletion: true,
             buildSpec: microAppBuildSpec("root"),
-            customRules: webappSiteRules,
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: {
                 "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/staging`,

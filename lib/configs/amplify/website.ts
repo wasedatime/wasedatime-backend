@@ -24,7 +24,7 @@ const robotRewrite: CustomRule = new CustomRule({
     status: RedirectStatus.REWRITE
 });
 
-const spaRewrite: CustomRule = new CustomRule({
+export const spaRewrite: CustomRule = new CustomRule({
     source: "</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>",
     target: "/index.html",
     status: RedirectStatus.REWRITE
