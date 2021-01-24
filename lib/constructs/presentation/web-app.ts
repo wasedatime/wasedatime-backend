@@ -198,7 +198,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
 
         this.app.addCustomRule(new CustomRule({
             source: `/${name}/<*>`,
-            target: `https://${microApp.defaultDomain}/<*>`,
+            target: `https://feature-micro-frontends.${microApp.defaultDomain}/<*>`,
             status: RedirectStatus.REWRITE
         }));
         this.app.addEnvironment(`${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
