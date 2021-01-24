@@ -104,51 +104,59 @@ export const webappDevBuildSpec: BuildSpec = BuildSpec.fromObject({
 
 export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
     "version": 1,
-    "frontend": {
-        "phases": {
-            "preBuild": {
-                "commands": ["npm ci"]
+    "applications": [
+        {
+            "frontend": {
+                "phases": {
+                    "preBuild": {
+                        "commands": ["npm ci"]
+                    },
+                    // IMPORTANT - Please verify your build commands
+                    "build": {
+                        "commands": ["npm run build"]
+                    }
+                },
+                "artifacts": {
+                    // IMPORTANT - Please verify your build output directory
+                    "baseDirectory": "/dist",
+                    "files": ["**/*"]
+                },
+                "cache": {
+                    "paths": ["node_modules/**/*"]
+                }
             },
-            // IMPORTANT - Please verify your build commands
-            "build": {
-                "commands": ["npm run build"]
-            }
-        },
-        "artifacts": {
-            // IMPORTANT - Please verify your build output directory
-            "baseDirectory": "/dist",
-            "files": ["**/*"]
-        },
-        "cache": {
-            "paths": ["node_modules/**/*"]
+            "appRoot": name
         }
-    },
-    "appRoot": name
+    ]
 });
 
 export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
     "version": 1,
-    "frontend": {
-        "phases": {
-            "preBuild": {
-                "commands": ["npm ci"]
+    "applications": [
+        {
+            "frontend": {
+                "phases": {
+                    "preBuild": {
+                        "commands": ["npm ci"]
+                    },
+                    // IMPORTANT - Please verify your build commands
+                    "build": {
+                        "commands": [
+                            "export PREFIX=\"${AWS_BRANCH//[\\/_]/-}\"",
+                            "npm run build"
+                        ]
+                    }
+                },
+                "artifacts": {
+                    // IMPORTANT - Please verify your build output directory
+                    "baseDirectory": "/dist",
+                    "files": ["**/*"]
+                },
+                "cache": {
+                    "paths": ["node_modules/**/*"]
+                }
             },
-            // IMPORTANT - Please verify your build commands
-            "build": {
-                "commands": [
-                    "export PREFIX=\"${AWS_BRANCH//[\\/_]/-}\"",
-                    "npm run build"
-                ]
-            }
-        },
-        "artifacts": {
-            // IMPORTANT - Please verify your build output directory
-            "baseDirectory": "/dist",
-            "files": ["**/*"]
-        },
-        "cache": {
-            "paths": ["node_modules/**/*"]
+            "appRoot": name
         }
-    },
-    "appRoot": name
+    ]
 });
