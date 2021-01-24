@@ -1,5 +1,4 @@
 import {BuildSpec} from "@aws-cdk/aws-codebuild/lib/build-spec";
-import {customHeaders} from "./website";
 
 
 export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
@@ -122,8 +121,7 @@ export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObje
         },
         "cache": {
             "paths": ["node_modules/**/*"]
-        },
-        "customHeaders": customHeaders
+        }
     },
     "appRoot": name
 });
@@ -150,8 +148,7 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
         },
         "cache": {
             "paths": ["node_modules/**/*"]
-        },
-        "customHeaders": customHeaders
+        }
     },
     "appRoot": name
 });
