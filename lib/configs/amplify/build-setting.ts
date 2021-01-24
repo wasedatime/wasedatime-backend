@@ -1,4 +1,5 @@
 import {BuildSpec} from "@aws-cdk/aws-codebuild/lib/build-spec";
+import {customHeaders} from "./website";
 
 
 export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
@@ -100,4 +101,57 @@ export const webappDevBuildSpec: BuildSpec = BuildSpec.fromObject({
             "paths": ["node_modules/**/*"]
         }
     }
+});
+
+export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
+    "version": 1,
+    "frontend": {
+        "phases": {
+            "preBuild": {
+                "commands": ["npm ci"]
+            },
+            // IMPORTANT - Please verify your build commands
+            "build": {
+                "commands": ["npm run build"]
+            }
+        },
+        "artifacts": {
+            // IMPORTANT - Please verify your build output directory
+            "baseDirectory": "/dist",
+            "files": ["**/*"]
+        },
+        "cache": {
+            "paths": ["node_modules/**/*"]
+        },
+        "customHeaders": customHeaders
+    },
+    "appRoot": name
+});
+
+export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
+    "version": 1,
+    "frontend": {
+        "phases": {
+            "preBuild": {
+                "commands": ["npm ci"]
+            },
+            // IMPORTANT - Please verify your build commands
+            "build": {
+                "commands": [
+                    "export PREFIX=\"${AWS_BRANCH//[\\/_]/-}\"",
+                    "npm run build"
+                ]
+            }
+        },
+        "artifacts": {
+            // IMPORTANT - Please verify your build output directory
+            "baseDirectory": "/dist",
+            "files": ["**/*"]
+        },
+        "cache": {
+            "paths": ["node_modules/**/*"]
+        },
+        "customHeaders": customHeaders
+    },
+    "appRoot": name
 });
