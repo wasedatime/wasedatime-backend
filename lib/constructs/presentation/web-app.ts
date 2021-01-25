@@ -185,8 +185,8 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         microApp.addBranch('master', {
             autoBuild: true,
             branchName: "feature/micro-frontends",
-            stage: "PRODUCTION",
-            buildSpec: microAppBuildSpec(name)
+            stage: "DEVELOPMENT",
+            buildSpec: microAppDevBuildSpec(name)
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/v1`);
 
         // microApp.addBranch('dev', {

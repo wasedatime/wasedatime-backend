@@ -154,7 +154,18 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
                 },
                 "cache": {
                     "paths": ["node_modules/**/*"]
-                }
+                },
+                "customHeaders": [
+                    {
+                        "pattern": "**/*",
+                        "headers": [
+                            {
+                                "key": "Access-Control-Allow-Origin",
+                                "value": "*"
+                            }
+                        ]
+                    }
+                ]
             },
             "appRoot": name
         }
