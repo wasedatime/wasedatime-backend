@@ -143,7 +143,7 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
                     "build": {
                         "commands": [
                             "export PREFIX=\"${AWS_BRANCH//[\\/_]/-}\"",
-                            "npm run build"
+                            "npm run build-dev"
                         ]
                     }
                 },
@@ -162,6 +162,10 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
                             {
                                 "key": "Access-Control-Allow-Origin",
                                 "value": "*"
+                            },
+                            {
+                                "key": "Access-Control-Allow-Methods",
+                                "value": "GET, OPTIONS"
                             }
                         ]
                     }
