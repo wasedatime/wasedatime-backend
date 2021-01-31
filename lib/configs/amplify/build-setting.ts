@@ -109,7 +109,7 @@ export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObje
             "frontend": {
                 "phases": {
                     "preBuild": {
-                        "commands": ["npm ci"]
+                        "commands": ["npm login --registry=https://node.bit.dev --scope=@bit", "npm ci"]
                     },
                     // IMPORTANT - Please verify your build commands
                     "build": {
@@ -137,7 +137,7 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
             "frontend": {
                 "phases": {
                     "preBuild": {
-                        "commands": ["npm ci"]
+                        "commands": ["npm login --registry=https://node.bit.dev --scope=@bit", "npm ci"]
                     },
                     // IMPORTANT - Please verify your build commands
                     "build": {
