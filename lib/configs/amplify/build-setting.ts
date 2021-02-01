@@ -109,7 +109,11 @@ export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObje
             "frontend": {
                 "phases": {
                     "preBuild": {
-                        "commands": ["npm login --registry=https://node.bit.dev --scope=@bit", "npm ci"]
+                        "commands": [
+                            "npm config set @bit:registry https://node.bit.dev",
+                            `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
+                            "npm ci"
+                        ]
                     },
                     // IMPORTANT - Please verify your build commands
                     "build": {
@@ -137,7 +141,11 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
             "frontend": {
                 "phases": {
                     "preBuild": {
-                        "commands": ["npm login --registry=https://node.bit.dev --scope=@bit", "npm ci"]
+                        "commands": [
+                            "npm config set @bit:registry https://node.bit.dev",
+                            `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
+                            "npm ci"
+                        ]
                     },
                     // IMPORTANT - Please verify your build commands
                     "build": {
