@@ -109,7 +109,11 @@ export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObje
             "frontend": {
                 "phases": {
                     "preBuild": {
-                        "commands": ["npm ci"]
+                        "commands": [
+                            "npm config set @bit:registry https://node.bit.dev",
+                            `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
+                            "npm ci"
+                        ]
                     },
                     // IMPORTANT - Please verify your build commands
                     "build": {
@@ -137,13 +141,17 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
             "frontend": {
                 "phases": {
                     "preBuild": {
-                        "commands": ["npm ci"]
+                        "commands": [
+                            "npm config set @bit:registry https://node.bit.dev",
+                            `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
+                            "npm ci"
+                        ]
                     },
                     // IMPORTANT - Please verify your build commands
                     "build": {
                         "commands": [
                             "export PREFIX=\"${AWS_BRANCH//[\\/_]/-}\"",
-                            "npm run build"
+                            "npm run build-dev"
                         ]
                     }
                 },
@@ -154,7 +162,22 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
                 },
                 "cache": {
                     "paths": ["node_modules/**/*"]
-                }
+                },
+                "customHeaders": [
+                    {
+                        "pattern": "**/*",
+                        "headers": [
+                            {
+                                "key": "Access-Control-Allow-Origin",
+                                "value": "*"
+                            },
+                            {
+                                "key": "Access-Control-Allow-Methods",
+                                "value": "GET, OPTIONS"
+                            }
+                        ]
+                    }
+                ]
             },
             "appRoot": name
         }
