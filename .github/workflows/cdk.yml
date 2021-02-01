@@ -25,6 +25,7 @@ env:
   SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
   SLACK_WORKSPACE_ID: ${{ secrets.SLACK_WORKSPACE_ID }}
   GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+  BIT_TOKEN: ${{ secrets.BIT_TOKEN }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   STAGE: dev
@@ -103,10 +104,6 @@ jobs:
           cd ./openapi
           aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
           aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
 
       - name: Push
         uses: EndBug/add-and-commit@v7

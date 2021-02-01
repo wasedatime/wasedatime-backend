@@ -101,3 +101,85 @@ export const webappDevBuildSpec: BuildSpec = BuildSpec.fromObject({
         }
     }
 });
+
+export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
+    "version": 1,
+    "applications": [
+        {
+            "frontend": {
+                "phases": {
+                    "preBuild": {
+                        "commands": [
+                            "npm config set @bit:registry https://node.bit.dev",
+                            `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
+                            "npm ci"
+                        ]
+                    },
+                    // IMPORTANT - Please verify your build commands
+                    "build": {
+                        "commands": ["npm run build"]
+                    }
+                },
+                "artifacts": {
+                    // IMPORTANT - Please verify your build output directory
+                    "baseDirectory": "/dist",
+                    "files": ["**/*"]
+                },
+                "cache": {
+                    "paths": ["node_modules/**/*"]
+                }
+            },
+            "appRoot": name
+        }
+    ]
+});
+
+export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
+    "version": 1,
+    "applications": [
+        {
+            "frontend": {
+                "phases": {
+                    "preBuild": {
+                        "commands": [
+                            "npm config set @bit:registry https://node.bit.dev",
+                            `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
+                            "npm ci"
+                        ]
+                    },
+                    // IMPORTANT - Please verify your build commands
+                    "build": {
+                        "commands": [
+                            "export PREFIX=\"${AWS_BRANCH//[\\/_]/-}\"",
+                            "npm run build-dev"
+                        ]
+                    }
+                },
+                "artifacts": {
+                    // IMPORTANT - Please verify your build output directory
+                    "baseDirectory": "/dist",
+                    "files": ["**/*"]
+                },
+                "cache": {
+                    "paths": ["node_modules/**/*"]
+                },
+                "customHeaders": [
+                    {
+                        "pattern": "**/*",
+                        "headers": [
+                            {
+                                "key": "Access-Control-Allow-Origin",
+                                "value": "*"
+                            },
+                            {
+                                "key": "Access-Control-Allow-Methods",
+                                "value": "GET, OPTIONS"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "appRoot": name
+        }
+    ]
+});
