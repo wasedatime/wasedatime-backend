@@ -201,7 +201,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             target: `https://feature-micro-frontends.${microApp.defaultDomain}/<*>`,
             status: RedirectStatus.REWRITE
         }));
-        this.app.addEnvironment(`${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
+        this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
 
         return this;
     }
