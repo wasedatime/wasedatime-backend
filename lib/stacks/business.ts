@@ -1,4 +1,5 @@
 import * as cdk from "@aws-cdk/core";
+import {IHostedZone} from "@aws-cdk/aws-route53";
 
 import {
     AbstractApiEndpoint,
@@ -18,13 +19,14 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
 
     authProvider: AbstractAuthProvider;
 
-    constructor(scope: cdk.Construct, id: string, dataInterface: DataInterface, props: cdk.StackProps) {
+    constructor(scope: cdk.Construct, id: string, dataInterface: DataInterface, hostedZone: IHostedZone, props: cdk.StackProps) {
         super(scope, id, dataInterface, props);
 
-        const authEndpoint = new WasedaTimeUserAuth(this, 'cognito-endpoint');
+        const authEndpoint = new WasedaTimeUserAuth(this, 'cognito-endpoint', hostedZone);
         this.authProvider = authEndpoint;
 
         const mainApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
+            zone: hostedZone,
             dataSources: {
                 [ApiServices.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
                 [ApiServices.COURSE_REVIEW]: this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),

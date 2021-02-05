@@ -7,6 +7,7 @@ import {AdminLayer, BusinessLayer, PersistenceLayer, PresentationLayer} from "./
 import {WasedaTimeAdminLayer} from "./stacks/admin";
 import {OperationInterface} from "./architecture/interfaces";
 import {OperationEndpoint} from "./configs/common/registry";
+import {WasedaTimeHostedZone} from "./constructs/common/hosted-zone";
 
 
 export class WasedaTime extends AbstractServerlessApp {
@@ -19,14 +20,18 @@ export class WasedaTime extends AbstractServerlessApp {
 
     readonly adminLayer: AdminLayer;
 
+    readonly hostedZone: WasedaTimeHostedZone;
+
     constructor() {
 
         super();
 
+        this.hostedZone = new WasedaTimeHostedZone(this, 'wt-hosted-zone', awsEnv);
+
         this.persistenceLayer = new WasedaTimePersistenceLayer(this, 'persistence', awsEnv);
         const dataInterface = this.persistenceLayer.dataInterface;
 
-        this.businessLayer = new WasedaTimeBusinessLayer(this, 'business', dataInterface, awsEnv);
+        this.businessLayer = new WasedaTimeBusinessLayer(this, 'business', dataInterface, this.hostedZone.zone, awsEnv);
         this.businessLayer.dataInterface = dataInterface;
         const serviceInterface = this.businessLayer.serviceInterface;
 
