@@ -1,15 +1,15 @@
 import * as cdk from '@aws-cdk/core';
-import * as route53 from '@aws-cdk/aws-route53';
+import {PublicHostedZone} from '@aws-cdk/aws-route53';
 
-class WasedaTimeHostedZone extends cdk.Construct {
+export class WasedaTimeHostedZone extends cdk.Stack {
+
+    readonly zone: PublicHostedZone;
 
     constructor(scope: cdk.Construct, id: string) {
         super(scope, id);
-        new route53.PublicHostedZone(this, 'hosted-zone', {
+        this.zone = new PublicHostedZone(this, 'hosted-zone', {
             zoneName: "wasedatime.com",
             comment: "The main hosted zone for WasedaTime."
         });
-
-        //todo add records
     }
 }
