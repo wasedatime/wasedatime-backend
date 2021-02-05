@@ -31,7 +31,7 @@ export class WasedaTime extends AbstractServerlessApp {
         this.persistenceLayer = new WasedaTimePersistenceLayer(this, 'persistence', awsEnv);
         const dataInterface = this.persistenceLayer.dataInterface;
 
-        this.businessLayer = new WasedaTimeBusinessLayer(this, 'business', dataInterface, this.hostedZone, awsEnv);
+        this.businessLayer = new WasedaTimeBusinessLayer(this, 'business', dataInterface, this.hostedZone.zone, awsEnv);
         this.businessLayer.dataInterface = dataInterface;
         const serviceInterface = this.businessLayer.serviceInterface;
 
