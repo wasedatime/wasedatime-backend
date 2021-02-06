@@ -29,7 +29,7 @@ import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions} from "../
 import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} from "../../configs/api/mapping";
 
 
-export interface ApiServiceProps {
+export interface RestApiServiceProps {
 
     apiEndpoint: RestApi;
 
@@ -44,7 +44,7 @@ export abstract class AbstractRestApiService extends cdk.Construct {
 
     abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
-    protected constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+    protected constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
         super(scope, id);
     }
 }
@@ -53,7 +53,7 @@ export class SyllabusApiService extends AbstractRestApiService {
 
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
-    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
         super(scope, id, props);
 
         const root = new Resource(scope, 'syllabus', {
@@ -182,7 +182,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
 
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
-    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
         super(scope, id, props);
 
         const root = new Resource(this, 'course-reviews', {
@@ -304,7 +304,7 @@ export class FeedsApiService extends AbstractRestApiService {
 
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
-    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
         super(scope, id, props);
 
         const root = new Resource(scope, 'feeds', {
@@ -377,7 +377,7 @@ export class CareerApiService extends AbstractRestApiService {
 
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
-    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
         super(scope, id, props);
 
         const root = new Resource(scope, 'career', {
@@ -477,7 +477,7 @@ export class TimetableApiService extends AbstractRestApiService {
 
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
-    constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
         super(scope, id, props);
 
         const root = new Resource(scope, 'timetable', {
