@@ -61,8 +61,8 @@ export class DynamoDatabase extends cdk.Construct {
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
             tableName: "timetable",
-            readCapacity: 2,
-            writeCapacity: 2,
+            readCapacity: 7,
+            writeCapacity: 7,
             pointInTimeRecovery: true
         });
     }
