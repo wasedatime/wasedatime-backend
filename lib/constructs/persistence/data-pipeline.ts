@@ -8,10 +8,10 @@ import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-d
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
-import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../configs/s3/access-setting";
 import {SyllabusScraper} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
+import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../utils/s3";
 
 
 export enum Worker {

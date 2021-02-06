@@ -32,6 +32,7 @@ export abstract class SyllabusApiService extends cdk.Construct {
             description: "Syllabus table from DynamoDB as a data source.",
             name: "syllabus-table"
         });
+        // todo add types, resolvers etc...
     }
 }
 
