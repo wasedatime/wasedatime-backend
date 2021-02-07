@@ -1,10 +1,11 @@
-import {GraphqlType, ObjectType} from '@aws-cdk/aws-appsync';
+import {GraphqlType, IIntermediateType, ObjectType} from '@aws-cdk/aws-appsync';
 
 var pluralize = require('pluralize');
 
 
 // Int
 export const int = GraphqlType.int();
+export const list_int = GraphqlType.int({isList: true});
 
 // String
 export const string = GraphqlType.string();
@@ -20,6 +21,14 @@ export const required_boolean = GraphqlType.boolean({isRequired: true});
 
 // Float
 export const float = GraphqlType.float();
+
+// Object
+export const from_type = (type: IIntermediateType) => {
+    return GraphqlType.intermediate({intermediateType: type});
+};
+export const list_of = (type: IIntermediateType) => {
+    return GraphqlType.intermediate({intermediateType: type, isList: true});
+};
 
 export const args = {
     after: string,

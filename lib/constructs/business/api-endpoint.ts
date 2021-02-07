@@ -1,5 +1,5 @@
 import * as cdk from "@aws-cdk/core";
-import {Expiration} from "@aws-cdk/core";
+import {Duration, Expiration} from "@aws-cdk/core";
 import * as rest from "@aws-cdk/aws-apigateway";
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import * as gql from "@aws-cdk/aws-appsync";
@@ -15,14 +15,15 @@ import {
     SyllabusApiService,
     TimetableApiService
 } from "./rest-api-service";
-import {ApiServices} from "../../configs/api/service";
+import {ApiServices} from "../../configs/api-gateway/service";
 import {STAGE} from "../../configs/common/aws";
-import {defaultHeaders} from "../../configs/api/cors";
+import {defaultHeaders} from "../../configs/api-gateway/cors";
 import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {ApiGatewayDomain} from "@aws-cdk/aws-route53-targets";
 import {API_DOMAIN} from "../../configs/route53/domain";
-import {AbstractGraphqlService} from "./graphql-api-service";
+import {AbstractGraphqlApiService} from "./graphql-api-service";
 import {IUserPool} from "@aws-cdk/aws-cognito";
+import {AbstractHttpApiService} from "./http-api-service";
 
 
 export interface ApiEndpointProps {
@@ -69,7 +70,18 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
 
     abstract readonly apiEndpoint: GraphqlApi;
 
-    abstract readonly apiServices: { [name in ApiServices]?: AbstractGraphqlService };
+    abstract readonly apiServices: { [name in ApiServices]?: AbstractGraphqlApiService };
+
+    protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
+        super(scope, id, props);
+    }
+}
+
+export abstract class AbstractHttpApiEndpoint extends AbstractApiEndpoint {
+
+    abstract readonly apiEndpoint: HttpApi;
+
+    abstract readonly apiServices: { [name in ApiServices]?: AbstractHttpApiService };
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);
@@ -218,12 +230,28 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
     }
 }
 
+export class WasedaTimeHttpEndpoint extends AbstractHttpApiEndpoint {
+
+    readonly apiEndpoint: HttpApi;
+
+    readonly apiServices: { [name in ApiServices]?: AbstractHttpApiService };
+
+    constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
+        super(scope, id, props);
+
+        this.apiEndpoint = new HttpApi(this, 'http-api-endpoint', {
+            apiName: "wasedatime-http-api",
+            description: "The main API endpoint for WasedaTime Web App.",
+            disableExecuteApiEndpoint: true
+        });
+    }
+}
 
 export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
 
     readonly apiEndpoint: GraphqlApi;
 
-    readonly apiServices: { [name in ApiServices]?: AbstractGraphqlService };
+    readonly apiServices: { [name in ApiServices]?: AbstractGraphqlApiService };
 
     constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
 
@@ -233,7 +261,7 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
             authorizationType: gql.AuthorizationType.API_KEY,
             apiKeyConfig: {
                 name: 'dev',
-                expires: Expiration.atDate(new Date(2020, 12, 31)),
+                expires: Expiration.after(Duration.days(365)),
                 description: "API Key for development environment."
             }
         };
