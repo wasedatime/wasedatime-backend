@@ -7,6 +7,7 @@ export class WasedaTimeHostedZone extends cdk.Stack {
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
+
         this.zone = new PublicHostedZone(this, 'hosted-zone', {
             zoneName: "wasedatime.com",
             comment: "The main hosted zone for WasedaTime."
