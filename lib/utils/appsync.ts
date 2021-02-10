@@ -23,11 +23,11 @@ export const required_boolean = GraphqlType.boolean({isRequired: true});
 export const float = GraphqlType.float();
 
 // Object
-export const from_type = (type: IIntermediateType) => {
-    return GraphqlType.intermediate({intermediateType: type});
-};
 export const list_of = (type: IIntermediateType) => {
-    return GraphqlType.intermediate({intermediateType: type, isList: true});
+    return type.attribute({isList: true});
+};
+export const required = (type: IIntermediateType) => {
+    return type.attribute({isRequired: true});
 };
 
 export const args = {

@@ -1,9 +1,8 @@
 import * as cdk from "@aws-cdk/core";
-import {AbstractGraphqlEndpoint} from "./api-endpoint";
 import {
-    Directive,
     EnumType,
     GraphqlApi,
+    InputType,
     MappingTemplate,
     ObjectType,
     ResolvableField,
@@ -11,7 +10,18 @@ import {
 } from "@aws-cdk/aws-appsync";
 import {IUserPool} from "@aws-cdk/aws-cognito";
 import {ITable} from "@aws-cdk/aws-dynamodb";
-import {from_type, int, list_int, list_of, string} from "../../utils/appsync";
+
+import {
+    generateConnectionAndEdge,
+    int,
+    list_int,
+    list_of,
+    list_string,
+    required,
+    required_string,
+    string
+} from "../../utils/appsync";
+import {AbstractGraphqlEndpoint} from "./api-endpoint";
 
 export interface GraphqlApiServiceProps {
 
@@ -45,54 +55,92 @@ export abstract class SyllabusApiService extends cdk.Construct {
 
         const schoolType = new EnumType('School', {
             definition: [
-                "PSE",
-                "FSE",
-                "SSS",
-                "SILS"
+                "PSE", "FSE", "SSS", "SILS", "CSE", "ASE", "LAW", "CMS", "HSS", "EDU", "SOC", "HUM", "SPS", "CJL",
+                "GEC", "CIE", "ART", "G_SPS", "G_SE", "G_LAW", "G_LAS", "G_SC", "G_EDU", "G_HUM", "G_SSS", "G_SAPS",
+                "G_ITS", "G_SJAL", "G_IPS", "G_WLS", "G_SA", "G_SPS", "G_FSE", "G_ASE", "G_CSE", "G_SEEE", "G_WBS",
+                "G_SICCS"
             ]
         });
         const evalType = new ObjectType("Evaluation", {
             definition: {
-                "type": int,
-                "percent": int,
-                "criteria": string
+                type: int,
+                percent: int,
+                criteria: string
             }
         });
         const occurrenceType = new ObjectType("Occurrence", {
             definition: {
-                "day": int,
-                "period": int,
-                "location": string
+                day: int,
+                period: int,
+                location: string
             }
         });
         const courseType = new ObjectType("Course", {
             definition: {
-                "id": string,
-                "category": string,
-                "code": string,
-                "credit": int,
-                "evals": list_of(evalType),
-                "instructor": string,
-                "lang": list_int,
-                "level": int,
-                "minYear": int,
-                "occurrences": list_of(occurrenceType),
-                "school": from_type(schoolType),
-                "subtitle": string,
-                "term": string,
-                "title": string,
-                "title_jp": string,
-                "type": int
-            },
-            directives: [Directive.apiKey()]
+                id: string,
+                category: string,
+                code: string,
+                credit: int,
+                evals: list_of(evalType),
+                instructor: string,
+                lang: list_int,
+                level: int,
+                minYear: int,
+                occurrences: list_of(occurrenceType),
+                school: schoolType.attribute(),
+                subtitle: string,
+                term: string,
+                title: string,
+                title_jp: string,
+                type: int
+            }
         });
 
-        [schoolType, evalType, occurrenceType, courseType].forEach((value) => props.apiEndpoint.addType(value));
-        props.apiEndpoint.addQuery('getCourse', new ResolvableField({
-            returnType: courseType.attribute(),
+        const evalFilter = new InputType("EvalFilter", {
+            definition: {
+                type: int,
+                percent: int
+            }
+        });
+        const filterForm = new InputType("FilterForm", {
+            definition: {
+                semesters: list_string,
+                langs: list_int,
+                days: list_int,
+                periods: list_int,
+                min_years: list_int,
+                credits: list_int,
+                evals: list_of(evalFilter),
+                type: list_int,
+                level: list_int
+            }
+        });
+
+        [schoolType, evalType, occurrenceType, courseType, evalFilter, filterForm].forEach(
+            (type) => props.apiEndpoint.addType(type)
+        );
+
+        props.apiEndpoint.addQuery('getCourses', new ResolvableField({
+            returnType: list_of(courseType),
             dataSource: dataSource,
+            args: {
+                id: required_string
+            },
             requestMappingTemplate: MappingTemplate.dynamoDbGetItem('id', 'id'),
             responseMappingTemplate: MappingTemplate.dynamoDbResultItem()
+        }));
+        props.apiEndpoint.addQuery('filterCourses', new ResolvableField({
+            returnType: generateConnectionAndEdge({base: courseType, target: courseType}).connection.attribute(),
+            dataSource: dataSource,
+            args: {
+                form: required(filterForm),
+                after: string,
+                first: int,
+                before: string,
+                last: int,
+            },
+            requestMappingTemplate: MappingTemplate.fromFile('src/appsync/mapping/syllabus-filter-req.vtl'),
+            responseMappingTemplate: MappingTemplate.dynamoDbResultList()
         }));
     }
 }
