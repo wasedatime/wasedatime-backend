@@ -24,7 +24,7 @@ export abstract class AbstractStatusNotifier extends Construct {
 
     abstract readonly publisher: Rule;
 
-    abstract readonly topic: Topic;
+    abstract readonly topic?: Topic;
 
     abstract readonly subscriber: Function;
 
@@ -37,7 +37,7 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
 
     readonly publisher: Rule;
 
-    readonly topic: Topic;
+    readonly topic?: Topic;
 
     readonly subscriber: Function;
 
@@ -76,7 +76,7 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
 
     readonly publisher: Rule;
 
-    readonly topic: Topic;
+    readonly topic?: Topic;
 
     readonly subscriber: Function;
 

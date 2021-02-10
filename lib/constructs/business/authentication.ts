@@ -9,6 +9,7 @@ import {
     UserPoolIdentityProviderGoogle
 } from "@aws-cdk/aws-cognito";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
+import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 
 import {PreSignupWasedaMailValidator} from "../common/lambda-functions";
 import {
@@ -17,8 +18,9 @@ import {
     GOOGLE_OAUTH_CLIENT_SECRET,
     LOGOUT_URLS
 } from "../../configs/cognito/oauth";
-import {WEBAPP_DOMAIN} from "../../configs/amplify/website";
 import {AUTH_CERT_ARN} from "../../configs/common/arn";
+import {UserPoolDomainTarget} from "@aws-cdk/aws-route53-targets";
+import {AUTH_DOMAIN} from "../../configs/route53/domain";
 
 
 export abstract class AbstractAuthProvider extends cdk.Construct {
@@ -54,7 +56,7 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
 
     readonly domain: UserPoolDomain;
 
-    constructor(scope: cdk.Construct, id: string) {
+    constructor(scope: cdk.Construct, id: string, zone: IHostedZone) {
         super(scope, id);
 
         this.pool = new UserPool(this, 'main-user-pool', {
@@ -117,11 +119,22 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
         });
 
         // todo add custom ses in us-east-1
+
+        // fixme cross region resource
+        // const cert = new Certificate(this, 'auth-cert', {
+        //     domainName: AUTH_DOMAIN,
+        //     validation: CertificateValidation.fromDns(zone)
+        // });
         this.domain = this.pool.addDomain('auth-domain', {
             customDomain: {
-                domainName: "auth." + WEBAPP_DOMAIN,
+                domainName: AUTH_DOMAIN,
                 certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert', AUTH_CERT_ARN)
             }
+        });
+        new ARecord(this, 'alias-record', {
+            zone: zone,
+            target: RecordTarget.fromAlias(new UserPoolDomainTarget(this.domain)),
+            recordName: AUTH_DOMAIN
         });
     }
 }
