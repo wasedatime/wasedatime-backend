@@ -41,9 +41,9 @@ export abstract class AbstractGraphqlApiService extends cdk.Construct {
     }
 }
 
-export abstract class SyllabusApiService extends cdk.Construct {
+export class SyllabusApiService extends cdk.Construct {
 
-    abstract readonly resolvers: { [name: string]: Resolver } = {};
+    readonly resolvers: { [name: string]: Resolver } = {};
 
     protected constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
         super(scope, id);
