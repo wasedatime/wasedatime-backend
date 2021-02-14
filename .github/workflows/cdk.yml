@@ -51,7 +51,6 @@ jobs:
         run: npm run build
 
   deploy:
-    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: [ build ]
     steps:
@@ -74,7 +73,7 @@ jobs:
           npm ci
 
       - name: Deploy dev
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/develop'
         env:
           STAGE: dev
         run: cdk deploy --all --require-approval "never"
@@ -86,7 +85,6 @@ jobs:
         run: cdk deploy --all --require-approval "never"
 
   update_doc:
-    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: [ deploy ]
     steps:
