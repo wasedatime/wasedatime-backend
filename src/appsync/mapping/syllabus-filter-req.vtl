@@ -1,0 +1,40 @@
+{
+    "version": "2017-02-28",
+    "operation": "Query",
+    "query": {
+        "expression": "school = :school",
+        "expressionValues": {
+            ":school": $util.dynamodb.toDynamoDBJson($ctx.args.school)
+        }
+    },
+    "filter": {
+        "expression": "#sem IN :sems AND #lan IN :lans AND #day IN :days AND #per IN :pers AND #min IN :mins AND #cre IN :cres AND #typ IN :typs AND #lev IN :levs",
+        "expressionNames": {
+            "#sem": "semester",
+            "#lan": "lang",
+            "#day": "day",
+            "#per": "period",
+            "#min": "min_year",
+            "#cre": "credit",
+            "#typ": "type",
+            "#lev": "level"
+        },
+        "expressionValues": {
+            ":sems": $util.dynamodb.toStringSetJson($ctx.args.form.semesters),
+            #if( ${ctx.args.first} )
+            ":lans": $util.dynamodb.toNumberSetJson($ctx.args.form.langs),
+            ":days": $util.dynamodb.toNumberSetJson($ctx.args.form.days),
+            ":pers": $util.dynamodb.toNumberSetJson($ctx.args.form.periods),
+            ":mins": $util.dynamodb.toNumberSetJson($ctx.args.form.min_years),
+            ":cres": $util.dynamodb.toNumberSetJson($ctx.args.form.credits),
+            ":typs": $util.dynamodb.toNumberSetJson($ctx.args.form.types),
+            ":levs": $util.dynamodb.toNumberSetJson($ctx.args.form.levels)
+        }
+    },
+    #if( $ctx.args.first )
+        ,"limit": $util.toJson($ctx.args.first)
+    #end
+    #if( $ctx.args.after )
+        ,"nextToken": $util.toJson($ctx.args.after)
+    #end
+}
