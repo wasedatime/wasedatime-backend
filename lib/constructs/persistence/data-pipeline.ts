@@ -176,7 +176,8 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
         this.dataSource = props?.dataSource;
 
         this.dataWarehouse = new Table(this, 'dynamodb-syllabus-table', {
-            partitionKey: {name: "id", type: AttributeType.STRING},
+            partitionKey: {name: "school", type: AttributeType.STRING},
+            sortKey: {name: "id", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,

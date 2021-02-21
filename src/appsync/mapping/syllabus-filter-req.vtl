@@ -21,7 +21,6 @@
         },
         "expressionValues": {
             ":sems": $util.dynamodb.toStringSetJson($ctx.args.form.semesters),
-            #if( ${ctx.args.first} )
             ":lans": $util.dynamodb.toNumberSetJson($ctx.args.form.langs),
             ":days": $util.dynamodb.toNumberSetJson($ctx.args.form.days),
             ":pers": $util.dynamodb.toNumberSetJson($ctx.args.form.periods),

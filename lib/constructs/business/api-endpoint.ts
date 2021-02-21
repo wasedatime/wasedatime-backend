@@ -5,6 +5,9 @@ import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import * as gql from "@aws-cdk/aws-appsync";
 import {AuthorizationMode, FieldLogLevel, GraphqlApi} from "@aws-cdk/aws-appsync";
 import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
+import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
+import {ApiGatewayDomain} from "@aws-cdk/aws-route53-targets";
+import {IUserPool} from "@aws-cdk/aws-cognito";
 import * as uuid from "uuid";
 
 import {
@@ -15,15 +18,14 @@ import {
     SyllabusApiService,
     TimetableApiService
 } from "./rest-api-service";
+import * as gqlService from "./graphql-api-service";
+import {AbstractGraphqlApiService} from "./graphql-api-service";
 import {ApiServices} from "../../configs/api-gateway/service";
 import {STAGE} from "../../configs/common/aws";
 import {defaultHeaders} from "../../configs/api-gateway/cors";
-import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
-import {ApiGatewayDomain} from "@aws-cdk/aws-route53-targets";
 import {API_DOMAIN} from "../../configs/route53/domain";
-import {AbstractGraphqlApiService} from "./graphql-api-service";
-import {IUserPool} from "@aws-cdk/aws-cognito";
 import {AbstractHttpApiService} from "./http-api-service";
+import {Table} from "@aws-cdk/aws-dynamodb";
 
 
 export interface ApiEndpointProps {
@@ -282,6 +284,10 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
             logConfig: {
                 fieldLogLevel: FieldLogLevel.ALL
             }
+        });
+        new gqlService.SyllabusApiService(this, 'syllabus-api', {
+            apiEndpoint: this.apiEndpoint,
+            dataSource: Table.fromTableArn(this, 'syllabus-table', "arn:aws:dynamodb:ap-northeast-1:564383102056:table/syllabus")
         });
     }
 }

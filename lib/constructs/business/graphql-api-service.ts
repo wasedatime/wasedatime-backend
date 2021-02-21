@@ -23,6 +23,7 @@ import {
 } from "../../utils/appsync";
 import {AbstractGraphqlEndpoint} from "./api-endpoint";
 
+
 export interface GraphqlApiServiceProps {
 
     apiEndpoint: GraphqlApi;
@@ -45,12 +46,12 @@ export class SyllabusApiService extends cdk.Construct {
 
     readonly resolvers: { [name: string]: Resolver } = {};
 
-    protected constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
+    constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
         super(scope, id);
 
         const dataSource = props.apiEndpoint.addDynamoDbDataSource('dynamo-db', props.dataSource, {
             description: "Syllabus table from DynamoDB.",
-            name: "syllabus-table"
+            name: "SyllabusTable"
         });
 
         const schoolType = new EnumType('School', {
@@ -116,7 +117,11 @@ export class SyllabusApiService extends cdk.Construct {
             }
         });
 
-        [schoolType, evalType, occurrenceType, courseType, evalFilter, filterForm].forEach(
+        const courseConnection = generateConnectionAndEdge({base: courseType, target: courseType}).connection;
+        const courseEdge = generateConnectionAndEdge({base: courseType, target: courseType}).edge;
+
+
+        [schoolType, evalType, occurrenceType, courseType, evalFilter, filterForm, courseConnection, courseEdge].forEach(
             (type) => props.apiEndpoint.addType(type)
         );
 
@@ -130,7 +135,7 @@ export class SyllabusApiService extends cdk.Construct {
             responseMappingTemplate: MappingTemplate.dynamoDbResultItem()
         }));
         props.apiEndpoint.addQuery('filterCourses', new ResolvableField({
-            returnType: generateConnectionAndEdge({base: courseType, target: courseType}).connection.attribute(),
+            returnType: courseConnection.attribute(),
             dataSource: dataSource,
             args: {
                 form: required(filterForm),
