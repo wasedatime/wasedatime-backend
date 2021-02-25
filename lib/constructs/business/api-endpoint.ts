@@ -16,7 +16,7 @@ import {
     CourseReviewsApiService,
     FeedsApiService,
     SyllabusApiService,
-    TimetableApiService
+    TimetableApiService,
 } from "./rest-api-service";
 import * as gqlService from "./graphql-api-service";
 import {AbstractGraphqlApiService} from "./graphql-api-service";
@@ -115,24 +115,24 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "The main API endpoint for WasedaTime Web App.",
             endpointTypes: [rest.EndpointType.REGIONAL],
             deploy: false,
-            binaryMediaTypes: ['application/pdf', 'image/png']
+            binaryMediaTypes: ['application/pdf', 'image/png'],
         });
         this.apiEndpoint.addGatewayResponse('4xx-resp', {
             type: rest.ResponseType.DEFAULT_4XX,
-            responseHeaders: defaultHeaders
+            responseHeaders: defaultHeaders,
         });
         this.apiEndpoint.addGatewayResponse('5xx-resp', {
             type: rest.ResponseType.DEFAULT_5XX,
-            responseHeaders: defaultHeaders
+            responseHeaders: defaultHeaders,
         });
 
         const prodDeployment = new rest.Deployment(this, 'prod-deployment', {
             api: this.apiEndpoint,
-            retainDeployments: false
+            retainDeployments: false,
         });
         const devDeployment = new rest.Deployment(this, 'dev-deployment', {
             api: this.apiEndpoint,
-            retainDeployments: false
+            retainDeployments: false,
         });
         if (STAGE === 'dev') {
             devDeployment.addToLogicalId(uuid.v4());
@@ -148,7 +148,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             throttlingBurstLimit: 50,
             variables: {["STAGE"]: STAGE},
             loggingLevel: rest.MethodLoggingLevel.ERROR,
-            dataTraceEnabled: true
+            dataTraceEnabled: true,
         });
         this.stages['dev'] = new rest.Stage(this, 'dev-stage', {
             stageName: 'dev',
@@ -158,32 +158,32 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             throttlingBurstLimit: 10,
             variables: {["STAGE"]: STAGE},
             loggingLevel: rest.MethodLoggingLevel.ERROR,
-            dataTraceEnabled: true
+            dataTraceEnabled: true,
         });
         // API Domain
         const cert = new Certificate(this, 'api-cert', {
             domainName: API_DOMAIN,
-            validation: CertificateValidation.fromDns(props.zone)
+            validation: CertificateValidation.fromDns(props.zone),
         });
         const domain = this.apiEndpoint.addDomainName('domain', {
             certificate: cert,
             domainName: API_DOMAIN,
             endpointType: rest.EndpointType.REGIONAL,
-            securityPolicy: rest.SecurityPolicy.TLS_1_2
+            securityPolicy: rest.SecurityPolicy.TLS_1_2,
         });
         new ARecord(this, 'alias-record', {
             zone: props.zone,
             target: RecordTarget.fromAlias(new ApiGatewayDomain(domain)),
-            recordName: API_DOMAIN
+            recordName: API_DOMAIN,
         });
         // Mapping from URL path to stages
         domain.addBasePathMapping(this.apiEndpoint, {
             basePath: 'staging',
-            stage: this.stages['dev']
+            stage: this.stages['dev'],
         });
         domain.addBasePathMapping(this.apiEndpoint, {
             basePath: 'v1',
-            stage: this.stages['prod']
+            stage: this.stages['prod'],
         });
         // Authorizer for methods that requires user login
         const authorizer = {
@@ -192,42 +192,42 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
                 identitySource: 'method.request.header.Authorization',
                 providerArns: [props.authProvider?.userPoolArn!],
                 restApiId: this.apiEndpoint.restApiId,
-                type: rest.AuthorizationType.COGNITO
+                type: rest.AuthorizationType.COGNITO,
             }).ref,
-            authorizationType: rest.AuthorizationType.COGNITO
+            authorizationType: rest.AuthorizationType.COGNITO,
         };
         // Request Validator
         const reqValidator = new rest.RequestValidator(this, 'req-validator', {
             restApi: this.apiEndpoint,
             requestValidatorName: "strict-validator",
             validateRequestBody: true,
-            validateRequestParameters: true
+            validateRequestParameters: true,
         });
         // API Services
         this.apiServices[ApiServices.SYLLABUS] = new SyllabusApiService(this, 'syllabus-api', {
             apiEndpoint: this.apiEndpoint,
             dataSource: props.dataSources![ApiServices.SYLLABUS],
-            validator: reqValidator
+            validator: reqValidator,
         });
         this.apiServices[ApiServices.COURSE_REVIEW] = new CourseReviewsApiService(this, 'course-reviews-api', {
             apiEndpoint: this.apiEndpoint,
             dataSource: props.dataSources![ApiServices.COURSE_REVIEW],
             authorizer: authorizer,
-            validator: reqValidator
+            validator: reqValidator,
         });
         this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
             apiEndpoint: this.apiEndpoint,
-            validator: reqValidator
+            validator: reqValidator,
         });
         this.apiServices[ApiServices.CAREER] = new CareerApiService(this, 'career-api', {
             apiEndpoint: this.apiEndpoint,
-            validator: reqValidator
+            validator: reqValidator,
         });
         this.apiServices[ApiServices.TIMETABLE] = new TimetableApiService(this, 'timetable-api', {
             apiEndpoint: this.apiEndpoint,
             dataSource: props.dataSources![ApiServices.TIMETABLE],
             authorizer: authorizer,
-            validator: reqValidator
+            validator: reqValidator,
         });
     }
 }
@@ -244,7 +244,7 @@ export class WasedaTimeHttpEndpoint extends AbstractHttpApiEndpoint {
         this.apiEndpoint = new HttpApi(this, 'http-api-endpoint', {
             apiName: "wasedatime-http-api",
             description: "The main API endpoint for WasedaTime Web App.",
-            disableExecuteApiEndpoint: true
+            disableExecuteApiEndpoint: true,
         });
     }
 }
@@ -264,30 +264,30 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
             apiKeyConfig: {
                 name: 'dev',
                 expires: Expiration.after(Duration.days(365)),
-                description: "API Key for development environment."
-            }
+                description: "API Key for development environment.",
+            },
         };
         const cognitoAuth: AuthorizationMode = {
             authorizationType: gql.AuthorizationType.USER_POOL,
             userPoolConfig: {
                 userPool: props.authProvider!,
-                appIdClientRegex: 'web-app'
-            }
+                appIdClientRegex: 'web-app',
+            },
         };
 
         this.apiEndpoint = new GraphqlApi(this, 'graphql-api', {
             name: "wasedatime-gql-api",
             authorizationConfig: {
                 defaultAuthorization: apiKeyAuth,
-                additionalAuthorizationModes: [cognitoAuth]
+                additionalAuthorizationModes: [cognitoAuth],
             },
             logConfig: {
-                fieldLogLevel: FieldLogLevel.ALL
-            }
+                fieldLogLevel: FieldLogLevel.ALL,
+            },
         });
         new gqlService.SyllabusApiService(this, 'syllabus-api', {
             apiEndpoint: this.apiEndpoint,
-            dataSource: Table.fromTableArn(this, 'syllabus-table', "arn:aws:dynamodb:ap-northeast-1:564383102056:table/syllabus")
+            dataSource: Table.fromTableArn(this, 'syllabus-table', "arn:aws:dynamodb:ap-northeast-1:564383102056:table/syllabus"),
         });
     }
 }
