@@ -1,5 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import * as s3 from "@aws-cdk/aws-s3";
+import * as s3n from "@aws-cdk/aws-s3-notifications"
 import { S3EventSource } from '@aws-cdk/aws-lambda-event-sources';
 import {Duration} from "@aws-cdk/core";
 import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
@@ -356,7 +357,11 @@ export class SyllabusFunctions extends cdk.Construct {
             timeout: Duration.seconds(3),
             environment: props.envVars
         });
-
+        
+        this.SyllabusBucket.addEventNotification(
+            s3.EventType.OBJECT_CREATED_PUT,
+            new s3n.LambdaDestination(this.updateFunction));
+            
          this.updateFunction.addEventSource(new S3EventSource(this.SyllabusBucket, {
             events: [ s3.EventType.OBJECT_CREATED_PUT],
             filters: [ { prefix: 'syllabus/' } ]
