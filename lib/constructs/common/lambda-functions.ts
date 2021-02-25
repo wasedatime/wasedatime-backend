@@ -361,11 +361,5 @@ export class SyllabusFunctions extends cdk.Construct {
         this.SyllabusBucket.addEventNotification(
             s3.EventType.OBJECT_CREATED_PUT,
             new s3n.LambdaDestination(this.updateFunction));
-            
-         this.updateFunction.addEventSource(new S3EventSource(this.SyllabusBucket, {
-            events: [ s3.EventType.OBJECT_CREATED_PUT],
-            filters: [ { prefix: 'syllabus/' } ]
-        }));
-        
     }
 }
