@@ -27,17 +27,18 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
 
         const mainApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
             zone: hostedZone,
-            dataSources: {
-                [DataEndpoint.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
-                [DataEndpoint.COURSE_REVIEWS]: this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),
-                [DataEndpoint.TIMETABLE]: this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE)
-            },
             authProvider: authEndpoint.pool.userPoolArn
         });
         this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
 
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, mainApiEndpoint.getDomain());
+        mainApiEndpoint.addService("SYLLABUS", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
+            .addService("COURSE_REVIEW", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
+            .addService("FEEDS")
+            .addService("CAREER")
+            .addService("TIMETABLE", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
+        mainApiEndpoint.deploy();
 
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, mainApiEndpoint.getDomain());
         this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }

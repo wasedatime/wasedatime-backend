@@ -27,14 +27,11 @@ import {defaultHeaders} from "../../configs/api/cors";
 import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {ApiGatewayDomain} from "@aws-cdk/aws-route53-targets";
 import {API_DOMAIN} from "../../configs/route53/domain";
-import {DataEndpoint} from "../../configs/common/registry";
 
 
 export interface ApiEndpointProps {
 
     zone: IHostedZone;
-
-    dataSources: { [source in DataEndpoint]?: string };
 
     authProvider?: string;
 }
@@ -92,7 +89,7 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
         return domainName.domainName;
     }
 
-    protected addService(name: string, dataSource?: string, auth: boolean = false): this {
+    public addService(name: string, dataSource?: string, auth: boolean = false): this {
         this.apiServices[name] = new apiServiceMap[name](this, 'timetable-api', {
             apiEndpoint: this.apiEndpoint,
             dataSource: dataSource,
@@ -101,6 +98,8 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
         });
         return this;
     }
+
+    public abstract deploy(): void
 }
 
 /**
@@ -164,12 +163,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             basePath: 'v1',
             stage: this.stages['prod']
         });
-        // API Services
-        this.addService("SYLLABUS", props.dataSources[DataEndpoint.SYLLABUS])
-            .addService("COURSE_REVIEW", props.dataSources[DataEndpoint.COURSE_REVIEWS], true)
-            .addService("FEEDS")
-            .addService("CAREER")
-            .addService("TIMETABLE", props.dataSources[DataEndpoint.TIMETABLE], true);
+    }
+
+    public deploy() {
         // Deployments
         const prodDeployment = new Deployment(this, 'prod-deployment', {
             api: this.apiEndpoint,

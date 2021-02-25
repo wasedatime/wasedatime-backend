@@ -29,13 +29,11 @@ export class WasedaTimeAdminLayer extends AdminLayer {
     readonly trail: GlobalTrailLogs;
 
     constructor(scope: cdk.Construct, id: string, operationInterface: OperationInterface, props: cdk.StackProps) {
-
         super(scope, id, operationInterface, props);
 
         this.statusNotifiers[StatusNotifier.BUILD_STATUS] = new AmplifyBuildStatusNotifier(this, 'build-notifier', {
             target: this.operationInterface.getEndpoint(OperationEndpoint.APP)
         });
-
         this.statusNotifiers[StatusNotifier.SCRAPER_STATUS] = new SyllabusScraperStatusNotifier(this, 'scraper-notifier', {
             target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
         });

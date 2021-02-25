@@ -51,12 +51,10 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
             DataEndpoint.CAREER,
             dynamoDatabase.tables[Collection.CAREER].tableName
         );
-
         this.dataInterface.setEndpoint(
             DataEndpoint.TIMETABLE,
             dynamoDatabase.tables[Collection.TIMETABLE].tableName
         );
-
         this.dataInterface.setEndpoint(
             DataEndpoint.SYLLABUS,
             syllabusDataPipeline.dataWarehouse.bucketName
