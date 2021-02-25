@@ -7,8 +7,8 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
         phases: {
             preBuild: {
                 commands: [
-                    "npm ci"
-                ]
+                    "npm ci",
+                ],
             },
             // IMPORTANT - Please verify your build commands
             build: {
@@ -16,21 +16,21 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
                     "if [ \"${AWS_BRANCH}\" = \"master\" ]; then npm run build; fi",
                     "if [[ \"${AWS_BRANCH}\" = \"release/\"* ]]; then npm run build-staging; fi",
                     "if [ \"${AWS_BRANCH}\" = \"develop\" ]; then npm run build-dev; fi",
-                    "if [[ \"${AWS_BRANCH}\" = \"feature/\"* ]]; then npm run build-dev; fi"
-                ]
-            }
+                    "if [[ \"${AWS_BRANCH}\" = \"feature/\"* ]]; then npm run build-dev; fi",
+                ],
+            },
         },
         artifacts: {
             // IMPORTANT - Please verify your build output directory
             baseDirectory: "/build",
             files: [
-                "**/*"
-            ]
+                "**/*",
+            ],
         },
         cache: {
             paths: [
-                "node_modules/**/*"
-            ]
+                "node_modules/**/*",
+            ],
         },
         customHeaders: [
             {
@@ -39,44 +39,44 @@ export const webappBuildSpec: BuildSpec = BuildSpec.fromObject({
                 headers: [
                     {
                         key: "Strict-Transport-Security",
-                        value: "max-age=15552000; includeSubDomains"
+                        value: "max-age=15552000; includeSubDomains",
                     },
                     {
                         key: "X-Frame-Options",
-                        value: "SAMEORIGIN"
+                        value: "SAMEORIGIN",
                     },
                     {
                         key: "X-XSS-Protection",
-                        value: "1; mode=block"
+                        value: "1; mode=block",
                     },
                     {
                         key: "X-Content-Type-Options",
-                        value: "nosniff"
+                        value: "nosniff",
                     },
                     {
                         key: "Content-Security-Policy",
-                        value: "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://storage.googleapis.com/ https://www.google-analytics.com/;"
+                        value: "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://storage.googleapis.com/ https://www.google-analytics.com/;",
                     },
                     {
                         key: "X-Content-Security-Policy",
-                        value: "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://storage.googleapis.com/ https://www.google-analytics.com/;"
+                        value: "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://storage.googleapis.com/ https://www.google-analytics.com/;",
                     },
                     {
                         key: "X-WebKit-CSP",
-                        value: "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://storage.googleapis.com/ https://www.google-analytics.com/;"
+                        value: "default-src 'self' 'unsafe-inline' https: data:; script-src 'unsafe-inline' 'self' https://storage.googleapis.com/ https://www.google-analytics.com/;",
                     },
                     {
                         key: "X-Download-Options",
-                        value: "noopen"
+                        value: "noopen",
                     },
                     {
                         key: "X-DNS-Prefetch-Control",
-                        value: "off"
-                    }
-                ]
-            }
-        ]
-    }
+                        value: "off",
+                    },
+                ],
+            },
+        ],
+    },
 });
 
 export const webappDevBuildSpec: BuildSpec = BuildSpec.fromObject({
@@ -84,22 +84,22 @@ export const webappDevBuildSpec: BuildSpec = BuildSpec.fromObject({
     frontend: {
         phases: {
             preBuild: {
-                commands: ["npm ci"]
+                commands: ["npm ci"],
             },
             // IMPORTANT - Please verify your build commands
             build: {
-                commands: ["npm run build-dev"]
-            }
+                commands: ["npm run build-dev"],
+            },
         },
         artifacts: {
             // IMPORTANT - Pease verify your build output directory
             baseDirectory: "/build",
-            files: ["**/*"]
+            files: ["**/*"],
         },
         cache: {
-            paths: ["node_modules/**/*"]
-        }
-    }
+            paths: ["node_modules/**/*"],
+        },
+    },
 });
 
 export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
@@ -112,26 +112,26 @@ export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObje
                         commands: [
                             "npm config set @bit:registry https://node.bit.dev",
                             `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
-                            "npm ci"
-                        ]
+                            "npm ci",
+                        ],
                     },
                     // IMPORTANT - Please verify your build commands
                     build: {
-                        commands: ["npm run build"]
-                    }
+                        commands: ["npm run build"],
+                    },
                 },
                 artifacts: {
                     // IMPORTANT - Please verify your build output directory
                     baseDirectory: "/dist",
-                    files: ["**/*"]
+                    files: ["**/*"],
                 },
                 cache: {
-                    paths: ["node_modules/**/*"]
-                }
+                    paths: ["node_modules/**/*"],
+                },
             },
-            appRoot: name
-        }
-    ]
+            appRoot: name,
+        },
+    ],
 });
 
 export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
@@ -144,24 +144,24 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
                         commands: [
                             "npm config set @bit:registry https://node.bit.dev",
                             `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
-                            "npm ci"
-                        ]
+                            "npm ci",
+                        ],
                     },
                     // IMPORTANT - Please verify your build commands
                     build: {
                         commands: [
                             "export PREFIX=\"${AWS_BRANCH//[\\/_]/-}\"",
-                            "npm run build-dev"
-                        ]
-                    }
+                            "npm run build-dev",
+                        ],
+                    },
                 },
                 artifacts: {
                     // IMPORTANT - Please verify your build output directory
                     baseDirectory: "/dist",
-                    files: ["**/*"]
+                    files: ["**/*"],
                 },
                 cache: {
-                    paths: ["node_modules/**/*"]
+                    paths: ["node_modules/**/*"],
                 },
                 customHeaders: [
                     {
@@ -169,17 +169,17 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
                         headers: [
                             {
                                 key: "Access-Control-Allow-Origin",
-                                value: "*"
+                                value: "*",
                             },
                             {
                                 key: "Access-Control-Allow-Methods",
-                                value: "GET, OPTIONS"
-                            }
-                        ]
-                    }
-                ]
+                                value: "GET, OPTIONS",
+                            },
+                        ],
+                    },
+                ],
             },
-            appRoot: name
-        }
-    ]
+            appRoot: name,
+        },
+    ],
 });

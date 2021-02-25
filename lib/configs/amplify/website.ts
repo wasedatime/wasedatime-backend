@@ -9,33 +9,33 @@ export const WEBAPP_DOMAIN: string = "wasedatime.com";
 const wwwRedirect: CustomRule = new CustomRule({
     source: "https://www.wasedatime.com",
     target: "https://wasedatime.com",
-    status: RedirectStatus.PERMANENT_REDIRECT
+    status: RedirectStatus.PERMANENT_REDIRECT,
 });
 
 const sitemapRewrite: CustomRule = new CustomRule({
     source: "/sitemap.xml",
     target: "/sitemap.xml",
-    status: RedirectStatus.REWRITE
+    status: RedirectStatus.REWRITE,
 });
 
 const robotRewrite: CustomRule = new CustomRule({
     source: "/robots.txt",
     target: "/robots.txt",
-    status: RedirectStatus.REWRITE
+    status: RedirectStatus.REWRITE,
 });
 
 export const spaRewrite: CustomRule = new CustomRule({
     source: "</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>",
     target: "/index.html",
-    status: RedirectStatus.REWRITE
+    status: RedirectStatus.REWRITE,
 });
 
 export const webappSiteRules: CustomRule[] = [
-    wwwRedirect, sitemapRewrite, robotRewrite, spaRewrite
+    wwwRedirect, sitemapRewrite, robotRewrite, spaRewrite,
 ];
 
 export const developerAuth: BasicAuth = BasicAuth.fromCredentials(
-    "wasedatime", new SecretValue(process.env.WEBSITE_DEV_PASS)
+    "wasedatime", new SecretValue(process.env.WEBSITE_DEV_PASS),
 );
 
 export const customHeaders = [
@@ -45,40 +45,40 @@ export const customHeaders = [
         "headers": [
             {
                 "key": "Strict-Transport-Security",
-                "value": "max-age=15552000; includeSubDomains"
+                "value": "max-age=15552000; includeSubDomains",
             },
             {
                 "key": "X-Frame-Options",
-                "value": "SAMEORIGIN"
+                "value": "SAMEORIGIN",
             },
             {
                 "key": "X-XSS-Protection",
-                "value": "1; mode=block"
+                "value": "1; mode=block",
             },
             {
                 "key": "X-Content-Type-Options",
-                "value": "nosniff"
+                "value": "nosniff",
             },
             {
                 "key": "Content-Security-Policy",
-                "value": "default-src 'self' 'unsafe-inline' https: data:;"
+                "value": "default-src 'self' 'unsafe-inline' https: data:;",
             },
             {
                 "key": "X-Content-Security-Policy",
-                "value": "default-src 'self' 'unsafe-inline' https: data:;"
+                "value": "default-src 'self' 'unsafe-inline' https: data:;",
             },
             {
                 "key": "X-WebKit-CSP",
-                "value": "default-src 'self' 'unsafe-inline' https: data:;"
+                "value": "default-src 'self' 'unsafe-inline' https: data:;",
             },
             {
                 "key": "X-Download-Options",
-                "value": "noopen"
+                "value": "noopen",
             },
             {
                 "key": "X-DNS-Prefetch-Control",
-                "value": "off"
-            }
-        ]
-    }
+                "value": "off",
+            },
+        ],
+    },
 ];

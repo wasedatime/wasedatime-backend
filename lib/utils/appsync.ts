@@ -93,7 +93,7 @@ export function generateEdge(options: baseOptions): ObjectType {
         definition: {
             node: options.target.attribute(),
             cursor: required_string,
-        }
+        },
     });
 }
 
@@ -114,7 +114,7 @@ export function generateConnection(edge: ObjectType, options: baseOptions): Obje
             edges: edge.attribute({isList: true}),
             totalCount: int,
             [plural]: options.target.attribute({isList: true}),
-        }
+        },
     });
 }
 

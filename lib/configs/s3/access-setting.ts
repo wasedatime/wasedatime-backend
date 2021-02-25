@@ -5,5 +5,5 @@ export const publicAccess: BlockPublicAccess = new BlockPublicAccess({
     blockPublicAcls: false,
     blockPublicPolicy: false,
     ignorePublicAcls: false,
-    restrictPublicBuckets: false
+    restrictPublicBuckets: false,
 });

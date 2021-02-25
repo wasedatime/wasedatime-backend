@@ -42,11 +42,11 @@ export class WasedaTime extends AbstractServerlessApp {
 
         operationInterface.setEndpoint(
             OperationEndpoint.SYLLABUS,
-            this.persistenceLayer.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
+            this.persistenceLayer.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS),
         );
         operationInterface.setEndpoint(
             OperationEndpoint.APP,
-            this.presentationLayer.operationInterface.getEndpoint(OperationEndpoint.APP)
+            this.presentationLayer.operationInterface.getEndpoint(OperationEndpoint.APP),
         );
 
         this.adminLayer = new WasedaTimeAdminLayer(this, 'admin', operationInterface, awsEnv);

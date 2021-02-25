@@ -30,7 +30,7 @@ export class DynamoDatabase extends cdk.Construct {
             tableName: "course-review",
             readCapacity: 5,
             writeCapacity: 5,
-            pointInTimeRecovery: true
+            pointInTimeRecovery: true,
         });
 
         this.tables[Collection.CAREER] = new Table(this, 'dynamodb-career-table', {
@@ -41,7 +41,7 @@ export class DynamoDatabase extends cdk.Construct {
             sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "career",
             readCapacity: 1,
-            writeCapacity: 1
+            writeCapacity: 1,
         });
 
         this.tables[Collection.FEEDS] = new Table(this, 'dynamodb-feeds-table', {
@@ -52,7 +52,7 @@ export class DynamoDatabase extends cdk.Construct {
             sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "feeds",
             readCapacity: 1,
-            writeCapacity: 1
+            writeCapacity: 1,
         });
 
         this.tables[Collection.TIMETABLE] = new Table(this, 'dynamodb-timetable-table', {
@@ -63,7 +63,7 @@ export class DynamoDatabase extends cdk.Construct {
             tableName: "timetable",
             readCapacity: 2,
             writeCapacity: 2,
-            pointInTimeRecovery: true
+            pointInTimeRecovery: true,
         });
     }
 }

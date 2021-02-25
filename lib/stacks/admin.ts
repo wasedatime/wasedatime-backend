@@ -9,7 +9,7 @@ import {
     AbstractStatusNotifier,
     AmplifyBuildStatusNotifier,
     StatusNotifier,
-    SyllabusScraperStatusNotifier
+    SyllabusScraperStatusNotifier,
 } from "../constructs/admin/status-notifier";
 import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../configs/chatbot/slack";
 import {FreeTierUsageBudget} from "../constructs/admin/budget";
@@ -33,11 +33,11 @@ export class WasedaTimeAdminLayer extends AdminLayer {
         super(scope, id, operationInterface, props);
 
         this.statusNotifiers[StatusNotifier.BUILD_STATUS] = new AmplifyBuildStatusNotifier(this, 'build-notifier', {
-            target: this.operationInterface.getEndpoint(OperationEndpoint.APP)
+            target: this.operationInterface.getEndpoint(OperationEndpoint.APP),
         });
 
         this.statusNotifiers[StatusNotifier.SCRAPER_STATUS] = new SyllabusScraperStatusNotifier(this, 'scraper-notifier', {
-            target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
+            target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS),
         });
 
         const freeTierBudget = new FreeTierUsageBudget(this, 'free-tier-budget');
@@ -54,8 +54,8 @@ export class WasedaTimeAdminLayer extends AdminLayer {
             slackWorkspaceId: SLACK_WORKSPACE_ID,
             notificationTopics: [
                 freeTierBudget.notification,
-                Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN)
-            ]
+                Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN),
+            ],
         });
 
         this.trail = new GlobalTrailLogs(this, 'cloudtrail-logs');

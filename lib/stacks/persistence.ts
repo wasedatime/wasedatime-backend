@@ -6,7 +6,7 @@ import {
     FeedsDataPipeline,
     SyllabusDataPipeline,
     SyllabusSyncPipeline,
-    Worker
+    Worker,
 } from "../constructs/persistence/data-pipeline";
 import {DataEndpoint, OperationEndpoint} from "../configs/common/registry";
 import {PersistenceLayer} from "../architecture/layers";
@@ -26,45 +26,45 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
         this.dataPipelines[Worker.SYLLABUS] = syllabusDataPipeline;
 
         const syllabusSyncPipeline = new SyllabusSyncPipeline(this, 'syllabus-sync', {
-            dataSource: syllabusDataPipeline.dataWarehouse
+            dataSource: syllabusDataPipeline.dataWarehouse,
         });
 
         const dynamoDatabase = new DynamoDatabase(this, 'dynamo-db', {});
         this.databases["dynamo-main"] = dynamoDatabase;
 
         this.dataPipelines[Worker.CAREER] = new CareerDataPipeline(this, 'career-datapipeline', {
-            dataWarehouse: dynamoDatabase.tables[Collection.CAREER]
+            dataWarehouse: dynamoDatabase.tables[Collection.CAREER],
         });
         this.dataPipelines[Worker.FEEDS] = new FeedsDataPipeline(this, 'feeds-datapipeline', {
-            dataWarehouse: dynamoDatabase.tables[Collection.FEEDS]
+            dataWarehouse: dynamoDatabase.tables[Collection.FEEDS],
         });
 
         this.dataInterface.setEndpoint(
             DataEndpoint.COURSE_REVIEWS,
-            dynamoDatabase.tables[Collection.COURSE_REVIEW].tableName
+            dynamoDatabase.tables[Collection.COURSE_REVIEW].tableName,
         );
         this.dataInterface.setEndpoint(
             DataEndpoint.FEEDS,
-            dynamoDatabase.tables[Collection.FEEDS].tableName
+            dynamoDatabase.tables[Collection.FEEDS].tableName,
         );
         this.dataInterface.setEndpoint(
             DataEndpoint.CAREER,
-            dynamoDatabase.tables[Collection.CAREER].tableName
+            dynamoDatabase.tables[Collection.CAREER].tableName,
         );
 
         this.dataInterface.setEndpoint(
             DataEndpoint.TIMETABLE,
-            dynamoDatabase.tables[Collection.TIMETABLE].tableName
+            dynamoDatabase.tables[Collection.TIMETABLE].tableName,
         );
 
         this.dataInterface.setEndpoint(
             DataEndpoint.SYLLABUS,
-            syllabusDataPipeline.dataWarehouse.bucketName
+            syllabusDataPipeline.dataWarehouse.bucketName,
         );
 
         this.operationInterface.setEndpoint(
             OperationEndpoint.SYLLABUS,
-            syllabusDataPipeline.processor.stateMachineArn
+            syllabusDataPipeline.processor.stateMachineArn,
         );
     }
 }

@@ -6,7 +6,7 @@ import {
     AbstractGraphqlEndpoint,
     AbstractRestApiEndpoint,
     WasedaTimeGraphqlEndpoint,
-    WasedaTimeRestApiEndpoint
+    WasedaTimeRestApiEndpoint,
 } from "../constructs/business/api-endpoint";
 import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ApiServices} from "../configs/api-gateway/service";
@@ -32,18 +32,18 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
             dataSources: {
                 [ApiServices.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
                 [ApiServices.COURSE_REVIEW]: this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),
-                [ApiServices.TIMETABLE]: this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE)
+                [ApiServices.TIMETABLE]: this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE),
             },
-            authProvider: authEndpoint.pool
+            authProvider: authEndpoint.pool,
         });
         this.apiEndpoints["rest-api"] = restApiEndpoint;
 
         const graphqlApiEndpoint: AbstractGraphqlEndpoint = new WasedaTimeGraphqlEndpoint(this, 'graphql-api-endpoint', {
             zone: hostedZone,
             dataSources: {
-                [ApiServices.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS)
+                [ApiServices.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
             },
-            authProvider: authEndpoint.pool
+            authProvider: authEndpoint.pool,
         });
         this.apiEndpoints["graphql-api"] = graphqlApiEndpoint;
 
