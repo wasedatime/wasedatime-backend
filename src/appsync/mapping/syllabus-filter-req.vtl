@@ -1,3 +1,8 @@
+#set($expr = "")
+#foreach($key in $ctx.args.form.keySet())
+    #set($expr = "$expr AND #$key IN :${ctx.args.form.$key}" )
+#end
+
 {
     "version": "2017-02-28",
     "operation": "Query",
@@ -8,26 +13,26 @@
         }
     },
     "filter": {
-        "expression": "#sem IN :sems AND #lan IN :lans AND #day IN :days AND #per IN :pers AND #min IN :mins AND #cre IN :cres AND #typ IN :typs AND #lev IN :levs",
+        "expression": $expr,
         "expressionNames": {
-            "#sem": "semester",
-            "#lan": "lang",
+            "#semester": "semester",
+            "#lang": "lang",
             "#day": "day",
-            "#per": "period",
-            "#min": "min_year",
-            "#cre": "credit",
-            "#typ": "type",
-            "#lev": "level"
+            "#period": "period",
+            "#min_year": "min_year",
+            "#credit": "credit",
+            "#type": "type",
+            "#level": "level"
         },
         "expressionValues": {
-            ":sems": $util.dynamodb.toStringSetJson($ctx.args.form.semesters),
-            ":lans": $util.dynamodb.toNumberSetJson($ctx.args.form.langs),
-            ":days": $util.dynamodb.toNumberSetJson($ctx.args.form.days),
-            ":pers": $util.dynamodb.toNumberSetJson($ctx.args.form.periods),
-            ":mins": $util.dynamodb.toNumberSetJson($ctx.args.form.min_years),
-            ":cres": $util.dynamodb.toNumberSetJson($ctx.args.form.credits),
-            ":typs": $util.dynamodb.toNumberSetJson($ctx.args.form.types),
-            ":levs": $util.dynamodb.toNumberSetJson($ctx.args.form.levels)
+            ":semester": $util.dynamodb.toStringSetJson($ctx.args.form.semester),
+            ":lang": $util.dynamodb.toNumberSetJson($ctx.args.form.lang),
+            ":day": $util.dynamodb.toNumberSetJson($ctx.args.form.day),
+            ":period": $util.dynamodb.toNumberSetJson($ctx.args.form.period),
+            ":min_year": $util.dynamodb.toNumberSetJson($ctx.args.form.min_year),
+            ":credit": $util.dynamodb.toNumberSetJson($ctx.args.form.credit),
+            ":type": $util.dynamodb.toNumberSetJson($ctx.args.form.type),
+            ":level": $util.dynamodb.toNumberSetJson($ctx.args.form.level)
         }
     },
     #if( $ctx.args.first )

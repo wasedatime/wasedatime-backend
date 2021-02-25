@@ -105,13 +105,13 @@ export class SyllabusApiService extends cdk.Construct {
         });
         const filterForm = new InputType("FilterForm", {
             definition: {
-                semesters: list_string,
-                langs: list_int,
-                days: list_int,
-                periods: list_int,
-                min_years: list_int,
-                credits: list_int,
-                evals: list_of(evalFilter),
+                semester: list_string,
+                lang: list_int,
+                day: list_int,
+                period: list_int,
+                min_year: list_int,
+                credit: list_int,
+                eval: list_of(evalFilter),
                 type: list_int,
                 level: list_int
             }
@@ -119,7 +119,6 @@ export class SyllabusApiService extends cdk.Construct {
 
         const courseConnection = generateConnectionAndEdge({base: courseType, target: courseType}).connection;
         const courseEdge = generateConnectionAndEdge({base: courseType, target: courseType}).edge;
-
 
         [schoolType, evalType, occurrenceType, courseType, evalFilter, filterForm, courseConnection, courseEdge].forEach(
             (type) => props.apiEndpoint.addType(type)
