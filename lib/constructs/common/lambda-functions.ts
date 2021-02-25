@@ -1,4 +1,6 @@
 import * as cdk from "@aws-cdk/core";
+import * as s3 from "@aws-cdk/aws-s3";
+import { S3EventSource } from '@aws-cdk/aws-lambda-event-sources';
 import {Duration} from "@aws-cdk/core";
 import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
@@ -302,10 +304,14 @@ export class TimetableFunctions extends cdk.Construct {
 export class SyllabusFunctions extends cdk.Construct {
 
     readonly getFunction: Function;
+    readonly updateFunction: Function;
+    readonly SyllabusBucket: s3.Bucket;
 
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
         super(scope, id);
-
+        const SyllabusBucket = new s3.Bucket(this,'waseda-syllabus',{
+            bucketName:'waseda-syllabus'
+        });
         const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to perform crud operation on dynamodb",
@@ -318,7 +324,18 @@ export class SyllabusFunctions extends cdk.Construct {
                     "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
             ]
         });
-
+        const LambdaFullAccess: LazyRole = new LazyRole(this, 'lambda-fullaccess-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
+            description: "Allow lambda function to access s3 buckets and dynamodb",
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+            roleName: "lambda-full-access",
+            managedPolicies: [
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 's3-full-access',
+                    "arn:aws:iam::aws:policy/AWSLambdaFullAccess")
+            ]
+        });
         this.getFunction = new PythonFunction(this, 'get-courses', {
             entry: 'src/lambda/get-courses',
             description: "Filter courses in the syllabus.",
@@ -330,5 +347,22 @@ export class SyllabusFunctions extends cdk.Construct {
             timeout: Duration.seconds(3),
             environment: props.envVars
         });
+        this.updateFunction = new PythonFunction(this,'update-syllabus',{
+            entry: 'src/lambda/update-syllabus',
+            description: 'Update syllabus when S3 bucket is updated.',
+            functionName: "update-syllabus",
+            role:LambdaFullAccess,
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 128,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3),
+            environment: props.envVars
+        });
+
+         this.updateFunction.addEventSource(new S3EventSource(this.SyllabusBucket, {
+            events: [ s3.EventType.OBJECT_CREATED_PUT],
+            filters: [ { prefix: 'syllabus/' } ]
+        }));
+        
     }
 }
