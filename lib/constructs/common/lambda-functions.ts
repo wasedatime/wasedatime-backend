@@ -313,6 +313,7 @@ export class SyllabusFunctions extends cdk.Construct {
         const SyllabusBucket = new s3.Bucket(this,'waseda-syllabus',{
             bucketName:'waseda-syllabus'
         });
+
         const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to perform crud operation on dynamodb",
@@ -325,6 +326,7 @@ export class SyllabusFunctions extends cdk.Construct {
                     "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
             ]
         });
+
         const LambdaFullAccess: LazyRole = new LazyRole(this, 'lambda-fullaccess-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to access s3 buckets and dynamodb",
@@ -335,6 +337,7 @@ export class SyllabusFunctions extends cdk.Construct {
                     "arn:aws:iam::aws:policy/AWSLambdaFullAccess")
             ]
         });
+
         this.getFunction = new PythonFunction(this, 'get-courses', {
             entry: 'src/lambda/get-courses',
             description: "Filter courses in the syllabus.",
@@ -357,9 +360,10 @@ export class SyllabusFunctions extends cdk.Construct {
             timeout: Duration.seconds(3),
             environment: props.envVars
         });
-        
+        /*
         this.SyllabusBucket.addEventNotification(
             s3.EventType.OBJECT_CREATED_PUT,
             new s3n.LambdaDestination(this.updateFunction));
+        */
     }
 }
