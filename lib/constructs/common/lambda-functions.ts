@@ -330,8 +330,6 @@ export class SyllabusFunctions extends cdk.Construct {
             path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
             roleName: "lambda-full-access",
             managedPolicies: [
-                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
-                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 's3-full-access',
                     "arn:aws:iam::aws:policy/AWSLambdaFullAccess")
             ]
