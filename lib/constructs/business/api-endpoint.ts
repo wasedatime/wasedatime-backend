@@ -17,7 +17,7 @@ import {
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
 import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
-import * as uuid from "uuid";
+import * as crypto from 'crypto';
 
 import {
     AbstractRestApiService,
@@ -111,40 +111,6 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             responseHeaders: defaultHeaders
         });
 
-        const prodDeployment = new Deployment(this, 'prod-deployment', {
-            api: this.apiEndpoint,
-            retainDeployments: false
-        });
-        const devDeployment = new Deployment(this, 'dev-deployment', {
-            api: this.apiEndpoint,
-            retainDeployments: false
-        });
-        if (STAGE === 'dev') {
-            devDeployment.addToLogicalId(uuid.v4());
-        } else if (STAGE === 'prod') {
-            prodDeployment.addToLogicalId(uuid.v4());
-        }
-        // Stages
-        this.stages['prod'] = new Stage(this, 'prod-stage', {
-            stageName: 'prod',
-            deployment: prodDeployment,
-            description: "Production stage",
-            throttlingRateLimit: 50,
-            throttlingBurstLimit: 50,
-            variables: {["STAGE"]: STAGE},
-            loggingLevel: MethodLoggingLevel.ERROR,
-            dataTraceEnabled: true
-        });
-        this.stages['dev'] = new Stage(this, 'dev-stage', {
-            stageName: 'dev',
-            deployment: devDeployment,
-            description: "Develop stage",
-            throttlingRateLimit: 10,
-            throttlingBurstLimit: 10,
-            variables: {["STAGE"]: STAGE},
-            loggingLevel: MethodLoggingLevel.ERROR,
-            dataTraceEnabled: true
-        });
         // API Domain
         const cert = new Certificate(this, 'api-cert', {
             domainName: API_DOMAIN,
@@ -213,6 +179,43 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             dataSource: props.dataSources![ApiServices.TIMETABLE],
             authorizer: authorizer,
             validator: reqValidator
+        });
+        // Deployments
+        const prodDeployment = new Deployment(this, 'prod-deployment', {
+            api: this.apiEndpoint,
+            retainDeployments: false
+        });
+        const devDeployment = new Deployment(this, 'dev-deployment', {
+            api: this.apiEndpoint,
+            retainDeployments: false
+        });
+        // hash for detecting changes to api configs
+        const hash = crypto.createHash('md5').update(JSON.stringify(this.apiServices)).digest('hex');
+        if (STAGE === 'dev') {
+            devDeployment.addToLogicalId(hash);
+        } else if (STAGE === 'prod') {
+            prodDeployment.addToLogicalId(hash);
+        }
+        // Stages
+        this.stages['prod'] = new Stage(this, 'prod-stage', {
+            stageName: 'prod',
+            deployment: prodDeployment,
+            description: "Production stage",
+            throttlingRateLimit: 50,
+            throttlingBurstLimit: 50,
+            variables: {["STAGE"]: STAGE},
+            loggingLevel: MethodLoggingLevel.ERROR,
+            dataTraceEnabled: true
+        });
+        this.stages['dev'] = new Stage(this, 'dev-stage', {
+            stageName: 'dev',
+            deployment: devDeployment,
+            description: "Develop stage",
+            throttlingRateLimit: 10,
+            throttlingBurstLimit: 10,
+            variables: {["STAGE"]: STAGE},
+            loggingLevel: MethodLoggingLevel.ERROR,
+            dataTraceEnabled: true
         });
     }
 }
