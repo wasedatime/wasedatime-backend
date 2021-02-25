@@ -1,12 +1,12 @@
 from const import *
 
-class course():
+class Course:
     def __init__(self,data):
         self.id = data["a"]
         self.data = data
 
 def create_db_item(new_course,school):
-    Item = {
+    item = {
         s3_to_dynamo["a"] : new_course.data["a"],
         s3_to_dynamo["b"] : new_course.data["b"],
         s3_to_dynamo["c"] : new_course.data["c"],
@@ -25,7 +25,7 @@ def create_db_item(new_course,school):
         s3_to_dynamo["p"] : new_course.data["p"],
         "school" : school
     }
-    return Item
+    return item
 
 def update_course(new_course,table,school):
     #test
@@ -34,7 +34,7 @@ def update_course(new_course,table,school):
             Key={
                 'id' : new_course.data["a"]
             },
-            UpdateExpression="set title=:b, title_jp=:c, instructor=:d, instructor_jp=:e, \
+            UpdateExpression="SET title=:b, title_jp=:c, instructor=:d, instructor_jp=:e, \
             lang=:f, #tp=:g, term=:h, occurrences=:i, min_year=:j, category=:k, credit=:l, \
             #lv=:m, #ev=:n, #cd=:o, subtitle=:p ,school=:s",
             ExpressionAttributeNames = {

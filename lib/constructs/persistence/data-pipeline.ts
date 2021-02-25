@@ -10,6 +10,7 @@ import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
 import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../configs/s3/access-setting";
 import {SyllabusScraper} from "../common/lambda-functions";
+import {SyllabusFunctions} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
 
@@ -164,7 +165,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
 // todo sync syllabus on notification
 export class SyllabusSyncPipeline extends AbstractDataPipeline {
 
-    readonly dataSource?: Bucket;
+    readonly dataSource: Bucket;
 
     readonly processor: Function;
 
@@ -173,7 +174,7 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
 
-        this.dataSource = props?.dataSource;
+        //this.dataSource = props?.dataSource;
 
         this.dataWarehouse = new Table(this, 'dynamodb-syllabus-table', {
             partitionKey: {name: "id", type: AttributeType.STRING},
@@ -185,5 +186,16 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
             readCapacity: 5,
             writeCapacity: 5
         });
+
+        this.dataSource = new Bucket(this,'waseda-syllabus',{
+            accessControl: BucketAccessControl.PRIVATE,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            bucketName: "waseda-syllabus",
+            cors: prodCorsRule,
+            encryption: BucketEncryption.S3_MANAGED,
+            publicReadAccess: false,
+            removalPolicy: RemovalPolicy.RETAIN,
+            versioned: true
+        })
     }
 }

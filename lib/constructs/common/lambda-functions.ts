@@ -2,6 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as s3n from "@aws-cdk/aws-s3-notifications"
 import { S3EventSource } from '@aws-cdk/aws-lambda-event-sources';
+import {SyllabusSyncPipeline} from "../persistence/data-pipeline"
 import {Duration} from "@aws-cdk/core";
 import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
@@ -306,14 +307,10 @@ export class SyllabusFunctions extends cdk.Construct {
 
     readonly getFunction: Function;
     readonly updateFunction: Function;
-    readonly SyllabusBucket: s3.Bucket;
 
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
         super(scope, id);
-        const SyllabusBucket = new s3.Bucket(this,'waseda-syllabus',{
-            bucketName:'waseda-syllabus'
-        });
-
+        
         const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to perform crud operation on dynamodb",
@@ -326,7 +323,6 @@ export class SyllabusFunctions extends cdk.Construct {
                     "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
             ]
         });
-
         const LambdaFullAccess: LazyRole = new LazyRole(this, 'lambda-fullaccess-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to access s3 buckets and dynamodb",
@@ -349,6 +345,7 @@ export class SyllabusFunctions extends cdk.Construct {
             timeout: Duration.seconds(3),
             environment: props.envVars
         });
+
         this.updateFunction = new PythonFunction(this,'update-syllabus',{
             entry: 'src/lambda/update-syllabus',
             description: 'Update syllabus when S3 bucket is updated.',
@@ -357,13 +354,13 @@ export class SyllabusFunctions extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(3),
+            timeout: Duration.seconds(10),
             environment: props.envVars
         });
-        /*
-        this.SyllabusBucket.addEventNotification(
-            s3.EventType.OBJECT_CREATED_PUT,
-            new s3n.LambdaDestination(this.updateFunction));
-        */
+
+        this.updateFunction.addEventSource(new S3EventSource(new SyllabusSyncPipeline(this,'syllabus-sync-pipline',{}).dataSource, {
+            events: [ s3.EventType.OBJECT_CREATED_PUT],
+            filters: [ { prefix: 'syllabus/' } ]
+        }));
     }
 }

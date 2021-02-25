@@ -17,21 +17,21 @@ table    = dynamodb.Table('syllabus')
     
 def compare_syllabus(now_name,old_name,school):
     old_dict = {}
-    with open(old_name) as f:
-        old_syllabus = json.load(f)
-    with open(now_name) as f2:
-        new_syllabus = json.load(f2)
+    with open(old_name) as old_file:
+        old_syllabus = json.load(old_file)
+    with open(now_name) as now_file:
+        new_syllabus = json.load(now_file)
     
     #store every old item in dict
     for i in range(0,len(old_syllabus)):
-        cs = course(old_syllabus[i])
+        cs = Course(old_syllabus[i])
         old_dict[cs.id] = cs
         
     print(len(old_syllabus))
     
     #compare old and new syllabus
     for new_item in new_syllabus:
-        new_cs = course(new_item)
+        new_cs = Course(new_item)
         match_id = new_cs.id
         print("match_id:{}",match_id)
         if(match_id in old_dict):
