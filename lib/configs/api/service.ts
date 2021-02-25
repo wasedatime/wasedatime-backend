@@ -1,3 +1,11 @@
+import {
+    CareerApiService,
+    CourseReviewsApiService,
+    FeedsApiService,
+    SyllabusApiService,
+    TimetableApiService
+} from "../../constructs/business/api-service";
+
 export enum ApiEndpoint {
 
     MAIN,
@@ -5,14 +13,14 @@ export enum ApiEndpoint {
     AUTH
 }
 
-export enum ApiServices {
-    SYLLABUS,
+export const apiServiceMap: { [name: string]: any } = {
+    "SYLLABUS": SyllabusApiService,
 
-    COURSE_REVIEW,
+    "COURSE_REVIEW": CourseReviewsApiService,
 
-    CAREER,
+    "CAREER": CareerApiService,
 
-    FEEDS,
+    "FEEDS": FeedsApiService,
 
-    TIMETABLE
-}
+    "TIMETABLE": TimetableApiService
+};

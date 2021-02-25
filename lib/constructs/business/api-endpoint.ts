@@ -5,6 +5,7 @@ import {
     Deployment,
     DomainName,
     EndpointType,
+    IAuthorizer,
     LambdaRestApi,
     MethodLoggingLevel,
     RequestValidator,
@@ -19,27 +20,21 @@ import {GraphqlApi} from "@aws-cdk/aws-appsync";
 import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
 import * as crypto from 'crypto';
 
-import {
-    AbstractRestApiService,
-    CareerApiService,
-    CourseReviewsApiService,
-    FeedsApiService,
-    SyllabusApiService,
-    TimetableApiService
-} from "./api-service";
-import {ApiServices} from "../../configs/api/service";
+import {AbstractRestApiService} from "./api-service";
+import {apiServiceMap} from "../../configs/api/service";
 import {STAGE} from "../../configs/common/aws";
 import {defaultHeaders} from "../../configs/api/cors";
 import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {ApiGatewayDomain} from "@aws-cdk/aws-route53-targets";
 import {API_DOMAIN} from "../../configs/route53/domain";
+import {DataEndpoint} from "../../configs/common/registry";
 
 
 export interface ApiEndpointProps {
 
     zone: IHostedZone;
 
-    dataSources?: { [service in ApiServices]?: string };
+    dataSources: { [source in DataEndpoint]?: string };
 
     authProvider?: string;
 }
@@ -55,23 +50,56 @@ export abstract class AbstractApiEndpoint extends cdk.Construct {
 
 export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
-    abstract readonly apiEndpoint: RestApi;
+    readonly apiEndpoint: RestApi;
 
-    abstract readonly apiServices: { [name in ApiServices]?: AbstractRestApiService };
+    abstract readonly apiServices: { [name: string]: AbstractRestApiService };
 
     abstract readonly stages: { [name: string]: Stage };
 
+    private readonly authorizer: IAuthorizer;
+
+    private readonly reqValidator: RequestValidator;
+
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);
+
+        // Authorizer for methods that requires user login
+        this.authorizer = {
+            authorizerId: new CfnAuthorizer(this, 'cognito-authorizer', {
+                name: 'cognito-authorizer',
+                identitySource: 'method.request.header.Authorization',
+                providerArns: [props.authProvider!],
+                restApiId: this.apiEndpoint.restApiId,
+                type: AuthorizationType.COGNITO
+            }).ref,
+            authorizationType: AuthorizationType.COGNITO
+        };
+        // Request Validator
+        this.reqValidator = new RequestValidator(this, 'req-validator', {
+            restApi: this.apiEndpoint,
+            requestValidatorName: "strict-validator",
+            validateRequestBody: true,
+            validateRequestParameters: true
+        });
     }
 
-    getDomain(): string {
+    public getDomain(): string {
         const domainName: DomainName | undefined = this.apiEndpoint.domainName;
 
         if (typeof domainName === "undefined") {
             throw RangeError("Domain not configured for this API endpoint.");
         }
         return domainName.domainName;
+    }
+
+    protected addService(name: string, dataSource?: string, auth: boolean = false): this {
+        this.apiServices[name] = new apiServiceMap[name](this, 'timetable-api', {
+            apiEndpoint: this.apiEndpoint,
+            dataSource: dataSource,
+            authorizer: auth ? this.authorizer : undefined,
+            validator: this.reqValidator
+        });
+        return this;
     }
 }
 
@@ -86,7 +114,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
     /**
      * Services provided by this API
      */
-    readonly apiServices: { [name in ApiServices]?: AbstractRestApiService } = {};
+    readonly apiServices: { [name: string]: AbstractRestApiService };
     /**
      * Stages of this API
      */
@@ -136,50 +164,12 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             basePath: 'v1',
             stage: this.stages['prod']
         });
-        // Authorizer for methods that requires user login
-        const authorizer = {
-            authorizerId: new CfnAuthorizer(this, 'cognito-authorizer', {
-                name: 'cognito-authorizer',
-                identitySource: 'method.request.header.Authorization',
-                providerArns: [props.authProvider!],
-                restApiId: this.apiEndpoint.restApiId,
-                type: AuthorizationType.COGNITO
-            }).ref,
-            authorizationType: AuthorizationType.COGNITO
-        };
-        // Request Validator
-        const reqValidator = new RequestValidator(this, 'req-validator', {
-            restApi: this.apiEndpoint,
-            requestValidatorName: "strict-validator",
-            validateRequestBody: true,
-            validateRequestParameters: true
-        });
         // API Services
-        this.apiServices[ApiServices.SYLLABUS] = new SyllabusApiService(this, 'syllabus-api', {
-            apiEndpoint: this.apiEndpoint,
-            dataSource: props.dataSources![ApiServices.SYLLABUS],
-            validator: reqValidator
-        });
-        this.apiServices[ApiServices.COURSE_REVIEW] = new CourseReviewsApiService(this, 'course-reviews-api', {
-            apiEndpoint: this.apiEndpoint,
-            dataSource: props.dataSources![ApiServices.COURSE_REVIEW],
-            authorizer: authorizer,
-            validator: reqValidator
-        });
-        this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
-            apiEndpoint: this.apiEndpoint,
-            validator: reqValidator
-        });
-        this.apiServices[ApiServices.CAREER] = new CareerApiService(this, 'career-api', {
-            apiEndpoint: this.apiEndpoint,
-            validator: reqValidator
-        });
-        this.apiServices[ApiServices.TIMETABLE] = new TimetableApiService(this, 'timetable-api', {
-            apiEndpoint: this.apiEndpoint,
-            dataSource: props.dataSources![ApiServices.TIMETABLE],
-            authorizer: authorizer,
-            validator: reqValidator
-        });
+        this.addService("SYLLABUS", props.dataSources[DataEndpoint.SYLLABUS])
+            .addService("COURSE_REVIEW", props.dataSources[DataEndpoint.COURSE_REVIEWS], true)
+            .addService("FEEDS")
+            .addService("CAREER")
+            .addService("TIMETABLE", props.dataSources[DataEndpoint.TIMETABLE], true);
         // Deployments
         const prodDeployment = new Deployment(this, 'prod-deployment', {
             api: this.apiEndpoint,
