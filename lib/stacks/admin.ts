@@ -9,13 +9,12 @@ import {
     AbstractStatusNotifier,
     AmplifyBuildStatusNotifier,
     StatusNotifier,
-    SyllabusScraperStatusNotifier
+    SyllabusScraperStatusNotifier,
 } from "../constructs/admin/status-notifier";
 import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../configs/chatbot/slack";
 import {FreeTierUsageBudget} from "../constructs/admin/budget";
 import {CF_TOPIC_ARN} from "../configs/common/arn";
 import {GlobalTrailLogs} from "../constructs/admin/log";
-import {WasedaTimeHostedZone} from "../constructs/common/hosted-zone";
 
 
 export class WasedaTimeAdminLayer extends AdminLayer {
@@ -23,8 +22,6 @@ export class WasedaTimeAdminLayer extends AdminLayer {
     readonly statusNotifiers: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
 
     readonly chatbot: SlackChannelConfiguration;
-
-    readonly hostedZone: WasedaTimeHostedZone;
 
     readonly trail: GlobalTrailLogs;
 
@@ -57,7 +54,5 @@ export class WasedaTimeAdminLayer extends AdminLayer {
         });
 
         this.trail = new GlobalTrailLogs(this, 'cloudtrail-logs');
-
-        this.hostedZone = new WasedaTimeHostedZone(this, 'wt-hosted-zone');
     }
 }
