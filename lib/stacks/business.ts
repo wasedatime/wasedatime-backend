@@ -4,7 +4,7 @@ import {IHostedZone} from "@aws-cdk/aws-route53";
 import {
     AbstractApiEndpoint,
     AbstractRestApiEndpoint,
-    WasedaTimeRestApiEndpoint
+    WasedaTimeRestApiEndpoint,
 } from "../constructs/business/api-endpoint";
 import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ApiEndpoint} from "../configs/api/service";
@@ -27,15 +27,15 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
 
         const mainApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
             zone: hostedZone,
-            authProvider: authEndpoint.pool.userPoolArn
+            authProvider: authEndpoint.pool.userPoolArn,
         });
         this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
 
-        mainApiEndpoint.addService("SYLLABUS", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
-            .addService("COURSE_REVIEW", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
-            .addService("FEEDS")
-            .addService("CAREER")
-            .addService("TIMETABLE", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
+        mainApiEndpoint.addService("syllabus", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
+            .addService("course-reviews", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
+            .addService("feeds")
+            .addService("career")
+            .addService("timetable", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
         mainApiEndpoint.deploy();
 
         this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, mainApiEndpoint.getDomain());

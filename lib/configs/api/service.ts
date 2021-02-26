@@ -3,7 +3,7 @@ import {
     CourseReviewsApiService,
     FeedsApiService,
     SyllabusApiService,
-    TimetableApiService
+    TimetableApiService,
 } from "../../constructs/business/api-service";
 
 export enum ApiEndpoint {
@@ -14,13 +14,13 @@ export enum ApiEndpoint {
 }
 
 export const apiServiceMap: { [name: string]: any } = {
-    "SYLLABUS": SyllabusApiService,
+    "syllabus": SyllabusApiService,
 
-    "COURSE_REVIEW": CourseReviewsApiService,
+    "course-reviews": CourseReviewsApiService,
 
-    "CAREER": CareerApiService,
+    "career": CareerApiService,
 
-    "FEEDS": FeedsApiService,
+    "feeds": FeedsApiService,
 
-    "TIMETABLE": TimetableApiService
+    "timetable": TimetableApiService,
 };
