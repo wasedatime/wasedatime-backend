@@ -1,26 +1,26 @@
-import {
-    CareerApiService,
-    CourseReviewsApiService,
-    FeedsApiService,
-    SyllabusApiService,
-    TimetableApiService,
-} from "../../constructs/business/api-service";
+import * as rest from "../../constructs/business/api-service";
+import * as gql from "../../constructs/business/graphql-api-service";
 
 export enum ApiEndpoint {
 
-    MAIN,
+    REST,
 
-    AUTH
+    AUTH,
+
+    GRAPHQL,
 }
 
 export const apiServiceMap: { [name: string]: any } = {
-    "syllabus": SyllabusApiService,
 
-    "course-reviews": CourseReviewsApiService,
+    "syllabus": rest.SyllabusApiService,
 
-    "career": CareerApiService,
+    "course-reviews": rest.CourseReviewsApiService,
 
-    "feeds": FeedsApiService,
+    "career": rest.CareerApiService,
 
-    "timetable": TimetableApiService,
+    "feeds": rest.FeedsApiService,
+
+    "timetable": rest.TimetableApiService,
+
+    "course": gql.CourseApiService,
 };

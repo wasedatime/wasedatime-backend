@@ -1,13 +1,5 @@
 import * as cdk from "@aws-cdk/core";
-import {
-    EnumType,
-    GraphqlApi,
-    InputType,
-    MappingTemplate,
-    ObjectType,
-    ResolvableField,
-    Resolver,
-} from "@aws-cdk/aws-appsync";
+import {EnumType, InputType, MappingTemplate, ObjectType, ResolvableField, Resolver} from "@aws-cdk/aws-appsync";
 import {IUserPool} from "@aws-cdk/aws-cognito";
 import {ITable} from "@aws-cdk/aws-dynamodb";
 
@@ -27,8 +19,6 @@ import {AbstractGraphqlEndpoint} from "./api-endpoint";
 
 export interface GraphqlApiServiceProps {
 
-    apiEndpoint: GraphqlApi;
-
     dataSource: ITable;
 
     auth?: IUserPool;
@@ -43,14 +33,14 @@ export abstract class AbstractGraphqlApiService extends cdk.Construct {
     }
 }
 
-export class SyllabusApiService extends cdk.Construct {
+export class CourseApiService extends cdk.Construct {
 
     readonly resolvers: { [name: string]: Resolver } = {};
 
     constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
         super(scope, id);
 
-        const dataSource = props.apiEndpoint.addDynamoDbDataSource('dynamo-db', props.dataSource, {
+        const dataSource = scope.apiEndpoint.addDynamoDbDataSource('dynamo-db', props.dataSource, {
             description: "Syllabus table from DynamoDB.",
             name: "SyllabusTable",
         });
@@ -122,10 +112,10 @@ export class SyllabusApiService extends cdk.Construct {
         const CourseEdge = generateConnectionAndEdge({base: Course, target: Course}).edge;
 
         [School, Eval, Occurrence, Course, Eval, FilterForm, CourseConnection, CourseEdge, PageInfo].forEach(
-            (type) => props.apiEndpoint.addType(type),
+            (type) => scope.apiEndpoint.addType(type),
         );
 
-        props.apiEndpoint.addQuery('getCourses', new ResolvableField({
+        scope.apiEndpoint.addQuery('getCourses', new ResolvableField({
             returnType: list_of(Course),
             dataSource: dataSource,
             args: {
@@ -134,7 +124,7 @@ export class SyllabusApiService extends cdk.Construct {
             requestMappingTemplate: MappingTemplate.dynamoDbGetItem('id', 'id'),
             responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
         }));
-        props.apiEndpoint.addQuery('filterCourses', new ResolvableField({
+        scope.apiEndpoint.addQuery('filterCourses', new ResolvableField({
             returnType: CourseConnection.attribute(),
             dataSource: dataSource,
             args: {

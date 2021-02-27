@@ -7,35 +7,24 @@ import {AuthorizationMode, FieldLogLevel, GraphqlApi} from "@aws-cdk/aws-appsync
 import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
 import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {ApiGatewayDomain} from "@aws-cdk/aws-route53-targets";
+import {Table} from "@aws-cdk/aws-dynamodb";
 import {IUserPool} from "@aws-cdk/aws-cognito";
-
 import * as flatted from 'flatted';
 
 import {AbstractRestApiService} from "./api-service";
 import {apiServiceMap} from "../../configs/api/service";
-import {
-    AbstractRestApiService,
-    CareerApiService,
-    CourseReviewsApiService,
-    FeedsApiService,
-    SyllabusApiService,
-    TimetableApiService,
-} from "./rest-api-service";
-import * as gqlService from "./graphql-api-service";
 import {AbstractGraphqlApiService} from "./graphql-api-service";
-import {ApiServices} from "../../configs/api-gateway/service";
 import {STAGE} from "../../configs/common/aws";
 import {defaultHeaders} from "../../configs/api-gateway/cors";
 import {API_DOMAIN} from "../../configs/route53/domain";
 import {AbstractHttpApiService} from "./http-api-service";
-import {Table} from "@aws-cdk/aws-dynamodb";
 
 
 export interface ApiEndpointProps {
 
     zone: IHostedZone;
 
-    authProvider?: string;
+    authProvider?: IUserPool;
 }
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
@@ -49,17 +38,17 @@ export abstract class AbstractApiEndpoint extends cdk.Construct {
 
 export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
-    readonly apiEndpoint: RestApi;
+    readonly apiEndpoint: rest.RestApi;
 
     readonly apiServices: { [name: string]: AbstractRestApiService } = {};
 
     abstract readonly stages: { [name: string]: rest.Stage };
 
-    protected authorizer: IAuthorizer;
+    protected authorizer: rest.IAuthorizer;
 
-    protected reqValidator: RequestValidator;
+    protected reqValidator: rest.RequestValidator;
 
-    protected domain: DomainName;
+    protected domain: rest.DomainName;
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);
@@ -90,10 +79,24 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
 
     abstract readonly apiEndpoint: GraphqlApi;
 
-    abstract readonly apiServices: { [name in ApiServices]?: AbstractGraphqlApiService };
+    abstract readonly apiServices: { [name: string]: AbstractGraphqlApiService };
+
+    protected authMode: { [mode: string]: AuthorizationMode };
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);
+    }
+
+    public addService(name: string, dataSource: string, auth: string = 'apiKey'): this {
+        this.apiServices[name] = new apiServiceMap[name](this, `${name}-api`, {
+            dataSource: Table.fromTableName(this, `${name}-datasource`, dataSource),
+            auth: this.authMode[auth],
+        });
+        return this;
+    }
+
+    public getDomain(): string {
+        return this.apiEndpoint.graphqlUrl;
     }
 }
 
@@ -101,7 +104,7 @@ export abstract class AbstractHttpApiEndpoint extends AbstractApiEndpoint {
 
     abstract readonly apiEndpoint: HttpApi;
 
-    abstract readonly apiServices: { [name in ApiServices]?: AbstractHttpApiService };
+    abstract readonly apiServices: { [name: string]: AbstractHttpApiService };
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);
@@ -140,23 +143,23 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             responseHeaders: defaultHeaders,
         });
         this.apiEndpoint.addGatewayResponse('5xx-resp', {
-            type: ResponseType.DEFAULT_5XX,
+            type: rest.ResponseType.DEFAULT_5XX,
             responseHeaders: defaultHeaders,
         });
 
         // Authorizer for methods that requires user login
         this.authorizer = {
-            authorizerId: new CfnAuthorizer(this, 'cognito-authorizer', {
+            authorizerId: new rest.CfnAuthorizer(this, 'cognito-authorizer', {
                 name: 'cognito-authorizer',
                 identitySource: 'method.request.header.Authorization',
-                providerArns: [props.authProvider!],
+                providerArns: [props.authProvider!.userPoolArn],
                 restApiId: this.apiEndpoint.restApiId,
-                type: AuthorizationType.COGNITO,
+                type: rest.AuthorizationType.COGNITO,
             }).ref,
-            authorizationType: AuthorizationType.COGNITO,
+            authorizationType: rest.AuthorizationType.COGNITO,
         };
         // Request Validator
-        this.reqValidator = new RequestValidator(this, 'req-validator', {
+        this.reqValidator = new rest.RequestValidator(this, 'req-validator', {
             restApi: this.apiEndpoint,
             requestValidatorName: "strict-validator",
             validateRequestBody: true,
@@ -171,8 +174,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         this.domain = this.apiEndpoint.addDomainName('domain', {
             certificate: cert,
             domainName: API_DOMAIN,
-            endpointType: EndpointType.REGIONAL,
-            securityPolicy: SecurityPolicy.TLS_1_2,
+            endpointType: rest.EndpointType.REGIONAL,
+            securityPolicy: rest.SecurityPolicy.TLS_1_2,
         });
         new ARecord(this, 'alias-record', {
             zone: props.zone,
@@ -205,8 +208,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             throttlingRateLimit: 50,
             throttlingBurstLimit: 50,
             variables: {["STAGE"]: "prod"},
-            loggingLevel: MethodLoggingLevel.ERROR,
+            loggingLevel: rest.MethodLoggingLevel.ERROR,
             dataTraceEnabled: true,
+            tracingEnabled: true,
         });
         this.stages['dev'] = new rest.Stage(this, 'dev-stage', {
             stageName: 'dev',
@@ -215,8 +219,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             throttlingRateLimit: 10,
             throttlingBurstLimit: 10,
             variables: {["STAGE"]: "dev"},
-            loggingLevel: MethodLoggingLevel.ERROR,
+            loggingLevel: rest.MethodLoggingLevel.ERROR,
             dataTraceEnabled: true,
+            tracingEnabled: true,
         });
         // Mapping from URL path to stages
         this.domain.addBasePathMapping(this.apiEndpoint, {
@@ -234,7 +239,7 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
 
     readonly apiEndpoint: GraphqlApi;
 
-    readonly apiServices: { [name in ApiServices]?: AbstractGraphqlApiService };
+    readonly apiServices: { [name: string]: AbstractGraphqlApiService };
 
     constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
 
@@ -248,6 +253,7 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
                 description: "API Key for development environment.",
             },
         };
+        this.authMode["apiKey"] = apiKeyAuth;
         const cognitoAuth: AuthorizationMode = {
             authorizationType: gql.AuthorizationType.USER_POOL,
             userPoolConfig: {
@@ -255,6 +261,7 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
                 appIdClientRegex: 'web-app',
             },
         };
+        this.authMode["userPool"] = cognitoAuth;
 
         this.apiEndpoint = new GraphqlApi(this, 'graphql-api', {
             name: "wasedatime-gql-api",
@@ -265,10 +272,6 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
             logConfig: {
                 fieldLogLevel: FieldLogLevel.ALL,
             },
-        });
-        new gqlService.SyllabusApiService(this, 'syllabus-api', {
-            apiEndpoint: this.apiEndpoint,
-            dataSource: Table.fromTableArn(this, 'syllabus-table', "arn:aws:dynamodb:ap-northeast-1:564383102056:table/syllabus"),
         });
     }
 }

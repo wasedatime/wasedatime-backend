@@ -59,6 +59,10 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
             DataEndpoint.SYLLABUS,
             syllabusDataPipeline.dataWarehouse.bucketName,
         );
+        this.dataInterface.setEndpoint(
+            DataEndpoint.COURSE,
+            syllabusSyncPipeline.dataWarehouse.tableArn,
+        );
 
         this.operationInterface.setEndpoint(
             OperationEndpoint.SYLLABUS,
