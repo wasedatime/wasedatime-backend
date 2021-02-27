@@ -18,7 +18,6 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
             apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_REST),
             authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
-
         this.app = amplifyApp;
 
         const monoApp = new AmplifyMonoWebApp(this, 'amplify-monorepo-web-app', {

@@ -8,8 +8,11 @@ import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanage
 import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {ApiGatewayDomain} from "@aws-cdk/aws-route53-targets";
 import {IUserPool} from "@aws-cdk/aws-cognito";
-import * as uuid from "uuid";
 
+import * as flatted from 'flatted';
+
+import {AbstractRestApiService} from "./api-service";
+import {apiServiceMap} from "../../configs/api/service";
 import {
     AbstractRestApiService,
     CareerApiService,
@@ -32,9 +35,7 @@ export interface ApiEndpointProps {
 
     zone: IHostedZone;
 
-    dataSources?: { [service in ApiServices]?: string };
-
-    authProvider?: IUserPool;
+    authProvider?: string;
 }
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
@@ -48,17 +49,23 @@ export abstract class AbstractApiEndpoint extends cdk.Construct {
 
 export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
-    abstract readonly apiEndpoint: rest.RestApi;
+    readonly apiEndpoint: RestApi;
 
-    abstract readonly apiServices: { [name in ApiServices]?: AbstractRestApiService };
+    readonly apiServices: { [name: string]: AbstractRestApiService } = {};
 
     abstract readonly stages: { [name: string]: rest.Stage };
+
+    protected authorizer: IAuthorizer;
+
+    protected reqValidator: RequestValidator;
+
+    protected domain: DomainName;
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);
     }
 
-    getDomain(): string {
+    public getDomain(): string {
         const domainName: rest.DomainName | undefined = this.apiEndpoint.domainName;
 
         if (typeof domainName === "undefined") {
@@ -66,6 +73,17 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
         }
         return domainName.domainName;
     }
+
+    public addService(name: string, dataSource?: string, auth: boolean = false): this {
+        this.apiServices[name] = new apiServiceMap[name](this, `${name}-api`, {
+            dataSource: dataSource,
+            authorizer: auth ? this.authorizer : undefined,
+            validator: this.reqValidator,
+        });
+        return this;
+    }
+
+    public abstract deploy(): void
 }
 
 export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
@@ -101,7 +119,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
     /**
      * Services provided by this API
      */
-    readonly apiServices: { [name in ApiServices]?: AbstractRestApiService } = {};
+    readonly apiServices: { [name: string]: AbstractRestApiService };
     /**
      * Stages of this API
      */
@@ -122,10 +140,49 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             responseHeaders: defaultHeaders,
         });
         this.apiEndpoint.addGatewayResponse('5xx-resp', {
-            type: rest.ResponseType.DEFAULT_5XX,
+            type: ResponseType.DEFAULT_5XX,
             responseHeaders: defaultHeaders,
         });
 
+        // Authorizer for methods that requires user login
+        this.authorizer = {
+            authorizerId: new CfnAuthorizer(this, 'cognito-authorizer', {
+                name: 'cognito-authorizer',
+                identitySource: 'method.request.header.Authorization',
+                providerArns: [props.authProvider!],
+                restApiId: this.apiEndpoint.restApiId,
+                type: AuthorizationType.COGNITO,
+            }).ref,
+            authorizationType: AuthorizationType.COGNITO,
+        };
+        // Request Validator
+        this.reqValidator = new RequestValidator(this, 'req-validator', {
+            restApi: this.apiEndpoint,
+            requestValidatorName: "strict-validator",
+            validateRequestBody: true,
+            validateRequestParameters: true,
+        });
+
+        // API Domain
+        const cert = new Certificate(this, 'api-cert', {
+            domainName: API_DOMAIN,
+            validation: CertificateValidation.fromDns(props.zone),
+        });
+        this.domain = this.apiEndpoint.addDomainName('domain', {
+            certificate: cert,
+            domainName: API_DOMAIN,
+            endpointType: EndpointType.REGIONAL,
+            securityPolicy: SecurityPolicy.TLS_1_2,
+        });
+        new ARecord(this, 'alias-record', {
+            zone: props.zone,
+            target: RecordTarget.fromAlias(new ApiGatewayDomain(this.domain)),
+            recordName: API_DOMAIN,
+        });
+    }
+
+    public deploy() {
+        // Deployments
         const prodDeployment = new rest.Deployment(this, 'prod-deployment', {
             api: this.apiEndpoint,
             retainDeployments: false,
@@ -134,10 +191,11 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             api: this.apiEndpoint,
             retainDeployments: false,
         });
+        const hash = new Buffer(flatted.stringify(this.apiServices), 'binary').toString('base64');
         if (STAGE === 'dev') {
-            devDeployment.addToLogicalId(uuid.v4());
+            devDeployment.addToLogicalId(hash);
         } else if (STAGE === 'prod') {
-            prodDeployment.addToLogicalId(uuid.v4());
+            prodDeployment.addToLogicalId(hash);
         }
         // Stages
         this.stages['prod'] = new rest.Stage(this, 'prod-stage', {
@@ -146,8 +204,8 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "Production stage",
             throttlingRateLimit: 50,
             throttlingBurstLimit: 50,
-            variables: {["STAGE"]: STAGE},
-            loggingLevel: rest.MethodLoggingLevel.ERROR,
+            variables: {["STAGE"]: "prod"},
+            loggingLevel: MethodLoggingLevel.ERROR,
             dataTraceEnabled: true,
         });
         this.stages['dev'] = new rest.Stage(this, 'dev-stage', {
@@ -156,95 +214,18 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             description: "Develop stage",
             throttlingRateLimit: 10,
             throttlingBurstLimit: 10,
-            variables: {["STAGE"]: STAGE},
-            loggingLevel: rest.MethodLoggingLevel.ERROR,
+            variables: {["STAGE"]: "dev"},
+            loggingLevel: MethodLoggingLevel.ERROR,
             dataTraceEnabled: true,
         });
-        // API Domain
-        const cert = new Certificate(this, 'api-cert', {
-            domainName: API_DOMAIN,
-            validation: CertificateValidation.fromDns(props.zone),
-        });
-        const domain = this.apiEndpoint.addDomainName('domain', {
-            certificate: cert,
-            domainName: API_DOMAIN,
-            endpointType: rest.EndpointType.REGIONAL,
-            securityPolicy: rest.SecurityPolicy.TLS_1_2,
-        });
-        new ARecord(this, 'alias-record', {
-            zone: props.zone,
-            target: RecordTarget.fromAlias(new ApiGatewayDomain(domain)),
-            recordName: API_DOMAIN,
-        });
         // Mapping from URL path to stages
-        domain.addBasePathMapping(this.apiEndpoint, {
+        this.domain.addBasePathMapping(this.apiEndpoint, {
             basePath: 'staging',
             stage: this.stages['dev'],
         });
-        domain.addBasePathMapping(this.apiEndpoint, {
+        this.domain.addBasePathMapping(this.apiEndpoint, {
             basePath: 'v1',
             stage: this.stages['prod'],
-        });
-        // Authorizer for methods that requires user login
-        const authorizer = {
-            authorizerId: new rest.CfnAuthorizer(this, 'cognito-authorizer', {
-                name: 'cognito-authorizer',
-                identitySource: 'method.request.header.Authorization',
-                providerArns: [props.authProvider?.userPoolArn!],
-                restApiId: this.apiEndpoint.restApiId,
-                type: rest.AuthorizationType.COGNITO,
-            }).ref,
-            authorizationType: rest.AuthorizationType.COGNITO,
-        };
-        // Request Validator
-        const reqValidator = new rest.RequestValidator(this, 'req-validator', {
-            restApi: this.apiEndpoint,
-            requestValidatorName: "strict-validator",
-            validateRequestBody: true,
-            validateRequestParameters: true,
-        });
-        // API Services
-        this.apiServices[ApiServices.SYLLABUS] = new SyllabusApiService(this, 'syllabus-api', {
-            apiEndpoint: this.apiEndpoint,
-            dataSource: props.dataSources![ApiServices.SYLLABUS],
-            validator: reqValidator,
-        });
-        this.apiServices[ApiServices.COURSE_REVIEW] = new CourseReviewsApiService(this, 'course-reviews-api', {
-            apiEndpoint: this.apiEndpoint,
-            dataSource: props.dataSources![ApiServices.COURSE_REVIEW],
-            authorizer: authorizer,
-            validator: reqValidator,
-        });
-        this.apiServices[ApiServices.FEEDS] = new FeedsApiService(this, 'feeds-api', {
-            apiEndpoint: this.apiEndpoint,
-            validator: reqValidator,
-        });
-        this.apiServices[ApiServices.CAREER] = new CareerApiService(this, 'career-api', {
-            apiEndpoint: this.apiEndpoint,
-            validator: reqValidator,
-        });
-        this.apiServices[ApiServices.TIMETABLE] = new TimetableApiService(this, 'timetable-api', {
-            apiEndpoint: this.apiEndpoint,
-            dataSource: props.dataSources![ApiServices.TIMETABLE],
-            authorizer: authorizer,
-            validator: reqValidator,
-        });
-    }
-}
-
-export class WasedaTimeHttpEndpoint extends AbstractHttpApiEndpoint {
-
-    readonly apiEndpoint: HttpApi;
-
-    readonly apiServices: { [name in ApiServices]?: AbstractHttpApiService };
-
-    constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
-        super(scope, id, props);
-
-        this.apiEndpoint = new HttpApi(this, 'http-api-endpoint', {
-            apiName: "wasedatime-http-api",
-            description: "The main API endpoint for WasedaTime Web App.",
-            disableExecuteApiEndpoint: true,
         });
     }
 }

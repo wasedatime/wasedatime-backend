@@ -9,7 +9,7 @@ import {
     WasedaTimeRestApiEndpoint,
 } from "../constructs/business/api-endpoint";
 import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
-import {ApiServices} from "../configs/api-gateway/service";
+import {ApiEndpoint} from "../configs/api/service";
 import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";
 import {AbstractAuthProvider, WasedaTimeUserAuth} from "../constructs/business/authentication";
@@ -29,15 +29,18 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
 
         const restApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
             zone: hostedZone,
-            dataSources: {
-                [ApiServices.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
-                [ApiServices.COURSE_REVIEW]: this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),
-                [ApiServices.TIMETABLE]: this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE),
-            },
-            authProvider: authEndpoint.pool,
+            authProvider: authEndpoint.pool.userPoolArn,
         });
         this.apiEndpoints["rest-api"] = restApiEndpoint;
 
+        mainApiEndpoint.addService("syllabus", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
+            .addService("course-reviews", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
+            .addService("feeds")
+            .addService("career")
+            .addService("timetable", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
+        mainApiEndpoint.deploy();
+
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, mainApiEndpoint.getDomain());
         const graphqlApiEndpoint: AbstractGraphqlEndpoint = new WasedaTimeGraphqlEndpoint(this, 'graphql-api-endpoint', {
             zone: hostedZone,
             dataSources: {

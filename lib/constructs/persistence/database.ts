@@ -28,8 +28,8 @@ export class DynamoDatabase extends cdk.Construct {
             removalPolicy: cdk.RemovalPolicy.RETAIN,
             sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "course-review",
-            readCapacity: 5,
-            writeCapacity: 5,
+            readCapacity: 10,
+            writeCapacity: 7,
             pointInTimeRecovery: true,
         });
 
@@ -61,8 +61,8 @@ export class DynamoDatabase extends cdk.Construct {
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
             tableName: "timetable",
-            readCapacity: 2,
-            writeCapacity: 2,
+            readCapacity: 12,
+            writeCapacity: 15,
             pointInTimeRecovery: true,
         });
     }
