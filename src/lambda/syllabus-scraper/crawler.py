@@ -1,5 +1,6 @@
 import urllib.request as requests
 from const import *
+from datetime import datetime
 from lxml import html
 from utils import *
 
@@ -16,6 +17,10 @@ class SyllabusCrawler:
             raise ValueError
         self.school = school
         self.worker = worker
+        now = datetime.now()
+        self.year = now.year
+        if now.month < 3:
+            self.year = self.year - 1
 
     def execute(self):
         """
@@ -96,15 +101,16 @@ class SyllabusCrawler:
             "d": scrape_info(info_en, 'instructor', to_half_width),
             "e": scrape_info(info_jp, 'instructor', to_half_width),
             "f": scrape_info(info_en, 'lang', parse_lang),
-            "g": scrape_info(info_en, 'type', to_enum(type_enum_map)),
+            "g": scrape_info(info_jp, 'type', to_enum(type_enum_map)),
             "h": scrape_info(info_en, 'occurrence', parse_term),
             "i": merge_period_location(periods, locations),
             "j": scrape_info(info_en, 'min_year', parse_min_year),
             "k": scrape_info(info_en, 'category', to_half_width),
             "l": scrape_info(info_en, 'credit', parse_credit),
-            "m": scrape_info(info_en, 'level', to_enum(level_enum_map)),
+            "m": scrape_info(info_jp, 'level', to_enum(level_enum_map)),
             "n": get_eval_criteria(parsed_en),
-            "o": scrape_info(info_en, 'code', None),
+            "o": scrape_info(info_jp, 'code', None),
             "p": scrape_text(parsed_en, "Subtitle", to_half_width),
-            "q": scrape_info(info_jp, 'category', to_half_width)
+            "q": scrape_info(info_jp, 'category', to_half_width),
+            "r": scrape_info(info_jp, 'modality', to_enum(modality_enum_map)),
         }

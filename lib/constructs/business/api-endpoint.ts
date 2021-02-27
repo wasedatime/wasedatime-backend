@@ -18,7 +18,6 @@ import {
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import {GraphqlApi} from "@aws-cdk/aws-appsync";
 import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
-import * as crypto from 'crypto';
 import * as flatted from 'flatted';
 
 import {AbstractRestApiService} from "./api-service";
@@ -75,7 +74,6 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
     public addService(name: string, dataSource?: string, auth: boolean = false): this {
         this.apiServices[name] = new apiServiceMap[name](this, `${name}-api`, {
-            apiEndpoint: this.apiEndpoint,
             dataSource: dataSource,
             authorizer: auth ? this.authorizer : undefined,
             validator: this.reqValidator,
@@ -167,10 +165,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
         });
         const devDeployment = new Deployment(this, 'dev-deployment', {
             api: this.apiEndpoint,
-            retainDeployments: false
+            retainDeployments: false,
         });
-        // hash for detecting changes to api configs
-        const hash = crypto.createHash('md5').update(flatted.stringify(this.apiServices)).digest('hex');
+        const hash = new Buffer(flatted.stringify(this.apiServices), 'binary').toString('base64');
         if (STAGE === 'dev') {
             devDeployment.addToLogicalId(hash);
         } else if (STAGE === 'prod') {
