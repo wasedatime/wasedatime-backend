@@ -93,7 +93,7 @@ jobs:
           npm ci
 
       - name: Deploy dev
-        if: github.ref != 'refs/heads/develop'
+        if: github.ref == 'refs/heads/develop'
         env:
           STAGE: dev
         run: cdk deploy --all --require-approval "never"
