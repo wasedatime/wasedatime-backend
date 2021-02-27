@@ -33,12 +33,12 @@ export abstract class AbstractGraphqlApiService extends cdk.Construct {
     }
 }
 
-export class CourseApiService extends cdk.Construct {
+export class CourseApiService extends AbstractGraphqlApiService {
 
     readonly resolvers: { [name: string]: Resolver } = {};
 
     constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
-        super(scope, id);
+        super(scope, id, props);
 
         const dataSource = scope.apiEndpoint.addDynamoDbDataSource('dynamo-db', props.dataSource, {
             description: "Syllabus table from DynamoDB.",

@@ -40,7 +40,7 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 
     readonly apiEndpoint: rest.RestApi;
 
-    readonly apiServices: { [name: string]: AbstractRestApiService } = {};
+    abstract readonly apiServices: { [name: string]: AbstractRestApiService };
 
     abstract readonly stages: { [name: string]: rest.Stage };
 
@@ -81,7 +81,7 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
 
     abstract readonly apiServices: { [name: string]: AbstractGraphqlApiService };
 
-    protected authMode: { [mode: string]: AuthorizationMode };
+    protected authMode: { [mode: string]: AuthorizationMode } = {};
 
     protected constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
         super(scope, id, props);
@@ -122,7 +122,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
     /**
      * Services provided by this API
      */
-    readonly apiServices: { [name: string]: AbstractRestApiService };
+    readonly apiServices: { [name: string]: AbstractRestApiService } = {};
     /**
      * Stages of this API
      */

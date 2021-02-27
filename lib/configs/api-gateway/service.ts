@@ -1,4 +1,4 @@
-import * as rest from "../../constructs/business/api-service";
+import * as rest from "../../constructs/business/rest-api-service";
 import * as gql from "../../constructs/business/graphql-api-service";
 
 export enum ApiEndpoint {
