@@ -9,13 +9,12 @@ import {
     AbstractStatusNotifier,
     AmplifyBuildStatusNotifier,
     StatusNotifier,
-    SyllabusScraperStatusNotifier
+    SyllabusScraperStatusNotifier,
 } from "../constructs/admin/status-notifier";
 import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../configs/chatbot/slack";
 import {FreeTierUsageBudget} from "../constructs/admin/budget";
 import {CF_TOPIC_ARN} from "../configs/common/arn";
 import {GlobalTrailLogs} from "../constructs/admin/log";
-import {WasedaTimeHostedZone} from "../constructs/common/hosted-zone";
 
 
 export class WasedaTimeAdminLayer extends AdminLayer {
@@ -24,18 +23,14 @@ export class WasedaTimeAdminLayer extends AdminLayer {
 
     readonly chatbot: SlackChannelConfiguration;
 
-    readonly hostedZone: WasedaTimeHostedZone;
-
     readonly trail: GlobalTrailLogs;
 
     constructor(scope: cdk.Construct, id: string, operationInterface: OperationInterface, props: cdk.StackProps) {
-
         super(scope, id, operationInterface, props);
 
         this.statusNotifiers[StatusNotifier.BUILD_STATUS] = new AmplifyBuildStatusNotifier(this, 'build-notifier', {
             target: this.operationInterface.getEndpoint(OperationEndpoint.APP)
         });
-
         this.statusNotifiers[StatusNotifier.SCRAPER_STATUS] = new SyllabusScraperStatusNotifier(this, 'scraper-notifier', {
             target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS)
         });
@@ -59,7 +54,5 @@ export class WasedaTimeAdminLayer extends AdminLayer {
         });
 
         this.trail = new GlobalTrailLogs(this, 'cloudtrail-logs');
-
-        this.hostedZone = new WasedaTimeHostedZone(this, 'wt-hosted-zone');
     }
 }

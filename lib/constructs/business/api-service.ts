@@ -9,7 +9,6 @@ import {
     PassthroughBehavior,
     RequestValidator,
     Resource,
-    RestApi
 } from "@aws-cdk/aws-apigateway";
 import {HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
@@ -22,7 +21,7 @@ import {
     courseReviewGetRespSchema,
     courseReviewPatchReqSchema,
     courseReviewPostReqSchema,
-    syllabusSchema
+    syllabusSchema,
 } from "../../configs/api/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
 import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions} from "../common/lambda-functions";
@@ -30,8 +29,6 @@ import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} fr
 
 
 export interface ApiServiceProps {
-
-    apiEndpoint: RestApi;
 
     dataSource?: string;
 
@@ -57,17 +54,14 @@ export class SyllabusApiService extends AbstractRestApiService {
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
-        const root = new Resource(scope, 'syllabus', {
-            parent: scope.apiEndpoint.root,
-            pathPart: "syllabus"
-        });
+        const root = scope.apiEndpoint.root.addResource("syllabus");
         const syllabusSchools: Resource = root.addResource("{school}");
 
-        const getRespModel = props.apiEndpoint.addModel('syllabus-get-resp-model', {
+        const getRespModel = scope.apiEndpoint.addModel('syllabus-get-resp-model', {
             schema: syllabusSchema,
             contentType: "application/json",
             description: "The new syllabus JSON schema for each school.",
-            modelName: "GetSyllabusResp"
+            modelName: "GetSyllabusResp",
         });
 
         const apiGatewayRole = new Role(this, 'rest-api-s3', {
@@ -186,28 +180,25 @@ export class CourseReviewsApiService extends AbstractRestApiService {
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
-        const root = new Resource(this, 'course-reviews', {
-            parent: scope.apiEndpoint.root,
-            pathPart: "course-reviews"
-        }).addResource('{key}');
+        const root = scope.apiEndpoint.root.addResource("course-reviews").addResource('{key}');
 
-        const getRespModel = props.apiEndpoint.addModel('review-get-resp-model', {
+        const getRespModel = scope.apiEndpoint.addModel('review-get-resp-model', {
             schema: courseReviewGetRespSchema,
             contentType: "application/json",
             description: "HTTP GET response body schema for fetching reviews.",
-            modelName: "GetReviewsResp"
+            modelName: "GetReviewsResp",
         });
-        const postReqModel = props.apiEndpoint.addModel('review-post-req-model', {
+        const postReqModel = scope.apiEndpoint.addModel('review-post-req-model', {
             schema: courseReviewPostReqSchema,
             contentType: "application/json",
             description: "HTTP POST request body schema for submitting the review.",
-            modelName: "PostReviewReq"
+            modelName: "PostReviewReq",
         });
-        const patchReqModel = props.apiEndpoint.addModel('review-patch-req-model', {
+        const patchReqModel = scope.apiEndpoint.addModel('review-patch-req-model', {
             schema: courseReviewPatchReqSchema,
             contentType: "application/json",
             description: "HTTP PATCH request body schema for updating a review",
-            modelName: "PatchReviewReq"
+            modelName: "PatchReviewReq",
         });
 
         const courseReviewsFunctions = new CourseReviewsFunctions(this, 'crud-functions', {
@@ -308,16 +299,13 @@ export class FeedsApiService extends AbstractRestApiService {
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
-        const root = new Resource(scope, 'feeds', {
-            parent: scope.apiEndpoint.root,
-            pathPart: "feeds"
-        });
+        const root = scope.apiEndpoint.root.addResource("feeds");
 
-        const getRespModel = props.apiEndpoint.addModel('feeds-get-resp-model', {
+        const getRespModel = scope.apiEndpoint.addModel('feeds-get-resp-model', {
             schema: articleListSchema,
             contentType: "application/json",
             description: "List of articles in feeds",
-            modelName: "GetFeedsResp"
+            modelName: "GetFeedsResp",
         });
 
         const getIntegration = new MockIntegration({
@@ -381,10 +369,7 @@ export class CareerApiService extends AbstractRestApiService {
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
-        const root = new Resource(scope, 'career', {
-            parent: scope.apiEndpoint.root,
-            pathPart: "career"
-        });
+        const root = scope.apiEndpoint.root.addResource("career");
         const intern = root.addResource('intern');
         const part = root.addResource('part-time');
         const seminar = root.addResource('seminar');
@@ -481,10 +466,7 @@ export class TimetableApiService extends AbstractRestApiService {
     constructor(scope: AbstractRestApiEndpoint, id: string, props: ApiServiceProps) {
         super(scope, id, props);
 
-        const root = new Resource(scope, 'timetable', {
-            parent: scope.apiEndpoint.root,
-            pathPart: "timetable"
-        });
+        const root = scope.apiEndpoint.root.addResource("timetable");
         const timetableImport = root.addResource('import');
         const timetableExport = root.addResource('export');
 

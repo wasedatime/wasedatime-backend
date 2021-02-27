@@ -9,7 +9,6 @@ from botocore.config import Config
 from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from const import *
-from datetime import datetime
 
 
 def scrape_info(parsed, key, fn):
@@ -20,14 +19,22 @@ def scrape_info(parsed, key, fn):
     :param fn: function used to transform data
     :return: scraped information
     """
-    if not fn:
-        return parsed.xpath(query[key])[0]
-    return fn(parsed.xpath(query[key])[0])
+    section = parsed.xpath(query[key])
+    # special cases if modality not present
+    if (key == "code" or key == "level" or key == "type") and scrape_info(parsed, 'modality',
+                                                                          to_enum(modality_enum_map)) == -1:
+        section = parsed.xpath(query[f"{key}_old"])
+    if section:
+        if not fn:
+            return section[0]
+        return fn(section[0])
+    return ""
 
 
-def build_url(dept=None, page=1, lang="en", course_id=None):
+def build_url(dept=None, page=1, lang="en", course_id=None, year=2021):
     """
     Constructs the url of course catalog page or course detail page(if course id is present)
+    :param year: year
     :param course_id: course id
     :param dept: department code
     :param page: page number
@@ -37,11 +44,6 @@ def build_url(dept=None, page=1, lang="en", course_id=None):
     if course_id:
         return f"https://www.wsl.waseda.jp/syllabus/JAA104.php?pKey={course_id}&pLng={lang}"
     param = school_name_map[dept]["param"]
-    now = datetime.now()
-    if now.month < 3:
-        year = now.year - 1
-    else:
-        year = now.year
     return f"https://www.wsl.waseda.jp/syllabus/JAA103.php?pYear={year}&p_gakubu={param}&p_page={page}&p_number=100" \
            f"&pLng={lang} "
 
