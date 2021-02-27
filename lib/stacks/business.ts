@@ -45,7 +45,7 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         });
         this.apiEndpoints["graphql-api"] = graphqlApiEndpoint;
 
-        // graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
+        graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
 
         this.serviceInterface.setEndpoint(ServiceEndpoint.API_REST, restApiEndpoint.getDomain());
         this.serviceInterface.setEndpoint(ServiceEndpoint.API_GRAPHQL, graphqlApiEndpoint.getDomain());

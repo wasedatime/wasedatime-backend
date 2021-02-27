@@ -14,7 +14,7 @@ import {HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 import {AbstractRestApiEndpoint} from "./api-endpoint";
-import {allowHeaders, allowOrigins} from "../../configs/api/cors";
+import {allowHeaders, allowOrigins} from "../../configs/api-gateway/cors";
 import {
     articleListSchema,
     articlePlainJson,
@@ -22,10 +22,10 @@ import {
     courseReviewPatchReqSchema,
     courseReviewPostReqSchema,
     syllabusSchema,
-} from "../../configs/api/schema";
+} from "../../configs/api-gateway/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
 import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions} from "../common/lambda-functions";
-import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} from "../../configs/api/mapping";
+import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} from "../../configs/api-gateway/mapping";
 
 
 export interface RestApiServiceProps {
