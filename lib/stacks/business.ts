@@ -12,11 +12,14 @@ import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";
 import {AbstractAuthProvider, WasedaTimeUserAuth} from "../constructs/business/authentication";
+import {WasedaTimeApiRouter} from "../constructs/business/api-router";
 
 
 export class WasedaTimeBusinessLayer extends BusinessLayer {
 
     apiEndpoints: { [name: string]: AbstractApiEndpoint } = {};
+
+    apiGateway: WasedaTimeApiRouter;
 
     authProvider: AbstractAuthProvider;
 
@@ -47,8 +50,12 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
 
         graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
 
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API_REST, restApiEndpoint.getDomain());
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API_GRAPHQL, graphqlApiEndpoint.getDomain());
+        this.apiGateway = new WasedaTimeApiRouter(this, 'api-router', {
+            "rest": restApiEndpoint.getDomain(),
+            "graphql": graphqlApiEndpoint.getDomain(),
+        }, hostedZone);
+
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API, this.apiGateway.domain);
         this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }

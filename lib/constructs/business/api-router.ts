@@ -9,43 +9,62 @@ import {
     ViewerProtocolPolicy,
 } from '@aws-cdk/aws-cloudfront';
 import {HttpOrigin} from "@aws-cdk/aws-cloudfront-origins";
+import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
+import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
+import {CloudFrontTarget} from "@aws-cdk/aws-route53-targets";
+
 import {API_DOMAIN} from "../../configs/route53/domain";
 
 
-export class WasedaTimeApiDistribution extends cdk.Construct {
+export class WasedaTimeApiRouter extends cdk.Construct {
 
     readonly distribution: Distribution;
 
-    constructor(scope: cdk.Construct, id: string, apiDomains: { [name: string]: string }) {
+    readonly domain: string;
+
+    constructor(scope: cdk.Construct, id: string, apiDomains: { [name: string]: string }, zone: IHostedZone) {
         super(scope, id);
 
-        const cacheRestApiGw: BehaviorOptions = {
+        const routeRestApiGw: BehaviorOptions = {
             origin: new HttpOrigin(apiDomains.rest),
             allowedMethods: AllowedMethods.ALLOW_ALL,
-            cachePolicy: CachePolicy.CACHING_OPTIMIZED,
+            cachePolicy: CachePolicy.CACHING_DISABLED,
             cachedMethods: CachedMethods.CACHE_GET_HEAD,
             compress: true,
             originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
-            viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY,
         };
-        const cacheGraphqlApi: BehaviorOptions = {
+        const routeGraphqlApi: BehaviorOptions = {
             origin: new HttpOrigin(apiDomains.graphql),
             allowedMethods: AllowedMethods.ALLOW_ALL,
-            cachePolicy: CachePolicy.CACHING_OPTIMIZED,
+            cachePolicy: CachePolicy.CACHING_DISABLED,
             cachedMethods: CachedMethods.CACHE_GET_HEAD,
             compress: true,
             originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
-            viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY,
         };
+
+        const cert = new Certificate(this, 'api-cert', {
+            domainName: API_DOMAIN,
+            validation: CertificateValidation.fromDns(zone),
+        });
 
         this.distribution = new Distribution(this, 'distribution', {
             comment: "Proxy/Gateway router for API Gateway and AppSync GraphQL API.",
-            defaultBehavior: cacheRestApiGw,
+            defaultBehavior: routeRestApiGw,
             additionalBehaviors: {
-                "graphql": cacheGraphqlApi,
+                "/graphql": routeGraphqlApi,
             },
+            certificate: cert,
             domainNames: [API_DOMAIN],
         });
-    }
 
+        new ARecord(this, 'alias-record', {
+            zone: zone,
+            target: RecordTarget.fromAlias(new CloudFrontTarget(this.distribution)),
+            recordName: API_DOMAIN,
+        });
+
+        this.domain = this.distribution.domainName;
+    }
 }
