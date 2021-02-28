@@ -193,6 +193,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             dataTraceEnabled: true,
             tracingEnabled: true,
         });
+
+        this.apiEndpoint.deploymentStage = this.stages['prod'];
+
         this.stages['dev'] = new rest.Stage(this, 'dev-stage', {
             stageName: 'dev',
             deployment: devDeployment,
