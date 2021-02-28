@@ -247,6 +247,7 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
             logConfig: {
                 fieldLogLevel: FieldLogLevel.ALL,
             },
+            xrayEnabled: true,
         });
     }
 }

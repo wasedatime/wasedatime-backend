@@ -1,9 +1,11 @@
 from boto3.dynamodb.conditions import Key
-from utils import JsonPayloadBuilder, resp_handler, table
+from utils import JsonPayloadBuilder
+from utils import resp_handler
+from utils import table
 
 
 @resp_handler
-def get_reviews(course_key, uid):
+def get_reviews(course_key, uid=""):
     results = table.query(KeyConditionExpression=Key("course_key").eq(course_key), ScanIndexForward=False)["Items"]
     for r in results:
         r.pop("course_key")
@@ -22,8 +24,9 @@ def get_reviews(course_key, uid):
 
 def handler(event, context):
     params = {
-        "course_key": event["pathParameters"]["key"],
-        "uid": event["queryStringParameters"]["uid"]
+        "course_key": event["pathParameters"]["key"]
     }
+    if "uid" in event["queryStringParameters"]:
+        params["uid"] = event["queryStringParameters"]["uid"]
 
     return get_reviews(**params)
