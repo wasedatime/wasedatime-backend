@@ -89,7 +89,7 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
 
     public addService(name: string, dataSource: string, auth: string = 'apiKey'): this {
         this.apiServices[name] = new apiServiceMap[name](this, `${name}-api`, {
-            dataSource: Table.fromTableName(this, `${name}-datasource`, dataSource),
+            dataSource: Table.fromTableName(this, `${name}-table`, dataSource),
             auth: this.authMode[auth],
         });
         return this;
