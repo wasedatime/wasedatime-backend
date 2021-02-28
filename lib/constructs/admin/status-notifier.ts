@@ -52,20 +52,20 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
             enabled: true,
             eventPattern: {
                 source: [
-                    "aws.amplify"
+                    "aws.amplify",
                 ],
                 detailType: [
-                    "Amplify Deployment Status Change"
+                    "Amplify Deployment Status Change",
                 ],
                 detail: {
                     "appId": [props.target],
                     "jobStatus": [
                         "SUCCEED",
                         "FAILED",
-                        "STARTED"
-                    ]
-                }
-            }
+                        "STARTED",
+                    ],
+                },
+            },
         });
 
         this.publisher.addTarget(new LambdaFunction(this.subscriber));
@@ -91,10 +91,10 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
             enabled: true,
             eventPattern: {
                 source: [
-                    "aws.states"
+                    "aws.states",
                 ],
                 detailType: [
-                    "Step Functions Execution Status Change"
+                    "Step Functions Execution Status Change",
                 ],
                 detail: {
                     "status": [
@@ -102,11 +102,11 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
                         "SUCCEEDED",
                         "FAILED",
                         "TIMED_OUT",
-                        "ABORTED"
+                        "ABORTED",
                     ],
-                    "stateMachineArn": [props.target]
-                }
-            }
+                    "stateMachineArn": [props.target],
+                },
+            },
         });
 
         this.publisher.addTarget(new LambdaFunction(this.subscriber));

@@ -27,33 +27,33 @@ export const syllabusSchema: JsonSchema = {
             "n",
             "o",
             "p",
-            "q"
+            "q",
         ],
         properties: {
             "a": {
                 type: JsonSchemaType.STRING,
                 title: "Course Key",
-                description: "Course key of the course."
+                description: "Course key of the course.",
             },
             "b": {
                 type: JsonSchemaType.STRING,
                 title: "Title",
-                description: "Course title in English."
+                description: "Course title in English.",
             },
             "c": {
                 type: JsonSchemaType.STRING,
                 title: "Title JP",
-                description: "Course title in Japanese."
+                description: "Course title in Japanese.",
             },
             "d": {
                 type: JsonSchemaType.STRING,
                 title: "Instructor",
-                description: "Instructor's name in English."
+                description: "Instructor's name in English.",
             },
             "e": {
                 type: JsonSchemaType.STRING,
                 title: "Instructor JP",
-                description: "Instructor's name in Japanese."
+                description: "Instructor's name in Japanese.",
             },
             "f": {
                 type: JsonSchemaType.ARRAY,
@@ -74,9 +74,9 @@ export const syllabusSchema: JsonSchema = {
                         6,
                         7,
                         8,
-                        9
-                    ]
-                }
+                        9,
+                    ],
+                },
             },
             "g": {
                 type: JsonSchemaType.INTEGER,
@@ -92,8 +92,8 @@ export const syllabusSchema: JsonSchema = {
                     5,
                     6,
                     7,
-                    8
-                ]
+                    8,
+                ],
             },
             "h": {
                 type: JsonSchemaType.STRING,
@@ -122,8 +122,8 @@ export const syllabusSchema: JsonSchema = {
                     "1&2s",
                     "0s&1",
                     "f/2s",
-                    "0i&3i"
-                ]
+                    "0i&3i",
+                ],
             },
             "i": {
                 type: JsonSchemaType.ARRAY,
@@ -136,7 +136,7 @@ export const syllabusSchema: JsonSchema = {
                     required: [
                         "d",
                         "p",
-                        "l"
+                        "l",
                     ],
                     properties: {
                         "d": {
@@ -151,21 +151,21 @@ export const syllabusSchema: JsonSchema = {
                                 3,
                                 4,
                                 5,
-                                6
-                            ]
+                                6,
+                            ],
                         },
                         "p": {
                             type: JsonSchemaType.INTEGER,
                             title: "Period",
-                            description: "The period on which the course is taught.\nstart_period := -1 others | 0 On-demand | 1 .. 9\nend_period := start_period "
+                            description: "The period on which the course is taught.\nstart_period := -1 others | 0 On-demand | 1 .. 9\nend_period := start_period ",
                         },
                         "l": {
                             type: JsonSchemaType.STRING,
                             title: "Loction",
-                            description: "The location where the course takes place."
-                        }
-                    }
-                }
+                            description: "The location where the course takes place.",
+                        },
+                    },
+                },
             },
             "j": {
                 type: JsonSchemaType.INTEGER,
@@ -176,18 +176,18 @@ export const syllabusSchema: JsonSchema = {
                     1,
                     2,
                     3,
-                    4
-                ]
+                    4,
+                ],
             },
             "k": {
                 type: JsonSchemaType.STRING,
                 title: "Category",
-                description: "The category the course falls in."
+                description: "The category the course falls in.",
             },
             "l": {
                 type: JsonSchemaType.INTEGER,
                 title: "Credit",
-                description: "The credit of the course.\n -1 unknown | 0 .."
+                description: "The credit of the course.\n -1 unknown | 0 ..",
             },
             "m": {
                 type: JsonSchemaType.INTEGER,
@@ -200,8 +200,8 @@ export const syllabusSchema: JsonSchema = {
                     2,
                     3,
                     4,
-                    5
-                ]
+                    5,
+                ],
             },
             "n": {
                 type: JsonSchemaType.ARRAY,
@@ -214,7 +214,7 @@ export const syllabusSchema: JsonSchema = {
                     required: [
                         "t",
                         "p",
-                        "c"
+                        "c",
                     ],
                     properties: {
                         "t": {
@@ -226,39 +226,39 @@ export const syllabusSchema: JsonSchema = {
                                 0,
                                 1,
                                 2,
-                                3
-                            ]
+                                3,
+                            ],
                         },
                         "p": {
                             type: JsonSchemaType.INTEGER,
                             title: "Percentage",
-                            description: "The percentage of this criteria in evaluation."
+                            description: "The percentage of this criteria in evaluation.",
                         },
                         "c": {
                             type: JsonSchemaType.STRING,
                             title: "Comment",
-                            description: "An explanation about the criteria."
-                        }
-                    }
-                }
+                            description: "An explanation about the criteria.",
+                        },
+                    },
+                },
             },
             "o": {
                 type: JsonSchemaType.STRING,
                 title: "Code",
-                description: "Course code"
+                description: "Course code",
             },
             "p": {
                 type: JsonSchemaType.STRING,
                 title: "Subtitle",
-                description: "Subtitle of the course (often seen in seminar courses)"
+                description: "Subtitle of the course (often seen in seminar courses)",
             },
             "q": {
                 type: JsonSchemaType.STRING,
                 title: "CategoryJP",
-                description: "The category the course falls in.(in Japanese)"
-            }
-        }
-    }
+                description: "The category the course falls in.(in Japanese)",
+            },
+        },
+    },
 };
 
 export const courseReviewGetRespSchema: JsonSchema = {
@@ -266,7 +266,7 @@ export const courseReviewGetRespSchema: JsonSchema = {
     type: JsonSchemaType.OBJECT,
     properties: {
         "success": {
-            type: JsonSchemaType.BOOLEAN
+            type: JsonSchemaType.BOOLEAN,
         },
         "data": {
             type: JsonSchemaType.ARRAY,
@@ -274,56 +274,56 @@ export const courseReviewGetRespSchema: JsonSchema = {
                 type: JsonSchemaType.OBJECT,
                 properties: {
                     "title_jp": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "instructor_jp": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "updated_at": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "created_at": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "benefit": {
-                        type: JsonSchemaType.INTEGER
+                        type: JsonSchemaType.INTEGER,
                     },
                     "difficulty": {
-                        type: JsonSchemaType.INTEGER
+                        type: JsonSchemaType.INTEGER,
                     },
                     "satisfaction": {
-                        type: JsonSchemaType.INTEGER
+                        type: JsonSchemaType.INTEGER,
                     },
                     "instructor": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "comment_zh_CN": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "comment_en": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "comment_ko": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "year": {
-                        type: JsonSchemaType.INTEGER
+                        type: JsonSchemaType.INTEGER,
                     },
                     "src_lang": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "comment_ja": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "comment_zh_TW": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "title": {
-                        type: JsonSchemaType.STRING
+                        type: JsonSchemaType.STRING,
                     },
                     "mod": {
-                        type: JsonSchemaType.BOOLEAN
-                    }
+                        type: JsonSchemaType.BOOLEAN,
+                    },
                 },
                 required: [
                     "title_jp",
@@ -342,19 +342,19 @@ export const courseReviewGetRespSchema: JsonSchema = {
                     "src_lang",
                     "comment_ja",
                     "title",
-                    "mod"
-                ]
-            }
+                    "mod",
+                ],
+            },
         },
         "message": {
-            type: JsonSchemaType.STRING
-        }
+            type: JsonSchemaType.STRING,
+        },
     },
     required: [
         "success",
         "data",
-        "message"
-    ]
+        "message",
+    ],
 };
 
 export const courseReviewPostReqSchema: JsonSchema = {
@@ -365,32 +365,32 @@ export const courseReviewPostReqSchema: JsonSchema = {
             type: JsonSchemaType.OBJECT,
             properties: {
                 "title_jp": {
-                    type: JsonSchemaType.STRING
+                    type: JsonSchemaType.STRING,
                 },
                 "instructor_jp": {
-                    type: JsonSchemaType.STRING
+                    type: JsonSchemaType.STRING,
                 },
                 "benefit": {
-                    type: JsonSchemaType.INTEGER
+                    type: JsonSchemaType.INTEGER,
                 },
                 "difficulty": {
-                    type: JsonSchemaType.INTEGER
+                    type: JsonSchemaType.INTEGER,
                 },
                 "satisfaction": {
-                    type: JsonSchemaType.INTEGER
+                    type: JsonSchemaType.INTEGER,
                 },
                 "instructor": {
-                    type: JsonSchemaType.STRING
+                    type: JsonSchemaType.STRING,
                 },
                 "year": {
-                    type: JsonSchemaType.INTEGER
+                    type: JsonSchemaType.INTEGER,
                 },
                 "comment": {
-                    type: JsonSchemaType.STRING
+                    type: JsonSchemaType.STRING,
                 },
                 "title": {
-                    type: JsonSchemaType.STRING
-                }
+                    type: JsonSchemaType.STRING,
+                },
             },
             required: [
                 "title_jp",
@@ -401,13 +401,13 @@ export const courseReviewPostReqSchema: JsonSchema = {
                 "instructor",
                 "comment",
                 "year",
-                "title"
-            ]
-        }
+                "title",
+            ],
+        },
     },
     required: [
-        "data"
-    ]
+        "data",
+    ],
 };
 
 export const courseReviewPatchReqSchema: JsonSchema = {
@@ -418,29 +418,29 @@ export const courseReviewPatchReqSchema: JsonSchema = {
             type: JsonSchemaType.OBJECT,
             properties: {
                 "benefit": {
-                    type: JsonSchemaType.INTEGER
+                    type: JsonSchemaType.INTEGER,
                 },
                 "difficulty": {
-                    type: JsonSchemaType.INTEGER
+                    type: JsonSchemaType.INTEGER,
                 },
                 "satisfaction": {
-                    type: JsonSchemaType.INTEGER
+                    type: JsonSchemaType.INTEGER,
                 },
                 "comment": {
-                    type: JsonSchemaType.STRING
+                    type: JsonSchemaType.STRING,
                 },
             },
             required: [
                 "benefit",
                 "difficulty",
                 "satisfaction",
-                "comment"
-            ]
-        }
+                "comment",
+            ],
+        },
     },
     required: [
-        "data"
-    ]
+        "data",
+    ],
 };
 
 export const baseJsonApiSchema: JsonSchema = {
@@ -448,20 +448,20 @@ export const baseJsonApiSchema: JsonSchema = {
     type: JsonSchemaType.OBJECT,
     properties: {
         "success": {
-            type: JsonSchemaType.BOOLEAN
+            type: JsonSchemaType.BOOLEAN,
         },
         "data": {
-            type: JsonSchemaType.NULL
+            type: JsonSchemaType.NULL,
         },
         "message": {
-            type: JsonSchemaType.STRING
-        }
+            type: JsonSchemaType.STRING,
+        },
     },
     required: [
         "success",
         "data",
-        "message"
-    ]
+        "message",
+    ],
 };
 
 export const articleListSchema: JsonSchema = {
@@ -469,7 +469,7 @@ export const articleListSchema: JsonSchema = {
     type: JsonSchemaType.OBJECT,
     properties: {
         "success": {
-            type: JsonSchemaType.BOOLEAN
+            type: JsonSchemaType.BOOLEAN,
         },
         "data": {
             type: JsonSchemaType.OBJECT,
@@ -480,32 +480,32 @@ export const articleListSchema: JsonSchema = {
                         type: JsonSchemaType.OBJECT,
                         properties: {
                             "category": {
-                                type: JsonSchemaType.STRING
+                                type: JsonSchemaType.STRING,
                             },
                             "title": {
-                                type: JsonSchemaType.STRING
+                                type: JsonSchemaType.STRING,
                             },
                             "author": {
-                                type: JsonSchemaType.STRING
+                                type: JsonSchemaType.STRING,
                             },
                             "summary": {
-                                type: JsonSchemaType.STRING
+                                type: JsonSchemaType.STRING,
                             },
                             "created_at": {
-                                type: JsonSchemaType.STRING
+                                type: JsonSchemaType.STRING,
                             },
                             "updated_at": {
-                                type: JsonSchemaType.STRING
+                                type: JsonSchemaType.STRING,
                             },
                             "tags": {
                                 type: JsonSchemaType.ARRAY,
                                 items: {
-                                    type: JsonSchemaType.STRING
-                                }
+                                    type: JsonSchemaType.STRING,
+                                },
                             },
                             "src": {
-                                type: JsonSchemaType.STRING
-                            }
+                                type: JsonSchemaType.STRING,
+                            },
                         },
                         required: [
                             "category",
@@ -515,32 +515,32 @@ export const articleListSchema: JsonSchema = {
                             "created_at",
                             "updated_at",
                             "tags",
-                            "src"
-                        ]
-                    }
+                            "src",
+                        ],
+                    },
                 },
                 "size": {
-                    type: JsonSchemaType.INTEGER
+                    type: JsonSchemaType.INTEGER,
                 },
                 "offset": {
-                    type: JsonSchemaType.STRING
-                }
+                    type: JsonSchemaType.STRING,
+                },
             },
             required: [
                 "articles",
                 "size",
-                "offset"
-            ]
+                "offset",
+            ],
         },
         "message": {
-            type: JsonSchemaType.STRING
-        }
+            type: JsonSchemaType.STRING,
+        },
     },
     required: [
         "success",
         "data",
-        "message"
-    ]
+        "message",
+    ],
 };
 
 export const articlePlainJson = '{ "success": true, "data": { "articles": [ { "category": "career", "title": "Accenture WasedaTime", "author": "Cris Ye", "summary": "", "created_at": "2021-02-25T11:00:00.001Z", "updated_at": "2021-02-25T11:04:00.001Z", "tags": [], "src": "2021-02-25-Accenture-WasedaTime/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" } ], "size": 5, "offset": "dfne2341tt4ebewauka34ihy23784y128" }, "message": "OK" }';

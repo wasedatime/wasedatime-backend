@@ -15,14 +15,14 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         super(scope, id, serviceInterface, props);
 
         const amplifyApp = new AmplifyWebApp(this, 'amplify-web-app', {
-            apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_MAIN),
-            authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH)
+            apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_REST),
+            authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
         this.app = amplifyApp;
 
         const monoApp = new AmplifyMonoWebApp(this, 'amplify-monorepo-web-app', {
-            apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_MAIN),
-            authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH)
+            apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_REST),
+            authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
         monoApp.addMicroApp("syllabus").addMicroApp("campus");
         monoApp.app.addCustomRule(spaRewrite);

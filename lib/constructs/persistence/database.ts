@@ -41,7 +41,7 @@ export class DynamoDatabase extends cdk.Construct {
             sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "career",
             readCapacity: 1,
-            writeCapacity: 1
+            writeCapacity: 1,
         });
 
         this.tables[Collection.FEEDS] = new Table(this, 'dynamodb-feeds-table', {
@@ -52,7 +52,7 @@ export class DynamoDatabase extends cdk.Construct {
             sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "feeds",
             readCapacity: 1,
-            writeCapacity: 1
+            writeCapacity: 1,
         });
 
         this.tables[Collection.TIMETABLE] = new Table(this, 'dynamodb-timetable-table', {
