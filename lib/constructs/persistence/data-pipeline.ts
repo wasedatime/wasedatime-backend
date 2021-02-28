@@ -182,9 +182,9 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
             timeToLiveAttribute: "ttl",
-            tableName: "syllabus",
-            readCapacity: 5,
-            writeCapacity: 5,
+            tableName: "waseda-syllabus",
+            readCapacity: 1,
+            writeCapacity: 1,
         });
     }
 }
