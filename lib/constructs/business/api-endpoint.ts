@@ -137,6 +137,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             endpointTypes: [rest.EndpointType.REGIONAL],
             deploy: false,
             binaryMediaTypes: ['application/pdf', 'image/png'],
+            minimumCompressionSize: 100000,
         });
         this.apiEndpoint.addGatewayResponse('4xx-resp', {
             type: rest.ResponseType.DEFAULT_4XX,

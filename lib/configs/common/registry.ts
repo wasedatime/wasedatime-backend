@@ -1,10 +1,8 @@
 export enum ServiceEndpoint {
 
-    API_REST,
+    API,
 
-    AUTH,
-
-    API_GRAPHQL
+    AUTH
 }
 
 export const enum DataEndpoint {
