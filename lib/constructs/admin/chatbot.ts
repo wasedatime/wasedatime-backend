@@ -16,7 +16,7 @@ export class SlackChatbot extends cdk.Construct {
             slackChannelConfigurationName: 'aws-alert',
             slackChannelId: SLACK_CHANNEL_ID,
             slackWorkspaceId: SLACK_WORKSPACE_ID,
-            notificationTopics: topics
+            notificationTopics: topics,
         });
     }
 }

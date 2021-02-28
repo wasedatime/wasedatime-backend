@@ -1,0 +1,44 @@
+#set($expr = "")
+#foreach($key in $ctx.args.form.keySet())
+    #set($expr = "$expr AND #$key IN :${ctx.args.form.$key}" )
+#end
+
+{
+    "version": "2017-02-28",
+    "operation": "Query",
+    "query": {
+        "expression": "school = :school",
+        "expressionValues": {
+            ":school": $util.dynamodb.toDynamoDBJson($ctx.args.school)
+        }
+    },
+    "filter": {
+        "expression": $expr,
+        "expressionNames": {
+            "#semester": "semester",
+            "#lang": "lang",
+            "#day": "day",
+            "#period": "period",
+            "#min_year": "min_year",
+            "#credit": "credit",
+            "#type": "type",
+            "#level": "level"
+        },
+        "expressionValues": {
+            ":semester": $util.dynamodb.toStringSetJson($ctx.args.form.semester),
+            ":lang": $util.dynamodb.toNumberSetJson($ctx.args.form.lang),
+            ":day": $util.dynamodb.toNumberSetJson($ctx.args.form.day),
+            ":period": $util.dynamodb.toNumberSetJson($ctx.args.form.period),
+            ":min_year": $util.dynamodb.toNumberSetJson($ctx.args.form.min_year),
+            ":credit": $util.dynamodb.toNumberSetJson($ctx.args.form.credit),
+            ":type": $util.dynamodb.toNumberSetJson($ctx.args.form.type),
+            ":level": $util.dynamodb.toNumberSetJson($ctx.args.form.level)
+        }
+    },
+    #if( $ctx.args.first )
+        ,"limit": $util.toJson($ctx.args.first)
+    #end
+    #if( $ctx.args.after )
+        ,"nextToken": $util.toJson($ctx.args.after)
+    #end
+}

@@ -39,8 +39,8 @@ export class CourseReviewsFunctions extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
-            ]
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
+            ],
         });
 
         const dynamoDBPutRole: LazyRole = new LazyRole(this, 'dynamo-put-role', {
@@ -52,8 +52,8 @@ export class CourseReviewsFunctions extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec1',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")
-            ]
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"),
+            ],
         });
 
         this.getFunction = new Function(this, 'get-reviews', {
@@ -66,7 +66,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             role: dynamoDBReadRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envVars
+            environment: props.envVars,
         });
 
         this.postFunction = new PythonFunction(this, 'post-review', {
@@ -78,7 +78,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(5),
-            environment: props.envVars
+            environment: props.envVars,
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
 
         this.patchFunction = new PythonFunction(this, 'patch-review', {
@@ -90,7 +90,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(5),
-            environment: props.envVars
+            environment: props.envVars,
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
 
         this.deleteFunction = new PythonFunction(this, 'delete-review', {
@@ -102,7 +102,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envVars
+            environment: props.envVars,
         });
     }
 }
@@ -123,8 +123,8 @@ export class SyllabusScraper extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 's3-full-access',
-                    "arn:aws:iam::aws:policy/AmazonS3FullAccess")
-            ]
+                    "arn:aws:iam::aws:policy/AmazonS3FullAccess"),
+            ],
         });
 
         this.baseFunction = new PythonFunction(this, 'base-function', {
@@ -136,7 +136,7 @@ export class SyllabusScraper extends cdk.Construct {
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(210),
             environment: props.envVars,
-            role: s3AccessRole
+            role: s3AccessRole,
         });
     }
 }
@@ -156,7 +156,7 @@ export class AmplifyStatusPublisher extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
-            timeout: Duration.seconds(3)
+            timeout: Duration.seconds(3),
         }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
     }
 }
@@ -176,7 +176,7 @@ export class ScraperStatusPublisher extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
-            timeout: Duration.seconds(3)
+            timeout: Duration.seconds(3),
         }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
     }
 }
@@ -196,7 +196,7 @@ export class PreSignupWasedaMailValidator extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(3)
+            timeout: Duration.seconds(3),
         });
     }
 }
@@ -227,8 +227,8 @@ export class TimetableFunctions extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
-            ]
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
+            ],
         });
 
         const dynamoDBPutRole: LazyRole = new LazyRole(this, 'dynamo-put-role', {
@@ -240,8 +240,8 @@ export class TimetableFunctions extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec1',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")
-            ]
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"),
+            ],
         });
 
         this.getFunction = new Function(this, 'get-timetable', {
@@ -254,7 +254,7 @@ export class TimetableFunctions extends cdk.Construct {
             role: dynamoDBReadRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envVars
+            environment: props.envVars,
         });
 
         this.postFunction = new PythonFunction(this, 'post-timetable', {
@@ -266,7 +266,7 @@ export class TimetableFunctions extends cdk.Construct {
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envVars
+            environment: props.envVars,
         });
 
         this.patchFunction = new PythonFunction(this, 'patch-timetable', {
@@ -278,7 +278,7 @@ export class TimetableFunctions extends cdk.Construct {
             role: dynamoDBPutRole,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envVars
+            environment: props.envVars,
         });
 
         this.importFunction = new PythonFunction(this, 'import-timetable', {
@@ -288,7 +288,7 @@ export class TimetableFunctions extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(5)
+            timeout: Duration.seconds(5),
         });
 
         this.exportFunction = new PythonFunction(this, 'export-timetable', {
@@ -298,7 +298,7 @@ export class TimetableFunctions extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 512,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(5)
+            timeout: Duration.seconds(5),
         });
     }
 }
@@ -320,8 +320,8 @@ export class SyllabusFunctions extends cdk.Construct {
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess")
-            ]
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
+            ],
         });
         const LambdaFullAccess: LazyRole = new LazyRole(this, 'lambda-fullaccess-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
@@ -343,7 +343,7 @@ export class SyllabusFunctions extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envVars
+            environment: props.envVars,
         });
 
         this.updateFunction = new PythonFunction(this,'update-syllabus',{

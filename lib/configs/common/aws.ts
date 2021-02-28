@@ -7,15 +7,15 @@ export const STAGE: string = process.env.STAGE!;
 export const awsEnv: StackProps = {
     env: {
         account: process.env.AWS_ACCOUNT_ID,
-        region: process.env.AWS_REGION
-    }
+        region: process.env.AWS_REGION,
+    },
 };
 
 export const cognitoEnv: StackProps = {
     env: {
         account: process.env.AWS_ACCOUNT_ID,
-        region: process.env.COGNITO_AFFILIATE_REGION
-    }
+        region: process.env.COGNITO_AFFILIATE_REGION,
+    },
 };
 
 export enum AwsServicePrincipal {

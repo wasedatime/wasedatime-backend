@@ -79,6 +79,7 @@ location_name_map = {
     "14-809(院生指導室)": "14-809",
     "14-808(院生指導室)": "14-808",
     "Seminar room 2 50-303": "50-303",
+    "drafting room": "57-1F"
 }
 
 user_agents = [
@@ -124,9 +125,13 @@ query = {
     "classroom": "tr[6]/td[1]/text()",
     "campus": "tr[6]/td[2]/text()",
     "lang": "tr[8]/td[1]/text()",
-    "code": "tr[9]/td[1]/text()",
-    "level": "tr[13]/td[1]/text()",
-    "type": "tr[13]/td[2]/text()",
+    "modality": "tr[9]/td[1]/text()",
+    "code": "tr[10]/td[1]/text()",
+    "code_old": "tr[9]/td[1]/text()",
+    "level": "tr[14]/td[1]/text()",
+    "level_old": "tr[13]/td[1]/text()",
+    "type": "tr[14]/td[2]/text()",
+    "type_old": "tr[13]/td[2]/text()",
     "text_table": "/html[1]/body[1]/form[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/"
                   "div[1]/div[2]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/table[1]/tbody[1]/tr",
     "row_name": "th[1]/text()",
@@ -141,26 +146,26 @@ eval_type_map = {
 }
 
 type_enum_map = {
-    "N/A": -1,
-    "Lecture": 0,
-    "Seminar": 1,
-    "Work": 2,
-    "Foreign Language": 3,
-    "On-demand": 4,
-    "Thesis": 5,
-    "Graduate Research": 6,
-    "Practice": 7,
-    "Blended": 8
+    "指定なし": -1,
+    "講義": 0,
+    "演習／ゼミ": 1,
+    "実習／実験／実技": 2,
+    "外国語": 3,
+    "オンデマンド": 4,
+    "論文": 5,
+    "研究指導": 6,
+    "実践／フィールドワーク／インターンシップ／ボランティア": 7,
+    "対面／オンデマンド": 8
 }
 
 level_enum_map = {
-    "N/A": -1,
-    "Beginner, initial or introductory": 0,
-    "Intermediate, developmental and applicative": 1,
-    "Advanced, practical and specialized": 2,
-    "Final stage advanced-level undergraduate": 3,
-    "Level of Master": 4,
-    "Level of Doctor": 5
+    "指定なし": -1,
+    "初級レベル（入門・導入）": 0,
+    "中級レベル（発展・応用）": 1,
+    "上級レベル": 2,
+    "総仕上げ": 3,
+    "修士レベル": 4,
+    "博士レベル": 5
 }
 
 term_enum_map = {
@@ -211,5 +216,19 @@ lang_enum_map = {
     'Korean': 6,
     'Russian': 7,
     'Italian': 8,
-    'other': 9
+    'other': 9,
+    'Language Course': 9
+}
+
+modality_enum_map = {
+    "対面": 0,
+    "フル対面": 0,
+    "ハイブリッド（対面／オンライン併用）": 1,
+    "複合（対面/オンデマンド/リアルタイム配信/課題提出）": 1,
+    "フルオンデマンド（曜日時限なし）": 2,
+    "フルオンデマンド（コロナ）": 2,
+    "フルオンデマンド（既存）": 2,
+    "オンデマンド（曜日時限あり）": 3,
+    "オンデマンド": 3,
+    "リアルタイム配信": 4
 }
