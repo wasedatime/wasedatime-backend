@@ -83,26 +83,21 @@ export class CourseApiService extends AbstractGraphqlApiService {
                 subtitle: string,
                 term: string,
                 title: string,
-                title_jp: string,
+                titleJp: string,
                 type: int,
             },
         });
 
-        const EvalFilter = new InputType("EvalFilter", {
-            definition: {
-                type: int,
-                percent: int,
-            },
-        });
         const FilterForm = new InputType("FilterForm", {
             definition: {
                 semester: list_string,
                 lang: list_int,
                 day: list_int,
                 period: list_int,
-                min_year: list_int,
+                minYear: list_int,
                 credit: list_int,
-                eval: list_of(EvalFilter),
+                evalType: int,
+                percent: int,
                 type: list_int,
                 level: list_int,
             },
@@ -111,12 +106,12 @@ export class CourseApiService extends AbstractGraphqlApiService {
         const CourseConnection = generateConnectionAndEdge({base: Course, target: Course}).connection;
         const CourseEdge = generateConnectionAndEdge({base: Course, target: Course}).edge;
 
-        [School, Eval, Occurrence, Course, Eval, FilterForm, CourseConnection, CourseEdge, PageInfo].forEach(
+        [School, Eval, Occurrence, Course, CourseConnection, CourseEdge, PageInfo].forEach(
             (type) => scope.apiEndpoint.addType(type),
         );
 
-        scope.apiEndpoint.addQuery('getCourses', new ResolvableField({
-            returnType: list_of(Course),
+        scope.apiEndpoint.addQuery('getCourse', new ResolvableField({
+            returnType: Course.attribute(),
             dataSource: dataSource,
             args: {
                 id: required_string,
