@@ -1,5 +1,5 @@
 import * as cdk from "@aws-cdk/core";
-import {Duration, Expiration} from "@aws-cdk/core";
+import {Expiration} from "@aws-cdk/core";
 import * as rest from "@aws-cdk/aws-apigateway";
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import * as gql from "@aws-cdk/aws-appsync";
@@ -220,11 +220,12 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
 
         super(scope, id, props);
 
+        const keyValidDate: Date = new Date(2022, 2, 28);
         const apiKeyAuth: AuthorizationMode = {
             authorizationType: gql.AuthorizationType.API_KEY,
             apiKeyConfig: {
                 name: 'dev',
-                expires: Expiration.after(Duration.days(365)),
+                expires: Expiration.atDate(keyValidDate),
                 description: "API Key for development environment.",
             },
         };

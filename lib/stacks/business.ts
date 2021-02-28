@@ -34,7 +34,6 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
             authProvider: authEndpoint.pool,
         });
         this.apiEndpoints["rest-api"] = restApiEndpoint;
-
         restApiEndpoint.addService("syllabus", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
             .addService("course-reviews", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
             .addService("feeds")
@@ -47,7 +46,6 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
             authProvider: authEndpoint.pool,
         });
         this.apiEndpoints["graphql-api"] = graphqlApiEndpoint;
-
         graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
 
         this.apiGateway = new WasedaTimeApiRouter(this, 'api-router', {
