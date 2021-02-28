@@ -8,10 +8,10 @@ import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-d
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
-import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../configs/s3/access-setting";
 import {SyllabusScraper} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
+import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../utils/s3";
 
 
 export enum Worker {
@@ -60,7 +60,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: false,
             removalPolicy: RemovalPolicy.RETAIN,
-            versioned: true
+            versioned: true,
         });
         allowApiGatewayPolicy(this.dataWarehouse);
         allowLambdaPolicy(this.dataWarehouse);
@@ -68,8 +68,8 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         const scraperBaseFunction: Function = new SyllabusScraper(this, 'scraper-base-function', {
             envVars: {
                 ["BUCKET_NAME"]: this.dataWarehouse.bucketName,
-                ["OBJECT_PATH"]: 'syllabus/'
-            }
+                ["OBJECT_PATH"]: 'syllabus/',
+            },
         }).baseFunction;
 
         //todo use reduce
@@ -79,7 +79,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
                 comment: "Scrape the syllabus info of school(s).",
                 invocationType: LambdaInvocationType.REQUEST_RESPONSE,
                 payload: TaskInput.fromObject({schools: schools}),
-                qualifier: scraperBaseFunction.latestVersion.version
+                qualifier: scraperBaseFunction.latestVersion.version,
             });
         }
 
@@ -96,7 +96,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
                 .next(getLambdaTaskInstance(["SILS", "G_HUM", "CJL", "SPS", "G_WBS", "G_PS"], "7"))
                 .next(getLambdaTaskInstance(["G_SPS", "G_IPS", "G_WLS", "G_E", "G_SSS", "G_SC", "G_LAW",
                     "G_SAPS", "G_SA", "G_SJAL", "G_SICCS", "G_SEEE", "EHUM", "ART", "CIE", "G_ITS"], "8"))
-                .next(new Succeed(this, 'success', {}))
+                .next(new Succeed(this, 'success', {})),
         });
 
         for (const name in syllabusSchedule) {
@@ -105,7 +105,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
                     ruleName: name,
                     enabled: true,
                     schedule: syllabusSchedule[name],
-                    targets: [new SfnStateMachine(this.processor)]
+                    targets: [new SfnStateMachine(this.processor)],
                 });
             }
         }
@@ -133,7 +133,7 @@ export class CareerDataPipeline extends AbstractDataPipeline {
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: false,
             removalPolicy: RemovalPolicy.RETAIN,
-            versioned: false
+            versioned: false,
         });
     }
 }
@@ -156,7 +156,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: true,
             removalPolicy: RemovalPolicy.RETAIN,
-            versioned: true
+            versioned: true,
         });
     }
 }
@@ -176,14 +176,15 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
         this.dataSource = props?.dataSource;
 
         this.dataWarehouse = new Table(this, 'dynamodb-syllabus-table', {
-            partitionKey: {name: "id", type: AttributeType.STRING},
+            partitionKey: {name: "school", type: AttributeType.STRING},
+            sortKey: {name: "id", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
             timeToLiveAttribute: "ttl",
-            tableName: "syllabus",
+            tableName: "waseda-syllabus",
             readCapacity: 1,
-            writeCapacity: 1
+            writeCapacity: 1,
         });
     }
 }

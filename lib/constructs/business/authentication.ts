@@ -6,7 +6,7 @@ import {
     UserPool,
     UserPoolClient,
     UserPoolDomain,
-    UserPoolIdentityProviderGoogle
+    UserPoolIdentityProviderGoogle,
 } from "@aws-cdk/aws-cognito";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
 import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
@@ -16,7 +16,7 @@ import {
     CALLBACK_URLS,
     GOOGLE_OAUTH_CLIENT_ID,
     GOOGLE_OAUTH_CLIENT_SECRET,
-    LOGOUT_URLS
+    LOGOUT_URLS,
 } from "../../configs/cognito/oauth";
 import {AUTH_CERT_ARN} from "../../configs/common/arn";
 import {UserPoolDomainTarget} from "@aws-cdk/aws-route53-targets";
@@ -72,24 +72,24 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
                 requireDigits: true,
                 requireLowercase: true,
                 requireUppercase: false,
-                requireSymbols: false
+                requireSymbols: false,
             },
             selfSignUpEnabled: true,
             signInAliases: {
                 email: true,
-                username: true
+                username: true,
             },
             signInCaseSensitive: true,
             smsRole: undefined,
             standardAttributes: {
                 email: {
-                    required: true
-                }
+                    required: true,
+                },
             },
             userPoolName: 'wasedatime-users',
             lambdaTriggers: {
-                preSignUp: new PreSignupWasedaMailValidator(this, 'presign-up-handle').baseFunction
-            }
+                preSignUp: new PreSignupWasedaMailValidator(this, 'presign-up-handle').baseFunction,
+            },
         });
 
         this.pool.registerIdentityProvider(new UserPoolIdentityProviderGoogle(this, 'google-idp', {
@@ -99,23 +99,23 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
             attributeMapping: {
                 email: ProviderAttribute.GOOGLE_EMAIL,
                 preferredUsername: ProviderAttribute.GOOGLE_NAME,
-                profilePicture: ProviderAttribute.GOOGLE_PICTURE
+                profilePicture: ProviderAttribute.GOOGLE_PICTURE,
             },
-            scopes: ['email', 'openid', 'profile']
+            scopes: ['email', 'openid', 'profile'],
         }));
 
         this.clients['web-app'] = this.pool.addClient('web-app-client', {
             userPoolClientName: "web-app",
             authFlows: {
                 custom: true,
-                userSrp: true
+                userSrp: true,
             },
             generateSecret: false,
             oAuth: {
                 callbackUrls: CALLBACK_URLS,
-                logoutUrls: LOGOUT_URLS
+                logoutUrls: LOGOUT_URLS,
             },
-            preventUserExistenceErrors: true
+            preventUserExistenceErrors: true,
         });
 
         // todo add custom ses in us-east-1
@@ -128,13 +128,13 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
         this.domain = this.pool.addDomain('auth-domain', {
             customDomain: {
                 domainName: AUTH_DOMAIN,
-                certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert', AUTH_CERT_ARN)
-            }
+                certificate: Certificate.fromCertificateArn(this, 'auth-domain-cert', AUTH_CERT_ARN),
+            },
         });
         new ARecord(this, 'alias-record', {
             zone: zone,
             target: RecordTarget.fromAlias(new UserPoolDomainTarget(this.domain)),
-            recordName: AUTH_DOMAIN
+            recordName: AUTH_DOMAIN,
         });
     }
 }

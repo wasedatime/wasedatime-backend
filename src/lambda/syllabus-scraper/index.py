@@ -1,5 +1,4 @@
 import logging
-
 from crawler import SyllabusCrawler
 from utils import upload_to_s3
 

@@ -27,7 +27,7 @@ We adopted a simple serverless application architecture, consisted of four layer
 
 #### Admin Layer
 
-<img src="doc/admin.png" alt="Admin Layer" width=45%/>
+<img src="doc/admin.png" alt="Admin Layer" width=50%/>
 
 ## Getting Started
 

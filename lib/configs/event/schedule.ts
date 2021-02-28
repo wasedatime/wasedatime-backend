@@ -34,5 +34,5 @@ export const syllabusSchedule: { [name: string]: Schedule } = {
         Schedule.cron({minute: '0', hour: '16', day: '16,20,24,26,28', month: 'APR', year: '*'}),
 
     'spring-reg4':
-        Schedule.cron({minute: '0', hour: '16', day: '9,12,14,16', month: 'MAY', year: '*'})
+        Schedule.cron({minute: '0', hour: '16', day: '9,12,14,16', month: 'MAY', year: '*'}),
 };
