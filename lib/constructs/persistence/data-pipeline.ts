@@ -183,8 +183,8 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
             removalPolicy: cdk.RemovalPolicy.RETAIN,
             timeToLiveAttribute: "ttl",
             tableName: "syllabus",
-            readCapacity: 5,
-            writeCapacity: 5,
+            readCapacity: 1,
+            writeCapacity: 1,
         });
     }
 }
