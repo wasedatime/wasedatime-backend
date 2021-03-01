@@ -105,11 +105,7 @@ export class SyllabusApiService extends AbstractRestApiService {
                 },
             },
         );
-        const syllabusFunctions = new SyllabusFunctions(this, 'syllabus-function', {
-            envVars: {
-                'TABLE_NAME': "syllabus",
-            },
-        });
+        const syllabusFunctions = new SyllabusFunctions(this, 'syllabus-function');
         const courseGetIntegration = new LambdaIntegration(
             syllabusFunctions.getFunction, {proxy: true},
         );
@@ -139,17 +135,15 @@ export class SyllabusApiService extends AbstractRestApiService {
             requestValidator: props.validator,
         });
 
-        const optionsSyllabusCourses = root.addCorsPreflight({
+        const optionsSyllabusCourse = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
         });
-        const getSyllabusCourses = root.addMethod(HttpMethod.GET, courseGetIntegration, {
-            operationName: "GetCourses",
+        const getSyllabusCourse = root.addMethod(HttpMethod.GET, courseGetIntegration, {
+            operationName: "GetCourse",
             requestParameters: {
-                'method.request.querystring.offset': true,
-                'method.request.querystring.limit': true,
-                'method.request.querystring.id': false,
+                'method.request.querystring.id': true,
             },
             methodResponses: [{
                 statusCode: '200',
@@ -160,8 +154,8 @@ export class SyllabusApiService extends AbstractRestApiService {
 
         this.resourceMapping = {
             "/syllabus": {
-                [HttpMethod.GET]: getSyllabusCourses,
-                [HttpMethod.OPTIONS]: optionsSyllabusCourses,
+                [HttpMethod.GET]: getSyllabusCourse,
+                [HttpMethod.OPTIONS]: optionsSyllabusCourse,
             },
             "/syllabus/{school}": {
                 [HttpMethod.GET]: getSyllabusSchools,
