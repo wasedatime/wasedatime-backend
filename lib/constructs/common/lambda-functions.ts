@@ -303,32 +303,17 @@ export class SyllabusFunctions extends cdk.Construct {
 
     readonly getFunction: Function;
 
-    constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
+    constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
 
-        const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
-            description: "Allow lambda function to perform crud operation on dynamodb",
-            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-            roleName: "dynamodb-lambda-read-syllabus",
-            managedPolicies: [
-                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
-                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
-                ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
-            ],
-        });
-
-        this.getFunction = new PythonFunction(this, 'get-courses', {
-            entry: 'src/lambda/get-courses',
-            description: "Filter courses in the syllabus.",
-            functionName: "get-courses",
-            role: dynamoDBReadRole,
+        this.getFunction = new PythonFunction(this, 'get-course', {
+            entry: 'src/lambda/get-course',
+            description: "Get course info from Waseda.",
+            functionName: "get-course",
             logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 128,
+            memorySize: 512,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(3),
-            environment: props.envVars,
         });
     }
 }
