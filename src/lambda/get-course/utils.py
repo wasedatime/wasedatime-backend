@@ -1,14 +1,122 @@
-import boto3
 import itertools
 import json
 import logging
-import os
 import re
 import unicodedata
-from botocore.config import Config
-from concurrent.futures import as_completed
-from concurrent.futures.thread import ThreadPoolExecutor
+import urllib.request as requests
 from const import *
+from decimal import Decimal
+from lxml import html
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return json.JSONEncoder.default(self, obj)
+
+
+class JsonPayloadBuilder:
+    payload = {}
+
+    def add_status(self, success):
+        self.payload['success'] = success
+        return self
+
+    def add_data(self, data):
+        self.payload['data'] = data
+        return self
+
+    def add_message(self, msg):
+        self.payload['message'] = msg
+        return self
+
+    def compile(self):
+        return json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
+
+
+def api_response(code, body):
+    return {
+        "isBase64Encoded": False,
+        "statusCode": code,
+        'headers': {
+            "Access-Control-Allow-Origin": '*',
+            "Content-Type": "application/json",
+            "Referrer-Policy": "origin"
+        },
+        "multiValueHeaders": {"Access-Control-Allow-Methods": ["OPTIONS", "GET"]},
+        "body": body
+    }
+
+
+def resp_handler(func):
+    def handle(*args, **kwargs):
+        try:
+            resp = func(*args, **kwargs)
+            return api_response(200, resp)
+        except LookupError:
+            resp = JsonPayloadBuilder().add_status(False).add_data(None) \
+                .add_message("Not found").compile()
+            return api_response(404, resp)
+        except Exception as e:
+            logging.error(str(e))
+            resp = JsonPayloadBuilder().add_status(False).add_data(None) \
+                .add_message("Internal error, please contact bugs@wasedatime.com.").compile()
+            return api_response(500, resp)
+
+    return handle
+
+
+def build_url(lang, course_id):
+    """
+    Constructs the url of course catalog page or course detail page(if course id is present)
+    :param year: year
+    :param course_id: course id
+    :param dept: department code
+    :param page: page number
+    :param lang: language ('en', 'jp')
+    :return: str
+    """
+    return f"https://www.wsl.waseda.jp/syllabus/JAA104.php?pKey={course_id}&pLng={lang}"
+
+
+def scrape_course(course_id):
+    req_en = requests.Request(url=build_url('en', course_id))
+    req_jp = requests.Request(url=build_url('jp', course_id))
+    parsed_en = html.fromstring(requests.urlopen(req_en).read())
+    parsed_jp = html.fromstring(requests.urlopen(req_jp).read())
+    info_en = parsed_en.xpath(query["info_table"])[0]
+    info_jp = parsed_jp.xpath(query["info_table"])[0]
+    # TODO optimize code structure
+    locations = scrape_info(info_en, 'classroom', parse_location)
+    periods = scrape_info(info_en, 'occurrence', parse_period)
+    return {
+        "id": course_id,
+        "title": scrape_info(info_en, 'title', to_half_width),
+        "title_jp": scrape_info(info_jp, 'title', to_half_width),
+        "instructor": scrape_info(info_en, 'instructor', to_half_width),
+        "instructor_jp": scrape_info(info_jp, 'instructor', to_half_width),
+        "lang": scrape_info(info_en, 'lang', parse_lang),
+        "type": scrape_info(info_jp, 'type', to_enum(type_enum_map)),
+        "term": scrape_info(info_en, 'occurrence', parse_term),
+        "occ": merge_period_location(periods, locations),
+        "year": scrape_info(info_en, 'min_year', parse_min_year),
+        "cat": scrape_info(info_en, 'category', to_half_width),
+        "cred": scrape_info(info_en, 'credit', parse_credit),
+        "lvl": scrape_info(info_jp, 'level', to_enum(level_enum_map)),
+        "eval": get_eval_criteria(parsed_en),
+        "code": scrape_info(info_jp, 'code', None),
+        "sub": scrape_text(parsed_en, "Subtitle", to_half_width),
+        "cat_jp": scrape_info(info_jp, 'category', to_half_width),
+        "mod": scrape_info(info_jp, 'modality', to_enum(modality_enum_map)),
+        "outline": scrape_text(parsed_en, "Course Outline", to_half_width),
+        "obj": scrape_text(parsed_en, "Objectives", to_half_width),
+        "self_study": scrape_text(parsed_en, "before/after course of study", to_half_width),
+        "schedule": scrape_text(parsed_en, "Course Schedule", to_half_width),
+        "text": scrape_text(parsed_en, "Textbooks", to_half_width),
+        "ref": scrape_text(parsed_en, "Reference", to_half_width),
+        "note": scrape_text(parsed_en, "Note / URL", to_half_width),
+    }
 
 
 def scrape_info(parsed, key, fn):
@@ -29,23 +137,6 @@ def scrape_info(parsed, key, fn):
             return section[0]
         return fn(section[0])
     return ""
-
-
-def build_url(dept=None, page=1, lang="en", course_id=None, year=2021):
-    """
-    Constructs the url of course catalog page or course detail page(if course id is present)
-    :param year: year
-    :param course_id: course id
-    :param dept: department code
-    :param page: page number
-    :param lang: language ('en', 'jp')
-    :return: str
-    """
-    if course_id:
-        return f"https://www.wsl.waseda.jp/syllabus/JAA104.php?pKey={course_id}&pLng={lang}"
-    param = school_name_map[dept]["param"]
-    return f"https://www.wsl.waseda.jp/syllabus/JAA103.php?pYear={year}&p_gakubu={param}&p_page={page}&p_number=100" \
-           f"&pLng={lang} "
 
 
 def to_half_width(s):
@@ -76,7 +167,7 @@ def get_eval_criteria(parsed):
     rows = table.xpath('table//tr')
     # Case 1: the only row is the table header
     if len(rows) < 2:
-        return []
+        return table.text_content()
     # Case 2: 2 or more rows
     for r in rows[1:]:
         elem = r.getchildren()
@@ -88,9 +179,9 @@ def get_eval_criteria(parsed):
             logging.warning(f"Unable to parse percent: {percent}")
         criteria = to_half_width(elem[2].text)
         evals.append({
-            "t": to_enum(eval_type_map)(kind),
-            "p": percent,
-            "c": criteria
+            "type": to_enum(eval_type_map)(kind),
+            "percent": percent,
+            "criteria": criteria
         })
     return evals
 
@@ -98,7 +189,7 @@ def get_eval_criteria(parsed):
 def scrape_text(parsed, row_name, fn):
     element = get_syllabus_texts(parsed, row_name)
     if element is not None:
-        return fn(element.text)
+        return fn(element.text_content())
     return ""
 
 
@@ -163,16 +254,6 @@ def parse_min_year(eligible_year):
     return -1
 
 
-def rename_location(loc):
-    if re.fullmatch(r"^[\d]+-[\dA-Z-]+$", loc):
-        return loc
-    elif loc in location_name_map.keys():
-        return location_name_map[loc]
-    else:
-        logging.warning(f"Unable to parse location: {loc}")
-        return to_half_width(loc)
-
-
 def parse_location(loc):
     """
     Parse a series of locations
@@ -184,14 +265,14 @@ def parse_location(loc):
         return ["undecided"]
     # Case 2: a single location
     if len(loc.split('／')) == 1:
-        return [rename_location(loc)]
+        return [to_half_width(loc)]
     # Case 3: multiple 'period:location' separated by /
     rooms = []
     locations = loc.split('／')
     for l in locations:
         match = re.search(r'0(\d):(.*)', l)
         count, classroom = int(match.group(1)) - 1, match.group(2)
-        classroom = rename_location(classroom)
+        classroom = to_half_width(classroom)
         # Sub-case: two location records for same period
         if count >= len(rooms):
             rooms.append(classroom)
@@ -278,46 +359,3 @@ def to_enum(enum_map):
             return -1
 
     return map_to_int
-
-
-def upload_to_s3(syllabus, school):
-    """
-    Upload the syllabus info of the department to s3
-    :param syllabus: iterator of course info
-    :param school: abbr of the department. e.g. "PSE"
-    :return: dict :=
-        {
-            'Expiration': 'string',
-            'ETag': 'string',
-            'ServerSideEncryption': 'AES256'|'aws:kms',
-            'VersionId': 'string',
-            'SSECustomerAlgorithm': 'string',
-            'SSECustomerKeyMD5': 'string',
-            'SSEKMSKeyId': 'string',
-            'SSEKMSEncryptionContext': 'string',
-            'RequestCharged': 'requester'
-        }
-    """
-    s3 = boto3.resource('s3', region_name="ap-northeast-1", verify=False, config=Config(signature_version='s3v4'))
-    syllabus_object = s3.Object(os.getenv('BUCKET_NAME'), os.getenv('OBJECT_PATH') + school + '.json')
-    body = bytes(json.dumps(list(syllabus)).encode('UTF-8'))
-    resp = syllabus_object.put(
-        ACL='private',
-        Body=body,
-        ContentType='application/json; charset=utf-8',
-        CacheControl='public, max-age=2592000, must-revalidate'
-    )
-    return resp
-
-
-def run_concurrently(func, tasks, n):
-    """
-    Run tasks using multiple threads
-    :param func: function to run, type: a -> b
-    :param tasks: list of tasks to perform, type: [a]
-    :param n: number of worker threads
-    :return: generator of results, type: [b]
-    """
-    with ThreadPoolExecutor(max_workers=n) as executor:
-        wait_list = [executor.submit(func, t) for t in tasks]
-    return (page.result() for page in as_completed(wait_list))

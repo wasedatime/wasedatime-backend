@@ -3,11 +3,12 @@ import {IHostedZone} from "@aws-cdk/aws-route53";
 
 import {
     AbstractApiEndpoint,
+    AbstractGraphqlEndpoint,
     AbstractRestApiEndpoint,
-    WasedaTimeRestApiEndpoint
+    WasedaTimeGraphqlEndpoint,
+    WasedaTimeRestApiEndpoint,
 } from "../constructs/business/api-endpoint";
 import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
-import {ApiEndpoint, ApiServices} from "../configs/api/service";
 import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";
 import {AbstractAuthProvider, WasedaTimeUserAuth} from "../constructs/business/authentication";
@@ -15,7 +16,7 @@ import {AbstractAuthProvider, WasedaTimeUserAuth} from "../constructs/business/a
 
 export class WasedaTimeBusinessLayer extends BusinessLayer {
 
-    apiEndpoints: { [name in ApiEndpoint]?: AbstractApiEndpoint } = {};
+    apiEndpoints: { [name: string]: AbstractApiEndpoint } = {};
 
     authProvider: AbstractAuthProvider;
 
@@ -25,19 +26,29 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         const authEndpoint = new WasedaTimeUserAuth(this, 'cognito-endpoint', hostedZone);
         this.authProvider = authEndpoint;
 
-        const mainApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
+        const restApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
             zone: hostedZone,
-            dataSources: {
-                [ApiServices.SYLLABUS]: this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
-                [ApiServices.COURSE_REVIEW]: this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),
-                [ApiServices.TIMETABLE]: this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE)
-            },
-            authProvider: authEndpoint.pool.userPoolArn
+            authProvider: authEndpoint.pool,
         });
-        this.apiEndpoints[ApiEndpoint.MAIN] = mainApiEndpoint;
+        this.apiEndpoints["rest-api"] = restApiEndpoint;
 
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API_MAIN, mainApiEndpoint.getDomain());
+        restApiEndpoint.addService("syllabus", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
+            .addService("course-reviews", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
+            .addService("feeds")
+            .addService("career")
+            .addService("timetable", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
+        restApiEndpoint.deploy();
 
+        const graphqlApiEndpoint: AbstractGraphqlEndpoint = new WasedaTimeGraphqlEndpoint(this, 'graphql-api-endpoint', {
+            zone: hostedZone,
+            authProvider: authEndpoint.pool,
+        });
+        this.apiEndpoints["graphql-api"] = graphqlApiEndpoint;
+
+        graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
+
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API_REST, restApiEndpoint.getDomain());
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API_GRAPHQL, graphqlApiEndpoint.getDomain());
         this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }
