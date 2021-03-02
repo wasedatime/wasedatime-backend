@@ -303,6 +303,8 @@ export class SyllabusFunctions extends cdk.Construct {
 
     readonly getFunction: Function;
 
+    readonly postFunction: Function;
+
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
 
@@ -311,8 +313,32 @@ export class SyllabusFunctions extends cdk.Construct {
             description: "Get course info from Waseda.",
             functionName: "get-course",
             logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 512,
+            memorySize: 256,
             runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3),
+        });
+
+        const comprehendFullAccessRole: LazyRole = new LazyRole(this, 'comprehend-access-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
+            description: "Allow lambda function to interact with AWS Comprehend",
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+            roleName: "lambda-comprehend-access",
+            managedPolicies: [
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec1',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 'comprehend-full-access',
+                    "arn:aws:iam::aws:policy/ComprehendFullAccess"),
+            ],
+        });
+
+        this.postFunction = new PythonFunction(this, 'post-book', {
+            entry: 'src/lambda/get-book-info',
+            description: "Analyze reference and output book info.",
+            functionName: "get-book-info",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 128,
+            runtime: Runtime.PYTHON_3_8,
+            role: comprehendFullAccessRole,
             timeout: Duration.seconds(3),
         });
     }
