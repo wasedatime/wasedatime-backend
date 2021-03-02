@@ -1,7 +1,8 @@
 import json
 from datetime import datetime
-
-from utils import JsonPayloadBuilder, table, resp_handler
+from utils import JsonPayloadBuilder
+from utils import resp_handler
+from utils import table
 
 
 @resp_handler
@@ -17,10 +18,10 @@ def post_timetable(uid, content):
 
 
 def handler(event, context):
-    req = json.loads(event['body'])
+    body = json.loads(event['body'])
     params = {
         "uid": event['requestContext']['authorizer']['claims']['sub'],
-        "content": req["data"]
+        "content": body["data"]
     }
 
     return post_timetable(**params)
