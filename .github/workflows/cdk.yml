@@ -66,8 +66,8 @@ jobs:
           npm install -g aws-cdk
           npm ci
 
-      - name: Synth
-        run: cdk synth
+      - name: Diff
+        run: cdk diff
 
   deploy:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
