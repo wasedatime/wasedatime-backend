@@ -49,7 +49,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             customRules: webappSiteRules,
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/staging`,
+                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
                 "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192",
             },
@@ -74,19 +74,19 @@ export class AmplifyWebApp extends AbstractWebApp {
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
 
         this.branches["main"] = masterBranch;
-        const devBranch: Branch = this.app.addBranch('dev', {
-            autoBuild: true,
-            basicAuth: developerAuth,
-            branchName: "develop",
-            stage: "DEVELOPMENT",
-            buildSpec: webappDevBuildSpec,
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
-        this.branches["dev"] = devBranch;
+        // const devBranch: Branch = this.app.addBranch('dev', {
+        //     autoBuild: true,
+        //     basicAuth: developerAuth,
+        //     branchName: "develop",
+        //     stage: "DEVELOPMENT",
+        //     buildSpec: webappDevBuildSpec,
+        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
+        // this.branches["dev"] = devBranch;
 
         this.domain = this.app.addDomain('domain', {
             domainName: WEBAPP_DOMAIN,
             subDomains: [
-                {branch: devBranch, prefix: "dev"},
+                // {branch: devBranch, prefix: "dev"},
                 {branch: masterBranch, prefix: ''},
                 {branch: masterBranch, prefix: 'www'},
             ],
@@ -114,7 +114,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             buildSpec: microAppBuildSpec("root"),
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/staging`,
+                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
                 "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192",
             },
@@ -131,31 +131,31 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             },
         });
 
-        const masterBranch: Branch = this.app.addBranch('master', {
-            autoBuild: true,
-            branchName: "feature/micro-frontends",
-            stage: "PRODUCTION",
-            buildSpec: microAppBuildSpec("root"),
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
-
-        this.branches["main"] = masterBranch;
-        // const devBranch: Branch = this.app.addBranch('dev', {
+        // const masterBranch: Branch = this.app.addBranch('master', {
         //     autoBuild: true,
-        //     basicAuth: developerAuth,
-        //     branchName: "develop",
-        //     stage: "DEVELOPMENT",
-        //     buildSpec: webappDevBuildSpec
-        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
-        // this.branches["dev"] = devBranch;
+        //     branchName: "master",
+        //     stage: "PRODUCTION",
+        //     buildSpec: microAppBuildSpec("root"),
+        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
 
-        // this.domain = this.app.addDomain('domain', {
-        //     domainName: WEBAPP_DOMAIN,
-        //     subDomains: [
-        //         {branch: devBranch, prefix: "dev"},
-        //         {branch: masterBranch, prefix: ''},
-        //         {branch: masterBranch, prefix: 'www'}
-        //     ]
-        // });
+        // this.branches["main"] = masterBranch;
+        const devBranch: Branch = this.app.addBranch('dev', {
+            autoBuild: true,
+            basicAuth: developerAuth,
+            branchName: "develop",
+            stage: "DEVELOPMENT",
+            buildSpec: webappDevBuildSpec,
+        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
+        this.branches["dev"] = devBranch;
+
+        this.domain = this.app.addDomain('domain', {
+            domainName: WEBAPP_DOMAIN,
+            subDomains: [
+                {branch: devBranch, prefix: "dev"},
+                // {branch: masterBranch, prefix: ''},
+                // {branch: masterBranch, prefix: 'www'}
+            ],
+        });
     }
 
     public addMicroApp(name: string): AmplifyMonoWebApp {
@@ -164,7 +164,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             autoBranchDeletion: true,
             buildSpec: microAppBuildSpec(name),
             environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/staging`,
+                "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/v1`,
                 "REACT_APP_OAUTH_URL": `https://${this.appProps.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192",
             },
@@ -176,29 +176,29 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 pullRequestPreview: false,
                 buildSpec: microAppDevBuildSpec(name),
                 environmentVariables: {
-                    "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/staging`,
+                    "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/v1`,
                     "REACT_APP_OAUTH_URL": `https://${this.appProps.authDomain}`,
                 },
             },
         });
 
-        microApp.addBranch('master', {
+        // microApp.addBranch('master', {
+        //     autoBuild: true,
+        //     branchName: "master",
+        //     stage: "PRODUCTION",
+        //     buildSpec: microAppBuildSpec(name),
+        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/v1`);
+
+        microApp.addBranch('dev', {
             autoBuild: true,
-            branchName: "feature/micro-frontends",
+            branchName: "develop",
             stage: "DEVELOPMENT",
             buildSpec: microAppDevBuildSpec(name),
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/v1`);
-
-        // microApp.addBranch('dev', {
-        //     autoBuild: true,
-        //     branchName: "develop",
-        //     stage: "DEVELOPMENT",
-        //     buildSpec: microAppDevBuildSpec(name)
-        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
+        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
 
         this.app.addCustomRule(new CustomRule({
             source: `/${name}/<*>`,
-            target: `https://feature-micro-frontends.${microApp.defaultDomain}/<*>`,
+            target: `https://develop.${microApp.defaultDomain}/<*>`,
             status: RedirectStatus.REWRITE,
         }));
         this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
