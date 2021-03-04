@@ -106,7 +106,7 @@ export class CourseApiService extends AbstractGraphqlApiService {
         const CourseConnection = generateConnectionAndEdge({base: Course, target: Course}).connection;
         const CourseEdge = generateConnectionAndEdge({base: Course, target: Course}).edge;
 
-        [School, Eval, Occurrence, Course, CourseConnection, CourseEdge, PageInfo].forEach(
+        [School, Eval, Occurrence, Course, CourseConnection, CourseEdge, PageInfo, FilterForm].forEach(
             (type) => scope.apiEndpoint.addType(type),
         );
 

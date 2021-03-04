@@ -306,9 +306,8 @@ export class TimetableFunctions extends cdk.Construct {
 export class SyllabusFunctions extends cdk.Construct {
 
     readonly getFunction: Function;
-    readonly updateFunction: Function;
 
-    constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
+    constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
         
         const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
@@ -323,27 +322,39 @@ export class SyllabusFunctions extends cdk.Construct {
                     "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
             ],
         });
+
+        this.getFunction = new PythonFunction(this, 'get-course', {
+            entry: 'src/lambda/get-course',
+            description: "Get course info from Waseda.",
+            functionName: "get-course",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 512,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(3),
+        });
+    }
+}
+
+export class SyllabusUpdateFunction extends cdk.Construct{
+    readonly updateFunction: Function;
+
+
+    constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
+        super(scope,id);
+
         const LambdaFullAccess: LazyRole = new LazyRole(this, 'lambda-fullaccess-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to access s3 buckets and dynamodb",
             path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
             roleName: "lambda-full-access",
             managedPolicies: [
-                ManagedPolicy.fromManagedPolicyArn(this, 's3-full-access',
-                    "arn:aws:iam::aws:policy/AWSLambdaFullAccess")
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"),
+                ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
+                    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")
             ]
-        });
-
-        this.getFunction = new PythonFunction(this, 'get-courses', {
-            entry: 'src/lambda/get-courses',
-            description: "Filter courses in the syllabus.",
-            functionName: "get-courses",
-            role: dynamoDBReadRole,
-            logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 128,
-            runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(3),
-            environment: props.envVars,
         });
 
         this.updateFunction = new PythonFunction(this,'update-syllabus',{
@@ -357,10 +368,8 @@ export class SyllabusFunctions extends cdk.Construct {
             timeout: Duration.seconds(10),
             environment: props.envVars
         });
-
-        this.updateFunction.addEventSource(new S3EventSource(new SyllabusSyncPipeline(this,'syllabus-sync-pipline',{}).dataSource, {
-            events: [ s3.EventType.OBJECT_CREATED_PUT],
-            filters: [ { prefix: 'syllabus/' } ]
-        }));
+        
     }
+
+
 }

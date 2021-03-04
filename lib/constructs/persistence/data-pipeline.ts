@@ -1,14 +1,17 @@
 import * as cdk from '@aws-cdk/core';
+import * as s3 from "@aws-cdk/aws-s3";
+import * as iam from "@aws-cdk/aws-iam";
 import {Construct, RemovalPolicy} from '@aws-cdk/core';
-import {BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption} from '@aws-cdk/aws-s3';
+import {BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption, IBucket} from '@aws-cdk/aws-s3';
 import {StateMachine, Succeed, TaskInput} from "@aws-cdk/aws-stepfunctions";
 import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tasks";
 import {Function} from "@aws-cdk/aws-lambda";
 import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
+import {AwsCustomResource,PhysicalResourceId,AwsCustomResourcePolicy} from "@aws-cdk/custom-resources";
 
-import {SyllabusScraper} from "../common/lambda-functions";
+import {SyllabusScraper, SyllabusUpdateFunction} from "../common/lambda-functions";
 import {SyllabusFunctions} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
@@ -33,7 +36,7 @@ export interface DataPipelineProps {
 
 export abstract class AbstractDataPipeline extends Construct {
 
-    abstract readonly dataSource?: Bucket;
+    abstract readonly dataSource?: Bucket | IBucket;
 
     abstract readonly processor: Function | StateMachine;
 
@@ -165,7 +168,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
 // todo sync syllabus on notification
 export class SyllabusSyncPipeline extends AbstractDataPipeline {
 
-    readonly dataSource: Bucket;
+    readonly dataSource: IBucket;
 
     readonly processor: Function;
 
@@ -173,8 +176,6 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
 
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
-
-        //this.dataSource = props?.dataSource;
 
         this.dataWarehouse = new Table(this, 'dynamodb-syllabus-table', {
             partitionKey: {name: "school", type: AttributeType.STRING},
@@ -187,16 +188,60 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
             readCapacity: 1,
             writeCapacity: 1,
         });
+        //Use exsisting s3 bucket
+        this.dataSource = s3.Bucket.fromBucketName(this,'syllabus-bucket',"wasedatime-syllabus-prod");
 
-        this.dataSource = new Bucket(this,'waseda-syllabus',{
-            accessControl: BucketAccessControl.PRIVATE,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-            bucketName: "waseda-syllabus",
-            cors: prodCorsRule,
-            encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: false,
-            removalPolicy: RemovalPolicy.RETAIN,
-            versioned: true
-        })
+        this.processor = new SyllabusUpdateFunction(this,'syllabus-update-function',{
+            envVars: {
+                ["BUCKET_NAME"]: this.dataSource.bucketName,
+                ["OBJECT_PATH"]: 'syllabus/',
+            }}).updateFunction;
+        
+        /*
+            Due to current limitations with CloudFormation and the way we implemented bucket notifications in the CDK,
+            it is impossible to add bucket notifications on an imported bucket. So we need to use AwsCustomResource to
+            add event notification.
+        */
+        const rsrc = new AwsCustomResource(this, 'S3NotificationResource', {
+            onCreate: {
+                service: 'S3',
+                action: 'putBucketNotificationConfiguration',
+                parameters: {
+                    // This bucket must be in the same region you are deploying to
+                    Bucket: this.dataSource.bucketName,
+                    NotificationConfiguration: {
+                        LambdaFunctionConfigurations: [
+                            {
+                                Events: ['s3:ObjectCreated:*'],
+                                LambdaFunctionArn: this.processor.functionArn,
+                                Filter: {
+                                    Key: {
+                                        FilterRules: [{ Name: 'prefix', Value: 'syllabus/' }]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                    // Always update physical ID so function gets executed
+                    physicalResourceId : PhysicalResourceId.of(id + Date.now().toString()),
+                },
+                policy: AwsCustomResourcePolicy.fromStatements([new iam.PolicyStatement({
+                    // The actual function is PutBucketNotificationConfiguration.
+                    // The "Action" for IAM policies is PutBucketNotification.
+                    // https://docs.aws.amazon.com/AmazonS3/latest/dev/list_amazons3.html#amazons3-actions-as-permissions
+                    actions: ["S3:PutBucketNotification"],
+                    // allow this custom resource to modify this bucket
+                    resources: [this.dataSource.bucketArn],
+                })])
+        });
+
+        this.processor.addPermission('AllowS3Invocation', {
+            action: 'lambda:InvokeFunction',
+            principal: new iam.ServicePrincipal('s3.amazonaws.com'),
+            sourceArn: this.dataSource.bucketArn
+        });
+
+        rsrc.node.addDependency(this.processor.permissionsNode.findChild('AllowS3Invocation'));
     }
 }
