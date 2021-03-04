@@ -55,6 +55,7 @@ export class SyllabusApiService extends AbstractRestApiService {
 
         const root = scope.apiEndpoint.root.addResource("syllabus");
         const syllabusSchools: Resource = root.addResource("{school}");
+        const bookInfo: Resource = root.addResource("book-info");
 
         const getRespModel = scope.apiEndpoint.addModel('syllabus-get-resp-model', {
             schema: syllabusSchema,
@@ -109,6 +110,9 @@ export class SyllabusApiService extends AbstractRestApiService {
         const courseGetIntegration = new LambdaIntegration(
             syllabusFunctions.getFunction, {proxy: true},
         );
+        const bookPostIntegration = new LambdaIntegration(
+            syllabusFunctions.postFunction, {proxy: true},
+        );
 
         const optionsSyllabusSchools = syllabusSchools.addCorsPreflight({
             allowOrigins: allowOrigins,
@@ -152,6 +156,20 @@ export class SyllabusApiService extends AbstractRestApiService {
             requestValidator: props.validator,
         });
 
+        const optionsBookInfo = bookInfo.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
+        });
+        const postBookInfo = bookInfo.addMethod(HttpMethod.POST, bookPostIntegration, {
+            operationName: "GetBookInfo",
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams,
+            }],
+            requestValidator: props.validator,
+        });
+
         this.resourceMapping = {
             "/syllabus": {
                 [HttpMethod.GET]: getSyllabusCourse,
@@ -161,6 +179,10 @@ export class SyllabusApiService extends AbstractRestApiService {
                 [HttpMethod.GET]: getSyllabusSchools,
                 [HttpMethod.OPTIONS]: optionsSyllabusSchools,
                 [HttpMethod.HEAD]: headSyllabusSchools,
+            },
+            "/syllabus/book-info": {
+                [HttpMethod.POST]: postBookInfo,
+                [HttpMethod.OPTIONS]: optionsBookInfo,
             },
         };
     }
