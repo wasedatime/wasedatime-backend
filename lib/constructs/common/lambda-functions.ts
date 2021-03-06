@@ -2,15 +2,15 @@ import * as cdk from "@aws-cdk/core";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as s3n from "@aws-cdk/aws-s3-notifications"
 import { S3EventSource } from '@aws-cdk/aws-lambda-event-sources';
-import {SyllabusSyncPipeline} from "../persistence/data-pipeline"
-import {Duration} from "@aws-cdk/core";
-import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
-import {RetentionDays} from "@aws-cdk/aws-logs";
-import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
-import {PythonFunction} from "@aws-cdk/aws-lambda-python";
+import { SyllabusSyncPipeline } from "../persistence/data-pipeline"
+import { Duration } from "@aws-cdk/core";
+import { Code, Function, Runtime } from "@aws-cdk/aws-lambda";
+import { RetentionDays } from "@aws-cdk/aws-logs";
+import { LazyRole, ManagedPolicy, ServicePrincipal } from "@aws-cdk/aws-iam";
+import { PythonFunction } from "@aws-cdk/aws-lambda-python";
 
-import {AwsServicePrincipal} from "../../configs/common/aws";
-import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL} from "../../configs/lambda/environment";
+import { AwsServicePrincipal } from "../../configs/common/aws";
+import { GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL } from "../../configs/lambda/environment";
 
 
 interface FunctionsProps {
@@ -311,7 +311,7 @@ export class SyllabusFunctions extends cdk.Construct {
 
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
-        
+
         const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to perform crud operation on dynamodb",
@@ -361,12 +361,12 @@ export class SyllabusFunctions extends cdk.Construct {
     }
 }
 
-export class SyllabusUpdateFunction extends cdk.Construct{
+export class SyllabusUpdateFunction extends cdk.Construct {
+
     readonly updateFunction: Function;
 
-
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
-        super(scope,id);
+        super(scope, id);
 
         const LambdaFullAccess: LazyRole = new LazyRole(this, 'lambda-fullaccess-role', {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
@@ -379,23 +379,20 @@ export class SyllabusUpdateFunction extends cdk.Construct{
                 ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
                     "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"),
                 ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
-                    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")
-            ]
+                    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"),
+            ],
         });
 
-        this.updateFunction = new PythonFunction(this,'update-syllabus',{
+        this.updateFunction = new PythonFunction(this, 'update-syllabus', {
             entry: 'src/lambda/update-syllabus',
             description: 'Update syllabus when S3 bucket is updated.',
             functionName: "update-syllabus",
-            role:LambdaFullAccess,
+            role: LambdaFullAccess,
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(10),
             environment: props.envVars
         });
-        
     }
-
-
 }
