@@ -108,54 +108,54 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         super(scope, id, props);
         this.appProps = props;
 
-        this.app = new App(this, 'root-app', {
-            appName: "wasedatime-web-root",
-            autoBranchDeletion: true,
-            buildSpec: microAppBuildSpec("root"),
-            description: "A web app aiming to provide better campus life at Waseda University.",
-            environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
-                "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
-                "NODE_OPTIONS": "--max-old-space-size=8192",
-            },
-            sourceCodeProvider: webAppCode,
-            autoBranchCreation: {
-                autoBuild: true,
-                patterns: ['release/*'],
-                basicAuth: developerAuth,
-                pullRequestPreview: false,
-                buildSpec: microAppDevBuildSpec("root"),
-                environmentVariables: {
-                    "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/staging`,
-                },
-            },
-        });
-
-        // const masterBranch: Branch = this.app.addBranch('master', {
-        //     autoBuild: true,
-        //     branchName: "master",
-        //     stage: "PRODUCTION",
+        // this.app = new App(this, 'root-app', {
+        //     appName: "wasedatime-web-root",
+        //     autoBranchDeletion: true,
         //     buildSpec: microAppBuildSpec("root"),
-        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
-
-        // this.branches["main"] = masterBranch;
-        const devBranch: Branch = this.app.addBranch('dev', {
-            autoBuild: true,
-            basicAuth: developerAuth,
-            branchName: "develop",
-            stage: "DEVELOPMENT",
-            buildSpec: microAppBuildSpec("root"),
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
-        this.branches["dev"] = devBranch;
-
-        this.domain = this.app.addDomain('domain', {
-            domainName: WEBAPP_DOMAIN,
-            subDomains: [
-                {branch: devBranch, prefix: "dev"},
-                // {branch: masterBranch, prefix: ''},
-                // {branch: masterBranch, prefix: 'www'}
-            ],
-        });
+        //     description: "A web app aiming to provide better campus life at Waseda University.",
+        //     environmentVariables: {
+        //         "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
+        //         "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
+        //         "NODE_OPTIONS": "--max-old-space-size=8192",
+        //     },
+        //     sourceCodeProvider: webAppCode,
+        //     autoBranchCreation: {
+        //         autoBuild: true,
+        //         patterns: ['release/*'],
+        //         basicAuth: developerAuth,
+        //         pullRequestPreview: false,
+        //         buildSpec: microAppDevBuildSpec("root"),
+        //         environmentVariables: {
+        //             "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/staging`,
+        //         },
+        //     },
+        // });
+        //
+        // // const masterBranch: Branch = this.app.addBranch('master', {
+        // //     autoBuild: true,
+        // //     branchName: "master",
+        // //     stage: "PRODUCTION",
+        // //     buildSpec: microAppBuildSpec("root"),
+        // // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
+        //
+        // // this.branches["main"] = masterBranch;
+        // const devBranch: Branch = this.app.addBranch('dev', {
+        //     autoBuild: true,
+        //     basicAuth: developerAuth,
+        //     branchName: "develop",
+        //     stage: "DEVELOPMENT",
+        //     buildSpec: microAppBuildSpec("root"),
+        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
+        // this.branches["dev"] = devBranch;
+        //
+        // this.domain = this.app.addDomain('domain', {
+        //     domainName: WEBAPP_DOMAIN,
+        //     subDomains: [
+        //         {branch: devBranch, prefix: "dev"},
+        //         // {branch: masterBranch, prefix: ''},
+        //         // {branch: masterBranch, prefix: 'www'}
+        //     ],
+        // });
     }
 
     public addMicroApp(name: string): AmplifyMonoWebApp {
