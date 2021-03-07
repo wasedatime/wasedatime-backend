@@ -336,10 +336,10 @@ export class SyllabusFunctions extends cdk.Construct {
             description: "Analyze reference and output book info.",
             functionName: "get-book-info",
             logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 128,
+            memorySize: 256,
             runtime: Runtime.PYTHON_3_8,
             role: comprehendFullAccessRole,
-            timeout: Duration.seconds(3),
+            timeout: Duration.seconds(10),
         });
     }
 }
