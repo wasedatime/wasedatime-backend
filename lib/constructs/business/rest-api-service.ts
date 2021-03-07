@@ -55,6 +55,7 @@ export class SyllabusApiService extends AbstractRestApiService {
 
         const root = scope.apiEndpoint.root.addResource("syllabus");
         const syllabusSchools: Resource = root.addResource("{school}");
+        const bookInfo: Resource = root.addResource("book-info");
 
         const getRespModel = scope.apiEndpoint.addModel('syllabus-get-resp-model', {
             schema: syllabusSchema,
@@ -105,13 +106,12 @@ export class SyllabusApiService extends AbstractRestApiService {
                 },
             },
         );
-        const syllabusFunctions = new SyllabusFunctions(this, 'syllabus-function', {
-            envVars: {
-                'TABLE_NAME': "syllabus",
-            },
-        });
+        const syllabusFunctions = new SyllabusFunctions(this, 'syllabus-function');
         const courseGetIntegration = new LambdaIntegration(
             syllabusFunctions.getFunction, {proxy: true},
+        );
+        const bookPostIntegration = new LambdaIntegration(
+            syllabusFunctions.postFunction, {proxy: true},
         );
 
         const optionsSyllabusSchools = syllabusSchools.addCorsPreflight({
@@ -139,18 +139,30 @@ export class SyllabusApiService extends AbstractRestApiService {
             requestValidator: props.validator,
         });
 
-        const optionsSyllabusCourses = root.addCorsPreflight({
+        const optionsSyllabusCourse = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
             allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
         });
-        const getSyllabusCourses = root.addMethod(HttpMethod.GET, courseGetIntegration, {
-            operationName: "GetCourses",
+        const getSyllabusCourse = root.addMethod(HttpMethod.GET, courseGetIntegration, {
+            operationName: "GetCourse",
             requestParameters: {
-                'method.request.querystring.offset': true,
-                'method.request.querystring.limit': true,
-                'method.request.querystring.id': false,
+                'method.request.querystring.id': true,
             },
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams,
+            }],
+            requestValidator: props.validator,
+        });
+
+        const optionsBookInfo = bookInfo.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
+        });
+        const postBookInfo = bookInfo.addMethod(HttpMethod.POST, bookPostIntegration, {
+            operationName: "GetBookInfo",
             methodResponses: [{
                 statusCode: '200',
                 responseParameters: lambdaRespParams,
@@ -160,13 +172,17 @@ export class SyllabusApiService extends AbstractRestApiService {
 
         this.resourceMapping = {
             "/syllabus": {
-                [HttpMethod.GET]: getSyllabusCourses,
-                [HttpMethod.OPTIONS]: optionsSyllabusCourses,
+                [HttpMethod.GET]: getSyllabusCourse,
+                [HttpMethod.OPTIONS]: optionsSyllabusCourse,
             },
             "/syllabus/{school}": {
                 [HttpMethod.GET]: getSyllabusSchools,
                 [HttpMethod.OPTIONS]: optionsSyllabusSchools,
                 [HttpMethod.HEAD]: headSyllabusSchools,
+            },
+            "/syllabus/book-info": {
+                [HttpMethod.POST]: postBookInfo,
+                [HttpMethod.OPTIONS]: optionsBookInfo,
             },
         };
     }

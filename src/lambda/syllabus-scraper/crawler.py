@@ -52,7 +52,8 @@ class SyllabusCrawler:
         :param page: page number (starts from 1)
         :return: list of course ids
         """
-        req = requests.Request(url=build_url(self.school, page + 1, 'en', self.year), headers=header)
+        req = requests.Request(url=build_url(dept=self.school, page=page + 1, lang='en', year=self.year),
+                               headers=header)
         resp = requests.urlopen(req).read()
         clist = html.fromstring(resp).xpath(query["course_list"])
         return [re.search(r"\w{28}", clist[i].xpath(query["course_id"])[0]).group(0) for i in range(1, len(clist))]
