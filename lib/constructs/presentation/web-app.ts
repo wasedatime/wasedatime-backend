@@ -1,5 +1,5 @@
 import * as cdk from "@aws-cdk/core";
-import {App, Branch, CustomRule, Domain, RedirectStatus} from "@aws-cdk/aws-amplify";
+import {App, Branch, Domain} from "@aws-cdk/aws-amplify";
 
 import {developerAuth, WEBAPP_DOMAIN, webappSiteRules} from "../../configs/amplify/website";
 import {
@@ -196,12 +196,12 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             buildSpec: microAppDevBuildSpec(name),
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
 
-        this.app.addCustomRule(new CustomRule({
-            source: `/${name}/<*>`,
-            target: `https://develop.${microApp.defaultDomain}/<*>`,
-            status: RedirectStatus.REWRITE,
-        }));
-        this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
+        // this.app.addCustomRule(new CustomRule({
+        //     source: `/${name}/<*>`,
+        //     target: `https://develop.${microApp.defaultDomain}/<*>`,
+        //     status: RedirectStatus.REWRITE,
+        // }));
+        // this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
 
         return this;
     }
