@@ -4,6 +4,7 @@ import {AbstractWebApp, AmplifyMonoWebApp, AmplifyWebApp} from "../constructs/pr
 import {PresentationLayer} from "../architecture/layers";
 import {OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ServiceInterface} from "../architecture/interfaces";
+import {spaRewrite} from "../configs/amplify/website";
 
 
 export class WasedaTimePresentationLayer extends PresentationLayer {
@@ -24,7 +25,7 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
             authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
         monoApp.addMicroApp("syllabus").addMicroApp("campus");
-        // monoApp.app.addCustomRule(spaRewrite);
+        monoApp.app.addCustomRule(spaRewrite);
 
         this.operationInterface.setEndpoint(OperationEndpoint.APP, amplifyApp.app.appId);
     }
