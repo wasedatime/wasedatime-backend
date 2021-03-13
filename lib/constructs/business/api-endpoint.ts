@@ -220,7 +220,7 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
 
         super(scope, id, props);
 
-        const keyValidDate: Date = new Date(2022, 2, 28);
+        const keyValidDate: Date = new Date(2022, 3, 1);
         const apiKeyAuth: AuthorizationMode = {
             authorizationType: gql.AuthorizationType.API_KEY,
             apiKeyConfig: {
