@@ -32,11 +32,12 @@ def update_course(new_course,table,school):
     print("update course{}",new_course.data['a'])
     response = table.update_item(
             Key={
-                'id' : new_course.data["a"]
+                'id' : new_course.data["a"],
+                'school':school
             },
             UpdateExpression="SET title=:b, title_jp=:c, instructor=:d, instructor_jp=:e, \
             lang=:f, #tp=:g, term=:h, occurrences=:i, min_year=:j, category=:k, credit=:l, \
-            #lv=:m, #ev=:n, #cd=:o, subtitle=:p ,school=:s",
+            #lv=:m, #ev=:n, #cd=:o, subtitle=:p",
             ExpressionAttributeNames = {
 		        '#tp': 'type',
 		        '#cd': 'code',
@@ -59,7 +60,6 @@ def update_course(new_course,table,school):
                 ':n': new_course.data['n'],
                 ':o': new_course.data['o'],
                 ':p': new_course.data['p'],
-                ':s': school
             },
             ReturnValues="UPDATED_NEW"
         )
