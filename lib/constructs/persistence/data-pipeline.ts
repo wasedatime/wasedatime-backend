@@ -195,6 +195,7 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
         this.processor = new SyllabusUpdateFunction(this, 'syllabus-update-function', {
             envVars: {
                 ["BUCKET_NAME"]: this.dataSource.bucketName,
+                ['TABLE_NAME']: this.dataWarehouse.tableName,
                 ["OBJECT_PATH"]: 'syllabus/',
             }
         }).updateFunction;

@@ -12,7 +12,7 @@ s3r = boto3.resource('s3')
 transfesr = S3Transfer(s3)
 
 dynamodb = boto3.resource('dynamodb')
-table    = dynamodb.Table('syllabus')
+table    = dynamodb.Table(os.getenv('TABLE_NAME'))
     
     
 def compare_syllabus(now_name,old_name,school):
