@@ -1,17 +1,22 @@
 import * as cdk from '@aws-cdk/core';
-import {Construct, RemovalPolicy} from '@aws-cdk/core';
-import {BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption} from '@aws-cdk/aws-s3';
-import {StateMachine, Succeed, TaskInput} from "@aws-cdk/aws-stepfunctions";
-import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tasks";
-import {Function} from "@aws-cdk/aws-lambda";
-import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
-import {Rule} from "@aws-cdk/aws-events";
-import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
+import * as s3 from "@aws-cdk/aws-s3";
+import * as iam from "@aws-cdk/aws-iam";
+import { Construct, RemovalPolicy } from '@aws-cdk/core';
+import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption, IBucket } from '@aws-cdk/aws-s3';
+import { StateMachine, Succeed, TaskInput } from "@aws-cdk/aws-stepfunctions";
+import { LambdaInvocationType, LambdaInvoke } from "@aws-cdk/aws-stepfunctions-tasks";
+import { Function } from "@aws-cdk/aws-lambda";
+import { AttributeType, BillingMode, Table, TableEncryption } from "@aws-cdk/aws-dynamodb";
+import { Rule } from "@aws-cdk/aws-events";
+import { SfnStateMachine } from "@aws-cdk/aws-events-targets";
+import { AwsCustomResource, PhysicalResourceId, AwsCustomResourcePolicy } from "@aws-cdk/custom-resources";
 
-import {SyllabusScraper} from "../common/lambda-functions";
-import {prodCorsRule} from "../../configs/s3/cors";
-import {syllabusSchedule} from "../../configs/event/schedule";
-import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../utils/s3";
+import { SyllabusScraper, SyllabusUpdateFunction } from "../common/lambda-functions";
+import { SyllabusFunctions } from "../common/lambda-functions";
+import { prodCorsRule } from "../../configs/s3/cors";
+import { syllabusSchedule } from "../../configs/event/schedule";
+import { allowApiGatewayPolicy, allowLambdaPolicy } from "../../utils/s3";
+import { S3EventSource } from '@aws-cdk/aws-lambda-event-sources';
 
 
 export enum Worker {
@@ -78,7 +83,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
                 lambdaFunction: scraperBaseFunction,
                 comment: "Scrape the syllabus info of school(s).",
                 invocationType: LambdaInvocationType.REQUEST_RESPONSE,
-                payload: TaskInput.fromObject({schools: schools}),
+                payload: TaskInput.fromObject({ schools: schools }),
                 qualifier: scraperBaseFunction.latestVersion.version,
             });
         }
@@ -164,7 +169,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
 // todo sync syllabus on notification
 export class SyllabusSyncPipeline extends AbstractDataPipeline {
 
-    readonly dataSource?: Bucket;
+    readonly dataSource: Bucket;
 
     readonly processor: Function;
 
@@ -173,11 +178,9 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
 
-        this.dataSource = props?.dataSource;
-
         this.dataWarehouse = new Table(this, 'dynamodb-syllabus-table', {
-            partitionKey: {name: "school", type: AttributeType.STRING},
-            sortKey: {name: "id", type: AttributeType.STRING},
+            partitionKey: { name: "school", type: AttributeType.STRING },
+            sortKey: { name: "id", type: AttributeType.STRING },
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
@@ -186,5 +189,20 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
             readCapacity: 1,
             writeCapacity: 1,
         });
+        //Use exsisting s3 bucket
+        this.dataSource = props?.dataSource!;
+
+        this.processor = new SyllabusUpdateFunction(this, 'syllabus-update-function', {
+            envVars: {
+                ["BUCKET_NAME"]: this.dataSource.bucketName,
+                ['TABLE_NAME']: this.dataWarehouse.tableName,
+                ["OBJECT_PATH"]: 'syllabus/',
+            }
+        }).updateFunction;
+
+        this.processor.addEventSource(new S3EventSource(this.dataSource, {
+            events: [s3.EventType.OBJECT_CREATED_PUT],
+            filters: [{ prefix: 'syllabus/' }]
+        }))
     }
 }
