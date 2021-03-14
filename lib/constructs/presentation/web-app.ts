@@ -37,20 +37,24 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
 
     private appProps: WebAppProps;
 
+    private defaultEnvVars: { [key: string]: string };
+
     constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
         super(scope, id, props);
+
         this.appProps = props;
+        this.defaultEnvVars = {
+            "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
+            "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
+            "NODE_OPTIONS": "--max-old-space-size=8192",
+        };
 
         this.app = new App(this, 'root-app', {
             appName: "wasedatime-web-root",
             autoBranchDeletion: true,
             buildSpec: microAppBuildSpec("root"),
             description: "A web app aiming to provide better campus life at Waseda University.",
-            environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
-                "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
-                "NODE_OPTIONS": "--max-old-space-size=8192",
-            },
+            environmentVariables: this.defaultEnvVars,
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {
                 autoBuild: true,
@@ -58,9 +62,6 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 basicAuth: developerAuth,
                 pullRequestPreview: false,
                 buildSpec: microAppDevBuildSpec("root"),
-                environmentVariables: {
-                    "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/staging`,
-                },
             },
         });
 
@@ -96,11 +97,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             appName: `wasedatime-web-${name}`,
             autoBranchDeletion: true,
             buildSpec: microAppBuildSpec(name),
-            environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/v1`,
-                "REACT_APP_OAUTH_URL": `https://${this.appProps.authDomain}`,
-                "NODE_OPTIONS": "--max-old-space-size=8192",
-            },
+            environmentVariables: this.defaultEnvVars,
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {
                 autoBuild: true,
@@ -108,10 +105,6 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 basicAuth: developerAuth,
                 pullRequestPreview: false,
                 buildSpec: microAppDevBuildSpec(name),
-                environmentVariables: {
-                    "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/v1`,
-                    "REACT_APP_OAUTH_URL": `https://${this.appProps.authDomain}`,
-                },
             },
         });
 

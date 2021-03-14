@@ -19,7 +19,7 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
 
     apiEndpoints: { [name: string]: AbstractApiEndpoint } = {};
 
-    apiGateway: WasedaTimeApiRouter;
+    apiRouter: WasedaTimeApiRouter;
 
     authProvider: AbstractAuthProvider;
 
@@ -48,12 +48,12 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         this.apiEndpoints["graphql-api"] = graphqlApiEndpoint;
         graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
 
-        this.apiGateway = new WasedaTimeApiRouter(this, 'api-router', {
+        this.apiRouter = new WasedaTimeApiRouter(this, 'api-router', {
             "rest": restApiEndpoint.getDomain(),
             "graphql": graphqlApiEndpoint.getDomain(),
         }, hostedZone);
 
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API, this.apiGateway.domain);
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API, this.apiRouter.domain);
         this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }
