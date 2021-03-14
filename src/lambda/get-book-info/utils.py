@@ -1,9 +1,10 @@
+import aiohttp
+import asyncio
 import boto3
 import json
 import logging
 from decimal import Decimal
 from urllib import parse
-from urllib import request
 
 comprehend = boto3.client(service_name='comprehend', region_name='ap-northeast-1')
 
@@ -78,25 +79,24 @@ def build_queries(text):
 
     books_queries = []
     entities = comprehend.detect_entities(Text=text, LanguageCode=detect_lang(text))["Entities"]
-    #get offset of all of linefeed character and end with the length of text
+    # get offset of all of linefeed character and end with the length of text
     linefeed_offset = parse_linefeed_offset(text)
-    #suppose we only have one query per line
+    # suppose we only have one query per line
     query_info = ""
     organization = ""
     for e in entities:
-        if(e['EndOffset'] > linefeed_offset[line_index]):
-            while(e['EndOffset'] > linefeed_offset[line_index]):
+        if (e['EndOffset'] > linefeed_offset[line_index]):
+            while (e['EndOffset'] > linefeed_offset[line_index]):
                 line_index += 1
-            
+
             if (cnt == 0 or cnt == 2) and len(organization) != 0:
-                 query_info += "+intitle:" + organization
+                query_info += "+intitle:" + organization
 
             if len(query_info) > 0:
                 books_queries.append(query_info)
             query_info = ""
             organization = ""
             cnt = 0
-
 
         if e['Type'] == 'TITLE' and e['Score'] >= 0.83:
             if cnt == 0 or cnt == 2:
@@ -115,27 +115,40 @@ def build_queries(text):
 
         if e['Type'] == "ORGANIZATION" and len(organization) == 0:
             organization = e['Text']
-           
+
     return books_queries
 
 
 def get_books(queries):
-    results = []
-    for q in queries:
-        url = "https://www.googleapis.com/books/v1/volumes?q=" + parse.quote(q)
-        req = request.Request(url=url)
-        resp = json.loads(request.urlopen(req).read())
-        if resp["totalItems"] == 0:
-            continue
-        link = resp["items"][0]["selfLink"]
-        req = request.Request(url=link)
-        info = json.loads(request.urlopen(req).read())
-        vol_info = info["volumeInfo"]
-        results.append({
-            "title": vol_info["title"],
-            "authors": vol_info["authors"],
-            "publisher": vol_info["publisher"],
-            "thumbnail": vol_info["imageLinks"]["thumbnail"],
-            "link": f"https://www.google.co.jp/books/edition/volume/{info['id']}"
-        })
-    return results
+    async def async_get(url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as query_resp:
+                query_resp = await query_resp.json()
+                if query_resp["totalItems"] == 0:
+                    return None
+                link = query_resp["items"][0]["selfLink"]
+            async with session.get(link) as item_resp:
+                info = await item_resp.json()
+                vol_info = info["volumeInfo"]
+                try:
+                    thumbnail = vol_info["imageLinks"]["thumbnail"]
+                except LookupError:
+                    thumbnail = ""
+                return {
+                    "title": vol_info["title"],
+                    "authors": vol_info["authors"],
+                    "publisher": vol_info["publisher"],
+                    "thumbnail": thumbnail,
+                    "link": f"https://www.google.co.jp/books/edition/volume/{info['id']}"
+                }
+
+    async def batch_request():
+        tasks = []
+        for q in queries:
+            url = "https://www.googleapis.com/books/v1/volumes?q=" + parse.quote(q)
+            tasks.append(async_get(url))
+        return await asyncio.gather(*tasks)
+
+    loop = asyncio.get_event_loop()
+    resp = loop.run_until_complete(batch_request())
+    return [r for r in resp if r]
