@@ -74,23 +74,48 @@ def detect_lang(s):
 
 def build_queries(text):
     cnt = 0
+    line_index = 0
+
     books_queries = []
     entities = comprehend.detect_entities(Text=text, LanguageCode=detect_lang(text))["Entities"]
+    #get offset of all of linefeed character and end with the length of text
+    linefeed_offset = parse_linefeed_offset(text)
+    #suppose we only have one query per line
+    query_info = ""
+    organization = ""
     for e in entities:
+        if(e['EndOffset'] > linefeed_offset[line_index]):
+            while(e['EndOffset'] > linefeed_offset[line_index]):
+                line_index += 1
+            
+            if (cnt == 0 or cnt == 2) and len(organization) != 0:
+                 query_info += "+intitle:" + organization
+
+            if len(query_info) > 0:
+                books_queries.append(query_info)
+            query_info = ""
+            organization = ""
+            cnt = 0
+
+
         if e['Type'] == 'TITLE' and e['Score'] >= 0.83:
-            if cnt == 0:
-                books_queries.append(f"+intitle:{e['Text']}")
+            if cnt == 0 or cnt == 2:
+                query_info += f"+intitle:{e['Text']}"
                 cnt += 1
-            else:
-                cnt -= 1
-                books_queries[-1] += f"+intitle:{e['Text']}"
+            elif cnt == 1 or cnt == 3:
+                books_queries.append(query_info)
+                cnt = 0
+                query_info = ""
+                organization = ""
+
         if e['Type'] == 'PERSON' and e['Score'] >= 0.83:
-            if cnt == 0:
-                books_queries.append(f"+inauthor:{e['Text']}")
-                cnt += 1
-            else:
-                cnt -= 1
-                books_queries[-1] += f"+inauthor:{e['Text']}"
+            if cnt == 0 or cnt == 1:
+                query_info += f"+inauthor:{e['Text']}"
+                cnt += 2
+
+        if e['Type'] == "ORGANIZATION" and len(organization) == 0:
+            organization = e['Text']
+           
     return books_queries
 
 
