@@ -1,9 +1,10 @@
 import * as cdk from "@aws-cdk/core";
 import {App, Branch, CustomRule, Domain, RedirectStatus} from "@aws-cdk/aws-amplify";
 
-import {developerAuth, WEBAPP_DOMAIN} from "../../configs/amplify/website";
+import {developerAuth} from "../../configs/amplify/website";
 import {microAppBuildSpec, microAppDevBuildSpec} from "../../configs/amplify/build-setting";
 import {webAppCode} from "../../configs/amplify/codebase";
+import {ROOT_DOMAIN} from "../../configs/route53/domain";
 
 
 export interface WebAppProps {
@@ -81,7 +82,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         this.branches["dev"] = devBranch;
 
         this.domain = this.app.addDomain('domain', {
-            domainName: WEBAPP_DOMAIN,
+            domainName: ROOT_DOMAIN,
             subDomains: [
                 {branch: devBranch, prefix: "dev"},
                 // {branch: masterBranch, prefix: ''},

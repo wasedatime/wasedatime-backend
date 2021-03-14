@@ -36,7 +36,6 @@ export const rootAppBuildSpec = BuildSpec.fromObject({
             frontend: {
                 phases: {
                     preBuild: preBuild,
-                    // IMPORTANT - Please verify your build commands
                     build: prodBuild,
                 },
                 artifacts: artifacts,

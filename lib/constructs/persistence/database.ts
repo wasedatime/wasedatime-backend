@@ -10,6 +10,7 @@ export enum Collection {
     TIMETABLE
 }
 
+// TBD
 export interface DatabaseProps {
 
 }

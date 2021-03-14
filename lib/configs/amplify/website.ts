@@ -4,8 +4,6 @@ import {SecretValue} from "@aws-cdk/core";
 require('dotenv').config();
 
 
-export const WEBAPP_DOMAIN: string = "wasedatime.com";
-
 const wwwRedirect: CustomRule = new CustomRule({
     source: "https://www.wasedatime.com",
     target: "https://wasedatime.com",
