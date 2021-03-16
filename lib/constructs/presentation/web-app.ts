@@ -173,11 +173,6 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             stage: "PRODUCTION",
             buildSpec: microAppBuildSpec(name),
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/v1`);
-        this.app.addCustomRule(new CustomRule({
-            source: `/${name}/<*>`,
-            target: `https://master.${microApp.defaultDomain}/<*>`,
-            status: RedirectStatus.REWRITE,
-        }));
 
         microApp.addBranch('dev', {
             autoBuild: true,
@@ -185,6 +180,12 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             stage: "DEVELOPMENT",
             buildSpec: microAppDevBuildSpec(name),
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
+
+        this.app.addCustomRule(new CustomRule({
+            source: `/${name}/<*>`,
+            target: `https://master.${microApp.defaultDomain}/<*>`,
+            status: RedirectStatus.REWRITE,
+        }));
         this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
 
         return this;
