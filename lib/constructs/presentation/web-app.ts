@@ -1,13 +1,8 @@
 import * as cdk from "@aws-cdk/core";
 import {App, Branch, CustomRule, Domain, RedirectStatus} from "@aws-cdk/aws-amplify";
 
-import {developerAuth, webappSiteRules} from "../../configs/amplify/website";
-import {
-    microAppBuildSpec,
-    microAppDevBuildSpec,
-    rootAppBuildSpec,
-    rootAppDevBuildSpec,
-} from "../../configs/amplify/build-setting";
+import {developerAuth} from "../../configs/amplify/website";
+import {microAppBuildSpec, microAppDevBuildSpec} from "../../configs/amplify/build-setting";
 import {webAppCode} from "../../configs/amplify/codebase";
 import {ROOT_DOMAIN} from "../../configs/route53/domain";
 
@@ -29,61 +24,6 @@ export abstract class AbstractWebApp extends cdk.Construct {
 
     protected constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
         super(scope, id);
-    }
-}
-
-export class AmplifyWebApp extends AbstractWebApp {
-
-    readonly app: App;
-
-    readonly branches: { [key: string]: Branch } = {};
-
-    readonly domain: Domain;
-
-    constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
-        super(scope, id, props);
-
-        this.app = new App(this, 'app', {
-            appName: "wasedatime-web-app",
-            autoBranchDeletion: true,
-            buildSpec: rootAppBuildSpec,
-            customRules: webappSiteRules,
-            description: "A web app aiming to provide better campus life at Waseda University.",
-            environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
-                "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
-                "NODE_OPTIONS": "--max-old-space-size=8192",
-            },
-            sourceCodeProvider: webAppCode,
-            autoBranchCreation: {
-                autoBuild: true,
-                patterns: ['release/*'],
-                basicAuth: developerAuth,
-                pullRequestPreview: false,
-                buildSpec: rootAppDevBuildSpec,
-                environmentVariables: {
-                    ["REACT_APP_API_BASE_URL"]: `https://${props.apiDomain}/staging`,
-                },
-            },
-        });
-
-        const masterBranch: Branch = this.app.addBranch('master', {
-            autoBuild: true,
-            branchName: "master",
-            stage: "PRODUCTION",
-            buildSpec: rootAppBuildSpec,
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
-
-        this.branches["main"] = masterBranch;
-
-        this.domain = this.app.addDomain('domain', {
-            domainName: ROOT_DOMAIN,
-            subDomains: [
-                // {branch: devBranch, prefix: "dev"},
-                {branch: masterBranch, prefix: ''},
-                {branch: masterBranch, prefix: 'www'},
-            ],
-        });
     }
 }
 
@@ -146,8 +86,8 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             domainName: ROOT_DOMAIN,
             subDomains: [
                 {branch: devBranch, prefix: "dev"},
-                // {branch: masterBranch, prefix: ''},
-                {branch: masterBranch, prefix: 'master'},
+                {branch: masterBranch, prefix: ''},
+                {branch: masterBranch, prefix: 'www'},
             ],
         });
     }
