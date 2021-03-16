@@ -79,7 +79,6 @@ export class AmplifyWebApp extends AbstractWebApp {
         this.domain = this.app.addDomain('domain', {
             domainName: ROOT_DOMAIN,
             subDomains: [
-                // {branch: devBranch, prefix: "dev"},
                 {branch: masterBranch, prefix: ''},
                 {branch: masterBranch, prefix: 'www'},
             ],
@@ -94,6 +93,8 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
     readonly branches: { [key: string]: Branch } = {};
 
     readonly domain: Domain;
+
+    readonly microApps: { [key: string]: App } = {};
 
     private appProps: WebAppProps;
 
@@ -167,6 +168,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 buildSpec: microAppDevBuildSpec(name),
             },
         });
+        this.microApps[name] = microApp;
 
         microApp.addBranch('master', {
             autoBuild: true,
@@ -174,11 +176,6 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             stage: "PRODUCTION",
             buildSpec: microAppBuildSpec(name),
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/v1`);
-        this.app.addCustomRule(new CustomRule({
-            source: `/${name}/<*>`,
-            target: `https://master.${microApp.defaultDomain}/<*>`,
-            status: RedirectStatus.REWRITE,
-        }));
 
         microApp.addBranch('dev', {
             autoBuild: true,
@@ -186,7 +183,18 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             stage: "DEVELOPMENT",
             buildSpec: microAppDevBuildSpec(name),
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
-        this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
+
+        return this;
+    }
+
+    public connect(name: string): this {
+        const appDomain = this.microApps[name].defaultDomain;
+        this.app.addCustomRule(new CustomRule({
+            source: `/${name}/<*>`,
+            target: `https://master.${appDomain}/<*>`,
+            status: RedirectStatus.REWRITE,
+        }));
+        this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, appDomain);
 
         return this;
     }
