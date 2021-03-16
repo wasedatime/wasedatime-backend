@@ -4,7 +4,7 @@ import {AbstractWebApp, AmplifyMonoWebApp, AmplifyWebApp} from "../constructs/pr
 import {PresentationLayer} from "../architecture/layers";
 import {OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ServiceInterface} from "../architecture/interfaces";
-import {spaRewrite} from "../configs/amplify/website";
+import {webappSiteRules} from "../configs/amplify/website";
 
 
 export class WasedaTimePresentationLayer extends PresentationLayer {
@@ -18,15 +18,21 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
             apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_REST),
             authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
-        this.app = amplifyApp;
+        const amplifyArnOutput = new cdk.CfnOutput(this, 'BucketArnOutput', {
+            value: amplifyApp.app.appId,
+            exportName: 'presentation:ExportsOutputFnGetAttamplifywebappA5C1CA6DAppIdA23AFD5F',
+        });
+        amplifyArnOutput.overrideLogicalId('ExportsOutputFnGetAttamplifywebappA5C1CA6DAppIdA23AFD5F');
 
         const monoApp = new AmplifyMonoWebApp(this, 'amplify-monorepo-web-app', {
             apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_REST),
             authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
         monoApp.addMicroApp("syllabus").addMicroApp("campus");
-        monoApp.app.addCustomRule(spaRewrite);
+        webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));
 
-        this.operationInterface.setEndpoint(OperationEndpoint.APP, amplifyApp.app.appId);
+        this.app = monoApp;
+
+        this.operationInterface.setEndpoint(OperationEndpoint.APP, monoApp.app.appId);
     }
 }

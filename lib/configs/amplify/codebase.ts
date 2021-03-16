@@ -9,9 +9,3 @@ export const webAppCode: GitHubSourceCodeProvider = new GitHubSourceCodeProvider
     repository: "wasedatime-web",
     oauthToken: new SecretValue(process.env.GITHUB_OAUTH_TOKEN),
 });
-
-export const apiDocCode: GitHubSourceCodeProvider = new GitHubSourceCodeProvider({
-    owner: "wasedatime",
-    repository: "wasedatime-openapi",
-    oauthToken: new SecretValue(process.env.GITHUB_OAUTH_TOKEN),
-});
