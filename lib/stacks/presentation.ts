@@ -29,11 +29,11 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
             authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
         monoApp.addMicroApp("syllabus").addMicroApp("campus");
-        monoApp.connect("syllabus").connect("campus");
         webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));
 
         this.app = monoApp;
+        const appDomains = [monoApp.app.appId].concat(Object.entries(monoApp.microApps).map(value => value[1].defaultDomain));
 
-        this.operationInterface.setEndpoint(OperationEndpoint.APP, monoApp.app.appId);
+        this.operationInterface.setEndpoint(OperationEndpoint.APP, appDomains);
     }
 }

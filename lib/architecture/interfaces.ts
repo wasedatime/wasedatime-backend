@@ -71,7 +71,7 @@ export class OperationInterface implements IInterface {
         return value;
     }
 
-    setEndpoint(name: OperationEndpoint, value: string): void {
+    setEndpoint(name: OperationEndpoint, value: any): void {
         this.protocol.set(name, value);
         return;
     }

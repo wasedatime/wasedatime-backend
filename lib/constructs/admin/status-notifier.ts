@@ -17,7 +17,7 @@ export enum StatusNotifier {
 
 export interface StatusNotifierProps {
 
-    target?: string;
+    targets?: [string];
 }
 
 export abstract class AbstractStatusNotifier extends Construct {
@@ -58,7 +58,7 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
                     "Amplify Deployment Status Change",
                 ],
                 detail: {
-                    "appId": [props.target],
+                    "appId": props.targets,
                     "jobStatus": [
                         "SUCCEED",
                         "FAILED",
@@ -104,7 +104,7 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
                         "TIMED_OUT",
                         "ABORTED",
                     ],
-                    "stateMachineArn": [props.target],
+                    "stateMachineArn": props.targets,
                 },
             },
         });

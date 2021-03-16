@@ -98,7 +98,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
 
     private appProps: WebAppProps;
 
-    private defaultEnvVars: { [key: string]: string };
+    private readonly defaultEnvVars: { [key: string]: string };
 
     constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
         super(scope, id, props);
@@ -184,10 +184,6 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             buildSpec: microAppDevBuildSpec(name),
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
 
-        return this;
-    }
-
-    public connect(name: string): this {
         const appDomain = this.microApps[name].defaultDomain;
         this.app.addCustomRule(new CustomRule({
             source: `/${name}/<*>`,
