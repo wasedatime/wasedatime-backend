@@ -145,8 +145,8 @@ def get_books(queries):
                     thumbnail = ""
                 return {
                     "title": vol_info["title"],
-                    "authors": vol_info["authors"],
-                    "publisher": vol_info["publisher"],
+                    "authors": vol_info.get("authors", []),
+                    "publisher": vol_info.get("publisher", []),
                     "thumbnail": thumbnail,
                     "link": f"https://www.google.co.jp/books/edition/volume/{info['id']}"
                 }
