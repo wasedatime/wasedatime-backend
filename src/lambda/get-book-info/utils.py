@@ -72,6 +72,14 @@ def detect_lang(s):
         return 'en'
     return 'ja'
 
+def parse_linefeed_offset(text):
+    linefeed_offset = []
+    for index in range(len(text)):
+        if text[index] == '\n':
+            linefeed_offset.append(index)
+    linefeed_offset.append(len(text))
+    return linefeed_offset
+
 
 def build_queries(text):
     cnt = 0
