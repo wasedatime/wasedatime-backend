@@ -179,14 +179,14 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         //     target: `https://master.${microApp.defaultDomain}/<*>`,
         //     status: RedirectStatus.REWRITE,
         // }));
-
-        microApp.addBranch('dev', {
-            autoBuild: true,
-            branchName: "develop",
-            stage: "DEVELOPMENT",
-            buildSpec: microAppDevBuildSpec(name),
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
-        this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
+        //
+        // microApp.addBranch('dev', {
+        //     autoBuild: true,
+        //     branchName: "develop",
+        //     stage: "DEVELOPMENT",
+        //     buildSpec: microAppDevBuildSpec(name),
+        // }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
+        // this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
 
         return this;
     }
