@@ -147,7 +147,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             subDomains: [
                 {branch: devBranch, prefix: "dev"},
                 // {branch: masterBranch, prefix: ''},
-                {branch: masterBranch, prefix: 'master'},
+                // {branch: masterBranch, prefix: 'master'},
             ],
         });
     }
