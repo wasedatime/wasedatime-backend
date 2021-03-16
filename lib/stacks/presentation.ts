@@ -18,7 +18,11 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
             apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_REST),
             authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
-        this.app = amplifyApp;
+        const amplifyArnOutput = new cdk.CfnOutput(this, 'BucketArnOutput', {
+            value: amplifyApp.app.appId,
+            exportName: 'presentation:ExportsOutputFnGetAttamplifywebappA5C1CA6DAppIdA23AFD5F',
+        });
+        amplifyArnOutput.overrideLogicalId('ExportsOutputFnGetAttamplifywebappA5C1CA6DAppIdA23AFD5F');
 
         const monoApp = new AmplifyMonoWebApp(this, 'amplify-monorepo-web-app', {
             apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_REST),
