@@ -37,26 +37,23 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
 
     readonly microApps: { [key: string]: App } = {};
 
-    private appProps: WebAppProps;
-
-    private readonly defaultEnvVars: { [key: string]: string };
+    private readonly appProps: WebAppProps;
 
     constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
         super(scope, id, props);
 
         this.appProps = props;
-        this.defaultEnvVars = {
-            "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
-            "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
-            "NODE_OPTIONS": "--max-old-space-size=8192",
-        };
 
         this.app = new App(this, 'root-app', {
             appName: "wasedatime-web-root",
             autoBranchDeletion: true,
             buildSpec: microAppBuildSpec("root"),
             description: "A web app aiming to provide better campus life at Waseda University.",
-            environmentVariables: this.defaultEnvVars,
+            environmentVariables: {
+                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
+                "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
+                "NODE_OPTIONS": "--max-old-space-size=8192",
+            },
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {
                 autoBuild: true,
@@ -99,7 +96,11 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             appName: `wasedatime-web-${name}`,
             autoBranchDeletion: true,
             buildSpec: microAppBuildSpec(name),
-            environmentVariables: this.defaultEnvVars,
+            environmentVariables: {
+                "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/v1`,
+                "REACT_APP_OAUTH_URL": `https://${this.appProps.authDomain}`,
+                "NODE_OPTIONS": "--max-old-space-size=8192",
+            },
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {
                 autoBuild: true,
