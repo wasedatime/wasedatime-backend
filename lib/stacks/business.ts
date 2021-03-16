@@ -1,4 +1,5 @@
 import * as cdk from "@aws-cdk/core";
+import {CfnOutput} from "@aws-cdk/core";
 import {IHostedZone} from "@aws-cdk/aws-route53";
 
 import {
@@ -40,6 +41,11 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
             .addService("career")
             .addService("timetable", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
         restApiEndpoint.deploy();
+
+        new CfnOutput(this, 'output', {
+            value: "api.wasedatime.com",
+            exportName: "business:ExportsOutputRefrestapiendpointrestapidomainF1769E353FE83AF8",
+        }).overrideLogicalId("ExportsOutputRefrestapiendpointrestapidomainF1769E353FE83AF8");
 
         const graphqlApiEndpoint: AbstractGraphqlEndpoint = new WasedaTimeGraphqlEndpoint(this, 'graphql-api-endpoint', {
             zone: hostedZone,
