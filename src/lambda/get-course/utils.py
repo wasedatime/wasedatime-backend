@@ -189,6 +189,8 @@ def get_eval_criteria(parsed):
 def scrape_text(parsed, row_name, fn):
     element = get_syllabus_texts(parsed, row_name)
     if element is not None:
+        for br in element.xpath("*//br"):
+            br.tail = "\n" + br.tail if br.tail else "\n"
         return fn(element.text_content())
     return ""
 

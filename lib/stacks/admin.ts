@@ -28,10 +28,10 @@ export class WasedaTimeAdminLayer extends AdminLayer {
         super(scope, id, operationInterface, props);
 
         this.statusNotifiers[StatusNotifier.BUILD_STATUS] = new AmplifyBuildStatusNotifier(this, 'build-notifier', {
-            target: this.operationInterface.getEndpoint(OperationEndpoint.APP),
+            targets: this.operationInterface.getEndpoint(OperationEndpoint.APP),
         });
         this.statusNotifiers[StatusNotifier.SCRAPER_STATUS] = new SyllabusScraperStatusNotifier(this, 'scraper-notifier', {
-            target: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS),
+            targets: this.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS),
         });
 
         const freeTierBudget = new FreeTierUsageBudget(this, 'free-tier-budget');
