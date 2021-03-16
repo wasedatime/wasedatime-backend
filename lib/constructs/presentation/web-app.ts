@@ -1,8 +1,13 @@
 import * as cdk from "@aws-cdk/core";
 import {App, Branch, CustomRule, Domain, RedirectStatus} from "@aws-cdk/aws-amplify";
 
-import {developerAuth} from "../../configs/amplify/website";
-import {microAppBuildSpec, microAppDevBuildSpec} from "../../configs/amplify/build-setting";
+import {developerAuth, webappSiteRules} from "../../configs/amplify/website";
+import {
+    microAppBuildSpec,
+    microAppDevBuildSpec,
+    rootAppBuildSpec,
+    rootAppDevBuildSpec,
+} from "../../configs/amplify/build-setting";
 import {webAppCode} from "../../configs/amplify/codebase";
 import {ROOT_DOMAIN} from "../../configs/route53/domain";
 
@@ -41,7 +46,7 @@ export class AmplifyWebApp extends AbstractWebApp {
         this.app = new App(this, 'app', {
             appName: "wasedatime-web-app",
             autoBranchDeletion: true,
-            buildSpec: webappBuildSpec,
+            buildSpec: rootAppBuildSpec,
             customRules: webappSiteRules,
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: {
@@ -55,7 +60,7 @@ export class AmplifyWebApp extends AbstractWebApp {
                 patterns: ['release/*'],
                 basicAuth: developerAuth,
                 pullRequestPreview: false,
-                buildSpec: webappDevBuildSpec,
+                buildSpec: rootAppDevBuildSpec,
                 environmentVariables: {
                     ["REACT_APP_API_BASE_URL"]: `https://${props.apiDomain}/staging`,
                 },
@@ -66,7 +71,7 @@ export class AmplifyWebApp extends AbstractWebApp {
             autoBuild: true,
             branchName: "master",
             stage: "PRODUCTION",
-            buildSpec: webappBuildSpec,
+            buildSpec: rootAppBuildSpec,
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
 
         this.branches["main"] = masterBranch;
