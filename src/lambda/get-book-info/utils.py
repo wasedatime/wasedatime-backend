@@ -75,8 +75,8 @@ def detect_lang(s):
 
 def parse_linefeed_offset(text):
     linefeed_offset = []
-    for index in range(len(text)):
-        if text[index] == '\n':
+    for index, ch in enumerate(text):
+        if ch == '\n':
             linefeed_offset.append(index)
     linefeed_offset.append(len(text))
     return linefeed_offset
