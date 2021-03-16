@@ -35,9 +35,11 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
 
     readonly domain: Domain;
 
+    readonly microApps: { [key: string]: App } = {};
+
     private appProps: WebAppProps;
 
-    private defaultEnvVars: { [key: string]: string };
+    private readonly defaultEnvVars: { [key: string]: string };
 
     constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
         super(scope, id, props);
@@ -107,6 +109,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 buildSpec: microAppDevBuildSpec(name),
             },
         });
+        this.microApps[name] = microApp;
 
         microApp.addBranch('master', {
             autoBuild: true,
@@ -122,12 +125,13 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             buildSpec: microAppDevBuildSpec(name),
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
 
+        const appDomain = this.microApps[name].defaultDomain;
         this.app.addCustomRule(new CustomRule({
             source: `/${name}/<*>`,
-            target: `https://master.${microApp.defaultDomain}/<*>`,
+            target: `https://master.${appDomain}/<*>`,
             status: RedirectStatus.REWRITE,
         }));
-        this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, microApp.defaultDomain);
+        this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, appDomain);
 
         return this;
     }
