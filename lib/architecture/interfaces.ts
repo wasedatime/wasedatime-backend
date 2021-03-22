@@ -63,7 +63,7 @@ export class OperationInterface implements IInterface {
         this.protocol = new Map<OperationEndpoint, string>();
     }
 
-    getEndpoint(name: OperationEndpoint): string {
+    getEndpoint(name: OperationEndpoint): any {
         const value = this.protocol.get(name);
         if (typeof value === "undefined") {
             throw RangeError("Service not configured for this entry.");
@@ -71,7 +71,7 @@ export class OperationInterface implements IInterface {
         return value;
     }
 
-    setEndpoint(name: OperationEndpoint, value: string): void {
+    setEndpoint(name: OperationEndpoint, value: any): void {
         this.protocol.set(name, value);
         return;
     }
