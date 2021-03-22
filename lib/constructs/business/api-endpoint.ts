@@ -93,7 +93,11 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
     }
 
     public getDomain(): string {
-        return cdk.Fn.select(2, cdk.Fn.split("/", this.apiEndpoint.graphqlUrl));
+        const domain = this.apiEndpoint.graphqlUrl.match(/https:\/\/(.*)\/graphql/g);
+        if (domain === null) {
+            return "";
+        }
+        return domain[1];
     }
 }
 
