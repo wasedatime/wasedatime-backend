@@ -28,9 +28,9 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         amplifyArnOutput.overrideLogicalId('ExportsOutputFnGetAttamplifymonorepowebappsyllabusappE2E73B95DefaultDomainA48D6986');
         const amplifyArnOutput2 = new cdk.CfnOutput(this, 'output2', {
             value: "dummy",
-            exportName: 'ExportsOutputFnGetAttamplifymonorepowebappcampusappBA86D23CDefaultDomainC666940C',
+            exportName: 'presentation:ExportsOutputFnGetAttamplifymonorepowebappcampusappBA86D23CDefaultDomainC666940C',
         });
-        amplifyArnOutput2.overrideLogicalId('presentation:ExportsOutputFnGetAttamplifymonorepowebappcampusappBA86D23CDefaultDomainC666940C');
+        amplifyArnOutput2.overrideLogicalId('ExportsOutputFnGetAttamplifymonorepowebappcampusappBA86D23CDefaultDomainC666940C');
         this.app = monoApp;
         const appDomains = [monoApp.app.appId].concat(Object.entries(monoApp.microApps).map(value => value[1].appId));
 
