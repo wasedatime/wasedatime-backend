@@ -22,7 +22,7 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));
 
         this.app = monoApp;
-        const appDomains = [monoApp.app.appId].concat(Object.entries(monoApp.microApps).map(value => value[1].defaultDomain));
+        const appDomains = [monoApp.app.appId].concat(Object.entries(monoApp.microApps).map(value => value[1].appId));
 
         this.operationInterface.setEndpoint(OperationEndpoint.APP, appDomains);
     }
