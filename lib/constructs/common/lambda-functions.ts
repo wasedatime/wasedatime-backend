@@ -6,7 +6,7 @@ import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {GOOGLE_API_SERVICE_ACCOUNT_INFO} from "../../configs/lambda/environment";
+import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL} from "../../configs/lambda/environment";
 
 
 interface FunctionsProps {
@@ -153,8 +153,7 @@ export class AmplifyStatusPublisher extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3),
-            environment: props?.envVars,
-        });
+        }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
     }
 }
 
@@ -174,8 +173,7 @@ export class ScraperStatusPublisher extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3),
-            environment: props?.envVars,
-        });
+        }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
     }
 }
 
@@ -309,6 +307,19 @@ export class SyllabusFunctions extends cdk.Construct {
 
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
+
+        const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
+            description: "Allow lambda function to perform crud operation on dynamodb",
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+            roleName: "dynamodb-lambda-read-syllabus",
+            managedPolicies: [
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
+            ],
+        });
 
         this.getFunction = new PythonFunction(this, 'get-course', {
             entry: 'src/lambda/get-course',

@@ -186,7 +186,7 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
             readCapacity: 1,
             writeCapacity: 1,
         });
-        //Use existing s3 bucket
+        //Use exsisting s3 bucket
         this.dataSource = props?.dataSource!;
 
         this.processor = new SyllabusUpdateFunction(this, 'syllabus-update-function', {
@@ -194,12 +194,12 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
                 ["BUCKET_NAME"]: this.dataSource.bucketName,
                 ['TABLE_NAME']: this.dataWarehouse.tableName,
                 ["OBJECT_PATH"]: 'syllabus/',
-            },
+            }
         }).updateFunction;
 
         this.processor.addEventSource(new S3EventSource(this.dataSource, {
             events: [s3.EventType.OBJECT_CREATED_PUT],
             filters: [{prefix: 'syllabus/'}],
-        }));
+        }))
     }
 }

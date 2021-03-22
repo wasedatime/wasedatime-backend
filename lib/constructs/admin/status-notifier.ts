@@ -6,7 +6,6 @@ import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {Function} from '@aws-cdk/aws-lambda';
 
 import {AmplifyStatusPublisher, ScraperStatusPublisher} from "../common/lambda-functions";
-import {SLACK_WEBHOOK_URL} from "../../configs/lambda/environment";
 
 
 export enum StatusNotifier {
@@ -45,9 +44,7 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        this.subscriber = new AmplifyStatusPublisher(this, 'subscriber-function', {
-            envVars: {SLACK_WEBHOOK_URL: SLACK_WEBHOOK_URL},
-        }).baseFunction;
+        this.subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
 
         this.publisher = new Rule(this, 'build-sentinel', {
             ruleName: "amplify-build-event",
@@ -86,9 +83,7 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        this.subscriber = new ScraperStatusPublisher(this, 'subscriber-function', {
-            envVars: {SLACK_WEBHOOK_URL: SLACK_WEBHOOK_URL},
-        }).baseFunction;
+        this.subscriber = new ScraperStatusPublisher(this, 'subscriber-function').baseFunction;
 
         this.publisher = new Rule(this, 'scraper-status', {
             ruleName: "scraper-exec-event",
