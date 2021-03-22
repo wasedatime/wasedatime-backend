@@ -9,11 +9,12 @@ import {
     ViewerProtocolPolicy,
 } from '@aws-cdk/aws-cloudfront';
 import {HttpOrigin} from "@aws-cdk/aws-cloudfront-origins";
-import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
+import {Certificate} from "@aws-cdk/aws-certificatemanager";
 import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {CloudFrontTarget} from "@aws-cdk/aws-route53-targets";
 
 import {API_DOMAIN} from "../../configs/route53/domain";
+import {API_CERT_ARN} from "../../configs/common/arn";
 
 
 export class WasedaTimeApiRouter extends cdk.Construct {
@@ -44,10 +45,7 @@ export class WasedaTimeApiRouter extends cdk.Construct {
             viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY,
         };
 
-        const cert = new Certificate(this, 'api-cert', {
-            domainName: API_DOMAIN,
-            validation: CertificateValidation.fromDns(zone),
-        });
+        const cert = Certificate.fromCertificateArn(this, 'api-cert', API_CERT_ARN);
 
         this.distribution = new Distribution(this, 'distribution', {
             comment: "Proxy/Gateway router for API Gateway and AppSync GraphQL API.",

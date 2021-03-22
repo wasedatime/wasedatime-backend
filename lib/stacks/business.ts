@@ -59,7 +59,7 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
             "graphql": graphqlApiEndpoint.getDomain(),
         }, hostedZone);
 
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API, this.apiRouter.domain);
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API, "api.wasedatime.com");
         this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }
