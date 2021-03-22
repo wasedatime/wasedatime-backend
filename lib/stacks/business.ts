@@ -1,4 +1,5 @@
 import * as cdk from "@aws-cdk/core";
+import {CfnOutput} from "@aws-cdk/core";
 import {IHostedZone} from "@aws-cdk/aws-route53";
 
 import {
@@ -12,11 +13,14 @@ import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";
 import {AbstractAuthProvider, WasedaTimeUserAuth} from "../constructs/business/authentication";
+import {WasedaTimeApiRouter} from "../constructs/business/api-router";
 
 
 export class WasedaTimeBusinessLayer extends BusinessLayer {
 
     apiEndpoints: { [name: string]: AbstractApiEndpoint } = {};
+
+    apiRouter: WasedaTimeApiRouter;
 
     authProvider: AbstractAuthProvider;
 
@@ -31,7 +35,6 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
             authProvider: authEndpoint.pool,
         });
         this.apiEndpoints["rest-api"] = restApiEndpoint;
-
         restApiEndpoint.addService("syllabus", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
             .addService("course-reviews", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
             .addService("feeds")
@@ -39,16 +42,24 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
             .addService("timetable", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
         restApiEndpoint.deploy();
 
+        new CfnOutput(this, 'output', {
+            value: "api.wasedatime.com",
+            exportName: "business:ExportsOutputRefrestapiendpointrestapidomainF1769E353FE83AF8",
+        }).overrideLogicalId("ExportsOutputRefrestapiendpointrestapidomainF1769E353FE83AF8");
+
         const graphqlApiEndpoint: AbstractGraphqlEndpoint = new WasedaTimeGraphqlEndpoint(this, 'graphql-api-endpoint', {
             zone: hostedZone,
             authProvider: authEndpoint.pool,
         });
         this.apiEndpoints["graphql-api"] = graphqlApiEndpoint;
-
         graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
 
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API_REST, restApiEndpoint.getDomain());
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API_GRAPHQL, graphqlApiEndpoint.getDomain());
+        this.apiRouter = new WasedaTimeApiRouter(this, 'api-router', {
+            "rest": restApiEndpoint.getDomain(),
+            "graphql": graphqlApiEndpoint.getDomain(),
+        }, hostedZone);
+
+        this.serviceInterface.setEndpoint(ServiceEndpoint.API, "api.wasedatime.com");
         this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }

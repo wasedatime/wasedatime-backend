@@ -1,12 +1,10 @@
 import * as cdk from "@aws-cdk/core";
-import {Duration, Expiration} from "@aws-cdk/core";
+import {Expiration} from "@aws-cdk/core";
 import * as rest from "@aws-cdk/aws-apigateway";
 import {HttpApi} from "@aws-cdk/aws-apigatewayv2";
 import * as gql from "@aws-cdk/aws-appsync";
 import {AuthorizationMode, FieldLogLevel, GraphqlApi} from "@aws-cdk/aws-appsync";
-import {Certificate, CertificateValidation} from "@aws-cdk/aws-certificatemanager";
-import {ARecord, IHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
-import {ApiGatewayDomain} from "@aws-cdk/aws-route53-targets";
+import {IHostedZone} from "@aws-cdk/aws-route53";
 import {Table} from "@aws-cdk/aws-dynamodb";
 import {IUserPool} from "@aws-cdk/aws-cognito";
 import * as flatted from 'flatted';
@@ -16,7 +14,6 @@ import {apiServiceMap} from "../../configs/api-gateway/service";
 import {AbstractGraphqlApiService} from "./graphql-api-service";
 import {STAGE} from "../../configs/common/aws";
 import {defaultHeaders} from "../../configs/api-gateway/cors";
-import {API_DOMAIN} from "../../configs/route53/domain";
 import {AbstractHttpApiService} from "./http-api-service";
 
 
@@ -58,7 +55,7 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
         const domainName: rest.DomainName | undefined = this.apiEndpoint.domainName;
 
         if (typeof domainName === "undefined") {
-            throw RangeError("Domain not configured for this API endpoint.");
+            return this.apiEndpoint.url;
         }
         return domainName.domainName;
     }
@@ -137,6 +134,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             endpointTypes: [rest.EndpointType.REGIONAL],
             deploy: false,
             binaryMediaTypes: ['application/pdf', 'image/png'],
+            minimumCompressionSize: 100000,
         });
         this.apiEndpoint.addGatewayResponse('4xx-resp', {
             type: rest.ResponseType.DEFAULT_4XX,
@@ -165,23 +163,6 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             validateRequestBody: true,
             validateRequestParameters: true,
         });
-
-        // API Domain
-        const cert = new Certificate(this, 'api-cert', {
-            domainName: API_DOMAIN,
-            validation: CertificateValidation.fromDns(props.zone),
-        });
-        this.domain = this.apiEndpoint.addDomainName('domain', {
-            certificate: cert,
-            domainName: API_DOMAIN,
-            endpointType: rest.EndpointType.REGIONAL,
-            securityPolicy: rest.SecurityPolicy.TLS_1_2,
-        });
-        new ARecord(this, 'alias-record', {
-            zone: props.zone,
-            target: RecordTarget.fromAlias(new ApiGatewayDomain(this.domain)),
-            recordName: API_DOMAIN,
-        });
     }
 
     public deploy() {
@@ -194,7 +175,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             api: this.apiEndpoint,
             retainDeployments: false,
         });
-        const hash = new Buffer(flatted.stringify(this.apiServices), 'binary').toString('base64');
+        const hash = Buffer.from(flatted.stringify(this.apiServices), 'binary').toString('base64');
         if (STAGE === 'dev') {
             devDeployment.addToLogicalId(hash);
         } else if (STAGE === 'prod') {
@@ -212,6 +193,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             dataTraceEnabled: true,
             tracingEnabled: true,
         });
+
+        this.apiEndpoint.deploymentStage = this.stages['prod'];
+
         this.stages['dev'] = new rest.Stage(this, 'dev-stage', {
             stageName: 'dev',
             deployment: devDeployment,
@@ -222,15 +206,6 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             loggingLevel: rest.MethodLoggingLevel.ERROR,
             dataTraceEnabled: true,
             tracingEnabled: true,
-        });
-        // Mapping from URL path to stages
-        this.domain.addBasePathMapping(this.apiEndpoint, {
-            basePath: 'staging',
-            stage: this.stages['dev'],
-        });
-        this.domain.addBasePathMapping(this.apiEndpoint, {
-            basePath: 'v1',
-            stage: this.stages['prod'],
         });
     }
 }
@@ -245,11 +220,12 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
 
         super(scope, id, props);
 
+        const keyValidDate: Date = new Date(2022, 2, 1);
         const apiKeyAuth: AuthorizationMode = {
             authorizationType: gql.AuthorizationType.API_KEY,
             apiKeyConfig: {
                 name: 'dev',
-                expires: Expiration.after(Duration.days(365)),
+                expires: Expiration.atDate(keyValidDate),
                 description: "API Key for development environment.",
             },
         };

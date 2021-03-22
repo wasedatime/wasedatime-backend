@@ -1,5 +1,4 @@
 import * as cdk from "@aws-cdk/core";
-import {SlackChannelConfiguration} from "@aws-cdk/aws-chatbot/lib/slack-channel-configuration";
 import {Topic} from "@aws-cdk/aws-sns";
 
 import {AdminLayer} from "../architecture/layers";
@@ -11,17 +10,17 @@ import {
     StatusNotifier,
     SyllabusScraperStatusNotifier,
 } from "../constructs/admin/status-notifier";
-import {SLACK_CHANNEL_ID, SLACK_WORKSPACE_ID} from "../configs/chatbot/slack";
 import {FreeTierUsageBudget} from "../constructs/admin/budget";
 import {CF_TOPIC_ARN} from "../configs/common/arn";
 import {GlobalTrailLogs} from "../constructs/admin/log";
+import {SlackChatbot} from "../constructs/admin/chatbot";
 
 
 export class WasedaTimeAdminLayer extends AdminLayer {
 
     readonly statusNotifiers: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
 
-    readonly chatbot: SlackChannelConfiguration;
+    readonly chatbot: SlackChatbot;
 
     readonly trail: GlobalTrailLogs;
 
@@ -37,21 +36,10 @@ export class WasedaTimeAdminLayer extends AdminLayer {
 
         const freeTierBudget = new FreeTierUsageBudget(this, 'free-tier-budget');
 
-        // todo re-deploy
-        // this.chatbot = new SlackChatbot(this, 'slack-chatbot', [
-        //     freeTierBudget.notification,
-        //     Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN)
-        // ]);
-
-        this.chatbot = new SlackChannelConfiguration(this, 'chatbot-slack-config', {
-            slackChannelConfigurationName: 'aws-alert',
-            slackChannelId: SLACK_CHANNEL_ID,
-            slackWorkspaceId: SLACK_WORKSPACE_ID,
-            notificationTopics: [
-                freeTierBudget.notification,
-                Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN),
-            ],
-        });
+        this.chatbot = new SlackChatbot(this, 'slack-chatbot', [
+            freeTierBudget.notification,
+            Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN),
+        ]);
 
         this.trail = new GlobalTrailLogs(this, 'cloudtrail-logs');
     }

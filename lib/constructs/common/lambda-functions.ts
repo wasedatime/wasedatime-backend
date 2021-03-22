@@ -1,16 +1,12 @@
 import * as cdk from "@aws-cdk/core";
-import * as s3 from "@aws-cdk/aws-s3";
-import * as s3n from "@aws-cdk/aws-s3-notifications"
-import { S3EventSource } from '@aws-cdk/aws-lambda-event-sources';
-import { SyllabusSyncPipeline } from "../persistence/data-pipeline"
-import { Duration } from "@aws-cdk/core";
-import { Code, Function, Runtime } from "@aws-cdk/aws-lambda";
-import { RetentionDays } from "@aws-cdk/aws-logs";
-import { LazyRole, ManagedPolicy, ServicePrincipal } from "@aws-cdk/aws-iam";
-import { PythonFunction } from "@aws-cdk/aws-lambda-python";
+import {Duration} from "@aws-cdk/core";
+import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
+import {RetentionDays} from "@aws-cdk/aws-logs";
+import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 
-import { AwsServicePrincipal } from "../../configs/common/aws";
-import { GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL } from "../../configs/lambda/environment";
+import {AwsServicePrincipal} from "../../configs/common/aws";
+import {GOOGLE_API_SERVICE_ACCOUNT_INFO} from "../../configs/lambda/environment";
 
 
 interface FunctionsProps {
@@ -157,7 +153,8 @@ export class AmplifyStatusPublisher extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3),
-        }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
+            environment: props?.envVars,
+        });
     }
 }
 
@@ -177,7 +174,8 @@ export class ScraperStatusPublisher extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(3),
-        }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
+            environment: props?.envVars,
+        });
     }
 }
 
@@ -312,19 +310,6 @@ export class SyllabusFunctions extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
 
-        const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
-            description: "Allow lambda function to perform crud operation on dynamodb",
-            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-            roleName: "dynamodb-lambda-read-syllabus",
-            managedPolicies: [
-                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
-                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
-                ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
-            ],
-        });
-
         this.getFunction = new PythonFunction(this, 'get-course', {
             entry: 'src/lambda/get-course',
             description: "Get course info from Waseda.",
@@ -392,7 +377,7 @@ export class SyllabusUpdateFunction extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(10),
-            environment: props.envVars
+            environment: props.envVars,
         });
     }
 }

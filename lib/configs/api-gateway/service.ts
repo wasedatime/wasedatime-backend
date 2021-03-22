@@ -1,15 +1,6 @@
 import * as rest from "../../constructs/business/rest-api-service";
 import * as gql from "../../constructs/business/graphql-api-service";
 
-export enum ApiEndpoint {
-
-    REST,
-
-    AUTH,
-
-    GRAPHQL,
-}
-
 export const apiServiceMap: { [name: string]: any } = {
 
     "syllabus": rest.SyllabusApiService,
