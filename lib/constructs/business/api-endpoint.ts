@@ -52,10 +52,10 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     }
 
     public getDomain(): string {
-        const domainName: rest.DomainName | undefined = this.apiEndpoint.domainName;
+        const domainName = this.apiEndpoint.domainName;
 
         if (typeof domainName === "undefined") {
-            return this.apiEndpoint.url;
+            return this.apiEndpoint.url.match(/https:\/\/(.*)\//g)![1];
         }
         return domainName.domainName;
     }
