@@ -1,4 +1,5 @@
 from const import *
+import logging
 
 class Course:
     def __init__(self,data):
@@ -29,44 +30,52 @@ def create_db_item(new_course,school):
 
 def update_course(new_course,table,school):
     #test
-    print("update course{}",new_course.data['a'])
-    response = table.update_item(
-            Key={
-                'id' : new_course.data["a"],
-                'school':school
-            },
-            UpdateExpression="SET title=:b, title_jp=:c, instructor=:d, instructor_jp=:e, \
-            lang=:f, #tp=:g, term=:h, occurrences=:i, min_year=:j, category=:k, credit=:l, \
-            #lv=:m, #ev=:n, #cd=:o, subtitle=:p",
-            ExpressionAttributeNames = {
-		        '#tp': 'type',
-		        '#cd': 'code',
-		        '#lv': 'level',
-		        '#ev': 'eval'
-            },
-            ExpressionAttributeValues = {
-                ':b': new_course.data['b'],
-                ':c': new_course.data['c'],
-                ':d': new_course.data['d'],
-                ':e': new_course.data['e'],
-                ':f': new_course.data['f'],
-                ':g': new_course.data['g'],
-                ':h': new_course.data['h'],
-                ':i': new_course.data['i'],
-                ':j': new_course.data['j'],
-                ':k': new_course.data['k'],
-                ':l': new_course.data['l'],
-                ':m': new_course.data['m'],
-                ':n': new_course.data['n'],
-                ':o': new_course.data['o'],
-                ':p': new_course.data['p'],
-            },
-            ReturnValues="UPDATED_NEW"
-        )
+    logging.info("update course " + new_course.data['a'])
+    try:
+        response = table.update_item(
+                Key={
+                    'id' : new_course.data["a"],
+                    'school':school
+                },
+                UpdateExpression="SET title=:b, title_jp=:c, instructor=:d, instructor_jp=:e, \
+                lang=:f, #tp=:g, term=:h, occurrences=:i, min_year=:j, category=:k, credit=:l, \
+                #lv=:m, #ev=:n, #cd=:o, subtitle=:p",
+                ExpressionAttributeNames = {
+                    '#tp': 'type',
+                    '#cd': 'code',
+                    '#lv': 'level',
+                    '#ev': 'eval'
+                },
+                ExpressionAttributeValues = {
+                    ':b': new_course.data['b'],
+                    ':c': new_course.data['c'],
+                    ':d': new_course.data['d'],
+                    ':e': new_course.data['e'],
+                    ':f': new_course.data['f'],
+                    ':g': new_course.data['g'],
+                    ':h': new_course.data['h'],
+                    ':i': new_course.data['i'],
+                    ':j': new_course.data['j'],
+                    ':k': new_course.data['k'],
+                    ':l': new_course.data['l'],
+                    ':m': new_course.data['m'],
+                    ':n': new_course.data['n'],
+                    ':o': new_course.data['o'],
+                    ':p': new_course.data['p'],
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+    except Exception as e:
+        logging.error("Fail update course " + new_course.data['a'])
+        logging.error(e)
     
 
 def insert_course(new_course,table,school):
     #test
-    print("Insert course:",new_course.data['a'])
-    response = table.put_item(Item=create_db_item(new_course,school))
+    logging.info("Insert course:" + new_course.data['a'])
+    try:
+        response = table.put_item(Item=create_db_item(new_course,school))
+    except Exception as e:
+        logging.error("Fail insert course:" + new_course.data['a'])
+        logging.error(e)
     return response
