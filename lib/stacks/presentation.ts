@@ -22,12 +22,12 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));
 
         const amplifyArnOutput = new cdk.CfnOutput(this, 'BucketArnOutput', {
-            value: monoApp.microApps.syllabus.appId,
+            value: monoApp.microApps.syllabus.defaultDomain,
             exportName: 'presentation:ExportsOutputFnGetAttamplifymonorepowebappsyllabusappE2E73B95DefaultDomainA48D6986',
         });
         amplifyArnOutput.overrideLogicalId('ExportsOutputFnGetAttamplifymonorepowebappsyllabusappE2E73B95DefaultDomainA48D6986');
         const amplifyArnOutput2 = new cdk.CfnOutput(this, 'output2', {
-            value: monoApp.microApps.campus.appId,
+            value: monoApp.microApps.campus.defaultDomain,
             exportName: 'presentation:ExportsOutputFnGetAttamplifymonorepowebappcampusappBA86D23CDefaultDomainC666940C',
         });
         amplifyArnOutput2.overrideLogicalId('ExportsOutputFnGetAttamplifymonorepowebappcampusappBA86D23CDefaultDomainC666940C');
