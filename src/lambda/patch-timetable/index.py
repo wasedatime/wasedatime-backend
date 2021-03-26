@@ -15,9 +15,8 @@ def patch_timetable(uid, content):
             Key={
                 "uid": uid
             },
-            UpdateExpression='REMOVE #courses[:index] SET #updated_at = :time',
+            UpdateExpression=f'REMOVE #courses[{i}] SET #updated_at = :time',
             ExpressionAttributeValues={
-                ":index": i,
                 ":time": dt_now
             },
             ExpressionAttributeNames={
