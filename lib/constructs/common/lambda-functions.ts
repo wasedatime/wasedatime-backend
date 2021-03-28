@@ -1,16 +1,12 @@
 import * as cdk from "@aws-cdk/core";
-import * as s3 from "@aws-cdk/aws-s3";
-import * as s3n from "@aws-cdk/aws-s3-notifications"
-import { S3EventSource } from '@aws-cdk/aws-lambda-event-sources';
-import { SyllabusSyncPipeline } from "../persistence/data-pipeline"
-import { Duration } from "@aws-cdk/core";
-import { Code, Function, Runtime } from "@aws-cdk/aws-lambda";
-import { RetentionDays } from "@aws-cdk/aws-logs";
-import { LazyRole, ManagedPolicy, ServicePrincipal } from "@aws-cdk/aws-iam";
-import { PythonFunction } from "@aws-cdk/aws-lambda-python";
+import {Duration} from "@aws-cdk/core";
+import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
+import {RetentionDays} from "@aws-cdk/aws-logs";
+import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 
-import { AwsServicePrincipal } from "../../configs/common/aws";
-import { GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL } from "../../configs/lambda/environment";
+import {AwsServicePrincipal} from "../../configs/common/aws";
+import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL} from "../../configs/lambda/environment";
 
 
 interface FunctionsProps {
@@ -392,7 +388,7 @@ export class SyllabusUpdateFunction extends cdk.Construct {
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
             timeout: Duration.seconds(10),
-            environment: props.envVars
+            environment: props.envVars,
         });
     }
 }

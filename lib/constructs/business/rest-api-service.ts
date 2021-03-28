@@ -1,6 +1,7 @@
 import * as cdk from "@aws-cdk/core";
 import {
     AwsIntegration,
+    HttpIntegration,
     IAuthorizer,
     LambdaIntegration,
     Method,
@@ -573,6 +574,41 @@ export class TimetableApiService extends AbstractRestApiService {
             },
             "/timetable/import": {
                 [HttpMethod.POST]: importTimetable,
+            },
+        };
+    }
+}
+
+export class GraphqlApiService extends AbstractRestApiService {
+
+    readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
+
+    constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
+        super(scope, id, props);
+
+        const root = scope.apiEndpoint.root.addResource("graphql");
+
+        const postIntegration = new HttpIntegration(props.dataSource!, {
+            proxy: true,
+            httpMethod: HttpMethod.POST,
+        });
+
+        const optionsGql = root.addCorsPreflight({
+            allowOrigins: allowOrigins,
+            allowHeaders: allowHeaders,
+            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
+        });
+        const postGql = root.addMethod(HttpMethod.POST, postIntegration, {
+            operationName: "PostGraphQL",
+            methodResponses: [{
+                statusCode: '200',
+            }],
+        });
+
+        this.resourceMapping = {
+            "/graphql": {
+                [HttpMethod.OPTIONS]: optionsGql,
+                [HttpMethod.POST]: postGql,
             },
         };
     }
