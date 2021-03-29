@@ -387,7 +387,7 @@ export class SyllabusUpdateFunction extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             runtime: Runtime.PYTHON_3_8,
-            timeout: Duration.seconds(10),
+            timeout: Duration.seconds(60),
             environment: props.envVars,
         });
     }

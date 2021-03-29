@@ -33,13 +33,10 @@ def compare_syllabus(now_name,old_name,school):
     for new_item in new_syllabus:
         new_cs = Course(new_item)
         match_id = new_cs.id
-        print("match_id:{}",match_id)
         if(match_id in old_dict):
-            print("have data")
             if(old_dict[match_id].data != new_cs.data):
                 update_course(new_cs,table,school)
         else:
-            print("call insert")
             insert_course(new_cs,table,school)
             
 
@@ -48,7 +45,6 @@ def handler(event,context):
     for record in event['Records']:
         bucket = record['s3']['bucket']['name'] #get bucket name
         key = record['s3']['object']['key'] #get key
-        print('bucket:{} key:{}'.format(bucket,key[9:]))
         school = key[9:]
         school = school[0:school.find('.')]
         
