@@ -163,7 +163,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
     }
 }
 
-// todo sync syllabus on notification
+// sync syllabus on notification
 export class SyllabusSyncPipeline extends AbstractDataPipeline {
 
     readonly dataSource: Bucket;
@@ -200,6 +200,56 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
         this.processor.addEventSource(new S3EventSource(this.dataSource, {
             events: [s3.EventType.OBJECT_CREATED_PUT],
             filters: [{prefix: 'syllabus/'}],
+        }))
+    }
+}
+
+// update blog on notification
+export class BlogContentPipeline extends AbstractDataPipeline {
+
+    readonly dataSource: Bucket;
+
+    readonly processor: Function;
+
+    readonly dataWarehouse: Table;
+
+    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
+        super(scope, id);
+
+        this.dataWarehouse = new Table(this, 'blog-table', {
+            partitionKey: {name: "title", type: AttributeType.STRING},
+            sortKey: {name: "ctime", type: AttributeType.STRING},
+            billingMode: BillingMode.PROVISIONED,
+            encryption: TableEncryption.DEFAULT,
+            removalPolicy: cdk.RemovalPolicy.RETAIN,
+            timeToLiveAttribute: "ttl",
+            tableName: "wasedatime-blog",
+            readCapacity: 1,
+            writeCapacity: 1,
+        });
+
+        this.dataSource = new Bucket(this, 'blog-bucket', {
+            accessControl: BucketAccessControl.PRIVATE,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            bucketName: "wasedatime-blog",
+            cors: prodCorsRule,
+            encryption: BucketEncryption.S3_MANAGED,
+            publicReadAccess: false,
+            removalPolicy: RemovalPolicy.RETAIN,
+            versioned: false,
+        });
+
+        this.processor = new SyllabusUpdateFunction(this, 'blog-update-function', {
+            envVars: {
+                ["BUCKET_NAME"]: this.dataSource.bucketName,
+                ['TABLE_NAME']: this.dataWarehouse.tableName,
+                ["OBJECT_PATH"]: 'blogs/',
+            }
+        }).updateFunction;
+
+        this.processor.addEventSource(new S3EventSource(this.dataSource, {
+            events: [s3.EventType.OBJECT_CREATED],
+            filters: [{prefix: 'blogs/'},{suffix:'.md'}],
         }))
     }
 }

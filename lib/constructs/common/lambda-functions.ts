@@ -392,3 +392,39 @@ export class SyllabusUpdateFunction extends cdk.Construct {
         });
     }
 }
+
+export class BlogUpdateFunction extends cdk.Construct {
+
+    readonly updateFunction: Function;
+
+    constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
+        super(scope, id);
+
+        const LambdaFullAccess: LazyRole = new LazyRole(this, 'lambda-fullaccess-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
+            description: "Allow lambda function to access s3 buckets and dynamodb",
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+            roleName: "lambda-full-access",
+            managedPolicies: [
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"),
+                ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
+                    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"),
+            ],
+        });
+
+        this.updateFunction = new PythonFunction(this, 'update-blog', {
+            entry: 'src/lambda/update-blog',
+            description: 'Update blog when S3 bucket has something been put.',
+            functionName: "update-blog",
+            role: LambdaFullAccess,
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 128,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(60),
+            environment: props.envVars,
+        });
+    }
+}
