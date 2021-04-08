@@ -1,3 +1,4 @@
+  
 import json
 from utils import JsonPayloadBuilder
 from utils import build_queries
@@ -20,14 +21,3 @@ def handler(event, context):
     }
 
     return analyze_book(**params)
-
-def main():
-    with open('/home/youenn98/wasedatimenew/wasedatime-backend/src/lambda/get-book-info/text.txt','r',encoding='utf-8') as f:
-        contents = f.read()
-    
-    books_queries = build_queries(contents)
-    for q in books_queries:
-        print(q)
-
-if __name__ == "__main__":
-    main()
