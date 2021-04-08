@@ -27,7 +27,7 @@ def insert_blog(file_path,key,bucket_name):
                 "title" : head["title"], #get rid of .md
                 "author" : head["author"],
                 "src" : get_public_url(bucket_name, key),
-                "created_at" : head["date"]
+                "created_at" : head["date"],
                 "update_at"  : datetime.now().strftime('%Y-%m-%d-%H-%M-%S'),
             }
             response = table.put_item(Item=item)
@@ -49,5 +49,5 @@ def handler(event,context):
             bucket.download_file(key,file_path) #download file
             insert_blog(file_path,key,bucket_name) #insert contents into dynamodb
         except Exception as e:
-            logging.error("S3 download failed")
+            logging.error("Update blogs failed")
             logging.error(e)

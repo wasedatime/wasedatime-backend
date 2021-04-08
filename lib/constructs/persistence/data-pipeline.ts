@@ -9,7 +9,7 @@ import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-d
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
-import {SyllabusScraper, SyllabusUpdateFunction} from "../common/lambda-functions";
+import {SyllabusScraper, SyllabusUpdateFunction,BlogUpdateFunction} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
 import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../utils/s3";
@@ -222,24 +222,23 @@ export class BlogContentPipeline extends AbstractDataPipeline {
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
-            timeToLiveAttribute: "ttl",
             tableName: "wasedatime-blog",
             readCapacity: 1,
             writeCapacity: 1,
         });
 
         this.dataSource = new Bucket(this, 'blog-bucket', {
-            accessControl: BucketAccessControl.PRIVATE,
+            accessControl: BucketAccessControl.PUBLIC_READ,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             bucketName: "wasedatime-blog",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: false,
+            publicReadAccess: true,
             removalPolicy: RemovalPolicy.RETAIN,
             versioned: false,
         });
 
-        this.processor = new SyllabusUpdateFunction(this, 'blog-update-function', {
+        this.processor = new BlogUpdateFunction(this, 'blog-update-function', {
             envVars: {
                 ["BUCKET_NAME"]: this.dataSource.bucketName,
                 ['TABLE_NAME']: this.dataWarehouse.tableName,
