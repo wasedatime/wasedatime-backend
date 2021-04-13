@@ -392,3 +392,36 @@ export class SyllabusUpdateFunction extends cdk.Construct {
         });
     }
 }
+
+export class BlogsFunctions extends cdk.Construct {
+
+    readonly getFunction: Function;
+
+    constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
+        super(scope, id);
+
+        const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
+            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
+            description: "Allow lambda function to perform read operation on dynamodb",
+            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+            roleName: "dynamodb-lambda-read-blogs",
+            managedPolicies: [
+                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
+                ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
+                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
+            ],
+        });
+
+        this.getFunction = new PythonFunction(this, 'get-blog', {
+            entry: 'src/lambda/get-blog',
+            description: "Get blog info from DB.",
+            functionName: "get-blog",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 256,
+            runtime: Runtime.PYTHON_3_8,
+            timeout: Duration.seconds(5),
+            environment: props.envVars
+        });
+    }
+}

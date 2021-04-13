@@ -24,5 +24,8 @@ export const apiServiceMap: { [name: string]: any } = {
 
     "graphql": rest.GraphqlApiService,
 
+    "blogs": rest.BlogsApiService,
+
     "course": gql.CourseApiService,
+    
 };

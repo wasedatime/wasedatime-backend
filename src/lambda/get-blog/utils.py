@@ -71,6 +71,12 @@ def compare(A,B):
     if A['update_at'] == B['update_at']:
         return 0
 
+def ret_dic(indexes,cnt):
+    return {
+        "articles" : indexes,
+        "size" : cnt        
+    }
+
 def get_blogs(offset,limit):
     done = False
     start_key = False
@@ -91,6 +97,7 @@ def get_blogs(offset,limit):
 
     for i in range(offset,len(data)):
         indexes.append(data[i])
+        cnt+=1
 
-    return indexes
+    return ret_dic(indexes,cnt)
 
