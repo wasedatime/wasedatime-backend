@@ -330,7 +330,7 @@ export class FeedsApiService extends AbstractRestApiService {
         });
 
         const getIntegration = new LambdaIntegration(
-            FeedsFunctions.getFunction, {proxy: true},
+            feedsFunctions.getFunction, {proxy: true},
         );
         
         const postIntegration = new MockIntegration({
