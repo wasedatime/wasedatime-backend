@@ -1,4 +1,3 @@
-  
 import json
 from utils import JsonPayloadBuilder
 from utils import build_queries
