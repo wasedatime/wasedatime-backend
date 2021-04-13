@@ -45,11 +45,11 @@ export class DynamoDatabase extends cdk.Construct {
         });
 
         this.tables[Collection.FEEDS] = new Table(this, 'dynamodb-feeds-table', {
-            partitionKey: {name: "type", type: AttributeType.STRING},
+            partitionKey: {name: "category", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "update_at", type: AttributeType.STRING},
+            sortKey: {name: "created_at", type: AttributeType.STRING},
             tableName: "feeds",
             readCapacity: 1,
             writeCapacity: 1,

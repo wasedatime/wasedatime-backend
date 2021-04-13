@@ -23,9 +23,10 @@ def insert_blog(file_path,key,bucket_name,btype):
                 "type" : btype,
                 "title" : post["title"], #get rid of .md
                 "author" : post["author"],
+                "summary": "",
                 "src" : get_public_url(bucket_name, key),
                 "created_at" : post["date"],
-                "update_at"  : datetime.now().strftime('%Y-%m-%d-%H-%M-%S'),
+                "updated_at"  : datetime.now().strftime('%Y-%m-%d-%H-%M-%S'),
             }
             response = table.put_item(Item=item)
         except Exception as e:

@@ -42,7 +42,7 @@ def api_response(code, body):
             "Content-Type": "application/json",
             "Referrer-Policy": "origin"
         },
-        "multiValueHeaders": {"Access-Control-Allow-Methods": ["POST", "OPTIONS", "GET", "PATCH", "DELETE"]},
+        "multiValueHeaders": {"Access-Control-Allow-Methods": ["OPTIONS", "GET"]},
         "body": body
     }
 
@@ -63,13 +63,6 @@ def resp_handler(func):
 
     return handle
 
-def compare(A,B):
-    if A['update_at'] < B['update_at']:
-        return -1
-    elif A['update_at'] > B['update_at']:
-        return 1
-    if A['update_at'] == B['update_at']:
-        return 0
 
 def ret_dic(indexes,cnt):
     return {
@@ -78,26 +71,20 @@ def ret_dic(indexes,cnt):
     }
 
 def get_blogs(offset,limit):
-    done = False
-    start_key = False
-    data = []
-    scan_args = []
+   
+    queryData = table.query(
+      KeyConditionExpression = Key("type").eq("0"),
+      ScanIndexForward = False,
+      Limit = offset + limit
+    )
 
-    while not done:
-        if(start_key):
-            scan_args['ExclusiveStartKey'] = start_key
-        response = table.scan(**scan_args)
-        data = data + response.get('Items',[])
-        start_key = response.get('LastEvaluatedKey', None)
-        done = start_key is None
-
-    data.sort(key=functools.cmp_to_key(compare))
     indexes = []
     cnt = 0
-
-    for i in range(offset,len(data)):
-        indexes.append(data[i])
-        cnt+=1
+    print(queryData['Items'])
+    
+    for i in range(offset,len(queryData['Items'])):
+        indexes.append(queryData['Items'][i])
+        cnt += 1
 
     return ret_dic(indexes,cnt)
 

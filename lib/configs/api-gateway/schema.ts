@@ -479,7 +479,7 @@ export const articleListSchema: JsonSchema = {
                     items: {
                         type: JsonSchemaType.OBJECT,
                         properties: {
-                            "type": {
+                            "category": {
                                 type: JsonSchemaType.STRING,
                             },
                             "title": {
@@ -488,10 +488,13 @@ export const articleListSchema: JsonSchema = {
                             "author": {
                                 type: JsonSchemaType.STRING,
                             },
+                            "summary":{
+                                type: JsonSchemaType.STRING,
+                            },
                             "created_at": {
                                 type: JsonSchemaType.STRING,
                             },
-                            "update_at": {
+                            "updated_at": {
                                 type: JsonSchemaType.STRING,
                             },
                             "src": {
@@ -499,11 +502,12 @@ export const articleListSchema: JsonSchema = {
                             },
                         },
                         required: [
-                            "type",
+                            "category",
                             "title",
                             "author",
+                            "summary",
                             "created_at",
-                            "update_at",
+                            "updated_at",
                             "src",
                         ],
                     },
