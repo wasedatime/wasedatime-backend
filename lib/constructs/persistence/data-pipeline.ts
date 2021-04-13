@@ -217,8 +217,8 @@ export class BlogContentPipeline extends AbstractDataPipeline {
         super(scope, id);
 
         this.dataWarehouse = new Table(this, 'blog-table', {
-            partitionKey: {name: "title", type: AttributeType.STRING},
-            sortKey: {name: "ctime", type: AttributeType.STRING},
+            partitionKey: {name: "type", type: AttributeType.STRING},
+            sortKey: {name: "update_at", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
