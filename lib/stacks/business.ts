@@ -42,11 +42,10 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
 
         restApiEndpoint.addService("syllabus", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
             .addService("course-reviews", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
-            .addService("feeds")
+            .addService("feeds",this.dataInterface.getEndpoint(DataEndpoint.FEEDS))
             .addService("career")
             .addService("timetable", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true)
             .addService("graphql", graphqlApiEndpoint.apiEndpoint.graphqlUrl)
-            .addService("blogs",this.dataInterface.getEndpoint(DataEndpoint.BLOGS));
         restApiEndpoint.deploy();
 
         this.serviceInterface.setEndpoint(ServiceEndpoint.API_REST, restApiEndpoint.getDomain());

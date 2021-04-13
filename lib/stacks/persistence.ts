@@ -63,10 +63,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
             DataEndpoint.COURSE,
             syllabusSyncPipeline.dataWarehouse.tableName,
         );
-        this.dataInterface.setEndpoint(
-            DataEndpoint.BLOGS,
-            dynamoDatabase.tables[Collection.BLOGS].tableName,
-        )
 
         this.operationInterface.setEndpoint(
             OperationEndpoint.SYLLABUS,

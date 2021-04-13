@@ -393,7 +393,7 @@ export class SyllabusUpdateFunction extends cdk.Construct {
     }
 }
 
-export class BlogsFunctions extends cdk.Construct {
+export class FeedsFunctions extends cdk.Construct {
 
     readonly getFunction: Function;
 
@@ -413,10 +413,10 @@ export class BlogsFunctions extends cdk.Construct {
             ],
         });
 
-        this.getFunction = new PythonFunction(this, 'get-blog', {
+        this.getFunction = new PythonFunction(this, 'get-feeds', {
             entry: 'src/lambda/get-blog',
             description: "Get blog info from DB.",
-            functionName: "get-blog",
+            functionName: "get-feeds",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
             runtime: Runtime.PYTHON_3_8,

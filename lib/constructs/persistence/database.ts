@@ -8,7 +8,6 @@ export enum Collection {
     FEEDS,
     SYLLABUS,
     TIMETABLE,
-    BLOGS,
 }
 
 export interface DatabaseProps {
@@ -46,11 +45,11 @@ export class DynamoDatabase extends cdk.Construct {
         });
 
         this.tables[Collection.FEEDS] = new Table(this, 'dynamodb-feeds-table', {
-            partitionKey: {name: "category", type: AttributeType.STRING},
+            partitionKey: {name: "type", type: AttributeType.STRING},
             billingMode: BillingMode.PROVISIONED,
             encryption: TableEncryption.DEFAULT,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "created_at", type: AttributeType.STRING},
+            sortKey: {name: "update_at", type: AttributeType.STRING},
             tableName: "feeds",
             readCapacity: 1,
             writeCapacity: 1,
@@ -65,17 +64,6 @@ export class DynamoDatabase extends cdk.Construct {
             readCapacity: 12,
             writeCapacity: 15,
             pointInTimeRecovery: true,
-        });
-
-        this.tables[Collection.BLOGS] = new Table(this, 'dynamodb-blogs-table', {
-            partitionKey: {name: "type", type: AttributeType.STRING},
-            billingMode: BillingMode.PROVISIONED,
-            encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "update_at", type: AttributeType.STRING},
-            tableName: "blogs",
-            readCapacity: 1,
-            writeCapacity: 1,
         });
     }
 }

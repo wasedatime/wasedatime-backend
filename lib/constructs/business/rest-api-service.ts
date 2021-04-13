@@ -25,7 +25,7 @@ import {
     syllabusSchema,
 } from "../../configs/api-gateway/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions,BlogsFunctions} from "../common/lambda-functions";
+import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions,FeedsFunctions} from "../common/lambda-functions";
 import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} from "../../configs/api-gateway/mapping";
 
 
@@ -316,6 +316,11 @@ export class FeedsApiService extends AbstractRestApiService {
         super(scope, id, props);
 
         const root = scope.apiEndpoint.root.addResource("feeds");
+        const feedsFunctions = new FeedsFunctions(this, 'crud-functions', {
+            envVars: {
+                'TABLE_NAME': props.dataSource!,
+            },
+        });
 
         const getRespModel = scope.apiEndpoint.addModel('feeds-get-resp-model', {
             schema: articleListSchema,
@@ -324,15 +329,10 @@ export class FeedsApiService extends AbstractRestApiService {
             modelName: "GetFeedsResp",
         });
 
-        const getIntegration = new MockIntegration({
-            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            integrationResponses: [{
-                statusCode: '200',
-                responseTemplates: {["application/json"]: articlePlainJson},
-                responseParameters: mockRespMapping,
-            }],
-        });
+        const getIntegration = new LambdaIntegration(
+            FeedsFunctions.getFunction, {proxy: true},
+        );
+        
         const postIntegration = new MockIntegration({
             requestTemplates: {["application/json"]: '{"statusCode": 200}'},
             passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
@@ -609,78 +609,6 @@ export class GraphqlApiService extends AbstractRestApiService {
             "/graphql": {
                 [HttpMethod.OPTIONS]: optionsGql,
                 [HttpMethod.POST]: postGql,
-            },
-        };
-    }
-}
-
-export class BlogsApiService extends AbstractRestApiService {
-
-    readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
-
-    constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
-        super(scope, id, props);
-
-        const root = scope.apiEndpoint.root.addResource("blogs");
-        const blogsFunctions = new BlogsFunctions(this, 'crud-functions', {
-            envVars: {
-                'TABLE_NAME': props.dataSource!,
-            },
-        });
-
-        const getRespModel = scope.apiEndpoint.addModel('blogs-get-resp-model', {
-            schema: articleListSchema,
-            contentType: "application/json",
-            description: "List of blogs",
-            modelName: "GetBlogsResp",
-        });
-
-        const getIntegration = new LambdaIntegration(
-            blogsFunctions.getFunction, {proxy: true},
-        );
-        
-        const postIntegration = new MockIntegration({
-            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            integrationResponses: [{
-                statusCode: '200',
-            }],
-        });
-
-        const optionsBlogs = root.addCorsPreflight({
-            allowOrigins: allowOrigins,
-            allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
-        });
-
-        const getBlogs = root.addMethod(HttpMethod.GET, getIntegration, {
-            requestParameters: {
-                'method.request.querystring.offset': true,
-                'method.request.querystring.limit': true,
-            },
-            operationName: "ListBlogs",
-            methodResponses: [{
-                statusCode: '200',
-                responseModels: {["application/json"]: getRespModel},
-                responseParameters: lambdaRespParams,
-            }],
-            requestValidator: props.validator,
-        });
-
-        const postBlogs = root.addMethod(HttpMethod.POST, postIntegration, {
-            operationName: "PostBlogs",
-            methodResponses: [{
-                statusCode: '200',
-                responseParameters: lambdaRespParams,
-            }],
-            requestValidator: props.validator,
-        });
-
-        this.resourceMapping = {
-            "/feeds": {
-                [HttpMethod.OPTIONS]: optionsBlogs,
-                [HttpMethod.GET]: getBlogs,
-                [HttpMethod.POST]: postBlogs,
             },
         };
     }
