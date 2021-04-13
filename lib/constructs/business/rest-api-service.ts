@@ -621,7 +621,7 @@ export class BlogsApiService extends AbstractRestApiService {
     constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
         super(scope, id, props);
 
-        const root = scope.apiEndpoint.root.addResource("feeds");
+        const root = scope.apiEndpoint.root.addResource("blogs");
         const blogsFunctions = new BlogsFunctions(this, 'crud-functions', {
             envVars: {
                 'TABLE_NAME': props.dataSource!,
