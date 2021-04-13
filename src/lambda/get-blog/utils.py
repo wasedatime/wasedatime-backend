@@ -87,17 +87,10 @@ def get_blogs(offset,limit):
 
     data.sort(key=functools.cmp_to_key(compare))
     indexes = []
-    temp = []
     cnt = 0
 
     for i in range(offset,len(data)):
-        if cnt > offset and cnt % limit == 0:
-            indexes.append(temp)
-            temp = []
-        temp.append(data[i])
-        cnt += 1
-    if len(temp) > 0:
-        indexes.append(temp)
+        indexes.append(data[i])
 
     return indexes
 
