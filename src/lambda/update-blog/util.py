@@ -1,8 +1,7 @@
 import boto3
 s3 = boto3.client('s3')
 
-def get_public_url(bucket, target_object_path):
-    """
+"""
     Get S3 file's URL
     Parameters
     ----------
@@ -16,8 +15,7 @@ def get_public_url(bucket, target_object_path):
     url: string
         Object's url inside bucket
     """
+def get_public_url(bucket, target_object_path):
     bucket_location = s3.get_bucket_location(Bucket=bucket)
-    return "https://{1}.s3-{0}.amazonaws.com/{2}".format(
-        bucket_location['LocationConstraint'],
-        bucket,
-        target_object_path)
+    location_constraint = bucket_location["LocationConstraint"];
+    return f"https://{bucket}.s3-{location_constraint}.amazonaws.com/{target_object_path}"

@@ -4,6 +4,7 @@ from util import *
 import boto3
 import logging
 import os
+import frontmatter
 
 s3 = boto3.client('s3')
 s3r = boto3.resource('s3')
@@ -12,28 +13,24 @@ transfesr = S3Transfer(s3)
 dynamodb = boto3.resource('dynamodb')
 table    = dynamodb.Table(os.getenv('TABLE_NAME'))
 
-def insert_blog(file_path,key,bucket_name):
+def insert_blog(file_path,key,bucket_name,btype):
     with open(file_path) as blog_content:
-        logging.info("Insert blog:" + key)
-        print(key)
+        logging.info(f"Insert blog: {key}")
+
         try:
-            blog_content.readline()
-            head = {}
-            for i in range(0,3):
-                text = blog_content.readline().split(':',1)
-                head[text[0].strip()] = text[1].strip()
-            
+            post = frontmatter.load(blog_content)
             item = {
-                "title" : head["title"], #get rid of .md
-                "author" : head["author"],
+                "type" : btype,
+                "title" : post["title"], #get rid of .md
+                "author" : post["author"],
                 "src" : get_public_url(bucket_name, key),
-                "created_at" : head["date"],
+                "created_at" : post["date"],
                 "update_at"  : datetime.now().strftime('%Y-%m-%d-%H-%M-%S'),
             }
             response = table.put_item(Item=item)
         except Exception as e:
-            logging.error("Fail insert blog:" + key)
-            logging.error(e)
+            logging.error(f"Fail insert blog {key} :{e}")
+
         return response
 
 
@@ -43,11 +40,11 @@ def handler(event,context):
         key = record['s3']['object']['key'] #get key
         os.makedirs('/tmp/blogs', exist_ok=True)
         file_path = '/tmp/' + key + '_' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        btype = 0               #now all blogs' types are 0
 
         try:
             bucket = s3r.Bucket(bucket_name) #access bucket
             bucket.download_file(key,file_path) #download file
-            insert_blog(file_path,key,bucket_name) #insert contents into dynamodb
+            insert_blog(file_path,key,bucket_name,btype) #insert contents into dynamodb
         except Exception as e:
-            logging.error("Update blogs failed")
-            logging.error(e)
+            logging.error(f'Update blogs failed :{e}')
