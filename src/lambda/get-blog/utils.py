@@ -81,10 +81,10 @@ def get_blogs(offset,limit):
 
     indexes = []
     cnt = 0
-    
-    for i in range(offset,len(queryData['Items'])):
-        indexes.append(queryData['Items'][i])
-        cnt += 1
+    if offset < len(queryData['Items']):
+        for i in range(offset,len(queryData['Items'])):
+            indexes.append(queryData['Items'][i])
+            cnt += 1
 
     return ret_dic(indexes,cnt)
 
