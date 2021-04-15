@@ -3,6 +3,7 @@ import boto3
 import json
 import logging
 from decimal import Decimal
+from boto3.dynamodb.conditions import Key
 from urllib import parse
 
 dynamodb = boto3.resource('dynamodb')
@@ -73,7 +74,7 @@ def ret_dic(indexes,cnt):
 def get_blogs(offset,limit):
    
     queryData = table.query(
-      KeyConditionExpression = Key("type").eq("0"),
+      KeyConditionExpression = Key("category").eq("0"),
       ScanIndexForward = False,
       Limit = offset + limit
     )

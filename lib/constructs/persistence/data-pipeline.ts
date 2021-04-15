@@ -155,7 +155,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
 
         this.dataSource = new Bucket(this, 'feeds-bucket', {
             accessControl: BucketAccessControl.PUBLIC_READ,
-            bucketName: "wasedatime-feeds-prods",
+            bucketName: "wasedatime-feeds-prod",
             cors: prodCorsRule,
             encryption: BucketEncryption.S3_MANAGED,
             publicReadAccess: true,

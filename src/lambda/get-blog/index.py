@@ -10,10 +10,9 @@ def query_blogs(offset,limit):
     return resp_body
 
 def handler(event, context):
-    body = json.loads(event['body'])
     params = {
-        "offset": body["offset"],
-        "limit" : body["limit"]
+        "offset": int(event["queryStringParameters"]["offset"]),
+        "limit" : int(event["queryStringParameters"]["limit"])
     }
 
     return query_blogs(**params)
