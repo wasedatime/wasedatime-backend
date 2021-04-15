@@ -20,7 +20,7 @@ def insert_blog(file_path,key,bucket_name,btype):
         try:
             post = frontmatter.load(blog_content)
             item = {
-                "type" : btype,
+                "category" : str(btype),
                 "title" : post["title"], #get rid of .md
                 "author" : post["author"],
                 "summary": "",
@@ -40,7 +40,7 @@ def handler(event,context):
         bucket_name = record['s3']['bucket']['name'] #get bucket name
         key = record['s3']['object']['key'] #get key
         os.makedirs('/tmp/blogs', exist_ok=True)
-        file_path = '/tmp/' + key + '_' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        file_path = '/tmp/blogs/tempfile'  + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         btype = 0               #now all blogs' types are 0
 
         try:
