@@ -417,6 +417,7 @@ export class FeedsFunctions extends cdk.Construct {
             entry: 'src/lambda/get-blog',
             description: "Get blog info from DB.",
             functionName: "get-feeds",
+            role:dynamoDBReadRole,
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
             runtime: Runtime.PYTHON_3_8,
@@ -437,7 +438,7 @@ export class BlogUpdateFunction extends cdk.Construct {
             assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
             description: "Allow lambda function to access s3 buckets and dynamodb",
             path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-            roleName: "lambda-full-access",
+            roleName: "feeds-full-access",
             managedPolicies: [
                 ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
                     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
