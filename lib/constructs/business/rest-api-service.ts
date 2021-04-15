@@ -25,7 +25,7 @@ import {
     syllabusSchema,
 } from "../../configs/api-gateway/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions} from "../common/lambda-functions";
+import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions,FeedsFunctions} from "../common/lambda-functions";
 import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} from "../../configs/api-gateway/mapping";
 
 
@@ -316,6 +316,11 @@ export class FeedsApiService extends AbstractRestApiService {
         super(scope, id, props);
 
         const root = scope.apiEndpoint.root.addResource("feeds");
+        const feedsFunctions = new FeedsFunctions(this, 'crud-functions', {
+            envVars: {
+                'TABLE_NAME': props.dataSource!,
+            },
+        });
 
         const getRespModel = scope.apiEndpoint.addModel('feeds-get-resp-model', {
             schema: articleListSchema,
@@ -324,15 +329,10 @@ export class FeedsApiService extends AbstractRestApiService {
             modelName: "GetFeedsResp",
         });
 
-        const getIntegration = new MockIntegration({
-            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            integrationResponses: [{
-                statusCode: '200',
-                responseTemplates: {["application/json"]: articlePlainJson},
-                responseParameters: mockRespMapping,
-            }],
-        });
+        const getIntegration = new LambdaIntegration(
+            feedsFunctions.getFunction, {proxy: true},
+        );
+        
         const postIntegration = new MockIntegration({
             requestTemplates: {["application/json"]: '{"statusCode": 200}'},
             passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,

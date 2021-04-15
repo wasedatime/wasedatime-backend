@@ -7,7 +7,7 @@ export enum Collection {
     CAREER,
     FEEDS,
     SYLLABUS,
-    TIMETABLE
+    TIMETABLE,
 }
 
 export interface DatabaseProps {

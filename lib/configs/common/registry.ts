@@ -19,7 +19,7 @@ export const enum DataEndpoint {
 
     TIMETABLE,
 
-    COURSE
+    COURSE,
 }
 
 export enum OperationEndpoint {

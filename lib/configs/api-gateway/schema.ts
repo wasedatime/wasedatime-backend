@@ -488,7 +488,7 @@ export const articleListSchema: JsonSchema = {
                             "author": {
                                 type: JsonSchemaType.STRING,
                             },
-                            "summary": {
+                            "summary":{
                                 type: JsonSchemaType.STRING,
                             },
                             "created_at": {
@@ -496,12 +496,6 @@ export const articleListSchema: JsonSchema = {
                             },
                             "updated_at": {
                                 type: JsonSchemaType.STRING,
-                            },
-                            "tags": {
-                                type: JsonSchemaType.ARRAY,
-                                items: {
-                                    type: JsonSchemaType.STRING,
-                                },
                             },
                             "src": {
                                 type: JsonSchemaType.STRING,
@@ -514,7 +508,6 @@ export const articleListSchema: JsonSchema = {
                             "summary",
                             "created_at",
                             "updated_at",
-                            "tags",
                             "src",
                         ],
                     },
@@ -522,14 +515,10 @@ export const articleListSchema: JsonSchema = {
                 "size": {
                     type: JsonSchemaType.INTEGER,
                 },
-                "offset": {
-                    type: JsonSchemaType.STRING,
-                },
             },
             required: [
                 "articles",
                 "size",
-                "offset",
             ],
         },
         "message": {
@@ -543,6 +532,6 @@ export const articleListSchema: JsonSchema = {
     ],
 };
 
-export const articlePlainJson = '{ "success": true, "data": { "articles": [ { "category": "career", "title": "Accenture WasedaTime", "author": "Cris Ye", "summary": "", "created_at": "2021-02-25T11:00:00.001Z", "updated_at": "2021-02-25T11:04:00.001Z", "tags": [], "src": "2021-02-25-Accenture-WasedaTime/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" }, { "category": "career", "title": "markdown test", "author": "Bob", "summary": "This is a test file.", "created_at": "2020-09-11T08:00:00.001Z", "updated_at": "2020-09-11T10:00:00.001Z", "tags": [ "job fair", "graduates", "company" ], "src": "2020-09-11-markdown-test/" } ], "size": 5, "offset": "dfne2341tt4ebewauka34ihy23784y128" }, "message": "OK" }';
+export const articlePlainJson = '{"success": true, "data": {"articles": [{"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-05-58-09", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}, {"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-05-58-38", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}, {"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-05-58-39", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}, {"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-05-58-40", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}, {"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-06-34-41", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}], "size": 5}, "message": ""}';
 
 export const careerInfoSchema: JsonSchema = {};
