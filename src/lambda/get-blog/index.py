@@ -2,6 +2,31 @@ import json
 from utils import JsonPayloadBuilder
 from utils import resp_handler
 from utils import get_blogs
+from boto3.dynamodb.conditions import Key
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table    = dynamodb.Table(os.getenv('TABLE_NAME'))
+
+def get_blogs(offset,limit):
+       
+    query_result = table.query(
+      KeyConditionExpression = Key("category").eq("0"),
+      ScanIndexForward = False,
+      Limit = offset + limit
+    )
+
+    indexes = []
+    cnt = 0
+    if offset < len(query_result['Items']):
+        indexes = query_result['Items'][offset:]
+
+    return {
+        "articles" : indexes,
+        "size" : len(indexes)
+    }
+
+
 
 @resp_handler
 def query_blogs(offset,limit):
