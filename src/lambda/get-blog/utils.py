@@ -3,10 +3,8 @@ import boto3
 import json
 import logging
 from decimal import Decimal
+from boto3.dynamodb.conditions import Key
 from urllib import parse
-
-dynamodb = boto3.resource('dynamodb')
-table    = dynamodb.Table('blogs')
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -62,29 +60,4 @@ def resp_handler(func):
             return api_response(500, resp)
 
     return handle
-
-
-def ret_dic(indexes,cnt):
-    return {
-        "articles" : indexes,
-        "size" : cnt        
-    }
-
-def get_blogs(offset,limit):
-   
-    queryData = table.query(
-      KeyConditionExpression = Key("type").eq("0"),
-      ScanIndexForward = False,
-      Limit = offset + limit
-    )
-
-    indexes = []
-    cnt = 0
-    print(queryData['Items'])
-    
-    for i in range(offset,len(queryData['Items'])):
-        indexes.append(queryData['Items'][i])
-        cnt += 1
-
-    return ret_dic(indexes,cnt)
 

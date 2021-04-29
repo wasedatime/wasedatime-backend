@@ -1,6 +1,5 @@
 from boto3.s3.transfer import S3Transfer
 from datetime import datetime
-from util import *
 import boto3
 import logging
 import os
@@ -16,15 +15,15 @@ table    = dynamodb.Table(os.getenv('TABLE_NAME'))
 def insert_blog(file_path,key,bucket_name,btype):
     with open(file_path) as blog_content:
         logging.info(f"Insert blog: {key}")
-
+        store_path = os.path.dirname(key)
         try:
             post = frontmatter.load(blog_content)
             item = {
-                "type" : btype,
+                "category" : str(btype),
                 "title" : post["title"], #get rid of .md
                 "author" : post["author"],
                 "summary": "",
-                "src" : get_public_url(bucket_name, key),
+                "src" : f"s3://{bucket_name}/{store_path}/",
                 "created_at" : post["date"],
                 "updated_at"  : datetime.now().strftime('%Y-%m-%d-%H-%M-%S'),
             }
@@ -40,7 +39,7 @@ def handler(event,context):
         bucket_name = record['s3']['bucket']['name'] #get bucket name
         key = record['s3']['object']['key'] #get key
         os.makedirs('/tmp/blogs', exist_ok=True)
-        file_path = '/tmp/' + key + '_' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        file_path = '/tmp/blogs/tempfile'  + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         btype = 0               #now all blogs' types are 0
 
         try:
