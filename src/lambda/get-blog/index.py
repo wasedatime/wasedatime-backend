@@ -1,9 +1,9 @@
 import json
 from utils import JsonPayloadBuilder
 from utils import resp_handler
-from utils import get_blogs
 from boto3.dynamodb.conditions import Key
 import boto3
+import os
 
 dynamodb = boto3.resource('dynamodb')
 table    = dynamodb.Table(os.getenv('TABLE_NAME'))
