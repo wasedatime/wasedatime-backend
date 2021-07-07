@@ -9,7 +9,7 @@ import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-d
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
-import {SyllabusScraper, SyllabusUpdateFunction,BlogUpdateFunction} from "../common/lambda-functions";
+import {BlogUpdateFunction, SyllabusScraper, SyllabusUpdateFunction} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
 import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../utils/s3";
@@ -74,7 +74,6 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
             },
         }).baseFunction;
 
-        //todo use reduce
         function getLambdaTaskInstance(schools: string[], num: string): LambdaInvoke {
             return new LambdaInvoke(scope, "task-" + num, {
                 lambdaFunction: scraperBaseFunction,

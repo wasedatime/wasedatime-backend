@@ -18,7 +18,7 @@ Layer*,
 
 <img src="doc/pre.png" alt="Presentation Layer" width=35%/>
 
-- Micro-frontends server implementation using multiple AWS Amplify Apps.
+- Micro-frontends hosting using multiple AWS Amplify Apps.
 
 - Micro-app routing in production environment uses path-based redirect configured through custom rules in AWS Amplify.
 
@@ -31,7 +31,7 @@ Layer*,
 
 ![Business Layer](doc/biz.png)
 
-- REST API server using AWS API Gateway with Lambda and S3 integration.
+- REST API service using AWS API Gateway with Lambda and S3 integration.
 
 - AWS Cognito for user authentication and management.
 
@@ -47,7 +47,9 @@ Layer*,
 
 - Automatic backup is configured for critical tables
 
-- AWS EventBridge executes the scraper, which is implemented using AWS StepFunctions, using CRON jobs
+- AWS EventBridge executes the scraper using CRON jobs
+
+- Scraper tasks are chained using AWS StepFunctions
 
 - Automated data pipelines triggered by S3
 
