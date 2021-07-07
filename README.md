@@ -10,24 +10,58 @@ This repository defines the serverless application architecture, resource config
 
 ### Architecture
 
-We adopted a simple serverless application architecture, consisted of four layers: *Presentation Layer*, *Business Layer*, 
+We adopted a simple serverless application architecture, consisted of four layers: *Presentation Layer*, *Business
+Layer*,
 *Persistence Layer* and *Admin Layer*.
 
 #### Presentation Layer
 
 <img src="doc/pre.png" alt="Presentation Layer" width=35%/>
 
+- Micro-frontends hosting using multiple AWS Amplify Apps.
+
+- Micro-app routing in production environment uses path-based redirect configured through custom rules in AWS Amplify.
+
+- In develop environment, the domain of micro-apps are generated and injected as environment variables into the routing
+  table of system-js during build.
+
+- Continuous deployment for each micro-app.
+
 #### Business Layer
 
 ![Business Layer](doc/biz.png)
+
+- REST API service using AWS API Gateway with Lambda and S3 integration.
+
+- AWS Cognito for user authentication and management.
+
+- GraphQL API server using AWS AppSync
 
 #### Persistence Layer
 
 <img src="doc/pers.png" alt="Persistence Layer" width=57%/>
 
+- AWS DynamoDB as the main database
+
+- S3 stores static data and assets
+
+- Automatic backup is configured for critical tables
+
+- AWS EventBridge executes the scraper using CRON jobs
+
+- Scraper tasks are chained using AWS StepFunctions
+
+- Automated data pipelines triggered by S3
+
 #### Admin Layer
 
 <img src="doc/admin.png" alt="Admin Layer" width=50%/>
+
+- Integrates AWS Amplify, StepFunctions and CloudFormation status notification into Slack
+
+- AWS Budget plan and alerts
+
+- AWS CloudTrail for operation logging
 
 ## Getting Started
 
