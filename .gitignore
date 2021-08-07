@@ -90,7 +90,7 @@ Thumbs.db
 
 #js
 *.js
-!jest.config.js
+!jest.config.ts
 *.d.ts
 node_modules
 
