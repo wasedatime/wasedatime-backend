@@ -4,6 +4,7 @@ import {microAppCorsHeader, securityHeaders} from "./website";
 
 const preBuild = {
     commands: [
+        "git submodule update --init --recursive",
         "npm config set @bit:registry https://node.bit.dev",
         `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
         "npm ci",
