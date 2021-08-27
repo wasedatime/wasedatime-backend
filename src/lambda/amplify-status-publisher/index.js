@@ -3,16 +3,23 @@ const https = require('https');
 const colors = {
   'SUCCEED': 'good',
   'FAILED': 'danger',
-  'STARTED': 'good'
+  'STARTED': 'good',
+};
+
+const apps = {
+  'dvqo5dg5k8e6d': "ROOT",
+  'd4mmu2hx77tt5': "FEEDS",
+  'd30wetah1y35e8': "CAMPUS",
+  'd3tfy2z9dqnnsk': "SYLLABUS",
 };
 
 exports.handler = async (event) => {
   const detail = event.detail;
-
   const branch = detail.branchName;
   const appId = detail.appId;
   const stat = detail.jobStatus;
   const jobId = detail.jobId;
+  const appName = apps[appId];
 
   const link = `https://ap-northeast-1.console.aws.amazon.com/amplify/home?region=ap-northeast-1#${appId}/${branch}/${jobId}`;
 
@@ -27,16 +34,16 @@ exports.handler = async (event) => {
   }
 
   const data = JSON.stringify({
-    text: `Branch: ${branch} has entered status: ${stat} <${link}|(view in web console)>`,
+    text: `[${appName}]Branch: ${branch} has entered status: ${stat} <${link}|(view in web console)>`,
     attachments: [
       {
-        title: `Branch ${branch} is now status ${stat}`,
+        title: `[${appName}]Branch ${branch} is now status ${stat}`,
         color: colors[stat],
         fields: [
           {
             title: 'Website',
             value: `<${url}|Click to view the branch>`,
-            short: true
+            short: true,
           },
           {
             title: 'Branch',
