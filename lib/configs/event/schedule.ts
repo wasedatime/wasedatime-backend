@@ -2,7 +2,6 @@ import {Schedule} from "@aws-cdk/aws-events";
 
 
 export const syllabusSchedule: { [name: string]: Schedule } = {
-
     'regular':
         Schedule.cron({minute: '0', hour: '16', day: '1', month: '*', year: '*'}),
 

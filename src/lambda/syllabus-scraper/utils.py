@@ -8,6 +8,8 @@ import unicodedata
 from botocore.config import Config
 from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
+from datetime import datetime
+
 from const import *
 
 
@@ -305,7 +307,8 @@ def upload_to_s3(syllabus, school):
         ACL='private',
         Body=body,
         ContentType='application/json; charset=utf-8',
-        CacheControl='public, max-age=2592000, must-revalidate'
+        CacheControl='public, max-age=2592000, must-revalidate',
+        Expires=get_expire_date()
     )
     return resp
 
@@ -321,3 +324,14 @@ def run_concurrently(func, tasks, n):
     with ThreadPoolExecutor(max_workers=n) as executor:
         wait_list = [executor.submit(func, t) for t in tasks]
     return (page.result() for page in as_completed(wait_list))
+
+
+def get_expire_date():
+    now = datetime.now()
+    dt = now.strftime("%m-%d")
+    idx = cron_schedule.index(dt) + 1
+    if idx == len(cron_schedule) - 1:
+        idx = -1
+    next_dt = cron_schedule[idx + 1].split('-')
+    next_time = now.replace(month=next_dt[0], day=next_dt[1])
+    return next_time
