@@ -101,14 +101,13 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
         });
 
         for (const name in syllabusSchedule) {
-            if (syllabusSchedule.hasOwnProperty(name)) {
-                this.schedules[name] = new Rule(this, name, {
+            this.schedules[name] = new Rule(this, name, {
                     ruleName: name,
                     enabled: true,
                     schedule: syllabusSchedule[name],
                     targets: [new SfnStateMachine(this.processor)],
-                });
-            }
+                },
+            );
         }
     }
 }
@@ -150,7 +149,7 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
     constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
         super(scope, id);
 
-        this.dataWarehouse = props?.dataWarehouse!
+        this.dataWarehouse = props?.dataWarehouse!;
 
         this.dataSource = new Bucket(this, 'feeds-bucket', {
             accessControl: BucketAccessControl.PUBLIC_READ,
@@ -167,13 +166,13 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
                 ["BUCKET_NAME"]: this.dataSource.bucketName,
                 ['TABLE_NAME']: this.dataWarehouse.tableName,
                 ["OBJECT_PATH"]: 'blogs/',
-            }
+            },
         }).updateFunction;
 
         this.processor.addEventSource(new S3EventSource(this.dataSource, {
             events: [s3.EventType.OBJECT_CREATED],
-            filters: [{prefix: 'blogs/'},{suffix:'.md'}],
-        }))
+            filters: [{prefix: 'blogs/'}, {suffix: '.md'}],
+        }));
     }
 }
 
@@ -208,12 +207,12 @@ export class SyllabusSyncPipeline extends AbstractDataPipeline {
                 ["BUCKET_NAME"]: this.dataSource.bucketName,
                 ['TABLE_NAME']: this.dataWarehouse.tableName,
                 ["OBJECT_PATH"]: 'syllabus/',
-            }
+            },
         }).updateFunction;
 
         this.processor.addEventSource(new S3EventSource(this.dataSource, {
             events: [s3.EventType.OBJECT_CREATED_PUT],
             filters: [{prefix: 'syllabus/'}],
-        }))
+        }));
     }
 }
