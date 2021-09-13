@@ -329,9 +329,9 @@ def run_concurrently(func, tasks, n):
 def get_expire_date():
     now = datetime.now()
     dt = now.strftime("%m-%d")
-    idx = cron_schedule.index(dt) + 1
+    idx = cron_schedule.index(dt)
     if idx == len(cron_schedule) - 1:
         idx = -1
     next_dt = cron_schedule[idx + 1].split('-')
-    next_time = now.replace(month=next_dt[0], day=next_dt[1])
+    next_time = now.replace(month=int(next_dt[0]), day=int(next_dt[1]))
     return next_time
