@@ -79,7 +79,7 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
 
     abstract readonly apiEndpoint: GraphqlApi;
 
-    abstract readonly apiServices: { [name: string]: AbstractGraphqlApiService } = {};
+    abstract readonly apiServices: { [name: string]: AbstractGraphqlApiService };
 
     protected authMode: { [mode: string]: AuthorizationMode } = {};
 

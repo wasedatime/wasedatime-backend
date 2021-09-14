@@ -26,7 +26,7 @@ export interface GraphqlApiServiceProps {
 
 export abstract class AbstractGraphqlApiService extends cdk.Construct {
 
-    abstract readonly resolvers: { [name: string]: Resolver } = {};
+    abstract readonly resolvers: { [name: string]: Resolver };
 
     protected constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
         super(scope, id);
@@ -132,14 +132,5 @@ export class CourseApiService extends AbstractGraphqlApiService {
             requestMappingTemplate: MappingTemplate.fromFile('src/appsync/mapping/syllabus-filter-req.vtl'),
             responseMappingTemplate: MappingTemplate.dynamoDbResultList(),
         }));
-    }
-}
-
-export abstract class CareerApiService extends cdk.Construct {
-
-    abstract readonly resolvers: { [name: string]: Resolver } = {};
-
-    protected constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
-        super(scope, id);
     }
 }

@@ -15,7 +15,7 @@ export interface HttpApiServiceProps {
 
 export abstract class AbstractHttpApiService extends cdk.Construct {
 
-    abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: HttpRoute } } = {};
+    abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: HttpRoute } };
 
     protected constructor(scope: AbstractHttpApiEndpoint, id: string, props: HttpApiServiceProps) {
         super(scope, id);

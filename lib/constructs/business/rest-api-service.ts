@@ -18,15 +18,19 @@ import {AbstractRestApiEndpoint} from "./api-endpoint";
 import {allowHeaders, allowOrigins} from "../../configs/api-gateway/cors";
 import {
     articleListSchema,
-    articlePlainJson,
     courseReviewGetRespSchema,
     courseReviewPatchReqSchema,
     courseReviewPostReqSchema,
     syllabusSchema,
 } from "../../configs/api-gateway/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions,FeedsFunctions} from "../common/lambda-functions";
-import {lambdaRespParams, mockRespMapping, s3RespMapping, syllabusRespParams} from "../../configs/api-gateway/mapping";
+import {
+    CourseReviewsFunctions,
+    FeedsFunctions,
+    SyllabusFunctions,
+    TimetableFunctions,
+} from "../common/lambda-functions";
+import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../../configs/api-gateway/mapping";
 
 
 export interface RestApiServiceProps {
@@ -40,7 +44,7 @@ export interface RestApiServiceProps {
 
 export abstract class AbstractRestApiService extends cdk.Construct {
 
-    abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
+    abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } };
 
     protected constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
         super(scope, id);
