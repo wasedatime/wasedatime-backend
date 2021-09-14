@@ -2,22 +2,23 @@ import {BuildSpec} from "@aws-cdk/aws-codebuild/lib/build-spec";
 import {microAppCorsHeader, securityHeaders} from "./website";
 
 
+export const bitToken = process.env.BIT_TOKEN!;
+
 const preBuild = {
     commands: [
-        "npm config set @bit:registry https://node.bit.dev",
-        `npm config set //node.bit.dev/:_authToken ${process.env.BIT_TOKEN}`,
-        "npm ci",
+        "npm install -g pnpm",
+        "pnpm install --filter .",
     ],
 };
 
 const prodBuild = {
-    commands: ["npm run build"],
+    commands: ["pnpm run build"],
 };
 
 const devBuild = {
     commands: [
         "export PREFIX=\"${AWS_BRANCH//[\\/_]/-}\"",
-        "npm run build-dev",
+        "pnpm run build-dev",
     ],
 };
 
@@ -27,7 +28,7 @@ const artifacts = {
     files: ["**/*"],
 };
 
-const cache = {paths: ["node_modules/**/*"]};
+const cache = {paths: ["node_modules/**/*", "~/.pnpm-store"]};
 
 export const rootAppBuildSpec = BuildSpec.fromObject({
     version: 1,
