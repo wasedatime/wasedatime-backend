@@ -27,7 +27,7 @@ export abstract class AbstractAuthProvider extends cdk.Construct {
 
     abstract readonly pool: UserPool;
 
-    abstract readonly clients: { [name: string]: UserPoolClient } = {};
+    abstract readonly clients: { [name: string]: UserPoolClient };
 
     abstract readonly domain: UserPoolDomain;
 
