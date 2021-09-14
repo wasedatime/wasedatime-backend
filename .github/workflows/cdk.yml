@@ -42,14 +42,21 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - uses: actions/setup-node@v2.4.0
+        with:
+          node-version: 16.x
+
+      - name: Configure pnpm
+        run: npm install -g pnpm
+
       - name: Install
-        run: npm ci
+        run: pnpm install
 
       - name: Test
-        run: npm test
+        run: pnpm test
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
   verify:
     runs-on: ubuntu-latest
@@ -57,14 +64,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2.1.4
+      - uses: actions/setup-node@v2.4.0
         with:
-          node-version: 14.x
+          node-version: 16.x
+
+      - name: Configure pnpm
+        run: npm install -g pnpm
 
       - name: Setup CDK
         run: |
-          npm install -g aws-cdk
-          npm ci
+          pnpm install -g aws-cdk
+          pnpm install
 
       - name: Diff
         run: cdk diff
@@ -76,9 +86,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2.1.4
+      - uses: actions/setup-node@v2.4.0
         with:
-          node-version: 14.x
+          node-version: 16.x
+
+      - name: Configure pnpm
+        run: npm install -g pnpm
 
       - uses: Fooji/create-aws-profile-action@v1
         with:
@@ -89,8 +102,8 @@ jobs:
 
       - name: Setup CDK
         run: |
-          npm install -g aws-cdk
-          npm ci
+          pnpm install -g aws-cdk
+          pnpm install
 
       - name: Deploy dev
         if: github.ref == 'refs/heads/develop'
