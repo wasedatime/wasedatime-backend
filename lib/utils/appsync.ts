@@ -1,6 +1,6 @@
 import {GraphqlType, IIntermediateType, ObjectType} from '@aws-cdk/aws-appsync';
 
-var pluralize = require('pluralize');
+const pluralize = require('pluralize');
 
 
 // Int
