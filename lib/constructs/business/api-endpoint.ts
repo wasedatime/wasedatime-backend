@@ -79,7 +79,7 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
 
     abstract readonly apiEndpoint: GraphqlApi;
 
-    abstract readonly apiServices: { [name: string]: AbstractGraphqlApiService };
+    readonly apiServices: { [name: string]: AbstractGraphqlApiService };
 
     protected authMode: { [mode: string]: AuthorizationMode } = {};
 
@@ -243,7 +243,7 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
 
     readonly apiEndpoint: GraphqlApi;
 
-    readonly apiServices: { [name: string]: AbstractGraphqlApiService };
+    readonly apiServices: { [name: string]: AbstractGraphqlApiService } = {};
 
     constructor(scope: cdk.Construct, id: string, props: ApiEndpointProps) {
 
