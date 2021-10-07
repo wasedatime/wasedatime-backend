@@ -93,7 +93,7 @@ jobs:
       - name: Configure pnpm
         run: npm install -g pnpm
 
-      - uses: Fooji/create-aws-profile-action@v1
+      - uses: Fooji/create-aws-profile-action@v2
         with:
           profile: default
           region: ${{ env.AWS_REGION }}
