@@ -1,6 +1,6 @@
 {
   "name": "wasedatime-backend",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "bin": {
     "wasedatime-backend": "bin/index.js"
   },
@@ -12,7 +12,7 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.122.0",
+    "@aws-cdk/assert": "1.129.0",
     "@types/jest": "27.0.2",
     "@types/node": "16.9.1",
     "aws-cdk": "1.129.0",
