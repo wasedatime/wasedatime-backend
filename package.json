@@ -54,7 +54,7 @@
     "@aws-cdk/aws-stepfunctions": "1.129.0",
     "@aws-cdk/aws-stepfunctions-tasks": "1.129.0",
     "@aws-cdk/core": "1.129.0",
-    "dotenv": "8.6.0",
+    "dotenv": "10.0.0",
     "flatted": "3.2.2",
     "pluralize": "8.0.0",
     "source-map-support": "0.5.20"
