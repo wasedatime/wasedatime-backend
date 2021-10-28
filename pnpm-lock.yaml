@@ -43,7 +43,7 @@ specifiers:
   pluralize: 8.0.0
   source-map-support: 0.5.20
   ts-jest: 27.0.7
-  ts-node: 10.2.1
+  ts-node: 10.4.0
   typescript: 4.4.4
 
 dependencies:
@@ -106,7 +106,7 @@ packages:
       '@aws-cdk/core': 1.129.0
       '@aws-cdk/cx-api': 1.129.0
       constructs: 3.3.147
-      jest: 27.3.1_ts-node@10.2.1
+      jest: 27.3.1_ts-node@10.4.0
     dev: true
 
   /@aws-cdk/assets/1.129.0:
@@ -1502,8 +1502,8 @@ packages:
     engines: {node: '>= 12'}
     dev: true
 
-  /@cspotcode/source-map-support/0.6.1:
-    resolution: {integrity: sha512-DX3Z+T5dt1ockmPdobJS/FAsQPW4V4SrWEhD2iYQT2Cb2tQsiMnYxrcUH9By/Z3B+v0S5LMBkQtV/XOBbpLEOg==}
+  /@cspotcode/source-map-support/0.7.0:
+    resolution: {integrity: sha512-X4xqRHqN8ACt2aHVe51OxeA2HjbcL4MqFqXkrmQszJ1NOUuUu5u6Vqx/0lZSVNku7velL5FC/s5uEAj1lsBMhA==}
     engines: {node: '>=12'}
     dependencies:
       '@cspotcode/source-map-consumer': 0.8.0
@@ -1537,7 +1537,7 @@ packages:
       slash: 3.0.0
     dev: true
 
-  /@jest/core/27.3.1_ts-node@10.2.1:
+  /@jest/core/27.3.1_ts-node@10.4.0:
     resolution: {integrity: sha512-DMNE90RR5QKx0EA+wqe3/TNEwiRpOkhshKNxtLxd4rt3IZpCt+RSL+FoJsGeblRZmqdK4upHA/mKKGPPRAifhg==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     peerDependencies:
@@ -1558,7 +1558,7 @@ packages:
       exit: 0.1.2
       graceful-fs: 4.2.8
       jest-changed-files: 27.3.0
-      jest-config: 27.3.1_ts-node@10.2.1
+      jest-config: 27.3.1_ts-node@10.4.0
       jest-haste-map: 27.3.1
       jest-message-util: 27.3.1
       jest-regex-util: 27.0.6
@@ -3074,7 +3074,7 @@ packages:
       - supports-color
     dev: true
 
-  /jest-cli/27.3.1_ts-node@10.2.1:
+  /jest-cli/27.3.1_ts-node@10.4.0:
     resolution: {integrity: sha512-WHnCqpfK+6EvT62me6WVs8NhtbjAS4/6vZJnk7/2+oOr50cwAzG4Wxt6RXX0hu6m1169ZGMlhYYUNeKBXCph/Q==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -3084,14 +3084,14 @@ packages:
       node-notifier:
         optional: true
     dependencies:
-      '@jest/core': 27.3.1_ts-node@10.2.1
+      '@jest/core': 27.3.1_ts-node@10.4.0
       '@jest/test-result': 27.3.1
       '@jest/types': 27.2.5
       chalk: 4.1.2
       exit: 0.1.2
       graceful-fs: 4.2.8
       import-local: 3.0.2
-      jest-config: 27.3.1_ts-node@10.2.1
+      jest-config: 27.3.1_ts-node@10.4.0
       jest-util: 27.3.1
       jest-validate: 27.3.1
       prompts: 2.4.1
@@ -3104,7 +3104,7 @@ packages:
       - utf-8-validate
     dev: true
 
-  /jest-config/27.3.1_ts-node@10.2.1:
+  /jest-config/27.3.1_ts-node@10.4.0:
     resolution: {integrity: sha512-KY8xOIbIACZ/vdYCKSopL44I0xboxC751IX+DXL2+Wx6DKNycyEfV3rryC3BPm5Uq/BBqDoMrKuqLEUNJmMKKg==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     peerDependencies:
@@ -3134,7 +3134,7 @@ packages:
       jest-validate: 27.3.1
       micromatch: 4.0.4
       pretty-format: 27.3.1
-      ts-node: 10.2.1_e3a6d03856ea4ec83bf2e0c3b647a57e
+      ts-node: 10.4.0_c51a13cfa2c3195bf611f1652e33c9c1
     transitivePeerDependencies:
       - bufferutil
       - canvas
@@ -3516,7 +3516,7 @@ packages:
       supports-color: 8.1.1
     dev: true
 
-  /jest/27.3.1_ts-node@10.2.1:
+  /jest/27.3.1_ts-node@10.4.0:
     resolution: {integrity: sha512-U2AX0AgQGd5EzMsiZpYt8HyZ+nSVIh5ujQ9CPp9EQZJMjXIiSZpJNweZl0swatKRoqHWgGKM3zaSwm4Zaz87ng==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -3526,9 +3526,9 @@ packages:
       node-notifier:
         optional: true
     dependencies:
-      '@jest/core': 27.3.1_ts-node@10.2.1
+      '@jest/core': 27.3.1_ts-node@10.4.0
       import-local: 3.0.2
-      jest-cli: 27.3.1_ts-node@10.2.1
+      jest-cli: 27.3.1_ts-node@10.4.0
     transitivePeerDependencies:
       - bufferutil
       - canvas
@@ -4491,7 +4491,7 @@ packages:
       '@types/jest': 27.0.2
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 27.3.1_ts-node@10.2.1
+      jest: 27.3.1_ts-node@10.4.0
       jest-util: 27.2.0
       json5: 2.2.0
       lodash.memoize: 4.1.2
@@ -4501,9 +4501,8 @@ packages:
       yargs-parser: 20.2.9
     dev: true
 
-  /ts-node/10.2.1_e3a6d03856ea4ec83bf2e0c3b647a57e:
-    resolution: {integrity: sha512-hCnyOyuGmD5wHleOQX6NIjJtYVIO8bPP8F2acWkB4W06wdlkgyvJtubO/I9NkI88hCFECbsEgoLc0VNkYmcSfw==}
-    engines: {node: '>=12.0.0'}
+  /ts-node/10.4.0_c51a13cfa2c3195bf611f1652e33c9c1:
+    resolution: {integrity: sha512-g0FlPvvCXSIO1JDF6S232P5jPYqBkRL9qly81ZgAOSU7rwI0stphCgd2kLiCrU9DjQCrJMWEqcNSjQL02s6d8A==}
     hasBin: true
     peerDependencies:
       '@swc/core': '>=1.2.50'
@@ -4516,7 +4515,7 @@ packages:
       '@swc/wasm':
         optional: true
     dependencies:
-      '@cspotcode/source-map-support': 0.6.1
+      '@cspotcode/source-map-support': 0.7.0
       '@tsconfig/node10': 1.0.8
       '@tsconfig/node12': 1.0.9
       '@tsconfig/node14': 1.0.1
