@@ -83,9 +83,7 @@ jobs:
           echo "::set-output name=diff::$(cat diff.txt)"
 
       - name: Comment
-        uses: mshick/add-pr-comment@v1
+        uses: peter-evans/create-or-update-comment@v1
         with:
-          message: ${{ steps.diff.outputs.diff }}
-          repo-token: ${{ env.GITHUB_OAUTH_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
-          allow-repeats: false
+          body: ${{ steps.diff.outputs.diff }}
+          token: ${{ env.GITHUB_OAUTH_TOKEN }}
