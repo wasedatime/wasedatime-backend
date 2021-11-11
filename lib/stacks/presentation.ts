@@ -18,7 +18,11 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
             apiDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.API_REST),
             authDomain: this.serviceInterface.getEndpoint(ServiceEndpoint.AUTH),
         });
-        monoApp.addMicroApp("syllabus").addMicroApp("campus").addMicroApp("blog");
+        monoApp.addMicroApp("syllabus");
+        monoApp.addMicroApp("campus");
+        monoApp.addMicroApp("blog");
+        monoApp.addMicroApp("feeds");
+
         webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));
 
         this.app = monoApp;

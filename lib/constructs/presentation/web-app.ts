@@ -92,7 +92,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         });
     }
 
-    public addMicroApp(name: string): AmplifyMonoWebApp {
+    public addMicroApp(name: string) {
         const microApp = new App(this, `${name}-app`, {
             appName: `wasedatime-web-${name}`,
             autoBranchDeletion: true,
@@ -135,7 +135,5 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             status: RedirectStatus.REWRITE,
         }));
         this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, appDomain);
-
-        return this;
     }
 }
