@@ -85,5 +85,6 @@ jobs:
       - name: Comment
         uses: peter-evans/create-or-update-comment@v1
         with:
+          issue-number: ${{ github.event.pull_request.number }}
           body: ${{ steps.diff.outputs.diff }}
           token: ${{ env.GITHUB_OAUTH_TOKEN }}
