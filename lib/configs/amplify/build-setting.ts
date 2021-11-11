@@ -30,42 +30,6 @@ const artifacts = {
 
 const cache = {paths: ["node_modules/**/*", "~/.pnpm-store"]};
 
-export const rootAppBuildSpec = BuildSpec.fromObject({
-    version: 1,
-    applications: [
-        {
-            frontend: {
-                phases: {
-                    preBuild: preBuild,
-                    build: prodBuild,
-                },
-                artifacts: artifacts,
-                cache: cache,
-                customHeaders: securityHeaders,
-            },
-            appRoot: "root",
-        },
-    ],
-});
-
-export const rootAppDevBuildSpec = BuildSpec.fromObject({
-    version: 1,
-    applications: [
-        {
-            frontend: {
-                phases: {
-                    preBuild: preBuild,
-                    build: devBuild,
-                },
-                artifacts: artifacts,
-                cache: cache,
-                customHeaders: securityHeaders,
-            },
-            appRoot: "root",
-        },
-    ],
-});
-
 export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObject({
     version: 1,
     applications: [

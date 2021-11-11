@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: AWS CDK CI/CD
 
 # Controls when the action will run. 
@@ -10,10 +8,11 @@ on:
       - develop
   pull_request:
     branches:
-      - '**'
+      - main
+      - develop
 
 env:
-  GITHUB_OAUTH_TOKEN: ${{ secrets.PROVIDER_OAUTH_TOKEN }}
+  GITHUB_OAUTH_TOKEN: ${{ secrets.ACCESS_TOKEN_GITHUB }}
   WEBSITE_DEV_PASS: ${{ secrets.WEBSITE_DEV_PASS }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -25,7 +24,6 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
   SLACK_WORKSPACE_ID: ${{ secrets.SLACK_WORKSPACE_ID }}
-  GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
   BIT_TOKEN: ${{ secrets.BIT_TOKEN }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -75,76 +73,17 @@ jobs:
         run: |
           pnpm install -g aws-cdk
           pnpm install
+      - name: Diagnose
+        run: pnpm run cdk doctor
 
       - name: Diff
-        run: cdk diff
+        id: diff
+        run: echo "::set-output name=diff::$(cdk diff --no-color)\n"
 
-  deploy:
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    needs: [ verify ]
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-node@v2.4.1
+      - name: Comment
+        uses: mshick/add-pr-comment@v1
         with:
-          node-version: 16.x
-
-      - name: Configure pnpm
-        run: npm install -g pnpm
-
-      - uses: Fooji/create-aws-profile-action@v2
-        with:
-          profile: default
-          region: ${{ env.AWS_REGION }}
-          key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Setup CDK
-        run: |
-          pnpm install -g aws-cdk
-          pnpm install
-
-      - name: Deploy dev
-        if: github.ref == 'refs/heads/develop'
-        env:
-          STAGE: dev
-        run: cdk deploy --all --require-approval "never"
-
-      - name: Deploy prod
-        if: github.ref == 'refs/heads/main'
-        env:
-          STAGE: prod
-        run: cdk deploy --all --require-approval "never"
-
-  update_doc:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    needs: [ deploy ]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          repository: wasedatime/wasedatime.github.io
-          token: ${{ secrets.GIT_TOKEN }}
-
-      - name: Setup
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install --update
-
-      - name: Export
-        run: |
-          cd ./openapi
-          aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
-          aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
-
-      - name: Push
-        uses: EndBug/add-and-commit@v7
-        with:
-          author_name: GitHub Actions
-          author_email: actions@github.com
-          add: "['./openapi/dev.yml', './openapi/prod.yml']"
-          branch: main
-          message: 'API Documentation update from GitHub Actions'
-          push: true
+          message: ${{ steps.diff.outputs.diff }}
+          repo-token: ${{ secrets.GITHUB_OAUTH_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          allow-repeats: false
