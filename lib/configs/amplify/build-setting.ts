@@ -11,6 +11,17 @@ const preBuild = {
     ],
 };
 
+const preBuildForFeeds = {
+    commands: [
+        "eval $(ssh-agent -s)",
+        "ssh-add <(echo \"$DEPLOY_KEY\" | base64 --decode)",
+        "git submodule init",
+        "git submodule update --remote",
+        "npm install -g pnpm",
+        "pnpm install --filter .",
+    ],
+};
+
 const prodBuild = {
     commands: ["pnpm run build"],
 };
@@ -36,7 +47,7 @@ export const microAppBuildSpec = (name: string): BuildSpec => BuildSpec.fromObje
         {
             frontend: {
                 phases: {
-                    preBuild: preBuild,
+                    preBuild: name == "feeds" ? preBuildForFeeds : preBuild,
                     build: prodBuild,
                 },
                 artifacts: artifacts,

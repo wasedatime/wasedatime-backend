@@ -46,7 +46,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
 
         this.app = new App(this, 'root-app', {
             appName: "wasedatime-web-root",
-            autoBranchDeletion: true,
+            autoBranchDeletion: false,
             buildSpec: microAppBuildSpec("root"),
             description: "A web app aiming to provide better campus life at Waseda University.",
             environmentVariables: {
@@ -66,7 +66,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         });
 
         const masterBranch: Branch = this.app.addBranch('master', {
-            autoBuild: true,
+            autoBuild: false,
             branchName: "master",
             stage: "PRODUCTION",
             buildSpec: microAppBuildSpec("root"),
@@ -74,7 +74,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         this.branches["main"] = masterBranch;
 
         const devBranch: Branch = this.app.addBranch('dev', {
-            autoBuild: true,
+            autoBuild: false,
             basicAuth: developerAuth,
             branchName: "develop",
             stage: "DEVELOPMENT",
@@ -95,7 +95,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
     public addMicroApp(name: string) {
         const microApp = new App(this, `${name}-app`, {
             appName: `wasedatime-web-${name}`,
-            autoBranchDeletion: true,
+            autoBranchDeletion: false,
             buildSpec: microAppBuildSpec(name),
             environmentVariables: {
                 "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/v1`,
@@ -115,14 +115,14 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         this.microApps[name] = microApp;
 
         microApp.addBranch('master', {
-            autoBuild: true,
+            autoBuild: false,
             branchName: "master",
             stage: "PRODUCTION",
             buildSpec: microAppBuildSpec(name),
         }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/v1`);
 
         microApp.addBranch('dev', {
-            autoBuild: true,
+            autoBuild: false,
             branchName: "develop",
             stage: "DEVELOPMENT",
             buildSpec: microAppDevBuildSpec(name),
