@@ -79,7 +79,8 @@ jobs:
       - name: Diff
         id: diff
         run: |
-          LOG="$(cdk diff --no-color)"
+          cdk diff --no-color &> diff.txt
+          LOG="$(cat diff.txt)"
           LOG="${LOG//'%'/'%25'}"
           LOG="${LOG//$'\n'/'%0A'}"
           LOG="${LOG//$'\r'/'%0D'}"
