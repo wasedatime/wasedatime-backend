@@ -50,13 +50,14 @@ jobs:
           pnpm install -g aws-cdk
           pnpm install
 
-      #      - name: Deploy dev
-      #        if: github.event.release.prerelease == 'true'
-      #        env:
-      #          STAGE: dev
-      #        run: cdk deploy --all --require-approval "never"
+      - name: Deploy dev
+        if: github.event.release.prerelease == true
+        env:
+          STAGE: dev
+        run: cdk deploy --all --require-approval "never"
 
       - name: Deploy prod
+        if: github.event.release.prerelease != true
         env:
           STAGE: prod
         run: cdk deploy --all --require-approval "never"

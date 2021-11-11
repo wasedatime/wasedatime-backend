@@ -90,5 +90,8 @@ jobs:
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.diff.outputs.log }}
+          body: |
+            ```
+            ${{ steps.diff.outputs.log }}
+            ```
           token: ${{ env.GITHUB_OAUTH_TOKEN }}
