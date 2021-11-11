@@ -79,12 +79,15 @@ jobs:
       - name: Diff
         id: diff
         run: |
-          cdk diff --no-color &> diff.txt
-          echo "::set-output name=diff::$(cat diff.txt)"
+          LOG="$(cdk diff --no-color)"
+          LOG="${LOG//'%'/'%25'}"
+          LOG="${LOG//$'\n'/'%0A'}"
+          LOG="${LOG//$'\r'/'%0D'}"
+          echo "::set-output name=log::$LOG"
 
       - name: Comment
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.diff.outputs.diff }}
+          body: ${{ steps.diff.outputs.log }}
           token: ${{ env.GITHUB_OAUTH_TOKEN }}
