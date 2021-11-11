@@ -84,6 +84,5 @@ jobs:
         uses: mshick/add-pr-comment@v1
         with:
           message: ${{ steps.diff.outputs.diff }}
-          repo-token: ${{ secrets.GITHUB_OAUTH_TOKEN }}
           repo-token-user-login: 'github-actions[bot]'
           allow-repeats: false
