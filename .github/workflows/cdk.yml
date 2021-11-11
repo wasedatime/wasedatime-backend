@@ -78,7 +78,9 @@ jobs:
 
       - name: Diff
         id: diff
-        run: echo "::set-output name=diff::$(cdk diff --no-color)\n"
+        run: |
+          cdk diff --no-color &> diff.txt
+          echo "::set-output name=diff::$(cat diff.txt)"
 
       - name: Comment
         uses: mshick/add-pr-comment@v1
