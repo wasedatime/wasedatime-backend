@@ -8,7 +8,7 @@ const colors = {
 
 const apps = {
   'dvqo5dg5k8e6d': "ROOT",
-  'd4mmu2hx77tt5': "FEEDS",
+  'do6pem8fvvrm7': "FEEDS",
   'd30wetah1y35e8': "CAMPUS",
   'd3tfy2z9dqnnsk': "SYLLABUS",
 };
