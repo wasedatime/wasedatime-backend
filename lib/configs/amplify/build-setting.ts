@@ -17,6 +17,8 @@ const preBuildForFeeds = {
         "ssh-add <(echo \"$DEPLOY_KEY\" | base64 --decode)",
         "git submodule init",
         "git submodule update --remote",
+        "yum check-update",
+        "yum -y install glibc gcc gcc-c++ autoconf automake libtool git make nasm pkgconfig",
         "npm install -g pnpm",
         "pnpm install --filter .",
     ],
