@@ -13,8 +13,8 @@ const preBuild = {
 
 const preBuildForFeeds = {
     commands: [
-        "eval $(ssh-agent -s)",
-        "ssh-add <(echo \"$DEPLOY_KEY\" | base64 --decode)",
+        "git submodule set-url feeds/public/feeds https://${GITHUB_ACCESS_TOKEN}@github.com/wasedatime/feeds.git",
+        "git submodule sync",
         "git submodule init",
         "git submodule update --remote",
         "npm install -g pnpm",
