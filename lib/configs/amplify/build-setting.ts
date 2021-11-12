@@ -13,7 +13,9 @@ const preBuild = {
 
 const preBuildForFeeds = {
     commands: [
-        "git submodule set-url feeds/public/feeds https://${GITHUB_ACCESS_TOKEN}@github.com/wasedatime/feeds.git",
+        "sudo yum update",
+        "sudo yum -y install git",
+        "git submodule set-url feeds/public/feeds https://$GITHUB_ACCESS_TOKEN@github.com/wasedatime/feeds.git",
         "git submodule sync",
         "git submodule init",
         "git submodule update --remote",
@@ -70,7 +72,7 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
         {
             frontend: {
                 phases: {
-                    preBuild: preBuild,
+                    preBuild: name == "feeds" ? preBuildForFeeds : preBuild,
                     build: devBuild,
                 },
                 artifacts: artifacts,
