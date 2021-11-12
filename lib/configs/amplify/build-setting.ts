@@ -3,6 +3,7 @@ import {microAppCorsHeader, securityHeaders} from "./website";
 
 
 export const bitToken = process.env.BIT_TOKEN!;
+export const feedsDeployKey = process.env.FEEDS_DEPLOY_PRIVATE_KEY!;
 
 const preBuild = {
     commands: [
@@ -14,11 +15,10 @@ const preBuild = {
 const preBuildForFeeds = {
     commands: [
         "eval $(ssh-agent -s)",
-        "ssh-add <(echo \"$DEPLOY_KEY\" | base64 --decode)",
+        "ssh-add <(echo \"$FEEDS_DEPLOY_PRIVATE_KEY\" | base64 --decode)",
         "git submodule init",
         "git submodule update --remote",
-        "yum check-update",
-        "yum -y install glibc gcc gcc-c++ autoconf automake libtool git make nasm pkgconfig",
+        "yum -y install make nasm autoconf automake libtool dpkg pkgconfig libpng libpng-dev g++",
         "npm install -g pnpm",
         "pnpm install --filter .",
     ],
