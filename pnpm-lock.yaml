@@ -44,7 +44,7 @@ specifiers:
   source-map-support: 0.5.20
   ts-jest: 27.0.7
   ts-node: 10.4.0
-  typescript: 4.4.4
+  typescript: 4.5.2
 
 dependencies:
   '@aws-cdk/assets': 1.132.0
@@ -90,9 +90,9 @@ devDependencies:
   '@types/node': 16.11.7
   aws-cdk: 1.132.0
   jest: 27.3.1_ts-node@10.4.0
-  ts-jest: 27.0.7_2c4ca6574207836d1023f54689cc81ac
-  ts-node: 10.4.0_ee928ac548ac44c173bf0d4654ae2c29
-  typescript: 4.4.4
+  ts-jest: 27.0.7_013ef332172517e974c4b270e59f55f5
+  ts-node: 10.4.0_822df8cc64711c2db8d43ce90a8558a3
+  typescript: 4.5.2
 
 packages:
 
@@ -3101,7 +3101,7 @@ packages:
       jest-validate: 27.3.1
       micromatch: 4.0.4
       pretty-format: 27.3.1
-      ts-node: 10.4.0_ee928ac548ac44c173bf0d4654ae2c29
+      ts-node: 10.4.0_822df8cc64711c2db8d43ce90a8558a3
     transitivePeerDependencies:
       - bufferutil
       - canvas
@@ -4414,7 +4414,7 @@ packages:
       punycode: 2.1.1
     dev: true
 
-  /ts-jest/27.0.7_2c4ca6574207836d1023f54689cc81ac:
+  /ts-jest/27.0.7_013ef332172517e974c4b270e59f55f5:
     resolution: {integrity: sha512-O41shibMqzdafpuP+CkrOL7ykbmLh+FqQrXEmV9CydQ5JBk0Sj0uAEF5TNNe94fZWKm3yYvWa/IbyV4Yg1zK2Q==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -4441,11 +4441,11 @@ packages:
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.3.5
-      typescript: 4.4.4
+      typescript: 4.5.2
       yargs-parser: 20.2.9
     dev: true
 
-  /ts-node/10.4.0_ee928ac548ac44c173bf0d4654ae2c29:
+  /ts-node/10.4.0_822df8cc64711c2db8d43ce90a8558a3:
     resolution: {integrity: sha512-g0FlPvvCXSIO1JDF6S232P5jPYqBkRL9qly81ZgAOSU7rwI0stphCgd2kLiCrU9DjQCrJMWEqcNSjQL02s6d8A==}
     hasBin: true
     peerDependencies:
@@ -4471,7 +4471,7 @@ packages:
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 4.4.4
+      typescript: 4.5.2
       yn: 3.1.1
     dev: true
 
@@ -4502,8 +4502,8 @@ packages:
       is-typedarray: 1.0.0
     dev: true
 
-  /typescript/4.4.4:
-    resolution: {integrity: sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==}
+  /typescript/4.5.2:
+    resolution: {integrity: sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
