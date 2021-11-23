@@ -57,6 +57,6 @@
     "dotenv": "10.0.0",
     "flatted": "3.2.4",
     "pluralize": "8.0.0",
-    "source-map-support": "0.5.20"
+    "source-map-support": "0.5.21"
   }
 }
