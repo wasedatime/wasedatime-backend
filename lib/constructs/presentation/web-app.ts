@@ -2,7 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import {App, Branch, CustomRule, Domain, RedirectStatus} from "@aws-cdk/aws-amplify";
 
 import {developerAuth} from "../../configs/amplify/website";
-import {bitToken, microAppBuildSpec, microAppDevBuildSpec} from "../../configs/amplify/build-setting";
+import {bitToken, feedsDeployKey, microAppBuildSpec, microAppDevBuildSpec} from "../../configs/amplify/build-setting";
 import {webAppCode} from "../../configs/amplify/codebase";
 import {ROOT_DOMAIN} from "../../configs/route53/domain";
 
@@ -54,6 +54,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192",
                 "BIT_TOKEN": bitToken,
+                "FEEDS_DEPLOY_PRIVATE_KEY": feedsDeployKey,
             },
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {

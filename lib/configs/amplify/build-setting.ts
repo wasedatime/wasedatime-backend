@@ -3,6 +3,7 @@ import {microAppCorsHeader, securityHeaders} from "./website";
 
 
 export const bitToken = process.env.BIT_TOKEN!;
+export const feedsDeployKey = process.env.FEEDS_DEPLOY_PRIVATE_KEY!;
 
 const preBuild = {
     commands: [
@@ -13,10 +14,11 @@ const preBuild = {
 
 const preBuildForFeeds = {
     commands: [
-        "git submodule set-url feeds/public/feeds https://${GITHUB_ACCESS_TOKEN}@github.com/wasedatime/feeds.git",
-        "git submodule sync",
+        "eval $(ssh-agent -s)",
+        "ssh-add <(echo \"$FEEDS_DEPLOY_PRIVATE_KEY\" | base64 --decode)",
         "git submodule init",
         "git submodule update --remote",
+        "yum -y install make nasm autoconf automake libtool dpkg pkgconfig libpng libpng-dev g++",
         "npm install -g pnpm",
         "pnpm install --filter .",
     ],
@@ -70,7 +72,7 @@ export const microAppDevBuildSpec = (name: string): BuildSpec => BuildSpec.fromO
         {
             frontend: {
                 phases: {
-                    preBuild: preBuild,
+                    preBuild: name == "feeds" ? preBuildForFeeds : preBuild,
                     build: devBuild,
                 },
                 artifacts: artifacts,
