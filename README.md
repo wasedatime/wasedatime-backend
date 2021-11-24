@@ -2,7 +2,7 @@
 
 [![AWS CDK CI/CD](https://github.com/wasedatime/wasedatime-backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/wasedatime/wasedatime-backend/actions/workflows/deploy.yml)
 ![](https://img.shields.io/website?up_color=green&up_message=online&url=https%3A%2F%2Fwasedatime.com)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwasedatime%2Fwasedatime-backend.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwasedatime%2Fwasedatime-backend?ref=badge_small)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwasedatime%2Fwasedatime-backend.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwasedatime%2Fwasedatime-backend?ref=badge_shield)
 
 This repository defines the serverless application architecture, resource configuration and infrastructure provision strategy of 
 [wasedatime.com](https://wasedatime.com).
@@ -93,3 +93,7 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
  * `cdk deploy`      deploy this stack to your default AWS account/region
  * `cdk diff`        compare deployed stack with current state
  * `cdk synth`       emits the synthesized CloudFormation template
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwasedatime%2Fwasedatime-backend.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwasedatime%2Fwasedatime-backend?ref=badge_large)
