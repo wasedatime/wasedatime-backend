@@ -34,7 +34,7 @@ specifiers:
   '@aws-cdk/aws-stepfunctions': 1.134.0
   '@aws-cdk/aws-stepfunctions-tasks': 1.134.0
   '@aws-cdk/core': 1.134.0
-  '@types/jest': 27.0.2
+  '@types/jest': 27.0.3
   '@types/node': 16.11.10
   aws-cdk: 1.134.0
   dotenv: 10.0.0
@@ -86,11 +86,11 @@ dependencies:
 
 devDependencies:
   '@aws-cdk/assert': 1.134.0_jest@27.3.1
-  '@types/jest': 27.0.2
+  '@types/jest': 27.0.3
   '@types/node': 16.11.10
   aws-cdk: 1.134.0
   jest: 27.3.1_ts-node@10.4.0
-  ts-jest: 27.0.7_013ef332172517e974c4b270e59f55f5
+  ts-jest: 27.0.7_7e2a439bb7b53c38ff0c1a3c5e04c2c5
   ts-node: 10.4.0_36929cccfdb926da0bb85cc291f27124
   typescript: 4.5.2
 
@@ -1745,11 +1745,11 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/27.0.2:
-    resolution: {integrity: sha512-4dRxkS/AFX0c5XW6IPMNOydLn2tEhNhJV7DnYK+0bjoJZ+QTmfucBlihX7aoEsh/ocYtkLC73UbnBXBXIxsULA==}
+  /@types/jest/27.0.3:
+    resolution: {integrity: sha512-cmmwv9t7gBYt7hNKH5Spu7Kuu/DotGa+Ff+JGRKZ4db5eh8PnKS4LuebJ3YLUoyOyIHraTGyULn23YtEAm0VSg==}
     dependencies:
-      jest-diff: 27.2.0
-      pretty-format: 27.2.0
+      jest-diff: 27.3.1
+      pretty-format: 27.3.1
     dev: true
 
   /@types/node/10.17.60:
@@ -3103,16 +3103,6 @@ packages:
       - utf-8-validate
     dev: true
 
-  /jest-diff/27.2.0:
-    resolution: {integrity: sha512-QSO9WC6btFYWtRJ3Hac0sRrkspf7B01mGrrQEiCW6TobtViJ9RWL0EmOs/WnBsZDsI/Y2IoSHZA2x6offu0sYw==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-    dependencies:
-      chalk: 4.1.2
-      diff-sequences: 27.0.6
-      jest-get-type: 27.0.6
-      pretty-format: 27.2.0
-    dev: true
-
   /jest-diff/27.3.1:
     resolution: {integrity: sha512-PCeuAH4AWUo2O5+ksW4pL9v5xJAcIKPUPfIhZBcG1RKv/0+dvaWTQK1Nrau8d67dp65fOqbeMdoil+6PedyEPQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -3169,11 +3159,6 @@ packages:
       '@types/node': 16.11.10
       jest-mock: 27.3.0
       jest-util: 27.3.1
-    dev: true
-
-  /jest-get-type/27.0.6:
-    resolution: {integrity: sha512-XTkK5exIeUbbveehcSR8w0bhH+c0yloW/Wpl+9vZrjzztCPWrxhHwkIFpZzCt71oRBsgxmuUfxEqOYoZI2macg==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     dev: true
 
   /jest-get-type/27.3.1:
@@ -3913,16 +3898,6 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /pretty-format/27.2.0:
-    resolution: {integrity: sha512-KyJdmgBkMscLqo8A7K77omgLx5PWPiXJswtTtFV7XgVZv2+qPk6UivpXXO+5k6ZEbWIbLoKdx1pZ6ldINzbwTA==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-    dependencies:
-      '@jest/types': 27.1.1
-      ansi-regex: 5.0.1
-      ansi-styles: 5.2.0
-      react-is: 17.0.2
-    dev: true
-
   /pretty-format/27.3.1:
     resolution: {integrity: sha512-DR/c+pvFc52nLimLROYjnXPtolawm+uWDxr4FjuLDLUn+ktWnSN851KoHwHzzqq6rfCOjkzN8FLgDrSub6UDuA==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -4403,7 +4378,7 @@ packages:
       punycode: 2.1.1
     dev: true
 
-  /ts-jest/27.0.7_013ef332172517e974c4b270e59f55f5:
+  /ts-jest/27.0.7_7e2a439bb7b53c38ff0c1a3c5e04c2c5:
     resolution: {integrity: sha512-O41shibMqzdafpuP+CkrOL7ykbmLh+FqQrXEmV9CydQ5JBk0Sj0uAEF5TNNe94fZWKm3yYvWa/IbyV4Yg1zK2Q==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -4421,7 +4396,7 @@ packages:
       babel-jest:
         optional: true
     dependencies:
-      '@types/jest': 27.0.2
+      '@types/jest': 27.0.3
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 27.3.1_ts-node@10.4.0
