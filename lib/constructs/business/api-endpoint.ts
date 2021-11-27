@@ -19,16 +19,13 @@ import {defaultHeaders} from "../../configs/api-gateway/cors";
 import {API_DOMAIN} from "../../configs/route53/domain";
 import {AbstractHttpApiService} from "./http-api-service";
 
-
 export interface ApiEndpointProps {
-
     zone: IHostedZone;
 
     authProvider?: IUserPool;
 }
 
 export abstract class AbstractApiEndpoint extends cdk.Construct {
-
     abstract readonly apiEndpoint: rest.RestApi | rest.LambdaRestApi | rest.SpecRestApi | HttpApi | GraphqlApi;
 
     protected constructor(scope: cdk.Construct, id: string, props?: ApiEndpointProps) {
@@ -37,7 +34,6 @@ export abstract class AbstractApiEndpoint extends cdk.Construct {
 }
 
 export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
-
     readonly apiEndpoint: rest.RestApi;
 
     abstract readonly apiServices: { [name: string]: AbstractRestApiService };
@@ -76,7 +72,6 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 }
 
 export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
-
     abstract readonly apiEndpoint: GraphqlApi;
 
     readonly apiServices: { [name: string]: AbstractGraphqlApiService };
@@ -105,7 +100,6 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
 }
 
 export abstract class AbstractHttpApiEndpoint extends AbstractApiEndpoint {
-
     abstract readonly apiEndpoint: HttpApi;
 
     abstract readonly apiServices: { [name: string]: AbstractHttpApiService };
@@ -240,7 +234,6 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
 }
 
 export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
-
     readonly apiEndpoint: GraphqlApi;
 
     readonly apiServices: { [name: string]: AbstractGraphqlApiService } = {};

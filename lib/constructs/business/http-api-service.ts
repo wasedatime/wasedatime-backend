@@ -3,9 +3,7 @@ import {CfnAuthorizer, HttpApi, HttpMethod, HttpRoute} from "@aws-cdk/aws-apigat
 
 import {AbstractHttpApiEndpoint} from "./api-endpoint";
 
-
 export interface HttpApiServiceProps {
-
     apiEndpoint: HttpApi;
 
     dataSource?: string;
@@ -14,7 +12,6 @@ export interface HttpApiServiceProps {
 }
 
 export abstract class AbstractHttpApiService extends cdk.Construct {
-
     abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: HttpRoute } };
 
     protected constructor(scope: AbstractHttpApiEndpoint, id: string, props: HttpApiServiceProps) {

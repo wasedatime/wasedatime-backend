@@ -6,9 +6,7 @@ import {OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ServiceInterface} from "../architecture/interfaces";
 import {webappSiteRules} from "../configs/amplify/website";
 
-
 export class WasedaTimePresentationLayer extends PresentationLayer {
-
     readonly app: AbstractWebApp;
 
     constructor(scope: cdk.Construct, id: string, serviceInterface: ServiceInterface, props?: cdk.StackProps) {
@@ -20,7 +18,6 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         });
         monoApp.addMicroApp("syllabus");
         monoApp.addMicroApp("campus");
-        monoApp.addMicroApp("blog");
         monoApp.addMicroApp("feeds");
 
         webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));

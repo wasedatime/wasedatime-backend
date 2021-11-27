@@ -1,14 +1,13 @@
-name: AWS CDK CI
+name: Node.js
 
+# Controls when the action will run.
 on:
-  pull_request:
+  push:
     branches:
-      - main
-      - develop
+      - "**"
     paths:
       - "**.ts"
-      - "src/**"
-      - ".github/cdk.yml"
+      - ".github/node.yml"
       - "**.json"
       - "**.yaml"
 
@@ -52,43 +51,3 @@ jobs:
 
       - name: Build
         run: pnpm run build
-
-  verify:
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-node@v2.4.1
-        with:
-          node-version: 16.x
-
-      - name: Configure pnpm
-        run: npm install -g pnpm
-
-      - name: Setup CDK
-        run: |
-          pnpm install -g aws-cdk
-          pnpm install
-      - name: Diagnose
-        run: pnpm run cdk doctor
-
-      - name: Diff
-        id: diff
-        run: |
-          cdk diff --no-color &> diff.txt
-          LOG="$(cat diff.txt)"
-          LOG="${LOG//'%'/'%25'}"
-          LOG="${LOG//$'\n'/'%0A'}"
-          LOG="${LOG//$'\r'/'%0D'}"
-          echo "::set-output name=log::$LOG"
-
-      - name: Comment
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ```
-            ${{ steps.diff.outputs.log }}
-            ```
-          token: ${{ env.GITHUB_OAUTH_TOKEN }}

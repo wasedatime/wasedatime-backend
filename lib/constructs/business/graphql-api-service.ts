@@ -16,16 +16,13 @@ import {
 } from "../../utils/appsync";
 import {AbstractGraphqlEndpoint} from "./api-endpoint";
 
-
 export interface GraphqlApiServiceProps {
-
     dataSource: ITable;
 
     auth?: IUserPool;
 }
 
 export abstract class AbstractGraphqlApiService extends cdk.Construct {
-
     abstract readonly resolvers: { [name: string]: Resolver };
 
     protected constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
@@ -34,7 +31,6 @@ export abstract class AbstractGraphqlApiService extends cdk.Construct {
 }
 
 export class CourseApiService extends AbstractGraphqlApiService {
-
     readonly resolvers: { [name: string]: Resolver } = {};
 
     constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {

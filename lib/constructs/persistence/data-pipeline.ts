@@ -15,25 +15,19 @@ import {syllabusSchedule} from "../../configs/event/schedule";
 import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../utils/s3";
 import {S3EventSource} from '@aws-cdk/aws-lambda-event-sources';
 
-
 export enum Worker {
-
     SYLLABUS,
-
     CAREER,
-
     FEEDS
 }
 
 export interface DataPipelineProps {
-
     dataSource?: Bucket;
 
     dataWarehouse?: Table;
 }
 
 export abstract class AbstractDataPipeline extends Construct {
-
     abstract readonly dataSource?: Bucket;
 
     abstract readonly processor: Function | StateMachine;
@@ -42,7 +36,6 @@ export abstract class AbstractDataPipeline extends Construct {
 }
 
 export class SyllabusDataPipeline extends AbstractDataPipeline {
-
     readonly dataSource?: Bucket;
 
     readonly processor: StateMachine;
@@ -115,7 +108,6 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
 //todo add s3 deployment and notifications
 
 export class CareerDataPipeline extends AbstractDataPipeline {
-
     readonly dataSource?: Bucket;
 
     readonly processor: Function;
@@ -139,7 +131,6 @@ export class CareerDataPipeline extends AbstractDataPipeline {
 }
 
 export class FeedsDataPipeline extends AbstractDataPipeline {
-
     readonly dataSource: Bucket;
 
     readonly processor: Function;
@@ -178,7 +169,6 @@ export class FeedsDataPipeline extends AbstractDataPipeline {
 
 // sync syllabus on notification
 export class SyllabusSyncPipeline extends AbstractDataPipeline {
-
     readonly dataSource: Bucket;
 
     readonly processor: Function;

@@ -4,7 +4,6 @@ import {CnameRecord, MxRecord, PublicHostedZone, TxtRecord} from '@aws-cdk/aws-r
 import {DOC_DOMAIN, EMAIL_TXT, GITHUB_PAGES, MX_VALUES, ROOT_DOMAIN} from "../../configs/route53/domain";
 
 export class WasedaTimeHostedZone extends cdk.Stack {
-
     readonly zone: PublicHostedZone;
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {

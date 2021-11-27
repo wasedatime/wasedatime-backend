@@ -22,9 +22,7 @@ import {AUTH_CERT_ARN} from "../../configs/common/arn";
 import {UserPoolDomainTarget} from "@aws-cdk/aws-route53-targets";
 import {AUTH_DOMAIN} from "../../configs/route53/domain";
 
-
 export abstract class AbstractAuthProvider extends cdk.Construct {
-
     abstract readonly pool: UserPool;
 
     abstract readonly clients: { [name: string]: UserPoolClient };
@@ -49,7 +47,6 @@ export abstract class AbstractAuthProvider extends cdk.Construct {
  * User authentication service for WasedaTime
  */
 export class WasedaTimeUserAuth extends AbstractAuthProvider {
-
     readonly pool: UserPool;
 
     readonly clients: { [name: string]: UserPoolClient } = {};

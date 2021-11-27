@@ -1,7 +1,6 @@
 import {BasicAuth, CustomRule, RedirectStatus} from "@aws-cdk/aws-amplify";
 import {SecretValue} from "@aws-cdk/core";
 
-
 const wwwRedirect: CustomRule = new CustomRule({
     source: "https://www.wasedatime.com",
     target: "https://wasedatime.com",

@@ -12,9 +12,7 @@ import {DataEndpoint, OperationEndpoint} from "../configs/common/registry";
 import {PersistenceLayer} from "../architecture/layers";
 import {Collection, DynamoDatabase} from "../constructs/persistence/database";
 
-
 export class WasedaTimePersistenceLayer extends PersistenceLayer {
-
     readonly dataPipelines: { [name in Worker]?: AbstractDataPipeline } = {};
 
     readonly databases: { [name: string]: DynamoDatabase } = {};

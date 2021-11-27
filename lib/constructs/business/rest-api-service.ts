@@ -32,9 +32,7 @@ import {
 } from "../common/lambda-functions";
 import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../../configs/api-gateway/mapping";
 
-
 export interface RestApiServiceProps {
-
     dataSource?: string;
 
     authorizer?: IAuthorizer;
@@ -43,7 +41,6 @@ export interface RestApiServiceProps {
 }
 
 export abstract class AbstractRestApiService extends cdk.Construct {
-
     abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } };
 
     protected constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
@@ -52,7 +49,6 @@ export abstract class AbstractRestApiService extends cdk.Construct {
 }
 
 export class SyllabusApiService extends AbstractRestApiService {
-
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
@@ -194,7 +190,6 @@ export class SyllabusApiService extends AbstractRestApiService {
 }
 
 export class CourseReviewsApiService extends AbstractRestApiService {
-
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
@@ -313,7 +308,6 @@ export class CourseReviewsApiService extends AbstractRestApiService {
 }
 
 export class FeedsApiService extends AbstractRestApiService {
-
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
@@ -383,7 +377,6 @@ export class FeedsApiService extends AbstractRestApiService {
 }
 
 export class CareerApiService extends AbstractRestApiService {
-
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
@@ -480,7 +473,6 @@ export class CareerApiService extends AbstractRestApiService {
 }
 
 export class TimetableApiService extends AbstractRestApiService {
-
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
@@ -584,7 +576,6 @@ export class TimetableApiService extends AbstractRestApiService {
 }
 
 export class GraphqlApiService extends AbstractRestApiService {
-
     readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
 
     constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {

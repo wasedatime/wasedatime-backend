@@ -2,20 +2,17 @@ import * as cdk from "@aws-cdk/core";
 import {App, Branch, CustomRule, Domain, RedirectStatus} from "@aws-cdk/aws-amplify";
 
 import {developerAuth} from "../../configs/amplify/website";
-import {bitToken, microAppBuildSpec, microAppDevBuildSpec} from "../../configs/amplify/build-setting";
+import {bitToken, feedsDeployKey, microAppBuildSpec, microAppDevBuildSpec} from "../../configs/amplify/build-setting";
 import {webAppCode} from "../../configs/amplify/codebase";
 import {ROOT_DOMAIN} from "../../configs/route53/domain";
 
-
 export interface WebAppProps {
-
     apiDomain?: string;
 
     authDomain?: string;
 }
 
 export abstract class AbstractWebApp extends cdk.Construct {
-
     abstract readonly app: App;
 
     abstract readonly branches?: { [env: string]: Branch };
@@ -28,7 +25,6 @@ export abstract class AbstractWebApp extends cdk.Construct {
 }
 
 export class AmplifyMonoWebApp extends AbstractWebApp {
-
     readonly app: App;
 
     readonly branches: { [key: string]: Branch } = {};
@@ -54,6 +50,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192",
                 "BIT_TOKEN": bitToken,
+                "DEPLOY_KEY": feedsDeployKey,
             },
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {

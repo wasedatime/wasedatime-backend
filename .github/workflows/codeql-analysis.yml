@@ -14,9 +14,23 @@ name: "CodeQL"
 on:
   push:
     branches: [ main, develop ]
+    paths:
+      - "**.ts"
+      - "**.py"
+      - "**.js"
+      - ".github/codeql-analysis.yml"
+      - "**.json"
+      - "**.yaml"
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
+    paths:
+      - "**.ts"
+      - "**.py"
+      - "**.js"
+      - ".github/codeql-analysis.yml"
+      - "**.json"
+      - "**.yaml"
   schedule:
     - cron: '42 19 * * 6'
 

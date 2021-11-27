@@ -6,9 +6,7 @@ import {Effect, PolicyStatement, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {BudgetType, ComparisonOperator, NotificationType, SubscriptionType, TimeUnit} from "../../configs/budgets/enum";
 import {AwsServicePrincipal} from "../../configs/common/aws";
 
-
 export abstract class AbstractBudgetGroup extends cdk.Construct {
-
     abstract readonly notification: Topic;
 
     protected constructor(scope: cdk.Construct, id: string) {
@@ -17,7 +15,6 @@ export abstract class AbstractBudgetGroup extends cdk.Construct {
 }
 
 export class FreeTierUsageBudget extends AbstractBudgetGroup {
-
     readonly notification: Topic;
 
     constructor(scope: cdk.Construct, id: string) {
