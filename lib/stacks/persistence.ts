@@ -64,7 +64,9 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
 
         this.operationInterface.setEndpoint(
             OperationEndpoint.SYLLABUS,
-            [syllabusDataPipeline.processor.stateMachineArn],
+            {
+                [syllabusDataPipeline.processor.stateMachineArn]: "scraper",
+            },
         );
     }
 }

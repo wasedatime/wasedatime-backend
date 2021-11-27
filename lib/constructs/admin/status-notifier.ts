@@ -13,7 +13,7 @@ export enum StatusNotifier {
 }
 
 export interface StatusNotifierProps {
-    targets?: [string];
+    targets?: { [key: string]: string };
 }
 
 export abstract class AbstractStatusNotifier extends Construct {
@@ -38,7 +38,9 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
     constructor(scope: cdk.Construct, id: string, props: StatusNotifierProps) {
         super(scope, id, props);
 
-        this.subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
+        const subscriber = new AmplifyStatusPublisher(this, 'subscriber-function').baseFunction;
+        subscriber.addEnvironment('APP_ENDPOINTS', JSON.stringify(props.targets));
+        this.subscriber = subscriber;
 
         this.publisher = new Rule(this, 'build-sentinel', {
             ruleName: "amplify-build-event",
@@ -52,7 +54,7 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
                     "Amplify Deployment Status Change",
                 ],
                 detail: {
-                    "appId": props.targets,
+                    "appId": Object.keys(props.targets!),
                     "jobStatus": [
                         "SUCCEED",
                         "FAILED",
@@ -97,7 +99,7 @@ export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
                         "TIMED_OUT",
                         "ABORTED",
                     ],
-                    "stateMachineArn": props.targets,
+                    "stateMachineArn": Object.keys(props.targets!),
                 },
             },
         });
