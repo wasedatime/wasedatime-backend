@@ -5,6 +5,11 @@ on:
   push:
     branches:
       - "**"
+    paths:
+      - "**.ts"
+      - ".github/node.yml"
+      - "**.json"
+      - "**.yaml"
 
 env:
   GITHUB_OAUTH_TOKEN: ${{ secrets.ACCESS_TOKEN_GITHUB }}

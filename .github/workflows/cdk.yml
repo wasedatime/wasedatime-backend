@@ -6,6 +6,12 @@ on:
     branches:
       - main
       - develop
+    paths:
+      - "**.ts"
+      - "src/**"
+      - ".github/cdk.yml"
+      - "**.json"
+      - "**.yaml"
 
 env:
   GITHUB_OAUTH_TOKEN: ${{ secrets.ACCESS_TOKEN_GITHUB }}
