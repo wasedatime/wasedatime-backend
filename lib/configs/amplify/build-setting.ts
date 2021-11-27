@@ -14,7 +14,7 @@ const preBuild = {
 const preBuildForFeeds = {
     commands: [
         "eval $(ssh-agent -s)",
-        "ssh-add <(echo \"$FEEDS_DEPLOY_PRIVATE_KEY\" | base64 --decode)",
+        `ssh-add <(echo "${process.env.DEPLOY_KEY}" | base64 --decode)`,
         "git submodule init",
         "git submodule update --remote",
         "yum -y install make nasm autoconf automake libtool dpkg pkgconfig libpng libpng-dev g++",
