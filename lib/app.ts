@@ -9,9 +9,7 @@ import {OperationInterface} from "./architecture/interfaces";
 import {OperationEndpoint} from "./configs/common/registry";
 import {WasedaTimeHostedZone} from "./constructs/common/hosted-zone";
 
-
 export class WasedaTime extends AbstractServerlessApp {
-
     readonly presentationLayer: PresentationLayer;
 
     readonly businessLayer: BusinessLayer;
@@ -23,7 +21,6 @@ export class WasedaTime extends AbstractServerlessApp {
     readonly hostedZone: WasedaTimeHostedZone;
 
     constructor() {
-
         super();
 
         this.hostedZone = new WasedaTimeHostedZone(this, 'wt-hosted-zone', awsEnv);

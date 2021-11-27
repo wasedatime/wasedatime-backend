@@ -8,13 +8,11 @@ import {PythonFunction} from "@aws-cdk/aws-lambda-python";
 import {AwsServicePrincipal} from "../../configs/common/aws";
 import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL} from "../../configs/lambda/environment";
 
-
 interface FunctionsProps {
     envVars: { [name: string]: string }
 }
 
 export class CourseReviewsFunctions extends cdk.Construct {
-
     readonly getFunction: Function;
 
     readonly postFunction: Function;
@@ -104,7 +102,6 @@ export class CourseReviewsFunctions extends cdk.Construct {
 }
 
 export class SyllabusScraper extends cdk.Construct {
-
     readonly baseFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
@@ -138,7 +135,6 @@ export class SyllabusScraper extends cdk.Construct {
 }
 
 export class AmplifyStatusPublisher extends cdk.Construct {
-
     readonly baseFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
@@ -158,7 +154,6 @@ export class AmplifyStatusPublisher extends cdk.Construct {
 }
 
 export class ScraperStatusPublisher extends cdk.Construct {
-
     readonly baseFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
@@ -178,7 +173,6 @@ export class ScraperStatusPublisher extends cdk.Construct {
 }
 
 export class PreSignupWasedaMailValidator extends cdk.Construct {
-
     readonly baseFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
@@ -198,7 +192,6 @@ export class PreSignupWasedaMailValidator extends cdk.Construct {
 }
 
 export class TimetableFunctions extends cdk.Construct {
-
     readonly getFunction: Function;
 
     readonly postFunction: Function;
@@ -300,7 +293,6 @@ export class TimetableFunctions extends cdk.Construct {
 }
 
 export class SyllabusFunctions extends cdk.Construct {
-
     readonly getFunction: Function;
 
     readonly postFunction: Function;
@@ -358,7 +350,6 @@ export class SyllabusFunctions extends cdk.Construct {
 }
 
 export class SyllabusUpdateFunction extends cdk.Construct {
-
     readonly updateFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
@@ -394,7 +385,6 @@ export class SyllabusUpdateFunction extends cdk.Construct {
 }
 
 export class FeedsFunctions extends cdk.Construct {
-
     readonly getFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
@@ -424,13 +414,12 @@ export class FeedsFunctions extends cdk.Construct {
             timeout: Duration.seconds(5),
             environment: props.envVars
         });
-
     }
 }
 
 export class BlogUpdateFunction extends cdk.Construct {
-
     readonly updateFunction: Function;
+
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
         super(scope, id);
 
@@ -461,5 +450,4 @@ export class BlogUpdateFunction extends cdk.Construct {
             environment: props.envVars,
         });
     }
-
 }

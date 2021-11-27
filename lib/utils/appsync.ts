@@ -2,7 +2,6 @@ import {GraphqlType, IIntermediateType, ObjectType} from '@aws-cdk/aws-appsync';
 
 const pluralize = require('pluralize');
 
-
 // Int
 export const int = GraphqlType.int();
 export const list_int = GraphqlType.int({isList: true});

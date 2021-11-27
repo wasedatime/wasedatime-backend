@@ -13,9 +13,7 @@ import {BusinessLayer} from "../architecture/layers";
 import {DataInterface} from "../architecture/interfaces";
 import {AbstractAuthProvider, WasedaTimeUserAuth} from "../constructs/business/authentication";
 
-
 export class WasedaTimeBusinessLayer extends BusinessLayer {
-
     apiEndpoints: { [name: string]: AbstractApiEndpoint } = {};
 
     authProvider: AbstractAuthProvider;

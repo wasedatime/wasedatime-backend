@@ -2,9 +2,7 @@ import * as cdk from "@aws-cdk/core";
 
 import {DataInterface, OperationInterface, ServiceInterface} from "./interfaces";
 
-
 export abstract class PersistenceLayer extends cdk.Stack {
-
     dataInterface: DataInterface;
 
     operationInterface: OperationInterface;
@@ -19,7 +17,6 @@ export abstract class PersistenceLayer extends cdk.Stack {
 }
 
 export abstract class BusinessLayer extends cdk.Stack {
-
     serviceInterface: ServiceInterface;
 
     dataInterface: DataInterface;
@@ -38,7 +35,6 @@ export abstract class BusinessLayer extends cdk.Stack {
 }
 
 export abstract class PresentationLayer extends cdk.Stack {
-
     serviceInterface: ServiceInterface;
 
     operationInterface: OperationInterface;
@@ -53,7 +49,6 @@ export abstract class PresentationLayer extends cdk.Stack {
 }
 
 export abstract class AdminLayer extends cdk.Stack {
-
     operationInterface: OperationInterface;
 
     protected constructor(scope: cdk.Construct, id: string, operationInterface: OperationInterface, props?: cdk.StackProps) {

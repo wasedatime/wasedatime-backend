@@ -37,7 +37,6 @@ specifiers:
   '@types/jest': 27.0.3
   '@types/node': 16.11.10
   aws-cdk: 1.134.0
-  dotenv: 10.0.0
   flatted: 3.2.4
   jest: 27.3.1
   pluralize: 8.0.0
@@ -79,7 +78,6 @@ dependencies:
   '@aws-cdk/aws-stepfunctions': 1.134.0
   '@aws-cdk/aws-stepfunctions-tasks': 1.134.0
   '@aws-cdk/core': 1.134.0
-  dotenv: 10.0.0
   flatted: 3.2.4
   pluralize: 8.0.0
   source-map-support: 0.5.21
@@ -2463,11 +2461,6 @@ packages:
     dependencies:
       webidl-conversions: 5.0.0
     dev: true
-
-  /dotenv/10.0.0:
-    resolution: {integrity: sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==}
-    engines: {node: '>=10'}
-    dev: false
 
   /dreamopt/0.6.0:
     resolution: {integrity: sha1-2BPM2sjTnYrVJndVFKE92mZNa0s=}

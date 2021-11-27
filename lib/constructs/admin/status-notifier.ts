@@ -7,21 +7,16 @@ import {Function} from '@aws-cdk/aws-lambda';
 
 import {AmplifyStatusPublisher, ScraperStatusPublisher} from "../common/lambda-functions";
 
-
 export enum StatusNotifier {
-
     BUILD_STATUS,
-
     SCRAPER_STATUS
 }
 
 export interface StatusNotifierProps {
-
     targets?: [string];
 }
 
 export abstract class AbstractStatusNotifier extends Construct {
-
     abstract readonly publisher: Rule;
 
     abstract readonly topic?: Topic;
@@ -34,7 +29,6 @@ export abstract class AbstractStatusNotifier extends Construct {
 }
 
 export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
-
     readonly publisher: Rule;
 
     readonly topic?: Topic;
@@ -73,7 +67,6 @@ export class AmplifyBuildStatusNotifier extends AbstractStatusNotifier {
 }
 
 export class SyllabusScraperStatusNotifier extends AbstractStatusNotifier {
-
     readonly publisher: Rule;
 
     readonly topic?: Topic;

@@ -6,16 +6,13 @@ import {bitToken, feedsDeployKey, microAppBuildSpec, microAppDevBuildSpec} from 
 import {webAppCode} from "../../configs/amplify/codebase";
 import {ROOT_DOMAIN} from "../../configs/route53/domain";
 
-
 export interface WebAppProps {
-
     apiDomain?: string;
 
     authDomain?: string;
 }
 
 export abstract class AbstractWebApp extends cdk.Construct {
-
     abstract readonly app: App;
 
     abstract readonly branches?: { [env: string]: Branch };
@@ -28,7 +25,6 @@ export abstract class AbstractWebApp extends cdk.Construct {
 }
 
 export class AmplifyMonoWebApp extends AbstractWebApp {
-
     readonly app: App;
 
     readonly branches: { [key: string]: Branch } = {};

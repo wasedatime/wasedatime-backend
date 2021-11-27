@@ -1,6 +1,5 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
 
-
 export const syllabusSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     type: JsonSchemaType.ARRAY,

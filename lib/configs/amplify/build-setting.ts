@@ -1,7 +1,6 @@
 import {BuildSpec} from "@aws-cdk/aws-codebuild/lib/build-spec";
 import {microAppCorsHeader, securityHeaders} from "./website";
 
-
 export const bitToken = process.env.BIT_TOKEN!;
 export const feedsDeployKey = process.env.FEEDS_DEPLOY_PRIVATE_KEY!;
 

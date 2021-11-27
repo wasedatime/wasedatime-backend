@@ -3,9 +3,7 @@ import {SecretValue} from '@aws-cdk/core';
 import {Domain, ElasticsearchVersion, TLSSecurityPolicy} from "@aws-cdk/aws-elasticsearch";
 import {EbsDeviceVolumeType} from "@aws-cdk/aws-ec2";
 
-
 export class ElasticsearchService extends cdk.Construct {
-
     readonly domain: Domain;
 
     constructor(scope: cdk.Construct, id: string) {

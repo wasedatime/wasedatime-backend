@@ -16,9 +16,7 @@ import {FreeTierUsageBudget} from "../constructs/admin/budget";
 import {CF_TOPIC_ARN} from "../configs/common/arn";
 import {GlobalTrailLogs} from "../constructs/admin/log";
 
-
 export class WasedaTimeAdminLayer extends AdminLayer {
-
     readonly statusNotifiers: { [name in StatusNotifier]?: AbstractStatusNotifier } = {};
 
     readonly chatbot: SlackChannelConfiguration;

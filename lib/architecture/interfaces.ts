@@ -1,9 +1,7 @@
 import {DataEndpoint, OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {Protocol, Registry} from "./protocols";
 
-
 interface IInterface {
-
     protocol: Protocol;
 
     getEndpoint(name: number): string;
@@ -12,7 +10,6 @@ interface IInterface {
 }
 
 export class DataInterface implements IInterface {
-
     protocol: Registry<DataEndpoint>;
 
     constructor() {
@@ -34,7 +31,6 @@ export class DataInterface implements IInterface {
 }
 
 export class ServiceInterface implements IInterface {
-
     protocol: Registry<ServiceEndpoint>;
 
     constructor() {
@@ -56,7 +52,6 @@ export class ServiceInterface implements IInterface {
 }
 
 export class OperationInterface implements IInterface {
-
     protocol: Registry<OperationEndpoint>;
 
     constructor() {

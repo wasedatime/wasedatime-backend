@@ -1,7 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
 
-
 export enum Collection {
     COURSE_REVIEW,
     CAREER,
@@ -15,7 +14,6 @@ export interface DatabaseProps {
 }
 
 export class DynamoDatabase extends cdk.Construct {
-
     readonly tables: { [name: number]: Table } = {};
 
     constructor(scope: cdk.Construct, id: string, props?: DatabaseProps) {
@@ -67,4 +65,3 @@ export class DynamoDatabase extends cdk.Construct {
         });
     }
 }
-

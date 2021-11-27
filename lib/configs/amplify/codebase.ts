@@ -1,7 +1,6 @@
 import {GitHubSourceCodeProvider} from "@aws-cdk/aws-amplify";
 import {SecretValue} from "@aws-cdk/core";
 
-
 export const webAppCode: GitHubSourceCodeProvider = new GitHubSourceCodeProvider({
     owner: "wasedatime",
     repository: "wasedatime-web",
