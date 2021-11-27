@@ -1,6 +1,5 @@
-name: AWS CDK CI/CD
+name: AWS CDK CD
 
-# Controls when the action will run.
 on:
   release:
     types:
@@ -25,7 +24,6 @@ env:
   FEEDS_DEPLOY_PRIVATE_KEY: ${{ secrets.FEEDS_DEPLOY_PRIVATE_KEY }}
   STAGE: dev
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   deploy:
     runs-on: ubuntu-latest

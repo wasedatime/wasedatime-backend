@@ -50,7 +50,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
                 "NODE_OPTIONS": "--max-old-space-size=8192",
                 "BIT_TOKEN": bitToken,
-                "FEEDS_DEPLOY_PRIVATE_KEY": feedsDeployKey,
+                "DEPLOY_KEY": feedsDeployKey,
             },
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {

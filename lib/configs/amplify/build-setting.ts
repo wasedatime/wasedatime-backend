@@ -2,7 +2,7 @@ import {BuildSpec} from "@aws-cdk/aws-codebuild/lib/build-spec";
 import {microAppCorsHeader, securityHeaders} from "./website";
 
 export const bitToken = process.env.BIT_TOKEN!;
-export const feedsDeployKey = process.env.FEEDS_DEPLOY_PRIVATE_KEY!;
+export const feedsDeployKey = process.env.DEPLOY_KEY!;
 
 const preBuild = {
     commands: [
@@ -14,7 +14,7 @@ const preBuild = {
 const preBuildForFeeds = {
     commands: [
         "eval $(ssh-agent -s)",
-        `ssh-add <(echo "${process.env.DEPLOY_KEY}" | base64 --decode)`,
+        "ssh-add <(echo \"$DEPLOY_KEY\" | base64 --decode)",
         "git submodule init",
         "git submodule update --remote",
         "yum -y install make nasm autoconf automake libtool dpkg pkgconfig libpng libpng-dev g++",

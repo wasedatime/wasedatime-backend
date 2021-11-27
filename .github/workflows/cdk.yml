@@ -1,6 +1,5 @@
-name: AWS CDK CI/CD
+name: AWS CDK CI
 
-# Controls when the action will run. 
 on:
   pull_request:
     branches:
@@ -32,15 +31,10 @@ env:
   DEPLOY_KEY: ${{ secrets.FEEDS_DEPLOY_PRIVATE_KEY }}
   STAGE: dev
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
       - uses: actions/setup-node@v2.4.1
