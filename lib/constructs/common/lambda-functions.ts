@@ -1,9 +1,10 @@
 import * as cdk from "@aws-cdk/core";
 import {Duration} from "@aws-cdk/core";
-import {Code, Function, Runtime} from "@aws-cdk/aws-lambda";
+import {Function, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {LazyRole, ManagedPolicy, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {PythonFunction} from "@aws-cdk/aws-lambda-python";
+import {NodejsFunction} from "@aws-cdk/aws-lambda-nodejs";
 
 import {AwsServicePrincipal} from "../../configs/common/aws";
 import {GOOGLE_API_SERVICE_ACCOUNT_INFO, SLACK_WEBHOOK_URL} from "../../configs/lambda/environment";
@@ -50,15 +51,14 @@ export class CourseReviewsFunctions extends cdk.Construct {
             ],
         });
 
-        this.getFunction = new Function(this, 'get-reviews', {
-            code: Code.fromAsset('src/lambda/get-reviews'),
-            handler: "index.handler",
+        this.getFunction = new PythonFunction(this, 'get-reviews', {
+            entry: 'src/lambda/post-review',
             description: "Get course reviews from the database.",
             functionName: "get-course-reviews",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             role: dynamoDBReadRole,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(3),
             environment: props.envVars,
         });
@@ -70,7 +70,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
             role: dynamoDBPutRole,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(5),
             environment: props.envVars,
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
@@ -82,7 +82,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
             role: dynamoDBPutRole,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(5),
             environment: props.envVars,
         }).addEnvironment("GOOGLE_API_SERVICE_ACCOUNT_INFO", GOOGLE_API_SERVICE_ACCOUNT_INFO);
@@ -94,7 +94,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             role: dynamoDBPutRole,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(3),
             environment: props.envVars,
         });
@@ -126,7 +126,7 @@ export class SyllabusScraper extends cdk.Construct {
             functionName: "syllabus-scraper",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 4096,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(210),
             environment: props.envVars,
             role: s3AccessRole,
@@ -140,14 +140,13 @@ export class AmplifyStatusPublisher extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
 
-        this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('src/lambda/amplify-status-publisher'),
-            handler: "index.handler",
+        this.baseFunction = new NodejsFunction(this, 'base-function', {
+            entry: 'src/lambda/amplify-status-publisher/index.js',
             description: "Forwards Amplify build status message from SNS to Slack Webhook.",
             functionName: "amplify-status-publisher",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
-            runtime: Runtime.NODEJS_12_X,
+            runtime: Runtime.NODEJS_14_X,
             timeout: Duration.seconds(3),
         }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
     }
@@ -159,14 +158,13 @@ export class ScraperStatusPublisher extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
 
-        this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('src/lambda/sfn-status-publisher'),
-            handler: "index.handler",
+        this.baseFunction = new NodejsFunction(this, 'base-function', {
+            entry: 'src/lambda/sfn-status-publisher/index.js',
             description: "Forwards scraper execution status message from SNS to Slack Webhook.",
             functionName: "scraper-status-publisher",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
-            runtime: Runtime.NODEJS_12_X,
+            runtime: Runtime.NODEJS_14_X,
             timeout: Duration.seconds(3),
         }).addEnvironment("SLACK_WEBHOOK_URL", SLACK_WEBHOOK_URL);
     }
@@ -178,14 +176,13 @@ export class PreSignupWasedaMailValidator extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props?: FunctionsProps) {
         super(scope, id);
 
-        this.baseFunction = new Function(this, 'base-function', {
-            code: Code.fromAsset('src/lambda/signup-validator'),
-            handler: "index.handler",
+        this.baseFunction = new PythonFunction(this, 'base-function', {
+            entry: 'src/lambda/signup-validator',
             description: "Validates if the user is signing up using WasedaMail",
             functionName: "wasedamail-signup-validator",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(3),
         });
     }
@@ -233,15 +230,14 @@ export class TimetableFunctions extends cdk.Construct {
             ],
         });
 
-        this.getFunction = new Function(this, 'get-timetable', {
-            code: Code.fromAsset('src/lambda/get-timetable'),
-            handler: "index.handler",
+        this.getFunction = new PythonFunction(this, 'get-timetable', {
+            entry: 'src/lambda/get-timetable',
             description: "Get timetable from the database.",
             functionName: "get-timetable",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             role: dynamoDBReadRole,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(3),
             environment: props.envVars,
         });
@@ -253,7 +249,7 @@ export class TimetableFunctions extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             role: dynamoDBPutRole,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(3),
             environment: props.envVars,
         });
@@ -265,7 +261,7 @@ export class TimetableFunctions extends cdk.Construct {
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             role: dynamoDBPutRole,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(3),
             environment: props.envVars,
         });
@@ -276,7 +272,7 @@ export class TimetableFunctions extends cdk.Construct {
             functionName: "import-timetable",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(5),
         });
 
@@ -286,7 +282,7 @@ export class TimetableFunctions extends cdk.Construct {
             functionName: "export-timetable",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 512,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(5),
         });
     }
@@ -319,7 +315,7 @@ export class SyllabusFunctions extends cdk.Construct {
             functionName: "get-course",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(3),
         });
 
@@ -342,7 +338,7 @@ export class SyllabusFunctions extends cdk.Construct {
             functionName: "get-book-info",
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             role: comprehendFullAccessRole,
             timeout: Duration.seconds(10),
         });
@@ -377,7 +373,7 @@ export class SyllabusUpdateFunction extends cdk.Construct {
             role: LambdaFullAccess,
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(60),
             environment: props.envVars,
         });
@@ -407,12 +403,12 @@ export class FeedsFunctions extends cdk.Construct {
             entry: 'src/lambda/get-blog',
             description: "Get blog info from DB.",
             functionName: "get-feeds",
-            role:dynamoDBReadRole,
+            role: dynamoDBReadRole,
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 256,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(5),
-            environment: props.envVars
+            environment: props.envVars,
         });
     }
 }
@@ -445,7 +441,7 @@ export class BlogUpdateFunction extends cdk.Construct {
             role: LambdaFullAccess,
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
-            runtime: Runtime.PYTHON_3_8,
+            runtime: Runtime.PYTHON_3_9,
             timeout: Duration.seconds(60),
             environment: props.envVars,
         });

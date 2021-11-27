@@ -23,6 +23,7 @@ specifiers:
   '@aws-cdk/aws-iam': 1.134.0
   '@aws-cdk/aws-lambda': 1.134.0
   '@aws-cdk/aws-lambda-event-sources': 1.134.0
+  '@aws-cdk/aws-lambda-nodejs': 1.134.0
   '@aws-cdk/aws-lambda-python': 1.134.0
   '@aws-cdk/aws-logs': 1.134.0
   '@aws-cdk/aws-route53': 1.134.0
@@ -67,6 +68,7 @@ dependencies:
   '@aws-cdk/aws-iam': 1.134.0
   '@aws-cdk/aws-lambda': 1.134.0
   '@aws-cdk/aws-lambda-event-sources': 1.134.0
+  '@aws-cdk/aws-lambda-nodejs': 1.134.0
   '@aws-cdk/aws-lambda-python': 1.134.0
   '@aws-cdk/aws-logs': 1.134.0
   '@aws-cdk/aws-route53': 1.134.0
@@ -705,9 +707,18 @@ packages:
       constructs: 3.3.147
     dev: false
 
+  /@aws-cdk/aws-lambda-nodejs/1.134.0:
+    resolution: { integrity: sha512-tAlyH9/h3EEDtxTSnFW7E5HtkDHpdnamnW3VjF3BQOPz7W6ZhMG2XWVd+byFJg0/xgIeiIGjkaBTY1Pcxnc78Q== }
+    engines: { node: '>= 10.13.0 <13 || >=13.7.0' }
+    dependencies:
+      '@aws-cdk/aws-lambda': 1.134.0
+      '@aws-cdk/core': 1.134.0
+      constructs: 3.3.147
+    dev: false
+
   /@aws-cdk/aws-lambda-python/1.134.0:
-    resolution: {integrity: sha512-0MMyl+rIViKMnI4f/TVw94Q+2BNWNeXHos4Tgag3Z5Odrtky5lct7098tRaECGRi7NyB0H+rCuCvXZ2xdSTezw==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
+    resolution: { integrity: sha512-0MMyl+rIViKMnI4f/TVw94Q+2BNWNeXHos4Tgag3Z5Odrtky5lct7098tRaECGRi7NyB0H+rCuCvXZ2xdSTezw== }
+    engines: { node: '>= 10.13.0 <13 || >=13.7.0' }
     dependencies:
       '@aws-cdk/aws-ec2': 1.134.0
       '@aws-cdk/aws-lambda': 1.134.0
@@ -2300,7 +2311,6 @@ packages:
   /constructs/3.3.147:
     resolution: {integrity: sha512-xTSA87W5hscsHdFC2NcbJWALeMt8QWoCvVXRHPIuoBDDXdvBuNoqL2a5kY1yEWSMLQvBPnrDyinfz3twTX6dAw==}
     engines: {node: '>= 10.17.0'}
-    bundledDependencies: []
 
   /convert-source-map/1.8.0:
     resolution: {integrity: sha512-+OQdjP49zViI/6i7nIJpA8rAl4sV/JdPfU9nZs3VqOwGIgizICvuN2ru6fMd+4llL0tar18UYJXfZ/TWtmhUjA==}
