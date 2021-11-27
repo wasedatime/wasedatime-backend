@@ -21,7 +21,7 @@ env:
   BIT_TOKEN: ${{ secrets.BIT_TOKEN }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  FEEDS_DEPLOY_PRIVATE_KEY: ${{ secrets.FEEDS_DEPLOY_PRIVATE_KEY }}
+  DEPLOY_KEY: ${{ secrets.FEEDS_DEPLOY_PRIVATE_KEY }}
   STAGE: dev
 
 jobs:
