@@ -35,12 +35,6 @@ export class WasedaTimeAdminLayer extends AdminLayer {
 
         const freeTierBudget = new FreeTierUsageBudget(this, 'free-tier-budget');
 
-        // todo re-deploy
-        // this.chatbot = new SlackChatbot(this, 'slack-chatbot', [
-        //     freeTierBudget.notification,
-        //     Topic.fromTopicArn(this, 'stack-topic', CF_TOPIC_ARN)
-        // ]);
-
         this.chatbot = new SlackChannelConfiguration(this, 'chatbot-slack-config', {
             slackChannelConfigurationName: 'aws-alert',
             slackChannelId: SLACK_CHANNEL_ID,
