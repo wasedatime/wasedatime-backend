@@ -76,11 +76,9 @@ jobs:
       - name: Diff
         id: diff
         run: |
-          set -o pipefail
           echo "::add-mask::$DEPLOY_KEY"
           echo "::add-mask::$BIT_TOKEN"
-          cdk diff --no-color | tee diff.log
-          LOG="$(cat diff.log)"
+          LOG="$(cdk diff --no-color 2>&1)"
           LOG="${LOG//'%'/'%25'}"
           LOG="${LOG//$'\n'/'%0A'}"
           LOG="${LOG//$'\r'/'%0D'}"
