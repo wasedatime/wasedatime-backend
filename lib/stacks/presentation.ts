@@ -5,6 +5,7 @@ import {PresentationLayer} from "../architecture/layers";
 import {OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ServiceInterface} from "../architecture/interfaces";
 import {webappSiteRules} from "../configs/amplify/website";
+import {feedsDeployKey} from "../configs/amplify/build-setting";
 
 export class WasedaTimePresentationLayer extends PresentationLayer {
     readonly app: AbstractWebApp;
@@ -19,6 +20,8 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         monoApp.addMicroApp("syllabus");
         monoApp.addMicroApp("campus");
         monoApp.addMicroApp("feeds");
+
+        monoApp.microApps["feeds"].addEnvironment("DEPLOY_KEY", feedsDeployKey);
 
         webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));
 
