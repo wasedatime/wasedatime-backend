@@ -6,6 +6,7 @@ import {
     UserPool,
     UserPoolClient,
     UserPoolDomain,
+    UserPoolEmail,
     UserPoolIdentityProviderGoogle,
 } from "@aws-cdk/aws-cognito";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
@@ -59,9 +60,7 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
         this.pool = new UserPool(this, 'main-user-pool', {
             accountRecovery: AccountRecovery.NONE,
             autoVerify: {email: false, phone: false},
-            emailSettings: {
-                // from: "noreply@wasedatime.com"
-            },
+            email: UserPoolEmail.withCognito(),
             enableSmsRole: false,
             mfa: Mfa.OFF,
             passwordPolicy: {
