@@ -192,7 +192,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
             api: this.apiEndpoint,
             retainDeployments: false,
         });
-        const hash = new Buffer(flatted.stringify(this.apiServices), 'binary').toString('base64');
+        const hash = Buffer.from(flatted.stringify(this.apiServices), 'binary').toString('base64');
         if (STAGE === 'dev') {
             devDeployment.addToLogicalId(hash);
         } else if (STAGE === 'prod') {
