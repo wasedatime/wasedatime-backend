@@ -33,7 +33,9 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
             }, {},
         );
 
-        this.exportValue(monoApp.microApps["blog"].appId);
+        this.exportValue(monoApp.microApps["blog"].appId, {
+            name: "presentation:ExportsOutputFnGetAttamplifymonorepowebapprootapp72CC35EBAppIdD2BBB37D",
+        });
         this.operationInterface.setEndpoint(OperationEndpoint.APP, appDomains);
     }
 }

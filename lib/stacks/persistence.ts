@@ -37,7 +37,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
             DataEndpoint.COURSE_REVIEWS,
             dynamoDatabase.tables[Collection.COURSE_REVIEW].tableName,
         );
-        this.exportValue(dynamoDatabase.tables[Collection.FEEDS].tableName);
         this.dataInterface.setEndpoint(
             DataEndpoint.CAREER,
             dynamoDatabase.tables[Collection.CAREER].tableName,
@@ -50,7 +49,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
             DataEndpoint.SYLLABUS,
             syllabusDataPipeline.dataWarehouse.bucketName,
         );
-        this.exportValue(syllabusSyncPipeline.dataWarehouse.tableName);
         // this.dataInterface.setEndpoint(
         //     DataEndpoint.COURSE,
         //     syllabusSyncPipeline.dataWarehouse.tableName,
