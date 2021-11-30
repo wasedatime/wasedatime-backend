@@ -31,7 +31,7 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
             }, {},
         );
 
-        super.exportValue(appDomains);
+        super.exportValue(monoApp.microApps["blog"].appId);
         this.operationInterface.setEndpoint(OperationEndpoint.APP, appDomains);
     }
 }
