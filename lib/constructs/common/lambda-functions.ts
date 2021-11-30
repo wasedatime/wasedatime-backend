@@ -266,25 +266,25 @@ export class TimetableFunctions extends cdk.Construct {
             environment: props.envVars,
         });
 
-        this.importFunction = new PythonFunction(this, 'import-timetable', {
-            entry: 'src/lambda/import-timetable',
-            description: "Import timetable from pdf.",
-            functionName: "import-timetable",
-            logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 256,
-            runtime: Runtime.PYTHON_3_9,
-            timeout: Duration.seconds(5),
-        });
-
-        this.exportFunction = new PythonFunction(this, 'export-timetable', {
-            entry: 'src/lambda/export-timetable',
-            description: "Export timetable as image.",
-            functionName: "export-timetable",
-            logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 512,
-            runtime: Runtime.PYTHON_3_9,
-            timeout: Duration.seconds(5),
-        });
+        //     this.importFunction = new PythonFunction(this, 'import-timetable', {
+        //         entry: 'src/lambda/import-timetable',
+        //         description: "Import timetable from pdf.",
+        //         functionName: "import-timetable",
+        //         logRetention: RetentionDays.ONE_MONTH,
+        //         memorySize: 256,
+        //         runtime: Runtime.PYTHON_3_9,
+        //         timeout: Duration.seconds(5),
+        //     });
+        //
+        //     this.exportFunction = new PythonFunction(this, 'export-timetable', {
+        //         entry: 'src/lambda/export-timetable',
+        //         description: "Export timetable as image.",
+        //         functionName: "export-timetable",
+        //         logRetention: RetentionDays.ONE_MONTH,
+        //         memorySize: 512,
+        //         runtime: Runtime.PYTHON_3_9,
+        //         timeout: Duration.seconds(5),
+        //     });
     }
 }
 
@@ -370,74 +370,6 @@ export class SyllabusUpdateFunction extends cdk.Construct {
             entry: 'src/lambda/update-syllabus',
             description: 'Update syllabus when S3 bucket is updated.',
             functionName: "update-syllabus",
-            role: LambdaFullAccess,
-            logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 128,
-            runtime: Runtime.PYTHON_3_9,
-            timeout: Duration.seconds(60),
-            environment: props.envVars,
-        });
-    }
-}
-
-export class FeedsFunctions extends cdk.Construct {
-    readonly getFunction: Function;
-
-    constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
-        super(scope, id);
-
-        const dynamoDBReadRole: LazyRole = new LazyRole(this, 'dynamo-read-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
-            description: "Allow lambda function to perform read operation on dynamodb",
-            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-            roleName: "dynamodb-lambda-read-blogs",
-            managedPolicies: [
-                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
-                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
-                ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"),
-            ],
-        });
-
-        this.getFunction = new PythonFunction(this, 'get-feeds', {
-            entry: 'src/lambda/get-blog',
-            description: "Get blog info from DB.",
-            functionName: "get-feeds",
-            role: dynamoDBReadRole,
-            logRetention: RetentionDays.ONE_MONTH,
-            memorySize: 256,
-            runtime: Runtime.PYTHON_3_9,
-            timeout: Duration.seconds(5),
-            environment: props.envVars,
-        });
-    }
-}
-
-export class BlogUpdateFunction extends cdk.Construct {
-    readonly updateFunction: Function;
-
-    constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
-        super(scope, id);
-
-        const LambdaFullAccess: LazyRole = new LazyRole(this, 'lambda-fullaccess-role', {
-            assumedBy: new ServicePrincipal(AwsServicePrincipal.LAMBDA),
-            description: "Allow lambda function to access s3 buckets and dynamodb",
-            path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-            roleName: "feeds-full-access",
-            managedPolicies: [
-                ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
-                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
-                ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"),
-                ManagedPolicy.fromManagedPolicyArn(this, 's3-read-only',
-                    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"),
-            ],
-        });
-
-        this.updateFunction = new PythonFunction(this, 'update-blog', {
-            entry: 'src/lambda/update-blog',
-            description: 'Update blog when S3 bucket has something been put.',
-            functionName: "update-blog",
             role: LambdaFullAccess,
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,

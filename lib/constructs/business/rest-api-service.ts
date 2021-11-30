@@ -17,19 +17,13 @@ import {ManagedPolicy, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {AbstractRestApiEndpoint} from "./api-endpoint";
 import {allowHeaders, allowOrigins} from "../../configs/api-gateway/cors";
 import {
-    articleListSchema,
     courseReviewGetRespSchema,
     courseReviewPatchReqSchema,
     courseReviewPostReqSchema,
     syllabusSchema,
 } from "../../configs/api-gateway/schema";
 import {AwsServicePrincipal} from "../../configs/common/aws";
-import {
-    CourseReviewsFunctions,
-    FeedsFunctions,
-    SyllabusFunctions,
-    TimetableFunctions,
-} from "../common/lambda-functions";
+import {CourseReviewsFunctions, SyllabusFunctions, TimetableFunctions} from "../common/lambda-functions";
 import {lambdaRespParams, s3RespMapping, syllabusRespParams} from "../../configs/api-gateway/mapping";
 
 export interface RestApiServiceProps {
@@ -302,75 +296,6 @@ export class CourseReviewsApiService extends AbstractRestApiService {
                 [HttpMethod.PATCH]: patchCourseReviews,
                 [HttpMethod.POST]: postCourseReviews,
                 [HttpMethod.DELETE]: deleteCourseReviews,
-            },
-        };
-    }
-}
-
-export class FeedsApiService extends AbstractRestApiService {
-    readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: Method } } = {};
-
-    constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
-        super(scope, id, props);
-
-        const root = scope.apiEndpoint.root.addResource("feeds");
-        const feedsFunctions = new FeedsFunctions(this, 'crud-functions', {
-            envVars: {
-                'TABLE_NAME': props.dataSource!,
-            },
-        });
-
-        const getRespModel = scope.apiEndpoint.addModel('feeds-get-resp-model', {
-            schema: articleListSchema,
-            contentType: "application/json",
-            description: "List of articles in feeds",
-            modelName: "GetFeedsResp",
-        });
-
-        const getIntegration = new LambdaIntegration(
-            feedsFunctions.getFunction, {proxy: true},
-        );
-        
-        const postIntegration = new MockIntegration({
-            requestTemplates: {["application/json"]: '{"statusCode": 200}'},
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            integrationResponses: [{
-                statusCode: '200',
-            }],
-        });
-
-        const optionsFeeds = root.addCorsPreflight({
-            allowOrigins: allowOrigins,
-            allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.GET, HttpMethod.OPTIONS],
-        });
-        const getFeeds = root.addMethod(HttpMethod.GET, getIntegration, {
-            requestParameters: {
-                'method.request.querystring.offset': true,
-                'method.request.querystring.limit': true,
-            },
-            operationName: "ListArticles",
-            methodResponses: [{
-                statusCode: '200',
-                responseModels: {["application/json"]: getRespModel},
-                responseParameters: lambdaRespParams,
-            }],
-            requestValidator: props.validator,
-        });
-        const postFeeds = root.addMethod(HttpMethod.POST, postIntegration, {
-            operationName: "PostArticles",
-            methodResponses: [{
-                statusCode: '200',
-                responseParameters: lambdaRespParams,
-            }],
-            requestValidator: props.validator,
-        });
-
-        this.resourceMapping = {
-            "/feeds": {
-                [HttpMethod.OPTIONS]: optionsFeeds,
-                [HttpMethod.GET]: getFeeds,
-                [HttpMethod.POST]: postFeeds,
             },
         };
     }
