@@ -76,7 +76,9 @@ jobs:
       - name: Diff
         id: diff
         run: |
-          cdk diff --no-color &> diff.txt
+          echo "::add-mask::$DEPLOY_KEY"
+          echo "::add-mask::$BIT_TOKEN"
+          cdk diff --no-color 2>&1 | tee -a diff.txt
           LOG="$(cat diff.txt)"
           LOG="${LOG//'%'/'%25'}"
           LOG="${LOG//$'\n'/'%0A'}"
