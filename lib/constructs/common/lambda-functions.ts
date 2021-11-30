@@ -52,7 +52,7 @@ export class CourseReviewsFunctions extends cdk.Construct {
         });
 
         this.getFunction = new PythonFunction(this, 'get-reviews', {
-            entry: 'src/lambda/post-review',
+            entry: 'src/lambda/get-reviews',
             description: "Get course reviews from the database.",
             functionName: "get-course-reviews",
             logRetention: RetentionDays.ONE_MONTH,

@@ -26,7 +26,9 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         this.app = monoApp;
         const appDomains = Object.entries(monoApp.microApps).reduce(
             function (result: { [key: string]: string }, [key, value]) {
-                result[value.appId] = key.toUpperCase();
+                if (key !== 'blog') {
+                    result[value.appId] = key.toUpperCase();
+                }
                 return result;
             }, {},
         );
