@@ -2,7 +2,7 @@ import * as cdk from '@aws-cdk/core';
 
 import {AbstractWebApp, AmplifyMonoWebApp} from "../constructs/presentation/web-app";
 import {PresentationLayer} from "../architecture/layers";
-import {ServiceEndpoint} from "../configs/common/registry";
+import {OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
 import {ServiceInterface} from "../architecture/interfaces";
 import {webappSiteRules} from "../configs/amplify/website";
 
@@ -32,6 +32,6 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         );
 
         super.exportValue(appDomains);
-        // this.operationInterface.setEndpoint(OperationEndpoint.APP, appDomains);
+        this.operationInterface.setEndpoint(OperationEndpoint.APP, appDomains);
     }
 }
