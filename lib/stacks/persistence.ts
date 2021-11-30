@@ -4,6 +4,7 @@ import {
     AbstractDataPipeline,
     CareerDataPipeline,
     SyllabusDataPipeline,
+    SyllabusSyncPipeline,
     Worker,
 } from "../constructs/persistence/data-pipeline";
 import {DataEndpoint, OperationEndpoint} from "../configs/common/registry";
@@ -21,9 +22,9 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
         const syllabusDataPipeline = new SyllabusDataPipeline(this, 'syllabus-datapipeline', {});
         this.dataPipelines[Worker.SYLLABUS] = syllabusDataPipeline;
 
-        // const syllabusSyncPipeline = new SyllabusSyncPipeline(this, 'syllabus-sync', {
-        //     dataSource: syllabusDataPipeline.dataWarehouse,
-        // });
+        const syllabusSyncPipeline = new SyllabusSyncPipeline(this, 'syllabus-sync', {
+            dataSource: syllabusDataPipeline.dataWarehouse,
+        });
 
         const dynamoDatabase = new DynamoDatabase(this, 'dynamo-db', {});
         this.databases["dynamo-main"] = dynamoDatabase;
@@ -49,6 +50,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
             DataEndpoint.SYLLABUS,
             syllabusDataPipeline.dataWarehouse.bucketName,
         );
+        this.exportValue(syllabusSyncPipeline.dataWarehouse.tableName);
         // this.dataInterface.setEndpoint(
         //     DataEndpoint.COURSE,
         //     syllabusSyncPipeline.dataWarehouse.tableName,
