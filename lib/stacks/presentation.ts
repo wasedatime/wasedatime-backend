@@ -18,7 +18,6 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         });
         monoApp.addMicroApp("syllabus");
         monoApp.addMicroApp("campus");
-        monoApp.addMicroApp("blog");
         monoApp.addMicroApp("feeds");
 
         webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));
@@ -26,14 +25,11 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         this.app = monoApp;
         const appDomains = Object.entries(monoApp.microApps).reduce(
             function (result: { [key: string]: string }, [key, value]) {
-                if (key !== 'blog') {
-                    result[value.appId] = key.toUpperCase();
-                }
+                result[value.appId] = key.toUpperCase();
                 return result;
             }, {},
         );
 
-        this.exportValue(monoApp.microApps["blog"].appId);
         this.operationInterface.setEndpoint(OperationEndpoint.APP, appDomains);
     }
 }
