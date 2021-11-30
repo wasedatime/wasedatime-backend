@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2.4.1
+      - uses: actions/setup-node@v2.5.0
         with:
           node-version: 16.x
 
@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2.4.1
+      - uses: actions/setup-node@v2.5.0
         with:
           node-version: 16.x
 
@@ -76,8 +76,9 @@ jobs:
       - name: Diff
         id: diff
         run: |
-          cdk diff --no-color &> diff.txt
-          LOG="$(cat diff.txt)"
+          echo "::add-mask::$DEPLOY_KEY"
+          echo "::add-mask::$BIT_TOKEN"
+          LOG="$(cdk diff --no-color 2>&1)"
           LOG="${LOG//'%'/'%25'}"
           LOG="${LOG//$'\n'/'%0A'}"
           LOG="${LOG//$'\r'/'%0D'}"

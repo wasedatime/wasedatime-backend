@@ -18,13 +18,22 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
         });
         monoApp.addMicroApp("syllabus");
         monoApp.addMicroApp("campus");
+        monoApp.addMicroApp("blog");
         monoApp.addMicroApp("feeds");
 
         webappSiteRules.forEach((value => monoApp.app.addCustomRule(value)));
 
         this.app = monoApp;
-        const appDomains = [monoApp.app.appId].concat(Object.entries(monoApp.microApps).map(value => value[1].appId));
+        const appDomains = Object.entries(monoApp.microApps).reduce(
+            function (result: { [key: string]: string }, [key, value]) {
+                if (key !== 'blog') {
+                    result[value.appId] = key.toUpperCase();
+                }
+                return result;
+            }, {},
+        );
 
+        this.exportValue(monoApp.microApps["blog"].appId);
         this.operationInterface.setEndpoint(OperationEndpoint.APP, appDomains);
     }
 }

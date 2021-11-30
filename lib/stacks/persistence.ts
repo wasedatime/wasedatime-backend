@@ -3,7 +3,6 @@ import * as cdk from "@aws-cdk/core";
 import {
     AbstractDataPipeline,
     CareerDataPipeline,
-    FeedsDataPipeline,
     SyllabusDataPipeline,
     SyllabusSyncPipeline,
     Worker,
@@ -33,17 +32,10 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
         this.dataPipelines[Worker.CAREER] = new CareerDataPipeline(this, 'career-datapipeline', {
             dataWarehouse: dynamoDatabase.tables[Collection.CAREER],
         });
-        this.dataPipelines[Worker.FEEDS] = new FeedsDataPipeline(this, 'feeds-datapipeline', {
-            dataWarehouse: dynamoDatabase.tables[Collection.FEEDS],
-        });
 
         this.dataInterface.setEndpoint(
             DataEndpoint.COURSE_REVIEWS,
             dynamoDatabase.tables[Collection.COURSE_REVIEW].tableName,
-        );
-        this.dataInterface.setEndpoint(
-            DataEndpoint.FEEDS,
-            dynamoDatabase.tables[Collection.FEEDS].tableName,
         );
         this.dataInterface.setEndpoint(
             DataEndpoint.CAREER,
@@ -57,14 +49,16 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
             DataEndpoint.SYLLABUS,
             syllabusDataPipeline.dataWarehouse.bucketName,
         );
-        this.dataInterface.setEndpoint(
-            DataEndpoint.COURSE,
-            syllabusSyncPipeline.dataWarehouse.tableName,
-        );
+        // this.dataInterface.setEndpoint(
+        //     DataEndpoint.COURSE,
+        //     syllabusSyncPipeline.dataWarehouse.tableName,
+        // );
 
         this.operationInterface.setEndpoint(
             OperationEndpoint.SYLLABUS,
-            [syllabusDataPipeline.processor.stateMachineArn],
+            {
+                [syllabusDataPipeline.processor.stateMachineArn]: "scraper",
+            },
         );
     }
 }

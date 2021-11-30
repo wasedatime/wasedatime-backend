@@ -6,7 +6,6 @@ export enum ServiceEndpoint {
 
 export const enum DataEndpoint {
     SYLLABUS,
-    FEEDS,
     COURSE_REVIEWS,
     CAREER,
     TIMETABLE,

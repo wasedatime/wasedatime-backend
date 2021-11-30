@@ -9,7 +9,7 @@ import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-d
 import {Rule} from "@aws-cdk/aws-events";
 import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
 
-import {BlogUpdateFunction, SyllabusScraper, SyllabusUpdateFunction} from "../common/lambda-functions";
+import {SyllabusScraper, SyllabusUpdateFunction} from "../common/lambda-functions";
 import {prodCorsRule} from "../../configs/s3/cors";
 import {syllabusSchedule} from "../../configs/event/schedule";
 import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../utils/s3";
@@ -127,43 +127,6 @@ export class CareerDataPipeline extends AbstractDataPipeline {
             removalPolicy: RemovalPolicy.RETAIN,
             versioned: false,
         });
-    }
-}
-
-export class FeedsDataPipeline extends AbstractDataPipeline {
-    readonly dataSource: Bucket;
-
-    readonly processor: Function;
-
-    readonly dataWarehouse: Table;
-
-    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
-        super(scope, id);
-
-        this.dataWarehouse = props?.dataWarehouse!;
-
-        this.dataSource = new Bucket(this, 'feeds-bucket', {
-            accessControl: BucketAccessControl.PUBLIC_READ,
-            bucketName: "wasedatime-feeds",
-            cors: prodCorsRule,
-            encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: true,
-            removalPolicy: RemovalPolicy.RETAIN,
-            versioned: true,
-        });
-
-        this.processor = new BlogUpdateFunction(this, 'blog-update-function', {
-            envVars: {
-                ["BUCKET_NAME"]: this.dataSource.bucketName,
-                ['TABLE_NAME']: this.dataWarehouse.tableName,
-                ["OBJECT_PATH"]: 'blogs/',
-            },
-        }).updateFunction;
-
-        this.processor.addEventSource(new S3EventSource(this.dataSource, {
-            events: [s3.EventType.OBJECT_CREATED],
-            filters: [{prefix: 'blogs/'}, {suffix: '.md'}],
-        }));
     }
 }
 

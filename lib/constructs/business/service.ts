@@ -1,5 +1,5 @@
-import * as rest from "../../constructs/business/rest-api-service";
-import * as gql from "../../constructs/business/graphql-api-service";
+import * as rest from "./rest-api-service";
+import * as gql from "./graphql-api-service";
 
 export enum ApiEndpoint {
     REST,
@@ -11,7 +11,6 @@ export const apiServiceMap: { [name: string]: any } = {
     "syllabus": rest.SyllabusApiService,
     "course-reviews": rest.CourseReviewsApiService,
     "career": rest.CareerApiService,
-    "feeds": rest.FeedsApiService,
     "timetable": rest.TimetableApiService,
     "graphql": rest.GraphqlApiService,
     "course": gql.CourseApiService,

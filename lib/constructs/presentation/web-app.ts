@@ -61,6 +61,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 buildSpec: microAppDevBuildSpec("root"),
             },
         });
+        this.microApps['root'] = this.app;
 
         const masterBranch: Branch = this.app.addBranch('master', {
             autoBuild: false,

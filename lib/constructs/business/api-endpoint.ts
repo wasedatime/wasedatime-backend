@@ -12,7 +12,7 @@ import {IUserPool} from "@aws-cdk/aws-cognito";
 import * as flatted from 'flatted';
 
 import {AbstractRestApiService} from "./rest-api-service";
-import {apiServiceMap} from "../../configs/api-gateway/service";
+import {apiServiceMap} from "./service";
 import {AbstractGraphqlApiService} from "./graphql-api-service";
 import {STAGE} from "../../configs/common/aws";
 import {defaultHeaders} from "../../configs/api-gateway/cors";

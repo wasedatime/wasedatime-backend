@@ -3,9 +3,7 @@ import {IHostedZone} from "@aws-cdk/aws-route53";
 
 import {
     AbstractApiEndpoint,
-    AbstractGraphqlEndpoint,
     AbstractRestApiEndpoint,
-    WasedaTimeGraphqlEndpoint,
     WasedaTimeRestApiEndpoint,
 } from "../constructs/business/api-endpoint";
 import {DataEndpoint, ServiceEndpoint} from "../configs/common/registry";
@@ -30,24 +28,23 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         });
         this.apiEndpoints["rest-api"] = restApiEndpoint;
 
-        const graphqlApiEndpoint: AbstractGraphqlEndpoint = new WasedaTimeGraphqlEndpoint(this, 'graphql-api-endpoint', {
-            zone: hostedZone,
-            authProvider: authEndpoint.pool,
-        });
-        this.apiEndpoints["graphql-api"] = graphqlApiEndpoint;
-
-        graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
+        // const graphqlApiEndpoint: AbstractGraphqlEndpoint = new WasedaTimeGraphqlEndpoint(this, 'graphql-api-endpoint', {
+        //     zone: hostedZone,
+        //     authProvider: authEndpoint.pool,
+        // });
+        // this.apiEndpoints["graphql-api"] = graphqlApiEndpoint;
+        //
+        // graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
 
         restApiEndpoint.addService("syllabus", this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
             .addService("course-reviews", this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
-            .addService("feeds",this.dataInterface.getEndpoint(DataEndpoint.FEEDS))
             .addService("career")
-            .addService("timetable", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true)
-            .addService("graphql", graphqlApiEndpoint.apiEndpoint.graphqlUrl);
+            .addService("timetable", this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
+        // .addService("graphql", graphqlApiEndpoint.apiEndpoint.graphqlUrl);
         restApiEndpoint.deploy();
 
         this.serviceInterface.setEndpoint(ServiceEndpoint.API_REST, restApiEndpoint.getDomain());
-        this.serviceInterface.setEndpoint(ServiceEndpoint.API_GRAPHQL, graphqlApiEndpoint.getDomain());
+        // this.serviceInterface.setEndpoint(ServiceEndpoint.API_GRAPHQL, graphqlApiEndpoint.getDomain());
         this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
     }
 }
