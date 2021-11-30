@@ -421,12 +421,12 @@ export class TimetableApiService extends AbstractRestApiService {
         const patchIntegration = new LambdaIntegration(
             timetableFunctions.patchFunction, {proxy: true},
         );
-        const importIntegration = new LambdaIntegration(
-            timetableFunctions.importFunction, {proxy: true},
-        );
-        const exportIntegration = new LambdaIntegration(
-            timetableFunctions.exportFunction, {proxy: true},
-        );
+        // const importIntegration = new LambdaIntegration(
+        //     timetableFunctions.importFunction, {proxy: true},
+        // );
+        // const exportIntegration = new LambdaIntegration(
+        //     timetableFunctions.exportFunction, {proxy: true},
+        // );
 
         const optionsTimetable = root.addCorsPreflight({
             allowOrigins: allowOrigins,
@@ -461,27 +461,27 @@ export class TimetableApiService extends AbstractRestApiService {
             requestValidator: props.validator,
         });
 
-        [timetableImport, timetableExport].forEach(value => value.addCorsPreflight({
-            allowOrigins: allowOrigins,
-            allowHeaders: allowHeaders,
-            allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
-        }));
-        const importTimetable = timetableImport.addMethod(HttpMethod.POST, importIntegration, {
-            operationName: "ImportTimetable",
-            methodResponses: [{
-                statusCode: '200',
-                responseParameters: lambdaRespParams,
-            }],
-            requestValidator: props.validator,
-        });
-        const exportTimetable = timetableExport.addMethod(HttpMethod.POST, exportIntegration, {
-            operationName: "ExportTimetable",
-            methodResponses: [{
-                statusCode: '200',
-                responseParameters: lambdaRespParams,
-            }],
-            requestValidator: props.validator,
-        });
+        // [timetableImport, timetableExport].forEach(value => value.addCorsPreflight({
+        //     allowOrigins: allowOrigins,
+        //     allowHeaders: allowHeaders,
+        //     allowMethods: [HttpMethod.POST, HttpMethod.OPTIONS],
+        // }));
+        // const importTimetable = timetableImport.addMethod(HttpMethod.POST, importIntegration, {
+        //     operationName: "ImportTimetable",
+        //     methodResponses: [{
+        //         statusCode: '200',
+        //         responseParameters: lambdaRespParams,
+        //     }],
+        //     requestValidator: props.validator,
+        // });
+        // const exportTimetable = timetableExport.addMethod(HttpMethod.POST, exportIntegration, {
+        //     operationName: "ExportTimetable",
+        //     methodResponses: [{
+        //         statusCode: '200',
+        //         responseParameters: lambdaRespParams,
+        //     }],
+        //     requestValidator: props.validator,
+        // });
 
         this.resourceMapping = {
             "/timetable": {
@@ -490,12 +490,12 @@ export class TimetableApiService extends AbstractRestApiService {
                 [HttpMethod.PATCH]: patchTimetable,
                 [HttpMethod.POST]: postTimetable,
             },
-            "/timetable/export": {
-                [HttpMethod.POST]: exportTimetable,
-            },
-            "/timetable/import": {
-                [HttpMethod.POST]: importTimetable,
-            },
+            // "/timetable/export": {
+            //     [HttpMethod.POST]: exportTimetable,
+            // },
+            // "/timetable/import": {
+            //     [HttpMethod.POST]: importTimetable,
+            // },
         };
     }
 }

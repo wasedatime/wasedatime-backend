@@ -197,9 +197,9 @@ export class TimetableFunctions extends cdk.Construct {
 
     readonly deleteFunction: Function;
 
-    readonly importFunction: Function;
-
-    readonly exportFunction: Function;
+    // readonly importFunction: Function;
+    //
+    // readonly exportFunction: Function;
 
     constructor(scope: cdk.Construct, id: string, props: FunctionsProps) {
         super(scope, id);
