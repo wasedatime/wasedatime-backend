@@ -90,8 +90,8 @@ devDependencies:
   '@types/node': 16.11.12
   aws-cdk: 1.134.0
   jest: 27.4.3_ts-node@10.4.0
-  ts-jest: 27.0.7_d967a5c71b36617f9eaef12c091f7695
-  ts-node: 10.4.0_68212d3c5f342a0c59715bbaaf1875e7
+  ts-jest: 27.1.1_d967a5c71b36617f9eaef12c091f7695
+  ts-node: 10.4.0_d1ba71cee4528a43e185cc3d6fa907dc
   typescript: 4.5.2
 
 packages:
@@ -4387,9 +4387,9 @@ packages:
       punycode: 2.1.1
     dev: true
 
-  /ts-jest/27.1.1_4ea97a3f85990082324bce850aef6ad5:
-    resolution: {integrity: sha512-Ds0VkB+cB+8g2JUmP/GKWndeZcCKrbe6jzolGrVWdqVUFByY/2KDHqxJ7yBSon7hDB1TA4PXxjfZ+JjzJisvgA==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
+  /ts-jest/27.1.1_d967a5c71b36617f9eaef12c091f7695:
+    resolution: { integrity: sha512-Ds0VkB+cB+8g2JUmP/GKWndeZcCKrbe6jzolGrVWdqVUFByY/2KDHqxJ7yBSon7hDB1TA4PXxjfZ+JjzJisvgA== }
+    engines: { node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0 }
     hasBin: true
     peerDependencies:
       '@babel/core': '>=7.0.0-beta.0 <8'
