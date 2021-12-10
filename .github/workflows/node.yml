@@ -7,7 +7,7 @@ on:
       - "**"
     paths:
       - "**.ts"
-      - ".github/node.yml"
+      - ".github/workflows/node.yml"
       - "**.json"
       - "**.yaml"
 
