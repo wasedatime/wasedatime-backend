@@ -83,7 +83,7 @@ jobs:
           aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
 
       - name: Push
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v8
         with:
           author_name: GitHub Actions
           author_email: actions@github.com
