@@ -12,14 +12,14 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.134.0",
-    "@types/jest": "27.0.3",
-    "@types/node": "16.11.16",
-    "aws-cdk": "1.134.0",
-    "jest": "27.4.5",
-    "ts-jest": "27.1.2",
+    "@aws-cdk/assert": "2.8.0",
+    "@types/jest": "27.4.0",
+    "@types/node": "16.11.22",
+    "aws-cdk": "2.8.0",
+    "jest": "27.4.7",
+    "ts-jest": "27.1.3",
     "ts-node": "10.4.0",
-    "typescript": "4.5.4"
+    "typescript": "4.5.5"
   },
   "dependencies": {
     "@aws-cdk/assets": "1.134.0",
@@ -55,7 +55,7 @@
     "@aws-cdk/aws-stepfunctions": "1.134.0",
     "@aws-cdk/aws-stepfunctions-tasks": "1.134.0",
     "@aws-cdk/core": "1.134.0",
-    "flatted": "3.2.4",
+    "flatted": "3.2.5",
     "pluralize": "8.0.0",
     "source-map-support": "0.5.21"
   }
