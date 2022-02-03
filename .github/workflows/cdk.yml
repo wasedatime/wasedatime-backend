@@ -84,12 +84,33 @@ jobs:
           LOG="${LOG//$'\r'/'%0D'}"
           echo "::set-output name=log::$LOG"
 
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: "### Diff Output:"
       - name: Comment
+        if: steps.fc.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
+            ### Diff Output:
             ```
             ${{ steps.diff.outputs.log }}
             ```
-          token: ${{ env.GITHUB_OAUTH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update Comment
+        if: steps.fc.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            ### Diff Output:
+            ```
+            ${{ steps.diff.outputs.log }}
+            ```
+          token: ${{ secrets.GITHUB_TOKEN }}
