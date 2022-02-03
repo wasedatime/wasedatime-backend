@@ -30,12 +30,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2.5.1
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: latest
+      - uses: actions/setup-node@v2.5.0
         with:
           node-version: 16.x
-
-      - name: Configure pnpm
-        run: npm install -g pnpm
+          cache: 'pnpm'
 
       - uses: Fooji/create-aws-profile-action@v2
         with:
@@ -83,7 +84,7 @@ jobs:
           aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
 
       - name: Push
-        uses: EndBug/add-and-commit@v8
+        uses: EndBug/add-and-commit@v7
         with:
           author_name: GitHub Actions
           author_email: actions@github.com
