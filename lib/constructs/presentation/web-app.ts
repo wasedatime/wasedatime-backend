@@ -1,36 +1,30 @@
-import * as cdk from "@aws-cdk/core";
-import {App, Branch, CustomRule, Domain, RedirectStatus} from "@aws-cdk/aws-amplify";
+import * as amplify from '@aws-cdk/aws-amplify-alpha';
 
-import {developerAuth} from "../../configs/amplify/website";
-import {bitToken, feedsDeployKey, microAppBuildSpec, microAppDevBuildSpec} from "../../configs/amplify/build-setting";
-import {webAppCode} from "../../configs/amplify/codebase";
-import {ROOT_DOMAIN} from "../../configs/route53/domain";
+import { developerAuth } from '../../configs/amplify/website';
+import { bitToken, feedsDeployKey, microAppBuildSpec, microAppDevBuildSpec } from '../../configs/amplify/build-setting';
+import { webAppCode } from '../../configs/amplify/codebase';
+import { ROOT_DOMAIN } from '../../configs/route53/domain';
+import { Construct } from 'constructs';
 
 export interface WebAppProps {
     apiDomain?: string;
-
     authDomain?: string;
 }
 
-export abstract class AbstractWebApp extends cdk.Construct {
-    abstract readonly app: App;
+export abstract class AbstractWebApp extends Construct {
+    abstract readonly app: amplify.App;
+    abstract readonly branches?: { [env: string]: amplify.Branch };
+    abstract readonly domain?: amplify.Domain;
 
-    abstract readonly branches?: { [env: string]: Branch };
-
-    abstract readonly domain?: Domain;
-
-    protected constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
+    protected constructor(scope: Construct, id: string, props: WebAppProps) {
         super(scope, id);
     }
 }
 
 export class AmplifyMonoWebApp extends AbstractWebApp {
     readonly app: App;
-
     readonly branches: { [key: string]: Branch } = {};
-
     readonly domain: Domain;
-
     readonly microApps: { [key: string]: App } = {};
 
     private readonly appProps: WebAppProps;
@@ -91,15 +85,15 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
     }
 
     public addMicroApp(name: string) {
-        const microApp = new App(this, `${name}-app`, {
-            appName: `wasedatime-web-${name}`,
+        const microApp = new amplify.App(this, `${ name }-app`, {
+            appName: `wasedatime-web-${ name }`,
             autoBranchDeletion: false,
             buildSpec: microAppBuildSpec(name),
             environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${this.appProps.apiDomain}/v1`,
-                "REACT_APP_OAUTH_URL": `https://${this.appProps.authDomain}`,
-                "NODE_OPTIONS": "--max-old-space-size=8192",
-                "BIT_TOKEN": bitToken,
+                'REACT_APP_API_BASE_URL': `https://${ this.appProps.apiDomain }/v1`,
+                'REACT_APP_OAUTH_URL': `https://${ this.appProps.authDomain }`,
+                'NODE_OPTIONS': '--max-old-space-size=8192',
+                'BIT_TOKEN': bitToken,
             },
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {

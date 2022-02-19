@@ -1,23 +1,19 @@
-import {WasedaTimePresentationLayer} from "./stacks/presentation";
-import {awsEnv} from "./configs/common/aws";
-import {AbstractServerlessApp} from "./architecture/patterns";
-import {WasedaTimeBusinessLayer} from "./stacks/business";
-import {WasedaTimePersistenceLayer} from "./stacks/persistence";
-import {AdminLayer, BusinessLayer, PersistenceLayer, PresentationLayer} from "./architecture/layers";
-import {WasedaTimeAdminLayer} from "./stacks/admin";
-import {OperationInterface} from "./architecture/interfaces";
-import {OperationEndpoint} from "./configs/common/registry";
-import {WasedaTimeHostedZone} from "./constructs/common/hosted-zone";
+import { WasedaTimePresentationLayer } from './stacks/presentation';
+import { awsEnv } from './configs/common/aws';
+import { AbstractServerlessApp } from './architecture/patterns';
+import { WasedaTimeBusinessLayer } from './stacks/business';
+import { WasedaTimePersistenceLayer } from './stacks/persistence';
+import { AdminLayer, BusinessLayer, PersistenceLayer, PresentationLayer } from './architecture/layers';
+import { WasedaTimeAdminLayer } from './stacks/admin';
+import { OperationInterface } from './architecture/interfaces';
+import { OperationEndpoint } from './configs/common/registry';
+import { WasedaTimeHostedZone } from './constructs/common/hosted-zone';
 
 export class WasedaTime extends AbstractServerlessApp {
     readonly presentationLayer: PresentationLayer;
-
     readonly businessLayer: BusinessLayer;
-
     readonly persistenceLayer: PersistenceLayer;
-
     readonly adminLayer: AdminLayer;
-
     readonly hostedZone: WasedaTimeHostedZone;
 
     constructor() {
