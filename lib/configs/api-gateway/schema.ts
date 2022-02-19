@@ -1,12 +1,12 @@
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as apigw from 'aws-cdk-lib/aws-apigateway';
 
-export const syllabusSchema: apigateway.JsonSchema = {
-  schema: apigateway.JsonSchemaVersion.DRAFT7,
-  type: apigateway.JsonSchemaType.ARRAY,
+export const syllabusSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.ARRAY,
   title: 'Syllabus',
   description: 'The new syllabus JSON schema for each school.',
   items: {
-    type: apigateway.JsonSchemaType.OBJECT,
+    type: apigw.JsonSchemaType.OBJECT,
     title: 'Items',
     description: 'The schema of each course in the array.',
     required: [
@@ -30,36 +30,36 @@ export const syllabusSchema: apigateway.JsonSchema = {
     ],
     properties: {
       a: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Course Key',
         description: 'Course key of the course.',
       },
       b: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Title',
         description: 'Course title in English.',
       },
       c: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Title JP',
         description: 'Course title in Japanese.',
       },
       d: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Instructor',
         description: 'Instructor\'s name in English.',
       },
       e: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Instructor JP',
         description: 'Instructor\'s name in Japanese.',
       },
       f: {
-        type: apigateway.JsonSchemaType.ARRAY,
+        type: apigw.JsonSchemaType.ARRAY,
         title: 'Langauges',
         description: 'Languages in which the course is taught.',
         items: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
           title: 'Language',
           description: '-1 N/A | 0 Japanese | 1 English | 2 German | 3 French | 4 Chinese | 5 Spanish | 6 Korean | 7 Russia | 8 Italian | 9 other',
           enum: [
@@ -78,7 +78,7 @@ export const syllabusSchema: apigateway.JsonSchema = {
         },
       },
       g: {
-        type: apigateway.JsonSchemaType.INTEGER,
+        type: apigw.JsonSchemaType.INTEGER,
         title: 'Type',
         description: 'Type of the course\n-1 N/A | 0 Lecture | 1 Seminar | 2 Work | 3 Foreign Langauge | 4 On-demand | 5 Thesis | 6 Graduate Research | 7 Practice | 8 Blended',
         enum: [
@@ -95,7 +95,7 @@ export const syllabusSchema: apigateway.JsonSchema = {
         ],
       },
       h: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Term',
         description: 'The term in which the course is taught.\nseason := 0 Spring | 1 Summer | 2 Fall | 3 Winter\nperiod := \'s\' Semester| \'q\' Quarter | \'i\' Intensive Course | \'f\' Full Year | \'t\' Term\ndelimiter := \'/\' or | \'&\' and',
         enum: [
@@ -125,11 +125,11 @@ export const syllabusSchema: apigateway.JsonSchema = {
         ],
       },
       i: {
-        type: apigateway.JsonSchemaType.ARRAY,
+        type: apigw.JsonSchemaType.ARRAY,
         title: 'Occurrences',
         description: 'The schedules and locations of the course.',
         items: {
-          type: apigateway.JsonSchemaType.OBJECT,
+          type: apigw.JsonSchemaType.OBJECT,
           title: 'Occurrence',
           description: 'Schedule and location',
           required: [
@@ -139,7 +139,7 @@ export const syllabusSchema: apigateway.JsonSchema = {
           ],
           properties: {
             d: {
-              type: apigateway.JsonSchemaType.INTEGER,
+              type: apigw.JsonSchemaType.INTEGER,
               title: 'Day',
               description: 'The day on which the course is taught.\n-1 others | 0 Mon | 1 Tues | 2 Wed | 3 Thur | 4 Fri | 5 Sat | 6 Sun',
               enum: [
@@ -154,12 +154,12 @@ export const syllabusSchema: apigateway.JsonSchema = {
               ],
             },
             p: {
-              type: apigateway.JsonSchemaType.INTEGER,
+              type: apigw.JsonSchemaType.INTEGER,
               title: 'Period',
               description: 'The period on which the course is taught.\nstart_period := -1 others | 0 On-demand | 1 .. 9\nend_period := start_period ',
             },
             l: {
-              type: apigateway.JsonSchemaType.STRING,
+              type: apigw.JsonSchemaType.STRING,
               title: 'Loction',
               description: 'The location where the course takes place.',
             },
@@ -167,7 +167,7 @@ export const syllabusSchema: apigateway.JsonSchema = {
         },
       },
       j: {
-        type: apigateway.JsonSchemaType.INTEGER,
+        type: apigw.JsonSchemaType.INTEGER,
         title: 'Minimum Eligible Year',
         description: 'Minimum eligible year.\n-1 unknown | 1 .. 4',
         enum: [
@@ -179,17 +179,17 @@ export const syllabusSchema: apigateway.JsonSchema = {
         ],
       },
       k: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Category',
         description: 'The category the course falls in.',
       },
       l: {
-        type: apigateway.JsonSchemaType.INTEGER,
+        type: apigw.JsonSchemaType.INTEGER,
         title: 'Credit',
         description: 'The credit of the course.\n -1 unknown | 0 ..',
       },
       m: {
-        type: apigateway.JsonSchemaType.INTEGER,
+        type: apigw.JsonSchemaType.INTEGER,
         title: 'Level',
         description: 'The level/difficulty of the course.\n-1 N/A | 0 Beginner | 1 Intermediate | 2 Advanced | 3 Final-stage | 4 Master | 5 Doctor',
         enum: [
@@ -203,11 +203,11 @@ export const syllabusSchema: apigateway.JsonSchema = {
         ],
       },
       n: {
-        type: apigateway.JsonSchemaType.ARRAY,
+        type: apigw.JsonSchemaType.ARRAY,
         title: 'Evaluations',
         description: 'The distribution of evaluation criterion and their descriptions',
         items: {
-          type: apigateway.JsonSchemaType.OBJECT,
+          type: apigw.JsonSchemaType.OBJECT,
           title: 'Evaluation',
           description: 'Criteria and description',
           required: [
@@ -217,7 +217,7 @@ export const syllabusSchema: apigateway.JsonSchema = {
           ],
           properties: {
             t: {
-              type: apigateway.JsonSchemaType.INTEGER,
+              type: apigw.JsonSchemaType.INTEGER,
               title: 'Type',
               description: 'Type of the evaluation\n-1 Unknown | 0 Exam | 1 Papers | 2 Class Participation | 3 Others',
               enum: [
@@ -229,12 +229,12 @@ export const syllabusSchema: apigateway.JsonSchema = {
               ],
             },
             p: {
-              type: apigateway.JsonSchemaType.INTEGER,
+              type: apigw.JsonSchemaType.INTEGER,
               title: 'Percentage',
               description: 'The percentage of this criteria in evaluation.',
             },
             c: {
-              type: apigateway.JsonSchemaType.STRING,
+              type: apigw.JsonSchemaType.STRING,
               title: 'Comment',
               description: 'An explanation about the criteria.',
             },
@@ -242,17 +242,17 @@ export const syllabusSchema: apigateway.JsonSchema = {
         },
       },
       o: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Code',
         description: 'Course code',
       },
       p: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'Subtitle',
         description: 'Subtitle of the course (often seen in seminar courses)',
       },
       q: {
-        type: apigateway.JsonSchemaType.STRING,
+        type: apigw.JsonSchemaType.STRING,
         title: 'CategoryJP',
         description: 'The category the course falls in.(in Japanese)',
       },
@@ -260,68 +260,68 @@ export const syllabusSchema: apigateway.JsonSchema = {
   },
 };
 
-export const courseReviewGetRespSchema: apigateway.JsonSchema = {
-  schema: apigateway.JsonSchemaVersion.DRAFT7,
-  type: apigateway.JsonSchemaType.OBJECT,
+export const courseReviewGetRespSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
   properties: {
     success: {
-      type: apigateway.JsonSchemaType.BOOLEAN,
+      type: apigw.JsonSchemaType.BOOLEAN,
     },
     data: {
-      type: apigateway.JsonSchemaType.ARRAY,
+      type: apigw.JsonSchemaType.ARRAY,
       items: {
-        type: apigateway.JsonSchemaType.OBJECT,
+        type: apigw.JsonSchemaType.OBJECT,
         properties: {
           title_jp: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           instructor_jp: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           updated_at: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           created_at: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           benefit: {
-            type: apigateway.JsonSchemaType.INTEGER,
+            type: apigw.JsonSchemaType.INTEGER,
           },
           difficulty: {
-            type: apigateway.JsonSchemaType.INTEGER,
+            type: apigw.JsonSchemaType.INTEGER,
           },
           satisfaction: {
-            type: apigateway.JsonSchemaType.INTEGER,
+            type: apigw.JsonSchemaType.INTEGER,
           },
           instructor: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           comment_zh_CN: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           comment_en: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           comment_ko: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           year: {
-            type: apigateway.JsonSchemaType.INTEGER,
+            type: apigw.JsonSchemaType.INTEGER,
           },
           src_lang: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           comment_ja: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           comment_zh_TW: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           title: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.STRING,
           },
           mod: {
-            type: apigateway.JsonSchemaType.BOOLEAN,
+            type: apigw.JsonSchemaType.BOOLEAN,
           },
         },
         required: [
@@ -346,7 +346,7 @@ export const courseReviewGetRespSchema: apigateway.JsonSchema = {
       },
     },
     message: {
-      type: apigateway.JsonSchemaType.STRING,
+      type: apigw.JsonSchemaType.STRING,
     },
   },
   required: [
@@ -356,39 +356,39 @@ export const courseReviewGetRespSchema: apigateway.JsonSchema = {
   ],
 };
 
-export const courseReviewPostReqSchema: apigateway.JsonSchema = {
-  schema: apigateway.JsonSchemaVersion.DRAFT7,
-  type: apigateway.JsonSchemaType.OBJECT,
+export const courseReviewPostReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
   properties: {
     data: {
-      type: apigateway.JsonSchemaType.OBJECT,
+      type: apigw.JsonSchemaType.OBJECT,
       properties: {
         title_jp: {
-          type: apigateway.JsonSchemaType.STRING,
+          type: apigw.JsonSchemaType.STRING,
         },
         instructor_jp: {
-          type: apigateway.JsonSchemaType.STRING,
+          type: apigw.JsonSchemaType.STRING,
         },
         benefit: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
         },
         difficulty: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
         },
         satisfaction: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
         },
         instructor: {
-          type: apigateway.JsonSchemaType.STRING,
+          type: apigw.JsonSchemaType.STRING,
         },
         year: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
         },
         comment: {
-          type: apigateway.JsonSchemaType.STRING,
+          type: apigw.JsonSchemaType.STRING,
         },
         title: {
-          type: apigateway.JsonSchemaType.STRING,
+          type: apigw.JsonSchemaType.STRING,
         },
       },
       required: [
@@ -409,24 +409,24 @@ export const courseReviewPostReqSchema: apigateway.JsonSchema = {
   ],
 };
 
-export const courseReviewPatchReqSchema: apigateway.JsonSchema = {
-  schema: apigateway.JsonSchemaVersion.DRAFT7,
-  type: apigateway.JsonSchemaType.OBJECT,
+export const courseReviewPatchReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
   properties: {
     data: {
-      type: apigateway.JsonSchemaType.OBJECT,
+      type: apigw.JsonSchemaType.OBJECT,
       properties: {
         benefit: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
         },
         difficulty: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
         },
         satisfaction: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
         },
         comment: {
-          type: apigateway.JsonSchemaType.STRING,
+          type: apigw.JsonSchemaType.STRING,
         },
       },
       required: [
@@ -442,18 +442,18 @@ export const courseReviewPatchReqSchema: apigateway.JsonSchema = {
   ],
 };
 
-export const baseJsonApiSchema: apigateway.JsonSchema = {
-  schema: apigateway.JsonSchemaVersion.DRAFT7,
-  type: apigateway.JsonSchemaType.OBJECT,
+export const baseJsonApiSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
   properties: {
     success: {
-      type: apigateway.JsonSchemaType.BOOLEAN,
+      type: apigw.JsonSchemaType.BOOLEAN,
     },
     data: {
-      type: apigateway.JsonSchemaType.NULL,
+      type: apigw.JsonSchemaType.NULL,
     },
     message: {
-      type: apigateway.JsonSchemaType.STRING,
+      type: apigw.JsonSchemaType.STRING,
     },
   },
   required: [
@@ -463,41 +463,41 @@ export const baseJsonApiSchema: apigateway.JsonSchema = {
   ],
 };
 
-export const articleListSchema: apigateway.JsonSchema = {
-  schema: apigateway.JsonSchemaVersion.DRAFT7,
-  type: apigateway.JsonSchemaType.OBJECT,
+export const articleListSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
   properties: {
     success: {
-      type: apigateway.JsonSchemaType.BOOLEAN,
+      type: apigw.JsonSchemaType.BOOLEAN,
     },
     data: {
-      type: apigateway.JsonSchemaType.OBJECT,
+      type: apigw.JsonSchemaType.OBJECT,
       properties: {
         articles: {
-          type: apigateway.JsonSchemaType.ARRAY,
+          type: apigw.JsonSchemaType.ARRAY,
           items: {
-            type: apigateway.JsonSchemaType.OBJECT,
+            type: apigw.JsonSchemaType.OBJECT,
             properties: {
               category: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: apigw.JsonSchemaType.STRING,
               },
               title: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: apigw.JsonSchemaType.STRING,
               },
               author: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: apigw.JsonSchemaType.STRING,
               },
               summary: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: apigw.JsonSchemaType.STRING,
               },
               created_at: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: apigw.JsonSchemaType.STRING,
               },
               updated_at: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: apigw.JsonSchemaType.STRING,
               },
               src: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: apigw.JsonSchemaType.STRING,
               },
             },
             required: [
@@ -512,7 +512,7 @@ export const articleListSchema: apigateway.JsonSchema = {
           },
         },
         size: {
-          type: apigateway.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.INTEGER,
         },
       },
       required: [
@@ -521,7 +521,7 @@ export const articleListSchema: apigateway.JsonSchema = {
       ],
     },
     message: {
-      type: apigateway.JsonSchemaType.STRING,
+      type: apigw.JsonSchemaType.STRING,
     },
   },
   required: [
@@ -533,4 +533,4 @@ export const articleListSchema: apigateway.JsonSchema = {
 
 export const articlePlainJson = '{"success": true, "data": {"articles": [{"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-05-58-09", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}, {"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-05-58-38", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}, {"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-05-58-39", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}, {"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-05-58-40", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}, {"src": "https://wasedatime-blog.s3-ap-northeast-1.amazonaws.com/blogs/tests.md", "created_at": "2021-03-27 18:00:00 +0900", "update_at": "2021-04-13-06-34-41", "type": 0.0, "title": "Studying at Waseda University as a Social Science Student", "author": "Siyuan (Peter) Chai"}], "size": 5}, "message": ""}';
 
-export const careerInfoSchema: apigateway.JsonSchema = {};
+export const careerInfoSchema: apigw.JsonSchema = {};
