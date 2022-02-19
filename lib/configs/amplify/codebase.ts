@@ -1,8 +1,8 @@
-import {GitHubSourceCodeProvider} from "@aws-cdk/aws-amplify";
-import {SecretValue} from "@aws-cdk/core";
+import * as amplify from '@aws-cdk/aws-amplify-alpha';
+import { SecretValue } from 'aws-cdk-lib';
 
-export const webAppCode: GitHubSourceCodeProvider = new GitHubSourceCodeProvider({
-    owner: "wasedatime",
-    repository: "wasedatime-web",
-    oauthToken: new SecretValue(process.env.GITHUB_OAUTH_TOKEN),
+export const webAppCode = new amplify.GitHubSourceCodeProvider({
+  owner: 'wasedatime',
+  repository: 'wasedatime-web',
+  oauthToken: new SecretValue(process.env.GITHUB_OAUTH_TOKEN),
 });

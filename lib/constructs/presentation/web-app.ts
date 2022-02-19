@@ -1,10 +1,14 @@
 import * as amplify from '@aws-cdk/aws-amplify-alpha';
-
-import { developerAuth } from '../../configs/amplify/website';
-import { bitToken, feedsDeployKey, microAppBuildSpec, microAppDevBuildSpec } from '../../configs/amplify/build-setting';
-import { webAppCode } from '../../configs/amplify/codebase';
-import { ROOT_DOMAIN } from '../../configs/route53/domain';
 import { Construct } from 'constructs';
+import {
+    BIT_TOKEN,
+    FEEDS_DEPLOY_KEY,
+    microAppBuildSpec,
+    microAppDevBuildSpec,
+} from '../../configs/amplify/build-setting';
+import { webAppCode } from '../../configs/amplify/codebase';
+import { developerAuth } from '../../configs/amplify/website';
+import { ROOT_DOMAIN } from '../../configs/route53/domain';
 
 export interface WebAppProps {
     apiDomain?: string;
@@ -22,29 +26,29 @@ export abstract class AbstractWebApp extends Construct {
 }
 
 export class AmplifyMonoWebApp extends AbstractWebApp {
-    readonly app: App;
-    readonly branches: { [key: string]: Branch } = {};
-    readonly domain: Domain;
-    readonly microApps: { [key: string]: App } = {};
+    readonly app: amplify.App;
+    readonly branches: { [key: string]: amplify.Branch } = {};
+    readonly domain: amplify.Domain;
+    readonly microApps: { [key: string]: amplify.App } = {};
 
     private readonly appProps: WebAppProps;
 
-    constructor(scope: cdk.Construct, id: string, props: WebAppProps) {
+    constructor(scope: Construct, id: string, props: WebAppProps) {
         super(scope, id, props);
 
         this.appProps = props;
 
-        this.app = new App(this, 'root-app', {
-            appName: "wasedatime-web-root",
+        this.app = new amplify.App(this, 'root-app', {
+            appName: 'wasedatime-web-root',
             autoBranchDeletion: false,
-            buildSpec: microAppBuildSpec("root"),
-            description: "A web app aiming to provide better campus life at Waseda University.",
+            buildSpec: microAppBuildSpec('root'),
+            description: 'A web app aiming to provide better campus life at Waseda University.',
             environmentVariables: {
-                "REACT_APP_API_BASE_URL": `https://${props.apiDomain}/v1`,
-                "REACT_APP_OAUTH_URL": `https://${props.authDomain}`,
-                "NODE_OPTIONS": "--max-old-space-size=8192",
-                "BIT_TOKEN": bitToken,
-                "DEPLOY_KEY": feedsDeployKey,
+                REACT_APP_API_BASE_URL: `https://${ props.apiDomain }/v1`,
+                REACT_APP_OAUTH_URL: `https://${ props.authDomain }`,
+                NODE_OPTIONS: '--max-old-space-size=8192',
+                BIT_TOKEN: BIT_TOKEN,
+                DEPLOY_KEY: FEEDS_DEPLOY_KEY,
             },
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {
@@ -52,34 +56,34 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
                 patterns: ['release/*'],
                 basicAuth: developerAuth,
                 pullRequestPreview: false,
-                buildSpec: microAppDevBuildSpec("root"),
+                buildSpec: microAppDevBuildSpec('root'),
             },
         });
-        this.microApps['root'] = this.app;
+        this.microApps.root = this.app;
 
-        const masterBranch: Branch = this.app.addBranch('master', {
+        const masterBranch = this.app.addBranch('master', {
             autoBuild: false,
-            branchName: "master",
-            stage: "PRODUCTION",
-            buildSpec: microAppBuildSpec("root"),
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/v1`);
-        this.branches["main"] = masterBranch;
+            branchName: 'master',
+            stage: 'PRODUCTION',
+            buildSpec: microAppBuildSpec('root'),
+        }).addEnvironment('REACT_APP_API_BASE_URL', `https://${ props.apiDomain }/v1`);
+        this.branches.main = masterBranch;
 
-        const devBranch: Branch = this.app.addBranch('dev', {
+        const devBranch = this.app.addBranch('dev', {
             autoBuild: false,
             basicAuth: developerAuth,
-            branchName: "develop",
-            stage: "DEVELOPMENT",
-            buildSpec: microAppDevBuildSpec("root"),
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${props.apiDomain}/staging`);
-        this.branches["dev"] = devBranch;
+            branchName: 'develop',
+            stage: 'DEVELOPMENT',
+            buildSpec: microAppDevBuildSpec('root'),
+        }).addEnvironment('REACT_APP_API_BASE_URL', `https://${ props.apiDomain }/staging`);
+        this.branches.dev = devBranch;
 
         this.domain = this.app.addDomain('domain', {
             domainName: ROOT_DOMAIN,
             subDomains: [
-                {branch: devBranch, prefix: "dev"},
-                {branch: masterBranch, prefix: ''},
-                {branch: masterBranch, prefix: 'www'},
+                { branch: devBranch, prefix: 'dev' },
+                { branch: masterBranch, prefix: '' },
+                { branch: masterBranch, prefix: 'www' },
             ],
         });
     }
@@ -90,10 +94,10 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
             autoBranchDeletion: false,
             buildSpec: microAppBuildSpec(name),
             environmentVariables: {
-                'REACT_APP_API_BASE_URL': `https://${ this.appProps.apiDomain }/v1`,
-                'REACT_APP_OAUTH_URL': `https://${ this.appProps.authDomain }`,
-                'NODE_OPTIONS': '--max-old-space-size=8192',
-                'BIT_TOKEN': bitToken,
+                REACT_APP_API_BASE_URL: `https://${ this.appProps.apiDomain }/v1`,
+                REACT_APP_OAUTH_URL: `https://${ this.appProps.authDomain }`,
+                NODE_OPTIONS: '--max-old-space-size=8192',
+                BIT_TOKEN: BIT_TOKEN,
             },
             sourceCodeProvider: webAppCode,
             autoBranchCreation: {
@@ -108,24 +112,24 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
 
         microApp.addBranch('master', {
             autoBuild: false,
-            branchName: "master",
-            stage: "PRODUCTION",
+            branchName: 'master',
+            stage: 'PRODUCTION',
             buildSpec: microAppBuildSpec(name),
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/v1`);
+        }).addEnvironment('REACT_APP_API_BASE_URL', `https://${ this.appProps.apiDomain }/v1`);
 
         microApp.addBranch('dev', {
             autoBuild: false,
-            branchName: "develop",
-            stage: "DEVELOPMENT",
+            branchName: 'develop',
+            stage: 'DEVELOPMENT',
             buildSpec: microAppDevBuildSpec(name),
-        }).addEnvironment("REACT_APP_API_BASE_URL", `https://${this.appProps.apiDomain}/staging`);
+        }).addEnvironment('REACT_APP_API_BASE_URL', `https://${ this.appProps.apiDomain }/staging`);
 
         const appDomain = this.microApps[name].defaultDomain;
-        this.app.addCustomRule(new CustomRule({
-            source: `/${name}/<*>`,
-            target: `https://master.${appDomain}/<*>`,
-            status: RedirectStatus.REWRITE,
+        this.app.addCustomRule(new amplify.CustomRule({
+            source: `/${ name }/<*>`,
+            target: `https://master.${ appDomain }/<*>`,
+            status: amplify.RedirectStatus.REWRITE,
         }));
-        this.app.addEnvironment(`MF_${name.toUpperCase()}_DOMAIN`, appDomain);
+        this.app.addEnvironment(`MF_${ name.toUpperCase() }_DOMAIN`, appDomain);
     }
 }
