@@ -76,43 +76,6 @@ jobs:
         run: pnpm run cdk doctor
 
       - name: Diff
-        id: diff
-        run: |
-          echo "::add-mask::$DEPLOY_KEY"
-          echo "::add-mask::$BIT_TOKEN"
-          LOG="$(cdk diff --no-color 2>&1)"
-          LOG="${LOG//'%'/'%25'}"
-          LOG="${LOG//$'\n'/'%0A'}"
-          LOG="${LOG//$'\r'/'%0D'}"
-          echo "::set-output name=log::$LOG"
-
-      - name: Find Comment
-        uses: peter-evans/find-comment@v1
-        id: fc
+        uses: youyo/aws-cdk-github-actions@v2
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: "### Diff Output:"
-      - name: Comment
-        if: steps.fc.outputs.comment-id == ''
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ### Diff Output:
-            ```
-            ${{ steps.diff.outputs.log }}
-            ```
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update Comment
-        if: steps.fc.outputs.comment-id != ''
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          edit-mode: replace
-          body: |
-            ### Diff Output:
-            ```
-            ${{ steps.diff.outputs.log }}
-            ```
-          token: ${{ secrets.GITHUB_TOKEN }}
+          cdk_subcommand: diff
