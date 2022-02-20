@@ -1,5 +1,5 @@
 {
-  "app": "pnpx ts-node --prefer-ts-exts bin/index.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/index.ts",
   "context": {
     "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": false,
     "@aws-cdk/aws-cloudfront:defaultSecurityPolicyTLSv1.2_2021": false,
