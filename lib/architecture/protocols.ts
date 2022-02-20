@@ -1,1 +1,1 @@
-export type Registry<T> = Map<T, string>;
+export type Registry<T> = Map<T, any>;

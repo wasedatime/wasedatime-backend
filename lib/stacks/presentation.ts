@@ -1,5 +1,5 @@
-import * as cdk from '@aws-cdk/core';
-
+import { StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { ServiceInterface } from '../architecture/interfaces';
 import { PresentationLayer } from '../architecture/layers';
 import { FEEDS_DEPLOY_KEY } from '../configs/amplify/build-setting';
@@ -10,7 +10,7 @@ import { AbstractWebApp, AmplifyMonoWebApp } from '../constructs/presentation/we
 export class WasedaTimePresentationLayer extends PresentationLayer {
   readonly app: AbstractWebApp;
 
-  constructor(scope: cdk.Construct, id: string, serviceInterface: ServiceInterface, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, serviceInterface: ServiceInterface, props?: StackProps) {
     super(scope, id, serviceInterface, props);
 
     const monoApp = new AmplifyMonoWebApp(this, 'amplify-monorepo-web-app', {

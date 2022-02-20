@@ -1,171 +1,158 @@
-import * as cdk from '@aws-cdk/core';
-import {Construct, RemovalPolicy} from '@aws-cdk/core';
-import * as s3 from "@aws-cdk/aws-s3";
-import {BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption} from "@aws-cdk/aws-s3";
-import {StateMachine, Succeed, TaskInput} from "@aws-cdk/aws-stepfunctions";
-import {LambdaInvocationType, LambdaInvoke} from "@aws-cdk/aws-stepfunctions-tasks";
-import {Function} from "@aws-cdk/aws-lambda";
-import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
-import {Rule} from "@aws-cdk/aws-events";
-import {SfnStateMachine} from "@aws-cdk/aws-events-targets";
-
-import {SyllabusScraper, SyllabusUpdateFunction} from "../common/lambda-functions";
-import {prodCorsRule} from "../../configs/s3/cors";
-import {syllabusSchedule} from "../../configs/event/schedule";
-import {allowApiGatewayPolicy, allowLambdaPolicy} from "../../utils/s3";
-import {S3EventSource} from '@aws-cdk/aws-lambda-event-sources';
+import { RemovalPolicy } from 'aws-cdk-lib';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as events_targets from 'aws-cdk-lib/aws-events-targets';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as event_sources from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
+import * as sfn_tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import { Construct } from 'constructs';
+import { syllabusSchedule } from '../../configs/event/schedule';
+import { prodCorsRule } from '../../configs/s3/cors';
+import { allowApiGatewayPolicy, allowLambdaPolicy } from '../../utils/s3';
+import { SyllabusScraper, SyllabusUpdateFunction } from '../common/lambda-functions';
 
 export enum Worker {
-    SYLLABUS,
-    CAREER,
-    FEEDS
+  SYLLABUS,
+  CAREER,
+  FEEDS
 }
 
 export interface DataPipelineProps {
-    dataSource?: Bucket;
-
-    dataWarehouse?: Table;
+  dataSource?: s3.Bucket;
+  dataWarehouse?: dynamodb.Table;
 }
 
 export abstract class AbstractDataPipeline extends Construct {
-    abstract readonly dataSource?: Bucket;
-
-    abstract readonly processor: Function | StateMachine;
-
-    abstract readonly dataWarehouse: Bucket | Table;
+  abstract readonly dataSource?: s3.Bucket;
+  abstract readonly processor: lambda.Function | sfn.StateMachine;
+  abstract readonly dataWarehouse: s3.Bucket | dynamodb.Table;
 }
 
 export class SyllabusDataPipeline extends AbstractDataPipeline {
-    readonly dataSource?: Bucket;
+  readonly dataSource?: s3.Bucket;
+  readonly processor: sfn.StateMachine;
+  readonly dataWarehouse: s3.Bucket;
+  readonly schedules: { [name: string]: events.Rule } = {};
 
-    readonly processor: StateMachine;
+  constructor(scope: Construct, id: string, props?: DataPipelineProps) {
+    super(scope, id);
 
-    readonly dataWarehouse: Bucket;
+    this.dataWarehouse = new s3.Bucket(this, 'syllabus-bucket', {
+      accessControl: s3.BucketAccessControl.PRIVATE,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      bucketName: 'wasedatime-syllabus-prod',
+      cors: prodCorsRule,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      publicReadAccess: false,
+      removalPolicy: RemovalPolicy.RETAIN,
+      versioned: true,
+    });
+    allowApiGatewayPolicy(this.dataWarehouse);
+    allowLambdaPolicy(this.dataWarehouse);
 
-    readonly schedules: { [name: string]: Rule } = {};
+    const scraperBaseFunction: lambda.Function = new SyllabusScraper(this, 'scraper-base-function', {
+      envVars: {
+        ['BUCKET_NAME']: this.dataWarehouse.bucketName,
+        ['OBJECT_PATH']: 'syllabus/',
+      },
+    }).baseFunction;
 
-    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
-        super(scope, id);
-
-        this.dataWarehouse = new Bucket(this, 'syllabus-bucket', {
-            accessControl: BucketAccessControl.PRIVATE,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-            bucketName: "wasedatime-syllabus-prod",
-            cors: prodCorsRule,
-            encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: false,
-            removalPolicy: RemovalPolicy.RETAIN,
-            versioned: true,
-        });
-        allowApiGatewayPolicy(this.dataWarehouse);
-        allowLambdaPolicy(this.dataWarehouse);
-
-        const scraperBaseFunction: Function = new SyllabusScraper(this, 'scraper-base-function', {
-            envVars: {
-                ["BUCKET_NAME"]: this.dataWarehouse.bucketName,
-                ["OBJECT_PATH"]: 'syllabus/',
-            },
-        }).baseFunction;
-
-        function getLambdaTaskInstance(schools: string[], num: string): LambdaInvoke {
-            return new LambdaInvoke(scope, "task-" + num, {
-                lambdaFunction: scraperBaseFunction,
-                comment: "Scrape the syllabus info of school(s).",
-                invocationType: LambdaInvocationType.REQUEST_RESPONSE,
-                payload: TaskInput.fromObject({schools: schools}),
-                qualifier: scraperBaseFunction.latestVersion.version,
-            });
-        }
-
-        // todo sync to table
-        this.processor = new StateMachine(this, 'state-machine', {
-            stateMachineName: 'syllabus-scraper',
-            definition: getLambdaTaskInstance(["GEC"], "0")
-                .next(getLambdaTaskInstance(["CMS", "HSS"], "1"))
-                .next(getLambdaTaskInstance(["EDU", "FSE"], "2"))
-                .next(getLambdaTaskInstance(["ASE", "CSE"], "3"))
-                .next(getLambdaTaskInstance(["PSE", "G_ASE", "LAW"], "4"))
-                .next(getLambdaTaskInstance(["G_FSE", "SOC", "SSS"], "5"))
-                .next(getLambdaTaskInstance(["G_LAS", "G_CSE", "G_EDU", "HUM"], "6"))
-                .next(getLambdaTaskInstance(["SILS", "G_HUM", "CJL", "SPS", "G_WBS", "G_PS"], "7"))
-                .next(getLambdaTaskInstance(["G_SPS", "G_IPS", "G_WLS", "G_E", "G_SSS", "G_SC", "G_LAW",
-                    "G_SAPS", "G_SA", "G_SJAL", "G_SICCS", "G_SEEE", "EHUM", "ART", "CIE", "G_ITS"], "8"))
-                .next(new Succeed(this, 'success', {})),
-        });
-
-        for (const name in syllabusSchedule) {
-            this.schedules[name] = new Rule(this, name, {
-                    ruleName: name,
-                    enabled: true,
-                    schedule: syllabusSchedule[name],
-                    targets: [new SfnStateMachine(this.processor)],
-                },
-            );
-        }
+    function getLambdaTaskInstance(schools: string[], num: string): sfn_tasks.LambdaInvoke {
+      return new sfn_tasks.LambdaInvoke(scope, 'task-' + num, {
+        lambdaFunction: scraperBaseFunction,
+        comment: 'Scrape the syllabus info of school(s).',
+        invocationType: sfn_tasks.LambdaInvocationType.REQUEST_RESPONSE,
+        payload: sfn.TaskInput.fromObject({ schools: schools }),
+        qualifier: scraperBaseFunction.latestVersion.version,
+      });
     }
+
+    // todo sync to table
+    this.processor = new sfn.StateMachine(this, 'state-machine', {
+      stateMachineName: 'syllabus-scraper',
+      definition: getLambdaTaskInstance(['GEC'], '0')
+        .next(getLambdaTaskInstance(['CMS', 'HSS'], '1'))
+        .next(getLambdaTaskInstance(['EDU', 'FSE'], '2'))
+        .next(getLambdaTaskInstance(['ASE', 'CSE'], '3'))
+        .next(getLambdaTaskInstance(['PSE', 'G_ASE', 'LAW'], '4'))
+        .next(getLambdaTaskInstance(['G_FSE', 'SOC', 'SSS'], '5'))
+        .next(getLambdaTaskInstance(['G_LAS', 'G_CSE', 'G_EDU', 'HUM'], '6'))
+        .next(getLambdaTaskInstance(['SILS', 'G_HUM', 'CJL', 'SPS', 'G_WBS', 'G_PS'], '7'))
+        .next(getLambdaTaskInstance(['G_SPS', 'G_IPS', 'G_WLS', 'G_E', 'G_SSS', 'G_SC', 'G_LAW',
+          'G_SAPS', 'G_SA', 'G_SJAL', 'G_SICCS', 'G_SEEE', 'EHUM', 'ART', 'CIE', 'G_ITS'], '8'))
+        .next(new sfn.Succeed(this, 'success', {})),
+    });
+
+    for (const name in syllabusSchedule) {
+      this.schedules[name] = new events.Rule(this, name, {
+          ruleName: name,
+          enabled: true,
+          schedule: syllabusSchedule[name],
+          targets: [new events_targets.SfnStateMachine(this.processor)],
+        },
+      );
+    }
+  }
 }
 
 //todo add s3 deployment and notifications
-
 export class CareerDataPipeline extends AbstractDataPipeline {
-    readonly dataSource?: Bucket;
+  readonly dataSource?: s3.Bucket;
+  readonly processor: lambda.Function;
+  readonly dataWarehouse: dynamodb.Table;
 
-    readonly processor: Function;
+  constructor(scope: Construct, id: string, props?: DataPipelineProps) {
+    super(scope, id);
 
-    readonly dataWarehouse: Table;
-
-    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
-        super(scope, id);
-
-        this.dataSource = new Bucket(this, 'career-bucket', {
-            accessControl: BucketAccessControl.PRIVATE,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-            bucketName: "wasedatime-career",
-            cors: prodCorsRule,
-            encryption: BucketEncryption.S3_MANAGED,
-            publicReadAccess: false,
-            removalPolicy: RemovalPolicy.RETAIN,
-            versioned: false,
-        });
-    }
+    this.dataSource = new s3.Bucket(this, 'career-bucket', {
+      accessControl: s3.BucketAccessControl.PRIVATE,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      bucketName: 'wasedatime-career',
+      cors: prodCorsRule,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      publicReadAccess: false,
+      removalPolicy: RemovalPolicy.RETAIN,
+      versioned: false,
+    });
+  }
 }
 
 // sync syllabus on notification
 export class SyllabusSyncPipeline extends AbstractDataPipeline {
-    readonly dataSource: Bucket;
+  readonly dataSource: s3.Bucket;
+  readonly processor: lambda.Function;
+  readonly dataWarehouse: dynamodb.Table;
 
-    readonly processor: Function;
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
+    super(scope, id);
 
-    readonly dataWarehouse: Table;
+    this.dataWarehouse = new dynamodb.Table(this, 'dynamodb-syllabus-table', {
+      partitionKey: { name: 'school', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PROVISIONED,
+      encryption: dynamodb.TableEncryption.DEFAULT,
+      removalPolicy: RemovalPolicy.RETAIN,
+      timeToLiveAttribute: 'ttl',
+      tableName: 'waseda-syllabus',
+      readCapacity: 1,
+      writeCapacity: 1,
+    });
+    //Use exsisting s3 bucket
+    this.dataSource = props.dataSource!;
 
-    constructor(scope: cdk.Construct, id: string, props?: DataPipelineProps) {
-        super(scope, id);
+    this.processor = new SyllabusUpdateFunction(this, 'syllabus-update-function', {
+      envVars: {
+        ['BUCKET_NAME']: this.dataSource.bucketName,
+        ['TABLE_NAME']: this.dataWarehouse.tableName,
+        ['OBJECT_PATH']: 'syllabus/',
+      },
+    }).updateFunction;
 
-        this.dataWarehouse = new Table(this, 'dynamodb-syllabus-table', {
-            partitionKey: {name: "school", type: AttributeType.STRING},
-            sortKey: {name: "id", type: AttributeType.STRING},
-            billingMode: BillingMode.PROVISIONED,
-            encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
-            timeToLiveAttribute: "ttl",
-            tableName: "waseda-syllabus",
-            readCapacity: 1,
-            writeCapacity: 1,
-        });
-        //Use exsisting s3 bucket
-        this.dataSource = props?.dataSource!;
-
-        this.processor = new SyllabusUpdateFunction(this, 'syllabus-update-function', {
-            envVars: {
-                ["BUCKET_NAME"]: this.dataSource.bucketName,
-                ['TABLE_NAME']: this.dataWarehouse.tableName,
-                ["OBJECT_PATH"]: 'syllabus/',
-            },
-        }).updateFunction;
-
-        this.processor.addEventSource(new S3EventSource(this.dataSource, {
-            events: [s3.EventType.OBJECT_CREATED_PUT],
-            filters: [{prefix: 'syllabus/'}],
-        }));
-    }
+    this.processor.addEventSource(new event_sources.S3EventSource(this.dataSource, {
+      events: [s3.EventType.OBJECT_CREATED_PUT],
+      filters: [{ prefix: 'syllabus/' }],
+    }));
+  }
 }

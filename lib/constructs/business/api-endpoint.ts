@@ -65,9 +65,11 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 }
 
 export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
-  abstract readonly appsync;
-.
-  AuthorizationMode = {};
+  abstract readonly apiEndpoint: appsync.GraphqlApi;
+
+  readonly apiServices: { [name: string]: AbstractGraphqlApiService };
+
+  protected authMode: { [mode: string]: appsync.AuthorizationMode } = {};
 
   protected constructor(scope: Construct, id: string, props: ApiEndpointProps) {
     super(scope, id, props);
@@ -242,7 +244,7 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
     };
     this.authMode.apiKey = apiKeyAuth;
     const cognitoAuth: appsync.AuthorizationMode = {
-      authorizationType: gql.AuthorizationType.USER_POOL,
+      authorizationType: appsync.AuthorizationType.USER_POOL,
       userPoolConfig: {
         userPool: props.authProvider!,
         appIdClientRegex: 'web-app',
