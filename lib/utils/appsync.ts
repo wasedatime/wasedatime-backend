@@ -1,6 +1,5 @@
 import { GraphqlType, IIntermediateType, ObjectType } from '@aws-cdk/aws-appsync-alpha';
-
-const pluralize = require('pluralize');
+import * as pluralize from 'pluralize';
 
 // Int
 export const int = GraphqlType.int();
@@ -55,7 +54,7 @@ export const PageInfo = new ObjectType('PageInfo', {
  * @option base - the prefix for this Object Type
  * @option target - the Object Type that the prefix is connected to
  */
-export interface baseOptions {
+export interface BaseOptions {
   /**
    * the prefix for this Object Type
    */
@@ -72,7 +71,7 @@ export interface baseOptions {
  * @param suffix the end of the name (i.e. Edge or Connection)
  * @param options the options associated with this name
  */
-function obtainName(suffix: string, options: baseOptions): string {
+function obtainName(suffix: string, options: BaseOptions): string {
   // If base and target are the same, do not have prefix
   const isSame: boolean = options.base == options.target;
   const prefix = isSame ? '' : options.base.name;
@@ -86,7 +85,7 @@ function obtainName(suffix: string, options: baseOptions): string {
  * @param options.base the base object type
  * @param options.target the target object type
  */
-export function generateEdge(options: baseOptions): ObjectType {
+export function generateEdge(options: BaseOptions): ObjectType {
   const name = obtainName('Edge', options);
   return new ObjectType(name, {
     definition: {
@@ -104,7 +103,7 @@ export function generateEdge(options: baseOptions): ObjectType {
  * @param options.base the base object type
  * @param options.target the target object type
  */
-export function generateConnection(edge: ObjectType, options: baseOptions): ObjectType {
+export function generateConnection(edge: ObjectType, options: BaseOptions): ObjectType {
   const name = obtainName('Connection', options);
   const plural = pluralize(options.target.name).toLowerCase();
   return new ObjectType(name, {
@@ -125,7 +124,7 @@ export function generateConnection(edge: ObjectType, options: baseOptions): Obje
  *
  * @returns - `{ edge: ObjectType, connection: ObjectType}`
  */
-export function generateConnectionAndEdge(options: baseOptions): { [key: string]: ObjectType } {
+export function generateConnectionAndEdge(options: BaseOptions): { [key: string]: ObjectType } {
   const edge = generateEdge(options);
   const connection = generateConnection(edge, options);
   return {
