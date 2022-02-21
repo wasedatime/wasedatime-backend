@@ -1,0 +1,103 @@
+name: AWS CDK CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - "**.ts"
+      - "src/**"
+      - ".github/workflows/cdk.yml"
+      - "**.json"
+      - "**.yaml"
+
+env:
+  GITHUB_OAUTH_TOKEN: ${{ secrets.ACCESS_TOKEN_GITHUB }}
+  WEBSITE_DEV_PASS: ${{ secrets.WEBSITE_DEV_PASS }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  COGNITO_AFFILIATE_REGION: ${{ secrets.COGNITO_AFFILIATE_REGION }}
+  GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+  GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+  GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+  GOOGLE_API_SERVICE_ACCOUNT_INFO: ${{ secrets.GOOGLE_API_SERVICE_ACCOUNT_INFO }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+  SLACK_WORKSPACE_ID: ${{ secrets.SLACK_WORKSPACE_ID }}
+  BIT_TOKEN: ${{ secrets.BIT_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DEPLOY_KEY: ${{ secrets.FEEDS_DEPLOY_PRIVATE_KEY }}
+  STAGE: dev
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/install-deps
+      - name: Lint
+        run: pnpm run lint
+
+  synth:
+    runs-on: ubuntu-latest
+    needs: [ lint ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/install-deps
+      - name: Synth
+        run: cdk synth
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [ synth ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/install-deps
+      - name: Test
+        run: pnpm test
+
+  validate:
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    steps:
+      - name: Diff
+        id: diff
+        run: |
+          cdk diff --no-color 2>&1 | tee /tmp/diff.log
+          LOG="$(cat /tmp/diff.log)"
+          LOG="${LOG//'%'/'%25'}"
+          LOG="${LOG//$'\n'/'%0A'}"
+          LOG="${LOG//$'\r'/'%0D'}"
+          echo "::set-output name=log::$LOG"
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: "### Diff Output:"
+      - name: Comment
+        if: steps.fc.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ### Diff Output:
+            ```
+            ${{ steps.diff.outputs.log }}
+            ```
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update Comment
+        if: steps.fc.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            ### Diff Output:
+            ```
+            ${{ steps.diff.outputs.log }}
+            ```
+          token: ${{ secrets.GITHUB_TOKEN }}

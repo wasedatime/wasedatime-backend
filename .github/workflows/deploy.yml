@@ -29,26 +29,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-      - uses: actions/setup-node@v2.5.0
-        with:
-          node-version: 16.x
-          cache: 'pnpm'
-
-      - uses: Fooji/create-aws-profile-action@v2
+      - uses: ./.github/actions/install-deps
+      - name: Setup AWS
+        uses: Fooji/create-aws-profile-action@v2
         with:
           profile: default
           region: ${{ env.AWS_REGION }}
           key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Setup CDK
-        run: |
-          pnpm install -g aws-cdk
-          pnpm install
 
       - name: Deploy dev
         if: github.event.release.prerelease == true
@@ -70,19 +58,16 @@ jobs:
         with:
           repository: wasedatime/wasedatime.github.io
           token: ${{ env.GITHUB_OAUTH_TOKEN }}
-
       - name: Setup
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           sudo ./aws/install --update
-
       - name: Export
         run: |
           cd ./openapi
           aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'dev' --export-type 'swagger' --accepts 'application/yaml' ./dev.yml
           aws apigateway get-export --rest-api-id 'anvonkl0fd' --stage-name 'prod' --export-type 'swagger' --accepts 'application/yaml' ./prod.yml
-
       - name: Push
         uses: EndBug/add-and-commit@v7
         with:

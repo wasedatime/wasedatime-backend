@@ -167,6 +167,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
       domainName: API_DOMAIN,
       endpointType: apigw.EndpointType.REGIONAL,
       securityPolicy: apigw.SecurityPolicy.TLS_1_2,
+      basePath: '(none)',
     });
     new route53.ARecord(this, 'alias-record', {
       zone: props.zone,
