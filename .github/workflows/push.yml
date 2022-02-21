@@ -54,4 +54,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/install-deps
       - name: Test
-        run: pnpm test
+        run: pnpm test -- --coverage
+      - name: Test Coverage
+        uses: codecov/codecov-action@v2
