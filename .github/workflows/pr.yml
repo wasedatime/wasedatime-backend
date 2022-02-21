@@ -8,7 +8,7 @@ on:
     paths:
       - "**.ts"
       - "src/**"
-      - ".github/workflows/cdk.yml"
+      - ".github/workflows/pr.yml"
       - "**.json"
       - "**.yaml"
 
