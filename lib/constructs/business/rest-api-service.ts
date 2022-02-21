@@ -21,16 +21,16 @@ export interface RestApiServiceProps {
   validator?: apigw.RequestValidator;
 }
 
-export abstract class AbstractRestApiService extends Construct {
-  abstract readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } };
+export class RestApiService extends Construct {
+  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } };
 
-  protected constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
+  constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
     super(scope, id);
   }
 }
 
-export class SyllabusApiService extends AbstractRestApiService {
-  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } } = {};
+export class SyllabusApiService extends RestApiService {
+  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } };
 
   constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
     super(scope, id, props);
@@ -170,8 +170,8 @@ export class SyllabusApiService extends AbstractRestApiService {
   }
 }
 
-export class CourseReviewsApiService extends AbstractRestApiService {
-  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } } = {};
+export class CourseReviewsApiService extends RestApiService {
+  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } };
 
   constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
     super(scope, id, props);
@@ -288,8 +288,8 @@ export class CourseReviewsApiService extends AbstractRestApiService {
   }
 }
 
-export class CareerApiService extends AbstractRestApiService {
-  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } } = {};
+export class CareerApiService extends RestApiService {
+  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } };
 
   constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
     super(scope, id, props);
@@ -384,8 +384,8 @@ export class CareerApiService extends AbstractRestApiService {
   }
 }
 
-export class TimetableApiService extends AbstractRestApiService {
-  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } } = {};
+export class TimetableApiService extends RestApiService {
+  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } };
 
   constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
     super(scope, id, props);
@@ -487,8 +487,8 @@ export class TimetableApiService extends AbstractRestApiService {
   }
 }
 
-export class GraphqlApiService extends AbstractRestApiService {
-  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } } = {};
+export class GraphqlApiService extends RestApiService {
+  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } };
 
   constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
     super(scope, id, props);

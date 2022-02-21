@@ -1,5 +1,4 @@
 import * as appsync from '@aws-cdk/aws-appsync-alpha';
-import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 
@@ -18,18 +17,18 @@ import { AbstractGraphqlEndpoint } from './api-endpoint';
 
 export interface GraphqlApiServiceProps {
   dataSource: dynamodb.ITable;
-  auth?: cognito.IUserPool;
+  auth?: appsync.AuthorizationMode;
 }
 
-export abstract class AbstractGraphqlApiService extends Construct {
-  abstract readonly resolvers: { [name: string]: appsync.Resolver };
+export class GraphqlApiService extends Construct {
+  readonly resolvers: { [name: string]: appsync.Resolver };
 
-  protected constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
+  constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {
     super(scope, id);
   }
 }
 
-export class CourseApiService extends AbstractGraphqlApiService {
+export class CourseApiService extends GraphqlApiService {
   readonly resolvers: { [name: string]: appsync.Resolver } = {};
 
   constructor(scope: AbstractGraphqlEndpoint, id: string, props: GraphqlApiServiceProps) {

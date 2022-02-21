@@ -12,10 +12,10 @@ import * as flatted from 'flatted';
 import { defaultHeaders } from '../../configs/api-gateway/cors';
 import { STAGE } from '../../configs/common/aws';
 import { API_DOMAIN } from '../../configs/route53/domain';
-import { AbstractGraphqlApiService } from './graphql-api-service';
+import { GraphqlApiService } from './graphql-api-service';
 import { AbstractHttpApiService } from './http-api-service';
-import { AbstractRestApiService } from './rest-api-service';
-import { apiServiceMap } from './service';
+import { RestApiService } from './rest-api-service';
+import { GraphqlApiServiceId, graphqlApiServiceMap, RestApiServiceId, restApiServiceMap } from './service';
 
 export interface ApiEndpointProps {
   zone: route53.IHostedZone;
@@ -32,7 +32,7 @@ export abstract class AbstractApiEndpoint extends Construct {
 
 export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
   readonly apiEndpoint: apigw.RestApi;
-  abstract readonly apiServices: { [name: string]: AbstractRestApiService };
+  abstract readonly apiServices: { [name: string]: RestApiService };
   abstract readonly stages: { [name: string]: apigw.Stage };
 
   protected authorizer: apigw.IAuthorizer;
@@ -52,8 +52,8 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     return domainName.domainName;
   }
 
-  public addService(name: string, dataSource?: string, auth = false): this {
-    this.apiServices[name] = new apiServiceMap[name](this, `${ name }-api`, {
+  public addService(name: RestApiServiceId, dataSource?: string, auth = false): this {
+    this.apiServices[name] = new restApiServiceMap[name](this, `${ name }-api`, {
       dataSource: dataSource,
       authorizer: auth ? this.authorizer : undefined,
       validator: this.reqValidator,
@@ -67,7 +67,7 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
 export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
   abstract readonly apiEndpoint: appsync.GraphqlApi;
 
-  readonly apiServices: { [name: string]: AbstractGraphqlApiService };
+  readonly apiServices: { [name: string]: GraphqlApiService };
 
   protected authMode: { [mode: string]: appsync.AuthorizationMode } = {};
 
@@ -75,8 +75,8 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
     super(scope, id, props);
   }
 
-  public addService(name: string, dataSource: string, auth = 'apiKey'): this {
-    this.apiServices[name] = new apiServiceMap[name](this, `${ name }-api`, {
+  public addService(name: GraphqlApiServiceId, dataSource: string, auth = 'apiKey'): this {
+    this.apiServices[name] = new graphqlApiServiceMap[name](this, `${ name }-api`, {
       dataSource: dynamodb.Table.fromTableName(this, `${ name }-table`, dataSource),
       auth: this.authMode[auth],
     });
@@ -113,7 +113,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
   /**
    * Services provided by this API
    */
-  readonly apiServices: { [name: string]: AbstractRestApiService } = {};
+  readonly apiServices: { [name: string]: RestApiService } = {};
   /**
    * Stages of this API
    */
@@ -229,7 +229,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
 
 export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
   readonly apiEndpoint: appsync.GraphqlApi;
-  readonly apiServices: { [name: string]: AbstractGraphqlApiService } = {};
+  readonly apiServices: { [name: string]: GraphqlApiService } = {};
 
   constructor(scope: Construct, id: string, props: ApiEndpointProps) {
 
