@@ -87,12 +87,11 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
 
     for (const name in syllabusSchedule) {
       this.schedules[name] = new events.Rule(this, name, {
-          ruleName: name,
-          enabled: true,
-          schedule: syllabusSchedule[name],
-          targets: [new events_targets.SfnStateMachine(this.processor)],
-        },
-      );
+        ruleName: name,
+        enabled: true,
+        schedule: syllabusSchedule[name],
+        targets: [new events_targets.SfnStateMachine(this.processor)],
+      });
     }
   }
 }
