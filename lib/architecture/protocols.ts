@@ -1,5 +1,1 @@
-export interface Protocol {
-}
-
-export interface Registry<T> extends Map<T, any>, Protocol {
-}
+export type Registry<T> = Map<T, any>;

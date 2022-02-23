@@ -1,12 +1,11 @@
-import '@aws-cdk/aws-cloudtrail';
-import * as cdk from '@aws-cdk/core';
-import {Trail} from "@aws-cdk/aws-cloudtrail";
+import * as cloudtrail from 'aws-cdk-lib/aws-cloudtrail';
+import { Construct } from 'constructs';
 
-export class GlobalTrailLogs extends cdk.Construct {
-    constructor(scope: cdk.Construct, id: string) {
-        super(scope, id);
-        new Trail(this, 'trail', {
-            trailName: "global-management-trail",
-        });
-    }
+export class GlobalTrailLogs extends Construct {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+    new cloudtrail.Trail(this, 'trail', {
+      trailName: 'global-management-trail',
+    });
+  }
 }

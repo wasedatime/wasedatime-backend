@@ -1,0 +1,21 @@
+name: 'Install Dependencies'
+description: 'Workflow for installing dependencies'
+runs:
+  using: "composite"
+  steps:
+    - uses: pnpm/action-setup@v2.0.1
+      with:
+        version: latest
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16.x
+        cache: 'pnpm'
+    - name: Setup CDK
+      shell: bash
+      run: |
+        pnpm install -g aws-cdk
+        pnpm install
+    - name: Diagnose
+      shell: bash
+      run: cdk doctor

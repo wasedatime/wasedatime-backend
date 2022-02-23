@@ -1,73 +1,71 @@
-import {DataEndpoint, OperationEndpoint, ServiceEndpoint} from "../configs/common/registry";
-import {Protocol, Registry} from "./protocols";
+import { DataEndpoint, OperationEndpoint, ServiceEndpoint } from '../configs/common/registry';
+import { Registry } from './protocols';
 
 interface IInterface {
-    protocol: Protocol;
+  protocol: Registry<unknown>;
 
-    getEndpoint(name: number): string;
+  getEndpoint(name: number): any;
 
-    setEndpoint(name: number, value: string): void;
+  setEndpoint(name: number, value: any): void;
 }
 
 export class DataInterface implements IInterface {
-    protocol: Registry<DataEndpoint>;
+  protocol: Registry<DataEndpoint>;
 
-    constructor() {
-        this.protocol = new Map<DataEndpoint, string>();
-    }
+  constructor() {
+    this.protocol = new Map();
+  }
 
-    getEndpoint(name: DataEndpoint): string {
-        let value = this.protocol.get(name);
-        if (typeof value === "undefined") {
-            throw RangeError("Service not configured for this entry.");
-        }
-        return value;
+  getEndpoint(name: DataEndpoint): any {
+    const value = this.protocol.get(name);
+    if (typeof value === 'undefined') {
+      throw RangeError('Service not configured for this entry.');
     }
+    return value;
+  }
 
-    setEndpoint(name: DataEndpoint, value: string): void {
-        this.protocol.set(name, value);
-        return;
-    }
+  setEndpoint(name: DataEndpoint, value: any) {
+    this.protocol.set(name, value);
+  }
 }
 
 export class ServiceInterface implements IInterface {
-    protocol: Registry<ServiceEndpoint>;
+  protocol: Registry<ServiceEndpoint>;
 
-    constructor() {
-        this.protocol = new Map<ServiceEndpoint, string>();
-    }
+  constructor() {
+    this.protocol = new Map();
+  }
 
-    getEndpoint(name: ServiceEndpoint): string {
-        const value = this.protocol.get(name);
-        if (typeof value === "undefined") {
-            throw RangeError("Service not configured for this entry.");
-        }
-        return value;
+  getEndpoint(name: ServiceEndpoint): any {
+    const value = this.protocol.get(name);
+    if (typeof value === 'undefined') {
+      throw RangeError('Service not configured for this entry.');
     }
+    return value;
+  }
 
-    setEndpoint(name: ServiceEndpoint, value: string): void {
-        this.protocol.set(name, value);
-        return;
-    }
+  setEndpoint(name: ServiceEndpoint, value: any) {
+    this.protocol.set(name, value);
+  }
 }
 
 export class OperationInterface implements IInterface {
-    protocol: Registry<OperationEndpoint>;
+  protocol: Registry<OperationEndpoint>;
 
-    constructor() {
-        this.protocol = new Map<OperationEndpoint, string>();
-    }
+  constructor() {
+    this.protocol = new Map();
+  }
 
-    getEndpoint(name: OperationEndpoint): any {
-        const value = this.protocol.get(name);
-        if (typeof value === "undefined") {
-            throw RangeError("Service not configured for this entry.");
-        }
-        return value;
+  getEndpoint(name: OperationEndpoint): any {
+    const value = this.protocol.get(name);
+    if (typeof value === 'undefined') {
+      throw RangeError('Service not configured for this entry.');
     }
+    return value;
+  }
 
-    setEndpoint(name: OperationEndpoint, value: any): void {
-        this.protocol.set(name, value);
-        return;
-    }
+  setEndpoint(name: OperationEndpoint, value: any): void {
+    this.protocol.set(name, value);
+    return;
+  }
 }

@@ -1,67 +1,64 @@
-import * as cdk from "@aws-cdk/core";
-import {AttributeType, BillingMode, Table, TableEncryption} from "@aws-cdk/aws-dynamodb";
+import { RemovalPolicy } from 'aws-cdk-lib';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import { Construct } from 'constructs';
 
 export enum Collection {
-    COURSE_REVIEW,
-    CAREER,
-    FEEDS,
-    SYLLABUS,
-    TIMETABLE,
+  COURSE_REVIEW,
+  CAREER,
+  FEEDS,
+  SYLLABUS,
+  TIMETABLE,
 }
 
-export interface DatabaseProps {
+export class DynamoDatabase extends Construct {
+  readonly tables: { [name: number]: dynamodb.Table } = {};
 
-}
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
 
-export class DynamoDatabase extends cdk.Construct {
-    readonly tables: { [name: number]: Table } = {};
+    this.tables[Collection.COURSE_REVIEW] = new dynamodb.Table(this, 'dynamodb-review-table', {
+      partitionKey: { name: 'course_key', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PROVISIONED,
+      encryption: dynamodb.TableEncryption.DEFAULT,
+      removalPolicy: RemovalPolicy.RETAIN,
+      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
+      tableName: 'course-review',
+      readCapacity: 10,
+      writeCapacity: 7,
+      pointInTimeRecovery: true,
+    });
 
-    constructor(scope: cdk.Construct, id: string, props?: DatabaseProps) {
-        super(scope, id);
+    this.tables[Collection.CAREER] = new dynamodb.Table(this, 'dynamodb-career-table', {
+      partitionKey: { name: 'type', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PROVISIONED,
+      encryption: dynamodb.TableEncryption.DEFAULT,
+      removalPolicy: RemovalPolicy.RETAIN,
+      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
+      tableName: 'career',
+      readCapacity: 1,
+      writeCapacity: 1,
+    });
 
-        this.tables[Collection.COURSE_REVIEW] = new Table(this, 'dynamodb-review-table', {
-            partitionKey: {name: "course_key", type: AttributeType.STRING},
-            billingMode: BillingMode.PROVISIONED,
-            encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "created_at", type: AttributeType.STRING},
-            tableName: "course-review",
-            readCapacity: 10,
-            writeCapacity: 7,
-            pointInTimeRecovery: true,
-        });
+    this.tables[Collection.FEEDS] = new dynamodb.Table(this, 'dynamodb-feeds-table', {
+      partitionKey: { name: 'category', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PROVISIONED,
+      encryption: dynamodb.TableEncryption.DEFAULT,
+      removalPolicy: RemovalPolicy.RETAIN,
+      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
+      tableName: 'feeds',
+      readCapacity: 1,
+      writeCapacity: 1,
+    });
 
-        this.tables[Collection.CAREER] = new Table(this, 'dynamodb-career-table', {
-            partitionKey: {name: "type", type: AttributeType.STRING},
-            billingMode: BillingMode.PROVISIONED,
-            encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "created_at", type: AttributeType.STRING},
-            tableName: "career",
-            readCapacity: 1,
-            writeCapacity: 1,
-        });
-
-        this.tables[Collection.FEEDS] = new Table(this, 'dynamodb-feeds-table', {
-            partitionKey: {name: "category", type: AttributeType.STRING},
-            billingMode: BillingMode.PROVISIONED,
-            encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
-            sortKey: {name: "created_at", type: AttributeType.STRING},
-            tableName: "feeds",
-            readCapacity: 1,
-            writeCapacity: 1,
-        });
-
-        this.tables[Collection.TIMETABLE] = new Table(this, 'dynamodb-timetable-table', {
-            partitionKey: {name: "uid", type: AttributeType.STRING},
-            billingMode: BillingMode.PROVISIONED,
-            encryption: TableEncryption.DEFAULT,
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
-            tableName: "timetable",
-            readCapacity: 12,
-            writeCapacity: 15,
-            pointInTimeRecovery: true,
-        });
-    }
+    this.tables[Collection.TIMETABLE] = new dynamodb.Table(this, 'dynamodb-timetable-table', {
+      partitionKey: { name: 'uid', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PROVISIONED,
+      encryption: dynamodb.TableEncryption.DEFAULT,
+      removalPolicy: RemovalPolicy.RETAIN,
+      tableName: 'timetable',
+      readCapacity: 12,
+      writeCapacity: 15,
+      pointInTimeRecovery: true,
+    });
+  }
 }

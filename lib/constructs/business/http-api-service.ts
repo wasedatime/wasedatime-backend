@@ -1,20 +1,18 @@
-import * as cdk from "@aws-cdk/core";
-import {CfnAuthorizer, HttpApi, HttpMethod, HttpRoute} from "@aws-cdk/aws-apigatewayv2";
+import * as apigw2 from '@aws-cdk/aws-apigatewayv2-alpha';
+import { Construct } from 'constructs';
 
-import {AbstractHttpApiEndpoint} from "./api-endpoint";
+import { AbstractHttpApiEndpoint } from './api-endpoint';
 
 export interface HttpApiServiceProps {
-    apiEndpoint: HttpApi;
-
-    dataSource?: string;
-
-    authorizer?: CfnAuthorizer;
+  apiEndpoint: apigw2.HttpApi;
+  dataSource?: string;
+  authorizer?: apigw2.HttpAuthorizer;
 }
 
-export abstract class AbstractHttpApiService extends cdk.Construct {
-    abstract readonly resourceMapping: { [path: string]: { [method in HttpMethod]?: HttpRoute } };
+export abstract class AbstractHttpApiService extends Construct {
+  abstract readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw2.HttpRoute } };
 
-    protected constructor(scope: AbstractHttpApiEndpoint, id: string, props: HttpApiServiceProps) {
-        super(scope, id);
-    }
+  protected constructor(scope: AbstractHttpApiEndpoint, id: string, props: HttpApiServiceProps) {
+    super(scope, id);
+  }
 }

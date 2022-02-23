@@ -1,0 +1,16 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+js_diff=$(git --no-pager diff --cached --name-only | grep \.ts | cat)
+
+if [ ! -z "$js_diff" ]; then
+  not_staged=$(git --no-pager diff --name-only)
+
+  if [ ! -z "$not_staged" ]; then
+    echo "Please commit all your changes if you have edit any JavaScripts. "
+    exit 1
+  fi
+
+else
+  echo "Seems you haven't changed any JavaScript, skip checks. "
+fi
