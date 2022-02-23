@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-alpha.1](https://github.com/wasedatime/wasedatime-backend/compare/v2.0.0-alpha.0...v2.0.0-alpha.1) (2022-02-23)
+
+
+### Features
+
+* **apigw:** define types ([5344952](https://github.com/wasedatime/wasedatime-backend/commit/5344952b614e155df678c0c5e9aef8c67fabd6e1))
+
 ## [2.0.0-alpha.0](https://github.com/wasedatime/wasedatime-backend/compare/v1.3.3...v2.0.0-alpha.0) (2022-02-21)
 
 
