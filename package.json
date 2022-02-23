@@ -12,6 +12,7 @@
     "cdk": "cdk"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@aws-cdk/assert": "2.8.0",
     "@types/jest": "27.4.0",
     "@types/node": "16.11.25",
@@ -20,6 +21,16 @@
     "ts-jest": "27.1.3",
     "ts-node": "10.5.0",
     "typescript": "4.5.5"
+=======
+    "@aws-cdk/assert": "1.134.0",
+    "@types/jest": "27.0.3",
+    "@types/node": "16.11.16",
+    "aws-cdk": "1.134.0",
+    "jest": "27.4.5",
+    "ts-jest": "27.1.2",
+    "ts-node": "10.4.0",
+    "typescript": "4.5.4"
+>>>>>>> c00b3e1 (chore(deps): update deps (#117))
   },
   "dependencies": {
     "@aws-cdk/assets": "1.134.0",
