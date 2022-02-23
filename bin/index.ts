@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import 'source-map-support/register';
-import {WasedaTime} from '../lib/app';
+import { WasedaTime } from '../lib/app';
 
 const wasedaTime = new WasedaTime();
 

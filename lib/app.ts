@@ -1,51 +1,47 @@
-import {WasedaTimePresentationLayer} from "./stacks/presentation";
-import {awsEnv} from "./configs/common/aws";
-import {AbstractServerlessApp} from "./architecture/patterns";
-import {WasedaTimeBusinessLayer} from "./stacks/business";
-import {WasedaTimePersistenceLayer} from "./stacks/persistence";
-import {AdminLayer, BusinessLayer, PersistenceLayer, PresentationLayer} from "./architecture/layers";
-import {WasedaTimeAdminLayer} from "./stacks/admin";
-import {OperationInterface} from "./architecture/interfaces";
-import {OperationEndpoint} from "./configs/common/registry";
-import {WasedaTimeHostedZone} from "./constructs/common/hosted-zone";
+import { OperationInterface } from './architecture/interfaces';
+import { AdminLayer, BusinessLayer, PersistenceLayer, PresentationLayer } from './architecture/layers';
+import { AbstractServerlessApp } from './architecture/patterns';
+import { awsEnv } from './configs/common/aws';
+import { OperationEndpoint } from './configs/common/registry';
+import { WasedaTimeHostedZone } from './constructs/common/hosted-zone';
+import { WasedaTimeAdminLayer } from './stacks/admin';
+import { WasedaTimeBusinessLayer } from './stacks/business';
+import { WasedaTimePersistenceLayer } from './stacks/persistence';
+import { WasedaTimePresentationLayer } from './stacks/presentation';
 
 export class WasedaTime extends AbstractServerlessApp {
-    readonly presentationLayer: PresentationLayer;
+  readonly presentationLayer: PresentationLayer;
+  readonly businessLayer: BusinessLayer;
+  readonly persistenceLayer: PersistenceLayer;
+  readonly adminLayer: AdminLayer;
+  readonly hostedZone: WasedaTimeHostedZone;
 
-    readonly businessLayer: BusinessLayer;
+  constructor() {
+    super();
 
-    readonly persistenceLayer: PersistenceLayer;
+    this.hostedZone = new WasedaTimeHostedZone(this, 'wt-hosted-zone', awsEnv);
 
-    readonly adminLayer: AdminLayer;
+    this.persistenceLayer = new WasedaTimePersistenceLayer(this, 'persistence', awsEnv);
+    const dataInterface = this.persistenceLayer.dataInterface;
 
-    readonly hostedZone: WasedaTimeHostedZone;
+    this.businessLayer = new WasedaTimeBusinessLayer(this, 'business', dataInterface, this.hostedZone.zone, awsEnv);
+    this.businessLayer.dataInterface = dataInterface;
+    const serviceInterface = this.businessLayer.serviceInterface;
 
-    constructor() {
-        super();
+    this.presentationLayer = new WasedaTimePresentationLayer(this, 'presentation', serviceInterface, awsEnv);
+    this.presentationLayer.serviceInterface = serviceInterface;
 
-        this.hostedZone = new WasedaTimeHostedZone(this, 'wt-hosted-zone', awsEnv);
+    const operationInterface = new OperationInterface;
 
-        this.persistenceLayer = new WasedaTimePersistenceLayer(this, 'persistence', awsEnv);
-        const dataInterface = this.persistenceLayer.dataInterface;
+    operationInterface.setEndpoint(
+      OperationEndpoint.SYLLABUS,
+      this.persistenceLayer.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS),
+    );
+    operationInterface.setEndpoint(
+      OperationEndpoint.APP,
+      this.presentationLayer.operationInterface.getEndpoint(OperationEndpoint.APP),
+    );
 
-        this.businessLayer = new WasedaTimeBusinessLayer(this, 'business', dataInterface, this.hostedZone.zone, awsEnv);
-        this.businessLayer.dataInterface = dataInterface;
-        const serviceInterface = this.businessLayer.serviceInterface;
-
-        this.presentationLayer = new WasedaTimePresentationLayer(this, 'presentation', serviceInterface, awsEnv);
-        this.presentationLayer.serviceInterface = serviceInterface;
-
-        const operationInterface = new OperationInterface;
-
-        operationInterface.setEndpoint(
-            OperationEndpoint.SYLLABUS,
-            this.persistenceLayer.operationInterface.getEndpoint(OperationEndpoint.SYLLABUS),
-        );
-        operationInterface.setEndpoint(
-            OperationEndpoint.APP,
-            this.presentationLayer.operationInterface.getEndpoint(OperationEndpoint.APP),
-        );
-
-        this.adminLayer = new WasedaTimeAdminLayer(this, 'admin', operationInterface, awsEnv);
-    }
+    this.adminLayer = new WasedaTimeAdminLayer(this, 'admin', operationInterface, awsEnv);
+  }
 }

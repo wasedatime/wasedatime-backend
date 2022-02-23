@@ -1,59 +1,51 @@
-import * as cdk from "@aws-cdk/core";
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { DataInterface, OperationInterface, ServiceInterface } from './interfaces';
 
-import {DataInterface, OperationInterface, ServiceInterface} from "./interfaces";
+export abstract class PersistenceLayer extends Stack {
+  dataInterface: DataInterface;
+  operationInterface: OperationInterface;
 
-export abstract class PersistenceLayer extends cdk.Stack {
-    dataInterface: DataInterface;
+  protected constructor(scope: Construct, id: string, props?: StackProps) {
+    super(scope, id, props);
 
-    operationInterface: OperationInterface;
-
-    protected constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id, props);
-
-        this.dataInterface = new DataInterface;
-
-        this.operationInterface = new OperationInterface;
-    }
+    this.dataInterface = new DataInterface;
+    this.operationInterface = new OperationInterface;
+  }
 }
 
-export abstract class BusinessLayer extends cdk.Stack {
-    serviceInterface: ServiceInterface;
+export abstract class BusinessLayer extends Stack {
+  serviceInterface: ServiceInterface;
+  dataInterface: DataInterface;
+  operationInterface: OperationInterface;
 
-    dataInterface: DataInterface;
+  protected constructor(scope: Construct, id: string, dataInterface: DataInterface, props: StackProps) {
+    super(scope, id, props);
 
-    operationInterface: OperationInterface;
-
-    protected constructor(scope: cdk.Construct, id: string, dataInterface: DataInterface, props: cdk.StackProps) {
-        super(scope, id, props);
-
-        this.dataInterface = dataInterface;
-
-        this.serviceInterface = new ServiceInterface;
-
-        this.operationInterface = new OperationInterface;
-    }
+    this.dataInterface = dataInterface;
+    this.serviceInterface = new ServiceInterface;
+    this.operationInterface = new OperationInterface;
+  }
 }
 
-export abstract class PresentationLayer extends cdk.Stack {
-    serviceInterface: ServiceInterface;
+export abstract class PresentationLayer extends Stack {
+  serviceInterface: ServiceInterface;
+  operationInterface: OperationInterface;
 
-    operationInterface: OperationInterface;
+  protected constructor(scope: Construct, id: string, serviceInterface: ServiceInterface, props?: StackProps) {
+    super(scope, id, props);
 
-    protected constructor(scope: cdk.Construct, id: string, serviceInterface: ServiceInterface, props?: cdk.StackProps) {
-        super(scope, id, props);
-
-        this.serviceInterface = serviceInterface;
-
-        this.operationInterface = new OperationInterface;
-    }
+    this.serviceInterface = serviceInterface;
+    this.operationInterface = new OperationInterface;
+  }
 }
 
-export abstract class AdminLayer extends cdk.Stack {
-    operationInterface: OperationInterface;
+export abstract class AdminLayer extends Stack {
+  operationInterface: OperationInterface;
 
-    protected constructor(scope: cdk.Construct, id: string, operationInterface: OperationInterface, props?: cdk.StackProps) {
-        super(scope, id, props);
+  protected constructor(scope: Construct, id: string, operationInterface: OperationInterface, props?: StackProps) {
+    super(scope, id, props);
 
-        this.operationInterface = operationInterface;
-    }
+    this.operationInterface = operationInterface;
+  }
 }

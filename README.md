@@ -1,10 +1,13 @@
 # WasedaTime Backend
 
 [![AWS CDK CI/CD](https://github.com/wasedatime/wasedatime-backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/wasedatime/wasedatime-backend/actions/workflows/deploy.yml)
-![](https://img.shields.io/website?up_color=green&up_message=online&url=https%3A%2F%2Fwasedatime.com)
+[![codecov](https://codecov.io/gh/wasedatime/wasedatime-backend/branch/main/graph/badge.svg?token=PJWAYAQAQH)](https://codecov.io/gh/wasedatime/wasedatime-backend)
+[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg?style=flat&logo=renovatebot)](https://app.renovatebot.com/dashboard#github/wasedatime/wasedatime-backend)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwasedatime%2Fwasedatime-backend.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwasedatime%2Fwasedatime-backend?ref=badge_shield)
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/##https://github.com/wasedatime/wasedatime-backend.git)
 
-This repository defines the serverless application architecture, resource configuration and infrastructure provision strategy of 
+This repository defines the serverless application architecture, resource configuration and infrastructure provision
+strategy of
 [wasedatime.com](https://wasedatime.com).
 
 ## About The Project

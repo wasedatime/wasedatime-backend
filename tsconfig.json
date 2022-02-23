@@ -1,6 +1,11 @@
 {
   "compilerOptions": {
+    "charset": "utf8",
+    "noEmitOnError": true,
+    "resolveJsonModule": true,
+    "stripInternal": true,
     "target": "ES2018",
+    "incremental": true,
     "module": "commonjs",
     "lib": [
       "es2018",
