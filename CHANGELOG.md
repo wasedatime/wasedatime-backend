@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/wasedatime/wasedatime-backend/compare/v1.3.3...v2.0.0) (2022-02-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency flatted to v3.2.5 ([#126](https://github.com/wasedatime/wasedatime-backend/issues/126)) ([21497ac](https://github.com/wasedatime/wasedatime-backend/commit/21497ac7a0b09c0474db4e46b15e490cf5909faa))
+* renew auth cert ([#127](https://github.com/wasedatime/wasedatime-backend/issues/127)) ([a661f2b](https://github.com/wasedatime/wasedatime-backend/commit/a661f2bace720641c15c57ec83f1b28745851f62))
+
 ## [2.0.0-alpha.1](https://github.com/wasedatime/wasedatime-backend/compare/v2.0.0-alpha.0...v2.0.0-alpha.1) (2022-02-23)
 
 
