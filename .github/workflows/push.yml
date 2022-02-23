@@ -45,9 +45,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/install-deps
       - name: Build
-        run: |
-          pnpm run build
-          cdk bootstrap
+        run: pnpm run build
 
   test:
     runs-on: ubuntu-latest
