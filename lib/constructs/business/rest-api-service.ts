@@ -520,3 +520,13 @@ export class GraphqlApiService extends RestApiService {
     };
   }
 }
+
+export type RestApiServiceId = 'syllabus' | 'course-reviews' | 'career' | 'timetable' | 'graphql';
+
+export const restApiServiceMap: { [name in RestApiServiceId]: typeof RestApiService } = {
+  'syllabus': SyllabusApiService,
+  'course-reviews': CourseReviewsApiService,
+  'career': CareerApiService,
+  'timetable': TimetableApiService,
+  'graphql': GraphqlApiService,
+};

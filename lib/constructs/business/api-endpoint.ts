@@ -12,10 +12,15 @@ import * as flatted from 'flatted';
 import { defaultHeaders } from '../../configs/api-gateway/cors';
 import { STAGE } from '../../configs/common/aws';
 import { API_DOMAIN } from '../../configs/route53/domain';
-import { GraphqlApiService } from './graphql-api-service';
+import { GraphqlApiService, GraphqlApiServiceId, graphqlApiServiceMap } from './graphql-api-service';
 import { AbstractHttpApiService } from './http-api-service';
-import { RestApiService } from './rest-api-service';
-import { GraphqlApiServiceId, graphqlApiServiceMap, RestApiServiceId, restApiServiceMap } from './service';
+import { RestApiService, RestApiServiceId, restApiServiceMap } from './rest-api-service';
+
+export enum ApiEndpoint {
+  REST,
+  AUTH,
+  GRAPHQL,
+}
 
 export interface ApiEndpointProps {
   zone: route53.IHostedZone;

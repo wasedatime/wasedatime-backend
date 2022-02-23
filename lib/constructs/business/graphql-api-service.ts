@@ -128,3 +128,9 @@ export class CourseApiService extends GraphqlApiService {
     }));
   }
 }
+
+export type GraphqlApiServiceId = 'course';
+
+export const graphqlApiServiceMap: { [name in GraphqlApiServiceId]: typeof GraphqlApiService } = {
+  course: CourseApiService,
+};
