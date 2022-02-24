@@ -3,7 +3,7 @@ description: 'Workflow for installing dependencies'
 runs:
   using: "composite"
   steps:
-    - uses: pnpm/action-setup@v2.0.1
+    - uses: pnpm/action-setup@v2.2.0
       with:
         version: latest
     - name: Use Node.js
