@@ -4,9 +4,7 @@ from utils import JsonPayloadBuilder
 from utils import resp_handler
 from utils import table
 
-
 @resp_handler
-
 def put_timetable(uid, content):
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     table.update_item(
