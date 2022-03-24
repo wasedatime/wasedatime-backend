@@ -228,6 +228,7 @@ export class CourseReviewsApiService extends AbstractRestApiService {
             courseReviewsFunctions.deleteFunction, {proxy: true},
         );
 
+
         const optionsCourseReviews = root.addCorsPreflight({
             allowOrigins: allowOrigins,
             allowHeaders: allowHeaders,
@@ -421,6 +422,9 @@ export class TimetableApiService extends AbstractRestApiService {
         const patchIntegration = new LambdaIntegration(
             timetableFunctions.patchFunction, {proxy: true},
         );
+        const putIntergation = new LambdaIntegration(
+            timetableFunctions.putFunction. {proxy: true},
+        );
         // const importIntegration = new LambdaIntegration(
         //     timetableFunctions.importFunction, {proxy: true},
         // );
@@ -460,6 +464,15 @@ export class TimetableApiService extends AbstractRestApiService {
             authorizer: props.authorizer,
             requestValidator: props.validator,
         });
+        const putTimetable = root.addmethod(HttpMethod.Put, putIntergation, {
+            operationName: "PutTimetable",
+            methodResponses: [{
+                statusCode: '200',
+                responseParameters: lambdaRespParams,
+            }],
+            authorizer: props.authorizer,
+            requestValidator: props.validator,
+        });
 
         // [timetableImport, timetableExport].forEach(value => value.addCorsPreflight({
         //     allowOrigins: allowOrigins,
@@ -489,6 +502,7 @@ export class TimetableApiService extends AbstractRestApiService {
                 [HttpMethod.GET]: getTimetable,
                 [HttpMethod.PATCH]: patchTimetable,
                 [HttpMethod.POST]: postTimetable,
+                [HttpMethod.PUT]: putTimetable
             },
             // "/timetable/export": {
             //     [HttpMethod.POST]: exportTimetable,

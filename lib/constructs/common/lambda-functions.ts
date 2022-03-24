@@ -197,6 +197,8 @@ export class TimetableFunctions extends cdk.Construct {
 
     readonly deleteFunction: Function;
 
+    readonly putFunction: Function;
+
     // readonly importFunction: Function;
     //
     // readonly exportFunction: Function;
@@ -258,6 +260,18 @@ export class TimetableFunctions extends cdk.Construct {
             entry: 'src/lambda/patch-timetable',
             description: "Update timetable in the database.",
             functionName: "patch-timetable",
+            logRetention: RetentionDays.ONE_MONTH,
+            memorySize: 128,
+            role: dynamoDBPutRole,
+            runtime: Runtime.PYTHON_3_9,
+            timeout: Duration.seconds(3),
+            environment: props.envVars,
+        });
+
+        this.putFunction = new PythonFunction(this, 'put-timetable', {
+            entry:'src/lambda/put-timetable',
+            description: 'Put timetable in the database.',
+            functionName: 'put-timetable',
             logRetention: RetentionDays.ONE_MONTH,
             memorySize: 128,
             role: dynamoDBPutRole,
