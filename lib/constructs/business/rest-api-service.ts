@@ -450,7 +450,7 @@ export class TimetableApiService extends RestApiService {
       authorizer: props.authorizer,
       requestValidator: props.validator,
     });
-    const putTimetable = root.addmethod(apigw2.HttpMethod.Put, putIntergation, {
+    const putTimetable = root.addMethod(apigw2.HttpMethod.PUT, putIntergation, {
       operationName: 'PutTimetable',
       methodResponses: [{
         statusCode: '200',
