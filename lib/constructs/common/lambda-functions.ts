@@ -257,9 +257,9 @@ export class TimetableFunctions extends Construct {
       timeout: Duration.seconds(3),
       environment: props.envVars,
     });
-    
+
     this.putFunction = new lambda_py.PythonFunction(this, 'put-timetable', {
-      entry:'src/lambda/put-timetable',
+      entry: 'src/lambda/put-timetable',
       description: 'Put timetable in the database.',
       functionName: 'put-timetable',
       logRetention: logs.RetentionDays.ONE_MONTH,
@@ -268,7 +268,7 @@ export class TimetableFunctions extends Construct {
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(3),
       environment: props.envVars,
-  });
+    });
 
     //     this.importFunction = new lambda_py.PythonFunction(this, 'import-timetable', {
     //         entry: 'src/lambda/import-timetable',
