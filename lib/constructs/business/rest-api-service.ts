@@ -408,6 +408,9 @@ export class TimetableApiService extends RestApiService {
     const patchIntegration = new apigw.LambdaIntegration(
       timetableFunctions.patchFunction, { proxy: true },
     );
+    const putIntergation = new apigw.LambdaIntegration(
+      timetableFunctions.putFunction, { proxy: true },
+    );
     // const importIntegration = new apigw.LambdaIntegration(
     //     timetableFunctions.importFunction, {proxy: true},
     // );
@@ -447,6 +450,15 @@ export class TimetableApiService extends RestApiService {
       authorizer: props.authorizer,
       requestValidator: props.validator,
     });
+    const putTimetable = root.addMethod(apigw2.HttpMethod.PUT, putIntergation, {
+      operationName: 'PutTimetable',
+      methodResponses: [{
+        statusCode: '200',
+        responseParameters: lambdaRespParams,
+      }],
+      authorizer: props.authorizer,
+      requestValidator: props.validator,
+    });
 
     // [timetableImport, timetableExport].forEach(value => value.addCorsPreflight({
     //     allowOrigins: allowOrigins,
@@ -476,6 +488,7 @@ export class TimetableApiService extends RestApiService {
         [apigw2.HttpMethod.GET]: getTimetable,
         [apigw2.HttpMethod.PATCH]: patchTimetable,
         [apigw2.HttpMethod.POST]: postTimetable,
+        [apigw2.HttpMethod.PUT]: putTimetable,
       },
       // "/timetable/export": {
       //     [apigw2.HttpMethod.POST]: exportTimetable,

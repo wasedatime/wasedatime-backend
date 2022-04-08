@@ -189,6 +189,7 @@ export class TimetableFunctions extends Construct {
   readonly postFunction: lambda.Function;
   readonly patchFunction: lambda.Function;
   readonly deleteFunction: lambda.Function;
+  readonly putFunction: lambda.Function;
   // readonly importFunction: lambda.Function;
   // readonly exportFunction: lambda.Function;
 
@@ -249,6 +250,18 @@ export class TimetableFunctions extends Construct {
       entry: 'src/lambda/patch-timetable',
       description: 'Update timetable in the database.',
       functionName: 'patch-timetable',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
+    this.putFunction = new lambda_py.PythonFunction(this, 'put-timetable', {
+      entry: 'src/lambda/put-timetable',
+      description: 'Put timetable in the database.',
+      functionName: 'put-timetable',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
       role: dynamoDBPutRole,
