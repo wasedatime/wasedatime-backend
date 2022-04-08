@@ -19,7 +19,7 @@ specifiers:
   constructs: 10.0.92
   eslint: 8.10.0
   eslint-import-resolver-node: 0.3.6
-  eslint-import-resolver-typescript: 2.7.0
+  eslint-import-resolver-typescript: 2.7.1
   eslint-plugin-import: 2.25.4
   flatted: 3.2.5
   husky: 7.0.4
@@ -55,7 +55,7 @@ devDependencies:
   constructs: 10.0.92
   eslint: 8.10.0
   eslint-import-resolver-node: 0.3.6
-  eslint-import-resolver-typescript: 2.7.0_8b406960a2a06af75ddac353adbd0cfd
+  eslint-import-resolver-typescript: 2.7.1_8b406960a2a06af75ddac353adbd0cfd
   eslint-plugin-import: 2.25.4_eslint@8.10.0
   husky: 7.0.4
   jest: 27.5.1_ts-node@10.7.0
@@ -2203,8 +2203,8 @@ packages:
       resolve: 1.20.0
     dev: true
 
-  /eslint-import-resolver-typescript/2.7.0_8b406960a2a06af75ddac353adbd0cfd:
-    resolution: {integrity: sha512-MNHS3u5pebvROX4MjGP9coda589ZGfL1SqdxUV4kSrcclfDRWvNE2D+eljbnWVMvWDVRgT89nhscMHPKYGcObQ==}
+  /eslint-import-resolver-typescript/2.7.1_8b406960a2a06af75ddac353adbd0cfd:
+    resolution: {integrity: sha512-00UbgGwV8bSgUv34igBDbTOtKhqoRMy9bFjNehT40bXg6585PNIct8HhXZ0SybqB9rWtXj9crcku8ndDn/gIqQ==}
     engines: {node: '>=4'}
     peerDependencies:
       eslint: '*'
