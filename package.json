@@ -34,7 +34,7 @@
     "eslint-import-resolver-typescript": "2.7.1",
     "eslint-plugin-import": "2.26.0",
     "husky": "7.0.4",
-    "jest": "27.5.1",
+    "jest": "28.0.3",
     "standard-version": "9.3.2",
     "ts-jest": "27.1.4",
     "ts-node": "10.7.0",
