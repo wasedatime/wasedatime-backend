@@ -16,7 +16,7 @@
   },
   "peerDependencies": {
     "aws-cdk-lib": "2.22.0",
-    "constructs": "10.0.92"
+    "constructs": "10.1.32"
   },
   "devDependencies": {
     "@aws-cdk/assert": "2.22.0",
@@ -28,7 +28,7 @@
     "@typescript-eslint/eslint-plugin": "5.21.0",
     "@typescript-eslint/parser": "5.21.0",
     "aws-cdk-lib": "2.22.0",
-    "constructs": "10.0.127",
+    "constructs": "10.1.32",
     "eslint": "8.14.0",
     "eslint-import-resolver-node": "0.3.6",
     "eslint-import-resolver-typescript": "2.7.1",
