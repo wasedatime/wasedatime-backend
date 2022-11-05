@@ -7,6 +7,13 @@ const config: Config.InitialOptions = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  globals: {
+    'ts-jest': {
+      tsconfig: {
+        rootDir: '.',
+      },
+    },
+  },
 };
 
 export default config;
