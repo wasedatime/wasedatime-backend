@@ -7,6 +7,7 @@ const config: Config.InitialOptions = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  moduleDirectories: ['<rootDir>/../', 'node_modules'],
 };
 
 export default config;
