@@ -408,6 +408,9 @@ export class TimetableApiService extends RestApiService {
     const patchIntegration = new apigw.LambdaIntegration(
       timetableFunctions.patchFunction, { proxy: true },
     );
+    const putIntergation = new apigw.LambdaIntegration(
+      timetableFunctions.putFunction, { proxy: true },
+    );
     // const importIntegration = new apigw.LambdaIntegration(
     //     timetableFunctions.importFunction, {proxy: true},
     // );
@@ -415,10 +418,12 @@ export class TimetableApiService extends RestApiService {
     //     timetableFunctions.exportFunction, {proxy: true},
     // );
 
+    // , apigw2.HttpMethod.DELETE
+
     const optionsTimetable = root.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
-      allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.POST, apigw2.HttpMethod.PATCH, apigw2.HttpMethod.OPTIONS, apigw2.HttpMethod.DELETE],
+      allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.PUT, apigw2.HttpMethod.POST, apigw2.HttpMethod.PATCH, apigw2.HttpMethod.OPTIONS],
     });
     const getTimetable = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
       operationName: 'GetTimetable',
@@ -440,6 +445,15 @@ export class TimetableApiService extends RestApiService {
     });
     const patchTimetable = root.addMethod(apigw2.HttpMethod.PATCH, patchIntegration, {
       operationName: 'UpdateTimetable',
+      methodResponses: [{
+        statusCode: '200',
+        responseParameters: lambdaRespParams,
+      }],
+      authorizer: props.authorizer,
+      requestValidator: props.validator,
+    });
+    const putTimetable = root.addMethod(apigw2.HttpMethod.PUT, putIntergation, {
+      operationName: 'PutTimetable',
       methodResponses: [{
         statusCode: '200',
         responseParameters: lambdaRespParams,
@@ -476,6 +490,7 @@ export class TimetableApiService extends RestApiService {
         [apigw2.HttpMethod.GET]: getTimetable,
         [apigw2.HttpMethod.PATCH]: patchTimetable,
         [apigw2.HttpMethod.POST]: postTimetable,
+        [apigw2.HttpMethod.PUT]: putTimetable,
       },
       // "/timetable/export": {
       //     [apigw2.HttpMethod.POST]: exportTimetable,
