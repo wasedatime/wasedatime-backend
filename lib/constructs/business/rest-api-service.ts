@@ -418,10 +418,12 @@ export class TimetableApiService extends RestApiService {
     //     timetableFunctions.exportFunction, {proxy: true},
     // );
 
+    // , apigw2.HttpMethod.DELETE
+
     const optionsTimetable = root.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
-      allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.POST, apigw2.HttpMethod.PATCH, apigw2.HttpMethod.OPTIONS, apigw2.HttpMethod.DELETE],
+      allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.PUT, apigw2.HttpMethod.POST, apigw2.HttpMethod.PATCH, apigw2.HttpMethod.OPTIONS],
     });
     const getTimetable = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
       operationName: 'GetTimetable',
