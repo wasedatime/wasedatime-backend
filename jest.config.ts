@@ -1,4 +1,4 @@
-import { Config } from '@jest/types';
+import type { Config } from '@jest/types';
 
 const config: Config.InitialOptions = {
   testEnvironment: 'node',
@@ -7,7 +7,6 @@ const config: Config.InitialOptions = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
-  moduleDirectories: ['<rootDir>/node_modules'],
 };
 
 export default config;

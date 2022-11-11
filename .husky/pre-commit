@@ -14,5 +14,3 @@ if [ ! -z "$js_diff" ]; then
 else
   echo "Seems you haven't changed any JavaScript, skip checks. "
 fi
-
-npx lint-staged
