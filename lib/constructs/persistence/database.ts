@@ -8,6 +8,7 @@ export enum Collection {
   FEEDS,
   SYLLABUS,
   TIMETABLE,
+  FORUM,
 }
 
 export class DynamoDatabase extends Construct {
@@ -58,6 +59,18 @@ export class DynamoDatabase extends Construct {
       tableName: 'timetable',
       readCapacity: 12,
       writeCapacity: 15,
+      pointInTimeRecovery: true,
+    });
+
+    this.tables[Collection.FORUM] = new dynamodb.Table(this, 'dynamodb-forum-table', {
+      partitionKey: { name: 'uid', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PROVISIONED,
+      encryption: dynamodb.TableEncryption.DEFAULT,
+      removalPolicy: RemovalPolicy.RETAIN,
+      sortKey: { name: 'board', type: dynamodb.AttributeType.STRING },
+      tableName: 'forum',
+      readCapacity: 10,
+      writeCapacity: 7,
       pointInTimeRecovery: true,
     });
   }

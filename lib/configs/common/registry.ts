@@ -10,6 +10,7 @@ export const enum DataEndpoint {
   CAREER,
   TIMETABLE,
   COURSE,
+  FORUM,
 }
 
 export enum OperationEndpoint {

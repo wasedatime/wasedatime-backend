@@ -533,3 +533,36 @@ export class GraphqlApiService extends RestApiService {
     };
   }
 }
+
+export class ForumApiService extends RestApiService {
+  readonly resourceMapping: { [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method } };
+  constructor(scope: AbstractRestApiEndpoint, id: string, props: RestApiServiceProps) {
+    super(scope, id, props);
+
+    const root = scope.apiEndpoint.root.addResource('forum');
+    const forumFunctions = new forumFunctions(this, 'crud-functions', {
+      envVars: {
+        TABLE_NAME: props.dataSource!,
+      },
+    });
+    const getIntegration = new apigw.LambdaIntegration(
+      forumFunctions.getFunction, { proxy: true },
+    );
+    const postIntegration = new apigw.LambdaIntegration(
+      forumFunctions.postFunction, { proxy: true },
+    );
+    const patchIntegration = new apigw.LambdaIntegration(
+      forumFunctions.patchFunction, { proxy: true },
+    );
+    const putIntergation = new apigw.LambdaIntegration(
+      forumFunctions.putFunction, { proxy: true },
+    );
+    const optionsForum = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.POST, apigw2.HttpMethod.PATCH, apigw2.HttpMethod.OPTIONS, apigw2.HttpMethod.DELETE],
+    });
+
+
+  }
+}
