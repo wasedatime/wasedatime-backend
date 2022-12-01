@@ -8,7 +8,8 @@ export enum Collection {
   FEEDS,
   SYLLABUS,
   TIMETABLE,
-  FORUM,
+  THREAD,
+  COMMENT
 }
 
 export class DynamoDatabase extends Construct {
@@ -62,16 +63,36 @@ export class DynamoDatabase extends Construct {
       pointInTimeRecovery: true,
     });
 
-    this.tables[Collection.FORUM] = new dynamodb.Table(this, 'dynamodb-forum-table', {
+    this.tables[Collection.THREAD] = new dynamodb.Table(this, 'dynamodb-thread-table', {
       partitionKey: { name: 'uid', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PROVISIONED,
       encryption: dynamodb.TableEncryption.DEFAULT,
       removalPolicy: RemovalPolicy.RETAIN,
       sortKey: { name: 'board', type: dynamodb.AttributeType.STRING },
-      tableName: 'forum',
+      tableName: 'forum-thread',
       readCapacity: 10,
       writeCapacity: 7,
       pointInTimeRecovery: true,
+    });
+
+    this.tables[Collection.COMMENT] = new dynamodb.Table(this, 'dynamodb-comment-table', {
+      partitionKey: { name: 'uid', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PROVISIONED,
+      encryption: dynamodb.TableEncryption.DEFAULT,
+      removalPolicy: RemovalPolicy.RETAIN,
+      sortKey: { name: 'board', type: dynamodb.AttributeType.STRING },
+      tableName: 'forum-comment',
+      readCapacity: 10,
+      writeCapacity: 7,
+      pointInTimeRecovery: true,
+    });
+    this.tables[Collection.COMMENT].addGlobalSecondaryIndex({
+      indexName: 'userIdIndex',
+      partitionKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'status', type: dynamodb.AttributeType.STRING },
+      readCapacity: 1,
+      writeCapacity: 1,
+      projectionType: dynamodb.ProjectionType.ALL,
     });
   }
 }
