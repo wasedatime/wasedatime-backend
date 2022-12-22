@@ -1,26 +1,26 @@
 from boto3.dynamodb.conditions import Key
+import boto3
 from datetime import datetime
 from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_thread(thread_id):
+def get_board_threads(board_id):
 
     results = table.query(KeyConditionExpression=Key(
-        "thread_id").eq(thread_id))["Items"]
+        "board_id").eq(board_id))["Items"]
     if not results:
         raise LookupError
 
-    item = results[0]
-
     body = JsonPayloadBuilder().add_status(
-        True).add_data(item).add_message('').compile()
+        True).add_data(results).add_message('').compile()
     return body
 
 
 def handler(event, context):
+
     params = {
-        "thread_id": event["queryStringParameters"]["thread_id"]
+        "board_id": event["queryStringParameters"]["board_id"]
     }
 
-    return get_thread(**params)
+    return get_board_threads(**params)
