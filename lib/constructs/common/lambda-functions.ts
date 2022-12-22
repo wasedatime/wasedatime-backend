@@ -483,87 +483,115 @@ export class SyllabusUpdateFunction extends Construct {
   }
 }
 
-// export class ForumThreadFunctions extends Construct {
-//   readonly getFunction: lambda.Function;
-//   readonly postFunction: lambda.Function;
-//   readonly patchFunction: lambda.Function;
-//   readonly deleteFunction: lambda.Function;
+export class ForumThreadFunctions extends Construct {
+  readonly getFunction: lambda.Function;
+  readonly postFunction: lambda.Function;
+  readonly patchFunction: lambda.Function;
+  readonly deleteFunction: lambda.Function;
 
-//   constructor(scope: Construct, id: string, props: FunctionsProps) {
-//     super(scope, id);
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
 
-//     const dynamoDBReadRole: iam.LazyRole = new iam.LazyRole(this, 'dynamo-read-role', {
-//       assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
-//       description: 'Allow lambda function to perform crud operation on dynamodb',
-//       path: `/service-role/${ AwsServicePrincipal.LAMBDA }/`,
-//       roleName: 'dynamodb-lambda-read',
-//       managedPolicies: [
-//         iam.ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec',
-//           'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'),
-//         iam.ManagedPolicy.fromManagedPolicyArn(this, 'db-read-only',
-//           'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess'),
-//       ],
-//     });
+    const dynamoDBReadRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-read-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-lambda-read',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-read-only',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+          ),
+        ],
+      },
+    );
 
-//     const dynamoDBPutRole: iam.LazyRole = new iam.LazyRole(this, 'dynamo-put-role', {
-//       assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
-//       description: 'Allow lambda function to perform crud operation on dynamodb',
-//       path: `/service-role/${ AwsServicePrincipal.LAMBDA }/`,
-//       roleName: 'dynamodb-lambda-write',
-//       managedPolicies: [
-//         iam.ManagedPolicy.fromManagedPolicyArn(this, 'basic-exec1',
-//           'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'),
-//         iam.ManagedPolicy.fromManagedPolicyArn(this, 'db-full-access',
-//           'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess'),
-//       ],
-//     });
+    const dynamoDBPutRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-put-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-lambda-write',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+        ],
+      },
+    );
 
-//     this.getFunction = new lambda_py.PythonFunction(this, 'get-threads', {
-//       entry: 'src/lambda/get-threads',
-//       description: 'Get forum threads from the database.',
-//       functionName: 'get-forum-threads',
-//       logRetention: logs.RetentionDays.ONE_MONTH,
-//       memorySize: 128,
-//       role: dynamoDBReadRole,
-//       runtime: lambda.Runtime.PYTHON_3_9,
-//       timeout: Duration.seconds(3),
-//       environment: props.envVars,
-//     });
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-threads', {
+      entry: 'src/lambda/get-threads',
+      description: 'Get forum threads from the database.',
+      functionName: 'get-forum-threads',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
 
-//     this.postFunction = new lambda_py.PythonFunction(this, 'post-thread', {
-//       entry: 'src/lambda/post-threads',
-//       description: 'Save forum thread into the database.',
-//       functionName: 'post-forum-thread',
-//       logRetention: logs.RetentionDays.ONE_MONTH,
-//       memorySize: 256,
-//       role: dynamoDBPutRole,
-//       runtime: lambda.Runtime.PYTHON_3_9,
-//       timeout: Duration.seconds(5),
-//       environment: props.envVars,
-//     }).addEnvironment('GOOGLE_API_SERVICE_ACCOUNT_INFO', GOOGLE_API_SERVICE_ACCOUNT_INFO);
+    this.postFunction = new lambda_py.PythonFunction(this, 'post-thread', {
+      entry: 'src/lambda/post-threads',
+      description: 'Save forum thread into the database.',
+      functionName: 'post-forum-thread',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    }).addEnvironment(
+      'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+      GOOGLE_API_SERVICE_ACCOUNT_INFO,
+    );
 
-//     this.patchFunction = new lambda_py.PythonFunction(this, 'patch-thread', {
-//       entry: 'src/lambda/patch-threads',
-//       description: 'Update forum thread in the database.',
-//       functionName: 'patch-forum-thread',
-//       logRetention: logs.RetentionDays.ONE_MONTH,
-//       memorySize: 256,
-//       role: dynamoDBPutRole,
-//       runtime: lambda.Runtime.PYTHON_3_9,
-//       timeout: Duration.seconds(5),
-//       environment: props.envVars,
-//     }).addEnvironment('GOOGLE_API_SERVICE_ACCOUNT_INFO', GOOGLE_API_SERVICE_ACCOUNT_INFO);
+    this.patchFunction = new lambda_py.PythonFunction(this, 'patch-thread', {
+      entry: 'src/lambda/patch-threads',
+      description: 'Update forum thread in the database.',
+      functionName: 'patch-forum-thread',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    }).addEnvironment(
+      'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+      GOOGLE_API_SERVICE_ACCOUNT_INFO,
+    );
 
-//     this.deleteFunction = new lambda_py.PythonFunction(this, 'delete-thread', {
-//       entry: 'src/lambda/delete-threads',
-//       description: 'Delete forum thread in the database.',
-//       functionName: 'delete-forum-thread',
-//       logRetention: logs.RetentionDays.ONE_MONTH,
-//       memorySize: 128,
-//       role: dynamoDBPutRole,
-//       runtime: lambda.Runtime.PYTHON_3_9,
-//       timeout: Duration.seconds(3),
-//       environment: props.envVars,
-//     });
-//   }
-//}
+    this.deleteFunction = new lambda_py.PythonFunction(this, 'delete-thread', {
+      entry: 'src/lambda/delete-threads',
+      description: 'Delete forum thread in the database.',
+      functionName: 'delete-forum-thread',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+  }
+}
