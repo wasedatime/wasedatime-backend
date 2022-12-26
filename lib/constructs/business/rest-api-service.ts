@@ -710,7 +710,7 @@ export class ForumThreadsApiService extends RestApiService {
     super(scope, id, props);
 
     const root = scope.apiEndpoint.root
-      .addResource('thread')
+      .addResource('forum-thread')
       .addResource('{board_id}');
 
     const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
@@ -776,7 +776,7 @@ export class ForumThreadsApiService extends RestApiService {
         requestParameters: {
           'method.request.querystring.uid': false,
         },
-        operationName: 'GetReviews',
+        operationName: 'GetThreads',
         methodResponses: [
           {
             statusCode: '200',
@@ -791,7 +791,7 @@ export class ForumThreadsApiService extends RestApiService {
       apigw2.HttpMethod.POST,
       postIntegration,
       {
-        operationName: 'PostReview',
+        operationName: 'PostThread',
         requestModels: { ['application/json']: postReqModel },
         methodResponses: [
           {
@@ -807,7 +807,7 @@ export class ForumThreadsApiService extends RestApiService {
       apigw2.HttpMethod.PATCH,
       patchIntegration,
       {
-        operationName: 'UpdateReview',
+        operationName: 'UpdateThread',
         requestParameters: {
           'method.request.querystring.ts': true,
         },
@@ -826,7 +826,7 @@ export class ForumThreadsApiService extends RestApiService {
       apigw2.HttpMethod.DELETE,
       deleteIntegration,
       {
-        operationName: 'DeleteReview',
+        operationName: 'DeleteThread',
         requestParameters: {
           'method.request.querystring.ts': true,
         },
@@ -842,7 +842,7 @@ export class ForumThreadsApiService extends RestApiService {
     );
 
     this.resourceMapping = {
-      '/course-reviews/{key}': {
+      '/forum-thread/{board_id}': {
         [apigw2.HttpMethod.GET]: getForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
         [apigw2.HttpMethod.PATCH]: patchForumThreads,
