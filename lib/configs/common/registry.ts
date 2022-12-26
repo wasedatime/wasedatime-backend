@@ -1,7 +1,7 @@
 export enum ServiceEndpoint {
   API_REST,
   AUTH,
-  API_GRAPHQL
+  API_GRAPHQL,
 }
 
 export const enum DataEndpoint {
@@ -10,10 +10,11 @@ export const enum DataEndpoint {
   CAREER,
   TIMETABLE,
   COURSE,
-  FORUM,
+  THREAD,
+  COMMENT,
 }
 
 export enum OperationEndpoint {
   APP,
-  SYLLABUS
+  SYLLABUS,
 }

@@ -18,19 +18,31 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const syllabusDataPipeline = new SyllabusDataPipeline(this, 'syllabus-datapipeline', {});
+    const syllabusDataPipeline = new SyllabusDataPipeline(
+      this,
+      'syllabus-datapipeline',
+      {},
+    );
     this.dataPipelines[Worker.SYLLABUS] = syllabusDataPipeline;
 
-    const syllabusSyncPipeline = new SyllabusSyncPipeline(this, 'syllabus-sync', {
-      dataSource: syllabusDataPipeline.dataWarehouse,
-    });
+    const syllabusSyncPipeline = new SyllabusSyncPipeline(
+      this,
+      'syllabus-sync',
+      {
+        dataSource: syllabusDataPipeline.dataWarehouse,
+      },
+    );
 
     const dynamoDatabase = new DynamoDatabase(this, 'dynamo-db');
     this.databases['dynamo-main'] = dynamoDatabase;
 
-    this.dataPipelines[Worker.CAREER] = new CareerDataPipeline(this, 'career-datapipeline', {
-      dataWarehouse: dynamoDatabase.tables[Collection.CAREER],
-    });
+    this.dataPipelines[Worker.CAREER] = new CareerDataPipeline(
+      this,
+      'career-datapipeline',
+      {
+        dataWarehouse: dynamoDatabase.tables[Collection.CAREER],
+      },
+    );
 
     this.dataInterface.setEndpoint(
       DataEndpoint.COURSE_REVIEWS,
@@ -48,16 +60,21 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       DataEndpoint.SYLLABUS,
       syllabusDataPipeline.dataWarehouse.bucketName,
     );
+    this.dataInterface.setEndpoint(
+      DataEndpoint.THREAD,
+      dynamoDatabase.tables[Collection.THREAD],
+    );
+    this.dataInterface.setEndpoint(
+      DataEndpoint.COMMENT,
+      dynamoDatabase.tables[Collection.COMMENT],
+    );
     // this.dataInterface.setEndpoint(
     //     DataEndpoint.COURSE,
     //     syllabusSyncPipeline.dataWarehouse.tableName,
     // );
 
-    this.operationInterface.setEndpoint(
-      OperationEndpoint.SYLLABUS,
-      {
-        [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
-      },
-    );
+    this.operationInterface.setEndpoint(OperationEndpoint.SYLLABUS, {
+      [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
+    });
   }
 }
