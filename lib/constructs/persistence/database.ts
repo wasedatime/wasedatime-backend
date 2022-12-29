@@ -8,7 +8,7 @@ export enum Collection {
   FEEDS,
   SYLLABUS,
   TIMETABLE,
-  FORUM,
+  THREAD,
   COMMENT,
 }
 
@@ -82,7 +82,7 @@ export class DynamoDatabase extends Construct {
       },
     );
 
-    this.tables[Collection.FORUM] = new dynamodb.Table(
+    this.tables[Collection.THREAD] = new dynamodb.Table(
       this,
       'dynamodb-thread-table',
       {
@@ -101,7 +101,7 @@ export class DynamoDatabase extends Construct {
       },
     );
 
-    this.tables[Collection.FORUM].addLocalSecondaryIndex({
+    this.tables[Collection.THREAD].addLocalSecondaryIndex({
       indexName: 'GroupIndex',
       sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,

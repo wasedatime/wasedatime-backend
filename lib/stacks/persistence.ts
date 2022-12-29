@@ -61,8 +61,8 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       syllabusDataPipeline.dataWarehouse.bucketName,
     );
     this.dataInterface.setEndpoint(
-      DataEndpoint.FORUM,
-      dynamoDatabase.tables[Collection.FORUM],
+      DataEndpoint.THREAD,
+      dynamoDatabase.tables[Collection.THREAD].tableName,
     );
     this.dataInterface.setEndpoint(
       DataEndpoint.COMMENT,
