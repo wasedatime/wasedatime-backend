@@ -541,7 +541,7 @@ export class ForumThreadFunctions extends Construct {
     );
 
     this.getFunction = new lambda_py.PythonFunction(this, 'get-board-threads', {
-      entry: 'src/lambda/get-threads',
+      entry: 'src/lambda/get-board-threads',
       description: 'Get forum threads from the database.',
       functionName: 'get-board-threads',
       logRetention: logs.RetentionDays.ONE_MONTH,
