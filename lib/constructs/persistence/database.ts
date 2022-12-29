@@ -102,17 +102,16 @@ export class DynamoDatabase extends Construct {
     );
 
     this.tables[Collection.FORUM].addLocalSecondaryIndex({
-      indexName: 'GroupbyCreated',
-      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-      projectionType: dynamodb.ProjectionType.INCLUDE,
-      nonKeyAttributes: ['thread_id', 'title', 'body'],
-    });
-
-    this.tables[Collection.FORUM].addLocalSecondaryIndex({
-      indexName: 'TagbyCreated',
+      indexName: 'GroupIndex',
       sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,
     });
+
+    // this.tables[Collection.FORUM].addLocalSecondaryIndex({
+    //   indexName: "TagbyCreated",
+    //   sortKey: { name: "created_at", type: dynamodb.AttributeType.STRING },
+    //   projectionType: dynamodb.ProjectionType.ALL,
+    // });
 
     this.tables[Collection.COMMENT] = new dynamodb.Table(
       this,
@@ -132,11 +131,5 @@ export class DynamoDatabase extends Construct {
         pointInTimeRecovery: true,
       },
     );
-
-    this.tables[Collection.COMMENT].addLocalSecondaryIndex({
-      indexName: 'UidbtCreated',
-      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-      projectionType: dynamodb.ProjectionType.ALL,
-    });
   }
 }
