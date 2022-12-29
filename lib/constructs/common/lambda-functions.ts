@@ -565,7 +565,7 @@ export class ForumThreadFunctions extends Construct {
     });
 
     this.postFunction = new lambda_py.PythonFunction(this, 'post-thread', {
-      entry: 'src/lambda/post-threads',
+      entry: 'src/lambda/post-thread',
       description: 'Save forum thread into the database.',
       functionName: 'post-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
