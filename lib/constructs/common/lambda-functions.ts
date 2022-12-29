@@ -540,10 +540,22 @@ export class ForumThreadFunctions extends Construct {
       },
     );
 
-    this.getFunction = new lambda_py.PythonFunction(this, 'get-threads', {
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-board-threads', {
       entry: 'src/lambda/get-threads',
       description: 'Get forum threads from the database.',
-      functionName: 'get-forum-threads',
+      functionName: 'get-board-threads',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-single-thread', {
+      entry: 'src/lambda/get-single-thread',
+      description: 'Gets a single forum thread from the database.',
+      functionName: 'get-single-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
       role: dynamoDBReadRole,

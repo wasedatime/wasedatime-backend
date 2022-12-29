@@ -1,14 +1,16 @@
 from boto3.dynamodb.conditions import Key
 import json
 from datetime import datetime
-from utils import JsonPayloadBuilder, table, resp_handler
+from utils import JsonPayloadBuilder, table, resp_handler, build_thread_id
+import uuid
 
 
 @resp_handler
 def post_thread(board_id, thread, uid):
 
+    thread_id = build_thread_id(uid)
+
     text = thread["body"]
-    thread_id = "thisthat"
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 

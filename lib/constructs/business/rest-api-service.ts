@@ -791,7 +791,7 @@ export class ForumThreadsApiService extends RestApiService {
       getIntegration,
       {
         requestParameters: {
-          'method.request.querystring.uid': false,
+          'method.request.path.forum': true,
         },
         operationName: 'GetThreads',
         methodResponses: [
@@ -810,7 +810,7 @@ export class ForumThreadsApiService extends RestApiService {
       getIntegration,
       {
         requestParameters: {
-          'method.request.querystring.uid': false,
+          'method.request.querystring.thread_id': true,
         },
         operationName: 'GetThreads',
         methodResponses: [
@@ -878,12 +878,16 @@ export class ForumThreadsApiService extends RestApiService {
     );
 
     this.resourceMapping = {
-      '/forum': {
+      '/forum/{board_id}': {
         [apigw2.HttpMethod.GET]: getAllForumThreads,
+        [apigw2.HttpMethod.POST]: postForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
-        // [apigw2.HttpMethod.PATCH]: patchForumThreads,
-        // [apigw2.HttpMethod.POST]: postForumThreads,
-        // [apigw2.HttpMethod.DELETE]: deleteForumThreads,
+      },
+      '/forum/{board_id}/{thread_id}': {
+        [apigw2.HttpMethod.GET]: getForumThread,
+        [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
+        [apigw2.HttpMethod.PATCH]: patchForumThreads,
+        [apigw2.HttpMethod.DELETE]: deleteForumThreads,
       },
     };
   }

@@ -4,6 +4,8 @@ import json
 import logging
 import os
 from decimal import Decimal
+from datetime import datetime
+import uuid
 from google.cloud import translate
 from google.oauth2 import service_account
 
@@ -105,3 +107,17 @@ def translate_text(text):
         translations[lang] = translated or ''
 
     return src_lang, translations
+
+
+def build_thread_id(uid):
+
+    unique_id = str(uuid.uuid4())
+
+    ts = datetime.now().strftime('%Y%m%d%H%M%S')
+
+    first_half = uid[:5]
+    second_half = unique_id[5:]
+
+    thread_id = f"{ts}{first_half}{second_half}"
+
+    return thread_id

@@ -20,7 +20,7 @@ def get_board_threads(board_id):
 def handler(event, context):
 
     params = {
-        "board_id": event["queryStringParameters"]["board_id"]
+        "board_id": event["pathParameters"]["board_id"]
     }
 
     return get_board_threads(**params)
