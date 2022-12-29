@@ -580,7 +580,7 @@ export class ForumThreadFunctions extends Construct {
     );
 
     this.patchFunction = new lambda_py.PythonFunction(this, 'patch-thread', {
-      entry: 'src/lambda/patch-threads',
+      entry: 'src/lambda/patch-thread',
       description: 'Update forum thread in the database.',
       functionName: 'patch-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
@@ -595,7 +595,7 @@ export class ForumThreadFunctions extends Construct {
     );
 
     this.deleteFunction = new lambda_py.PythonFunction(this, 'delete-thread', {
-      entry: 'src/lambda/delete-threads',
+      entry: 'src/lambda/delete-thread',
       description: 'Delete forum thread in the database.',
       functionName: 'delete-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
