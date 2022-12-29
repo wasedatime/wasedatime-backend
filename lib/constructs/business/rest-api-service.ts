@@ -810,9 +810,9 @@ export class ForumThreadsApiService extends RestApiService {
       getIntegration,
       {
         requestParameters: {
-          'method.request.querystring.thread_id': true,
+          'method.request.path.forum.thread_id': true,
         },
-        operationName: 'GetThreads',
+        operationName: 'GetThread',
         methodResponses: [
           {
             statusCode: '200',
