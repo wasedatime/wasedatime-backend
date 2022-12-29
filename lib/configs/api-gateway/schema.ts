@@ -393,7 +393,7 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
             type: apigw.JsonSchemaType.INTEGER,
           },
           board_id: {
-            type: apigw.JsonSchemaType.INTEGER,
+            type: apigw.JsonSchemaType.STRING,
           },
           updated_at: {
             type: apigw.JsonSchemaType.STRING,
@@ -402,7 +402,10 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
             type: apigw.JsonSchemaType.STRING,
           },
           tag_id: {
-            type: apigw.JsonSchemaType.INTEGER,
+            type: apigw.JsonSchemaType.STRING,
+          },
+          group_id: {
+            type: apigw.JsonSchemaType.STRING,
           },
           thread_id: {
             type: apigw.JsonSchemaType.STRING,
@@ -423,6 +426,7 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
           'updated_at',
           'created_at',
           'tag_id',
+          'group_id',
           'thread_id',
           'title',
           'body',
@@ -448,10 +452,13 @@ export const forumThreadPostReqSchema: apigw.JsonSchema = {
           type: apigw.JsonSchemaType.INTEGER,
         },
         board_id: {
-          type: apigw.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.STRING,
         },
         tag_id: {
-          type: apigw.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.STRING,
+        },
+        group_id: {
+          type: apigw.JsonSchemaType.STRING,
         },
         thread_id: {
           type: apigw.JsonSchemaType.STRING,
@@ -463,7 +470,15 @@ export const forumThreadPostReqSchema: apigw.JsonSchema = {
           type: apigw.JsonSchemaType.STRING,
         },
       },
-      required: ['univ_id', 'board_id', 'tag_id', 'thread_id', 'title', 'body'],
+      required: [
+        'univ_id',
+        'board_id',
+        'tag_id',
+        'group_id',
+        'thread_id',
+        'title',
+        'body',
+      ],
     },
   },
   required: ['data'],
@@ -477,10 +492,10 @@ export const forumThreadPatchReqSchema: apigw.JsonSchema = {
       type: apigw.JsonSchemaType.OBJECT,
       properties: {
         board_id: {
-          type: apigw.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.STRING,
         },
         tag_id: {
-          type: apigw.JsonSchemaType.INTEGER,
+          type: apigw.JsonSchemaType.STRING,
         },
         thread_id: {
           type: apigw.JsonSchemaType.STRING,

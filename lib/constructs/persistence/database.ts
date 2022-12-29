@@ -88,7 +88,7 @@ export class DynamoDatabase extends Construct {
       {
         partitionKey: {
           name: 'board_id',
-          type: dynamodb.AttributeType.STRING,
+          type: dynamodb.AttributeType.NUMBER,
         },
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
@@ -102,17 +102,23 @@ export class DynamoDatabase extends Construct {
     );
 
     this.tables[Collection.THREAD].addLocalSecondaryIndex({
-      indexName: 'GroupbyCreated',
-      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-      projectionType: dynamodb.ProjectionType.INCLUDE,
-      nonKeyAttributes: ['thread_id', 'title', 'body'],
+      indexName: 'GroupIndex',
+      sortKey: { name: 'group_id', type: dynamodb.AttributeType.NUMBER },
+      projectionType: dynamodb.ProjectionType.ALL,
     });
 
     this.tables[Collection.THREAD].addLocalSecondaryIndex({
-      indexName: 'TagbyCreated',
-      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
+      indexName: 'TagIndex',
+      sortKey: { name: 'tag_id', type: dynamodb.AttributeType.NUMBER },
       projectionType: dynamodb.ProjectionType.ALL,
     });
+
+    // this.tables[Collection.THREAD].addGlobalSecondaryIndex({
+    //   indexName: "UidbyCreated_at",
+    //   partitionKey: { name: "uid", type: dynamodb.AttributeType.STRING },
+    //   sortKey: { name: "created_at", type: dynamodb.AttributeType.NUMBER },
+    //   projectionType: dynamodb.ProjectionType.ALL,
+    // });
 
     this.tables[Collection.COMMENT] = new dynamodb.Table(
       this,
@@ -125,18 +131,12 @@ export class DynamoDatabase extends Construct {
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.RETAIN,
-        sortKey: { name: 'board', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
         tableName: 'forum-comment',
         readCapacity: 10,
         writeCapacity: 7,
         pointInTimeRecovery: true,
       },
     );
-
-    this.tables[Collection.COMMENT].addLocalSecondaryIndex({
-      indexName: 'UidbtCreated',
-      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-      projectionType: dynamodb.ProjectionType.ALL,
-    });
   }
 }

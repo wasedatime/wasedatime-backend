@@ -710,26 +710,54 @@ export class ForumThreadsApiService extends RestApiService {
     super(scope, id, props);
 
     const root = scope.apiEndpoint.root
-      .addResource('forum-thread')
+      .addResource('forum')
       .addResource('{board_id}');
+    const threadResource = root.addResource('{thread_id}');
+    // const threadGroupResource = threadBoardResource.addResource("{group_id}");
+    // const threadTagResource = root.addResource("{tag_id}");
+    // const threadGroupTagResource = threadGroupResource.addResource("{tag_id}");
+
+    const optionsAllThreads = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const optionsForumThreads = threadResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
 
     const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
       schema: forumThreadGetRespSchema,
       contentType: 'application/json',
       description: 'HTTP GET response body schema for fetching threads.',
-      modelName: 'GetReviewsResp',
+      modelName: 'GetThreadsResp',
     });
     const postReqModel = scope.apiEndpoint.addModel('review-post-req-model', {
       schema: forumThreadPostReqSchema,
       contentType: 'application/json',
       description: 'HTTP POST request body schema for submitting a thread.',
-      modelName: 'PostReviewReq',
+      modelName: 'PostThreadReq',
     });
     const patchReqModel = scope.apiEndpoint.addModel('review-patch-req-model', {
       schema: forumThreadPatchReqSchema,
       contentType: 'application/json',
       description: 'HTTP PATCH request body schema for updating a thread',
-      modelName: 'PatchReviewReq',
+      modelName: 'PatchThreadReq',
     });
 
     const forumThreadsFunctions = new ForumThreadFunctions(
@@ -758,18 +786,26 @@ export class ForumThreadsApiService extends RestApiService {
       { proxy: true },
     );
 
-    const optionsForumThreads = root.addCorsPreflight({
-      allowOrigins: allowOrigins,
-      allowHeaders: allowHeaders,
-      allowMethods: [
-        apigw2.HttpMethod.GET,
-        apigw2.HttpMethod.POST,
-        apigw2.HttpMethod.PATCH,
-        apigw2.HttpMethod.DELETE,
-        apigw2.HttpMethod.OPTIONS,
-      ],
-    });
-    const getForumThreads = root.addMethod(
+    const getAllForumThreads = root.addMethod(
+      apigw2.HttpMethod.GET,
+      getIntegration,
+      {
+        requestParameters: {
+          'method.request.querystring.uid': false,
+        },
+        operationName: 'GetThreads',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+
+    const getForumThread = threadResource.addMethod(
       apigw2.HttpMethod.GET,
       getIntegration,
       {
@@ -842,13 +878,57 @@ export class ForumThreadsApiService extends RestApiService {
     );
 
     this.resourceMapping = {
-      '/forum-thread/{board_id}': {
-        [apigw2.HttpMethod.GET]: getForumThreads,
+      '/forum': {
+        [apigw2.HttpMethod.GET]: getAllForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
-        [apigw2.HttpMethod.PATCH]: patchForumThreads,
-        [apigw2.HttpMethod.POST]: postForumThreads,
-        [apigw2.HttpMethod.DELETE]: deleteForumThreads,
+        // [apigw2.HttpMethod.PATCH]: patchForumThreads,
+        // [apigw2.HttpMethod.POST]: postForumThreads,
+        // [apigw2.HttpMethod.DELETE]: deleteForumThreads,
       },
     };
   }
 }
+
+// const root = scope.apiEndpoint.root;
+
+// // Create the /course-reviews resource
+// const courseReviewsResource = root.addResource("course-reviews");
+
+// // Create the /course-reviews/{key} resource
+// const singleCourseReviewResource = courseReviewsResource.addResource("{key}");
+
+// // Add the GET method to the /course-reviews resource
+// const getCourseReviews = courseReviewsResource.addMethod(
+//   apigw2.HttpMethod.GET,
+//   getAllCourseReviewsIntegration,
+//   {
+//     operationName: "GetAllCourseReviews",
+//     methodResponses: [
+//       {
+//         statusCode: "200",
+//         responseModels: { ["application/json"]: getRespModel },
+//         responseParameters: lambdaRespParams,
+//       },
+//     ],
+//     requestValidator: props.validator,
+//   }
+// );
+
+// // Add the GET method to the /course-reviews/{key} resource
+// const getSingleCourseReview = singleCourseReviewResource.addMethod(
+//   apigw2.HttpMethod.GET,
+//   getSingleCourseReviewIntegration,
+//   {
+//     requestParameters: {
+//       "method.request.querystring.uid": false,
+//     },
+//     operationName: "GetSingleCourseReview",
+//     methodResponses: [
+//       {
+//         statusCode: "200",
+//         responseModels: { ["application/json"]: getRespModel },
+//         responseParameters: lambdaRespParams,
+//       },
+//     ],
+//     requestValidator: props.valid
+// )
