@@ -747,13 +747,13 @@ export class ForumThreadsApiService extends RestApiService {
       description: 'HTTP GET response body schema for fetching threads.',
       modelName: 'GetThreadsResp',
     });
-    const postReqModel = scope.apiEndpoint.addModel('review-post-req-model', {
+    const postReqModel = scope.apiEndpoint.addModel('thread-post-req-model', {
       schema: forumThreadPostReqSchema,
       contentType: 'application/json',
       description: 'HTTP POST request body schema for submitting a thread.',
       modelName: 'PostThreadReq',
     });
-    const patchReqModel = scope.apiEndpoint.addModel('review-patch-req-model', {
+    const patchReqModel = scope.apiEndpoint.addModel('thread-patch-req-model', {
       schema: forumThreadPatchReqSchema,
       contentType: 'application/json',
       description: 'HTTP PATCH request body schema for updating a thread',
