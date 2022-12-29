@@ -88,7 +88,7 @@ export class DynamoDatabase extends Construct {
       {
         partitionKey: {
           name: 'board_id',
-          type: dynamodb.AttributeType.STRING,
+          type: dynamodb.AttributeType.NUMBER,
         },
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
@@ -103,13 +103,20 @@ export class DynamoDatabase extends Construct {
 
     this.tables[Collection.THREAD].addLocalSecondaryIndex({
       indexName: 'GroupIndex',
-      sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'group_id', type: dynamodb.AttributeType.NUMBER },
       projectionType: dynamodb.ProjectionType.ALL,
     });
 
-    // this.tables[Collection.FORUM].addLocalSecondaryIndex({
-    //   indexName: "TagbyCreated",
-    //   sortKey: { name: "created_at", type: dynamodb.AttributeType.STRING },
+    this.tables[Collection.THREAD].addLocalSecondaryIndex({
+      indexName: 'TagIndex',
+      sortKey: { name: 'tag_id', type: dynamodb.AttributeType.NUMBER },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
+
+    // this.tables[Collection.THREAD].addGlobalSecondaryIndex({
+    //   indexName: "UidbyCreated_at",
+    //   partitionKey: { name: "uid", type: dynamodb.AttributeType.STRING },
+    //   sortKey: { name: "created_at", type: dynamodb.AttributeType.NUMBER },
     //   projectionType: dynamodb.ProjectionType.ALL,
     // });
 
@@ -124,7 +131,7 @@ export class DynamoDatabase extends Construct {
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.RETAIN,
-        sortKey: { name: 'board', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
         tableName: 'forum-comment',
         readCapacity: 10,
         writeCapacity: 7,
