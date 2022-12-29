@@ -107,11 +107,11 @@ export class DynamoDatabase extends Construct {
       projectionType: dynamodb.ProjectionType.ALL,
     });
 
-    this.tables[Collection.THREAD].addLocalSecondaryIndex({
-      indexName: 'TagIndex',
-      sortKey: { name: 'tag_id', type: dynamodb.AttributeType.NUMBER },
-      projectionType: dynamodb.ProjectionType.ALL,
-    });
+    // this.tables[Collection.THREAD].addLocalSecondaryIndex({
+    //   indexName: 'TagIndex',
+    //   sortKey: { name: 'tag_id', type: dynamodb.AttributeType.NUMBER },
+    //   projectionType: dynamodb.ProjectionType.ALL,
+    // });
 
     // this.tables[Collection.THREAD].addGlobalSecondaryIndex({
     //   indexName: "UidbyCreated_at",
@@ -132,7 +132,7 @@ export class DynamoDatabase extends Construct {
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.RETAIN,
         sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-        tableName: 'forum-comment',
+        tableName: 'forum-comments',
         readCapacity: 10,
         writeCapacity: 7,
         pointInTimeRecovery: true,
