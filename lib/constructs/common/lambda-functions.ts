@@ -500,7 +500,7 @@ export class ForumThreadFunctions extends Construct {
         description:
           'Allow lambda function to perform crud operation on dynamodb',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-lambda-read',
+        roleName: 'dynamodb-lambda-read-thread',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -524,7 +524,7 @@ export class ForumThreadFunctions extends Construct {
         description:
           'Allow lambda function to perform crud operation on dynamodb',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-lambda-write',
+        roleName: 'dynamodb-lambda-write-thread',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
