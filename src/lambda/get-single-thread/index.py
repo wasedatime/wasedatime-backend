@@ -1,29 +1,36 @@
-# from boto3.dynamodb.conditions import Key
-# from datetime import datetime
-# from utils import JsonPayloadBuilder, table, resp_handler
+from boto3.dynamodb.conditions import Key
+from datetime import datetime
+from utils import JsonPayloadBuilder, table, resp_handler
 
 
-# @resp_handler
-# def get_thread(thread_id):
-#     now = datetime.now()
+@resp_handler
+def get_single_thread(thread_id):
 
-#     items = table.query(
-#         KeyConditionExpression='sort_key <= :sk',
-#         ExpressionAttributeValues={
-#             ':sk': now.strftime('%Y-%m-%d %H:%M:%S')
-#         },
-#         ScanIndexForward=False,
-#         Limit=50
-#     )
+    results = table.query(KeyConditionExpression=Key(
+        "thread_id").eq(thread_id))["Items"]
+    if not results:
+        raise LookupError
 
-#     body = JsonPayloadBuilder().add_status(
-#         True).add_data(items).add_message('').compile()
-#     return body
+    table.update_item(
+        key={
+            "thread_id": thread_id
+        },
+        UpdateExpression="SET views = views + :incr",
+        ExpressionAttributeValues={
+            ":incr": 1
+        }
+    )
+
+    item = results[0]
+
+    body = JsonPayloadBuilder().add_status(
+        True).add_data(item).add_message('').compile()
+    return body
 
 
-# def handler(event, context):
-#     params = {
-#         "thread_id": event["queryStringParameters"]["id"]
-#     }
+def handler(event, context):
+    params = {
+        "thread_id": event["pathParameters"]["thread_id"]
+    }
 
-#     return get_thread(**params)
+    return get_single_thread(**params)

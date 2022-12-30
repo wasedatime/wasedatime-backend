@@ -88,15 +88,15 @@ export class DynamoDatabase extends Construct {
       {
         partitionKey: {
           name: 'board_id',
-          type: dynamodb.AttributeType.NUMBER,
+          type: dynamodb.AttributeType.STRING,
         },
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.RETAIN,
         sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-        tableName: 'forum-thread',
-        readCapacity: 10,
-        writeCapacity: 7,
+        tableName: 'forum-threads',
+        readCapacity: 15,
+        writeCapacity: 15,
         pointInTimeRecovery: true,
       },
     );
@@ -132,7 +132,7 @@ export class DynamoDatabase extends Construct {
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.RETAIN,
         sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-        tableName: 'forum-comment',
+        tableName: 'forum-comments',
         readCapacity: 10,
         writeCapacity: 7,
         pointInTimeRecovery: true,
