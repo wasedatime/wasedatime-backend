@@ -23,7 +23,8 @@ def post_thread(board_id, thread, uid):
         "uid": uid,
         "thread_id": thread_id,
         "group_id": thread["group_id"],
-        "univ_id": thread["univ_id"]
+        "univ_id": thread["univ_id"],
+        "view": 0,
     }
 
     table.put_item(thread_item)

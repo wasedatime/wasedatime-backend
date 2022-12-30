@@ -416,7 +416,7 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
           body: {
             type: apigw.JsonSchemaType.STRING,
           },
-          view: {
+          views: {
             type: apigw.JsonSchemaType.INTEGER,
           },
           mod: {
@@ -433,7 +433,7 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
           'thread_id',
           'title',
           'body',
-          'view',
+          'views',
           'mod',
         ],
       },
