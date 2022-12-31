@@ -5,7 +5,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_threads():
+def get_all_threads():
 
     response = table.scan(TableName=table)
     items = response['Items']
@@ -17,4 +17,4 @@ def get_threads():
 
 def handler(event, context):
 
-    return get_threads()
+    return get_all_threads()
