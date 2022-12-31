@@ -709,15 +709,14 @@ export class ForumThreadsApiService extends RestApiService {
   ) {
     super(scope, id, props);
 
-    const root = scope.apiEndpoint.root
-      .addResource('forum')
-      .addResource('{board_id}');
-    const threadResource = root.addResource('{thread_id}');
+    const root = scope.apiEndpoint.root.addResource('forum');
+    const boardResource = root.addResource('{board_id}');
+    const threadResource = boardResource.addResource('{thread_id}');
     // const threadGroupResource = threadBoardResource.addResource("{group_id}");
     // const threadTagResource = root.addResource("{tag_id}");
     // const threadGroupTagResource = threadGroupResource.addResource("{tag_id}");
 
-    const optionsAllThreads = root.addCorsPreflight({
+    const optionsForumThreads = root.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
       allowMethods: [
@@ -729,17 +728,17 @@ export class ForumThreadsApiService extends RestApiService {
       ],
     });
 
-    const optionsForumThreads = threadResource.addCorsPreflight({
-      allowOrigins: allowOrigins,
-      allowHeaders: allowHeaders,
-      allowMethods: [
-        apigw2.HttpMethod.GET,
-        apigw2.HttpMethod.POST,
-        apigw2.HttpMethod.PATCH,
-        apigw2.HttpMethod.DELETE,
-        apigw2.HttpMethod.OPTIONS,
-      ],
-    });
+    // const optionsForumThreads = threadResource.addCorsPreflight({
+    //   allowOrigins: allowOrigins,
+    //   allowHeaders: allowHeaders,
+    //   allowMethods: [
+    //     apigw2.HttpMethod.GET,
+    //     apigw2.HttpMethod.POST,
+    //     apigw2.HttpMethod.PATCH,
+    //     apigw2.HttpMethod.DELETE,
+    //     apigw2.HttpMethod.OPTIONS,
+    //   ],
+    // });
 
     const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
       schema: forumThreadGetRespSchema,
@@ -769,8 +768,17 @@ export class ForumThreadsApiService extends RestApiService {
         },
       },
     );
-    const getIntegration = new apigw.LambdaIntegration(
-      forumThreadsFunctions.getFunction,
+
+    const getAllInegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.getAllFunction,
+      { proxy: true },
+    );
+    const getBoardIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.getBoardFunction,
+      { proxy: true },
+    );
+    const getSingleIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.getSingleFunction,
       { proxy: true },
     );
     const postIntegration = new apigw.LambdaIntegration(
@@ -788,12 +796,25 @@ export class ForumThreadsApiService extends RestApiService {
 
     const getAllForumThreads = root.addMethod(
       apigw2.HttpMethod.GET,
-      getIntegration,
+      getAllInegration,
       {
-        requestParameters: {
-          'method.request.path.forum': true,
-        },
-        operationName: 'GetThreads',
+        operationName: 'GetAllThreads',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+
+    const getBoardForumThreads = boardResource.addMethod(
+      apigw2.HttpMethod.GET,
+      getBoardIntegration,
+      {
+        operationName: 'GetBoardThreads',
         methodResponses: [
           {
             statusCode: '200',
@@ -807,12 +828,12 @@ export class ForumThreadsApiService extends RestApiService {
 
     const getForumThread = threadResource.addMethod(
       apigw2.HttpMethod.GET,
-      getIntegration,
+      getSingleIntegration,
       {
         requestParameters: {
           'method.request.path.thread_id': true,
         },
-        operationName: 'GetThreads',
+        operationName: 'GetSingleThread',
         methodResponses: [
           {
             statusCode: '200',
@@ -839,7 +860,7 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
-    const patchForumThreads = root.addMethod(
+    const patchForumThreads = threadResource.addMethod(
       apigw2.HttpMethod.PATCH,
       patchIntegration,
       {
@@ -858,7 +879,7 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
-    const deleteForumThreads = root.addMethod(
+    const deleteForumThreads = threadResource.addMethod(
       apigw2.HttpMethod.DELETE,
       deleteIntegration,
       {
@@ -878,8 +899,11 @@ export class ForumThreadsApiService extends RestApiService {
     );
 
     this.resourceMapping = {
-      '/forum/{board_id}': {
+      '/forum': {
         [apigw2.HttpMethod.GET]: getAllForumThreads,
+      },
+      '/forum/{board_id}': {
+        [apigw2.HttpMethod.GET]: getBoardForumThreads,
         [apigw2.HttpMethod.POST]: postForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
       },
@@ -892,47 +916,3 @@ export class ForumThreadsApiService extends RestApiService {
     };
   }
 }
-
-// const root = scope.apiEndpoint.root;
-
-// // Create the /course-reviews resource
-// const courseReviewsResource = root.addResource("course-reviews");
-
-// // Create the /course-reviews/{key} resource
-// const singleCourseReviewResource = courseReviewsResource.addResource("{key}");
-
-// // Add the GET method to the /course-reviews resource
-// const getCourseReviews = courseReviewsResource.addMethod(
-//   apigw2.HttpMethod.GET,
-//   getAllCourseReviewsIntegration,
-//   {
-//     operationName: "GetAllCourseReviews",
-//     methodResponses: [
-//       {
-//         statusCode: "200",
-//         responseModels: { ["application/json"]: getRespModel },
-//         responseParameters: lambdaRespParams,
-//       },
-//     ],
-//     requestValidator: props.validator,
-//   }
-// );
-
-// // Add the GET method to the /course-reviews/{key} resource
-// const getSingleCourseReview = singleCourseReviewResource.addMethod(
-//   apigw2.HttpMethod.GET,
-//   getSingleCourseReviewIntegration,
-//   {
-//     requestParameters: {
-//       "method.request.querystring.uid": false,
-//     },
-//     operationName: "GetSingleCourseReview",
-//     methodResponses: [
-//       {
-//         statusCode: "200",
-//         responseModels: { ["application/json"]: getRespModel },
-//         responseParameters: lambdaRespParams,
-//       },
-//     ],
-//     requestValidator: props.valid
-// )

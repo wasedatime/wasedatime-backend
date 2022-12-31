@@ -484,7 +484,9 @@ export class SyllabusUpdateFunction extends Construct {
 }
 
 export class ForumThreadFunctions extends Construct {
-  readonly getFunction: lambda.Function;
+  readonly getAllFunction: lambda.Function;
+  readonly getBoardFunction: lambda.Function;
+  readonly getSingleFunction: lambda.Function;
   readonly postFunction: lambda.Function;
   readonly patchFunction: lambda.Function;
   readonly deleteFunction: lambda.Function;
@@ -540,29 +542,53 @@ export class ForumThreadFunctions extends Construct {
       },
     );
 
-    this.getFunction = new lambda_py.PythonFunction(this, 'get-board-threads', {
-      entry: 'src/lambda/get-board-threads',
-      description: 'Get forum threads from the database.',
-      functionName: 'get-board-threads',
-      logRetention: logs.RetentionDays.ONE_MONTH,
-      memorySize: 128,
-      role: dynamoDBReadRole,
-      runtime: lambda.Runtime.PYTHON_3_9,
-      timeout: Duration.seconds(3),
-      environment: props.envVars,
-    });
+    this.getAllFunction = new lambda_py.PythonFunction(
+      this,
+      'get-all-threads',
+      {
+        entry: 'src/lambda/get-all-threads',
+        description: 'Get all forum threads from the database.',
+        functionName: 'get-all-threads',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 128,
+        role: dynamoDBReadRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(3),
+        environment: props.envVars,
+      },
+    );
 
-    this.getFunction = new lambda_py.PythonFunction(this, 'get-single-thread', {
-      entry: 'src/lambda/get-single-thread',
-      description: 'Gets a single forum thread from the database.',
-      functionName: 'get-single-thread',
-      logRetention: logs.RetentionDays.ONE_MONTH,
-      memorySize: 128,
-      role: dynamoDBReadRole,
-      runtime: lambda.Runtime.PYTHON_3_9,
-      timeout: Duration.seconds(3),
-      environment: props.envVars,
-    });
+    this.getBoardFunction = new lambda_py.PythonFunction(
+      this,
+      'get-board-threads',
+      {
+        entry: 'src/lambda/get-board-threads',
+        description: 'Get forum threads from the database.',
+        functionName: 'get-board-threads',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 128,
+        role: dynamoDBReadRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(3),
+        environment: props.envVars,
+      },
+    );
+
+    this.getSingleFunction = new lambda_py.PythonFunction(
+      this,
+      'get-single-thread',
+      {
+        entry: 'src/lambda/get-single-thread',
+        description: 'Gets a single forum thread from the database.',
+        functionName: 'get-single-thread',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 128,
+        role: dynamoDBReadRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(3),
+        environment: props.envVars,
+      },
+    );
 
     this.postFunction = new lambda_py.PythonFunction(this, 'post-thread', {
       entry: 'src/lambda/post-thread',
