@@ -17,7 +17,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': 5.27.1
   '@typescript-eslint/parser': 5.27.1
   aws-cdk-lib: 2.27.0
-  constructs: 10.1.32
+  constructs: 10.1.205
   esbuild: ^0.15.12
   eslint: 8.17.0
   eslint-import-resolver-node: 0.3.6
@@ -34,19 +34,19 @@ specifiers:
   typescript: 4.7.3
 
 dependencies:
-  '@aws-cdk/aws-amplify-alpha': 2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c
-  '@aws-cdk/aws-apigatewayv2-alpha': 2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c
-  '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.27.0-alpha.0_ba3f00dfefe49087b99b7f2caa78c655
-  '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.27.0-alpha.0_ba3f00dfefe49087b99b7f2caa78c655
-  '@aws-cdk/aws-appsync-alpha': 2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c
-  '@aws-cdk/aws-lambda-python-alpha': 2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c
+  '@aws-cdk/aws-amplify-alpha': 2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e
+  '@aws-cdk/aws-apigatewayv2-alpha': 2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e
+  '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.27.0-alpha.0_b5df61e8c26f4585bf63906ebcc480cd
+  '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.27.0-alpha.0_b5df61e8c26f4585bf63906ebcc480cd
+  '@aws-cdk/aws-appsync-alpha': 2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e
+  '@aws-cdk/aws-lambda-python-alpha': 2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e
   '@jest/types': 29.3.1
   flatted: 3.2.7
   pluralize: 8.0.0
   source-map-support: 0.5.21
 
 devDependencies:
-  '@aws-cdk/assert': 2.27.0_0f207ad41472abe7f30fe5b7f2cf4a37
+  '@aws-cdk/assert': 2.27.0_95d4d19549a387b0e1912c64912f0a5f
   '@commitlint/cli': 17.0.2
   '@commitlint/config-conventional': 17.0.2
   '@types/jest': 28.1.8
@@ -54,8 +54,8 @@ devDependencies:
   '@types/pluralize': 0.0.29
   '@typescript-eslint/eslint-plugin': 5.27.1_043f48e0ee10c350c28cdede89899bc7
   '@typescript-eslint/parser': 5.27.1_eslint@8.17.0+typescript@4.7.3
-  aws-cdk-lib: 2.27.0_constructs@10.1.32
-  constructs: 10.1.32
+  aws-cdk-lib: 2.27.0_constructs@10.1.205
+  constructs: 10.1.205
   esbuild: 0.15.13
   eslint: 8.17.0
   eslint-import-resolver-node: 0.3.6
@@ -77,7 +77,7 @@ packages:
       '@jridgewell/trace-mapping': 0.3.17
     dev: true
 
-  /@aws-cdk/assert/2.27.0_0f207ad41472abe7f30fe5b7f2cf4a37:
+  /@aws-cdk/assert/2.27.0_95d4d19549a387b0e1912c64912f0a5f:
     resolution: {integrity: sha512-OU3k7fwhduUl1tAFvIKvsoW7F2Lz+Aq6rxR2enPSBX9aCWk59VCoPV8xDe3RzvGEj2iALYunp7s202S3ai+eVg==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
@@ -86,34 +86,34 @@ packages:
       jest: '>=26.6.3'
     dependencies:
       '@aws-cdk/cloudformation-diff': 2.27.0
-      aws-cdk-lib: 2.27.0_constructs@10.1.32
-      constructs: 10.1.32
+      aws-cdk-lib: 2.27.0_constructs@10.1.205
+      constructs: 10.1.205
       jest: 28.1.3_cdf6f73f7695c0fb6cc1b54573bf6654
     dev: true
 
-  /@aws-cdk/aws-amplify-alpha/2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c:
+  /@aws-cdk/aws-amplify-alpha/2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e:
     resolution: {integrity: sha512-cuP5V7AoQHXsiPcn5YPHntPeD+22j6Oe0yb6hQPN2L8hZZGSysqsn12nVEVvg7Wtx8xDDSOzvNnU7VeY87fS4g==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       aws-cdk-lib: ^2.27.0
       constructs: ^10.0.0
     dependencies:
-      aws-cdk-lib: 2.27.0_constructs@10.1.32
-      constructs: 10.1.32
+      aws-cdk-lib: 2.27.0_constructs@10.1.205
+      constructs: 10.1.205
     dev: false
 
-  /@aws-cdk/aws-apigatewayv2-alpha/2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c:
+  /@aws-cdk/aws-apigatewayv2-alpha/2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e:
     resolution: {integrity: sha512-e0VsZANE8qNiAznRW5m7soHivcsyJoKhkHSVg9WRTTIwS0rZEty7qZH0UjDxq7M2lgIZICaLWAyJOWvGpHEqIA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       aws-cdk-lib: ^2.27.0
       constructs: ^10.0.0
     dependencies:
-      aws-cdk-lib: 2.27.0_constructs@10.1.32
-      constructs: 10.1.32
+      aws-cdk-lib: 2.27.0_constructs@10.1.205
+      constructs: 10.1.205
     dev: false
 
-  /@aws-cdk/aws-apigatewayv2-authorizers-alpha/2.27.0-alpha.0_ba3f00dfefe49087b99b7f2caa78c655:
+  /@aws-cdk/aws-apigatewayv2-authorizers-alpha/2.27.0-alpha.0_b5df61e8c26f4585bf63906ebcc480cd:
     resolution: {integrity: sha512-RSMvF/l6v50eKDoEZj7rKDdxOv+DSfx+mkWsHPqSkYU70UeWZNJ4a7jRqJ/tzbajxX5GSoRMcEdR1GsrRXTfuw==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
@@ -121,12 +121,12 @@ packages:
       aws-cdk-lib: ^2.27.0
       constructs: ^10.0.0
     dependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c
-      aws-cdk-lib: 2.27.0_constructs@10.1.32
-      constructs: 10.1.32
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e
+      aws-cdk-lib: 2.27.0_constructs@10.1.205
+      constructs: 10.1.205
     dev: false
 
-  /@aws-cdk/aws-apigatewayv2-integrations-alpha/2.27.0-alpha.0_ba3f00dfefe49087b99b7f2caa78c655:
+  /@aws-cdk/aws-apigatewayv2-integrations-alpha/2.27.0-alpha.0_b5df61e8c26f4585bf63906ebcc480cd:
     resolution: {integrity: sha512-AL3Ps0hPV8zRcI8k2wW4uTh+k9ZfvjgyUouDOZBaEW0U8PoQOgRj7b0FJbE+zmgbnw3YY2ycoCSpTfVbN3Akdg==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
@@ -134,31 +134,31 @@ packages:
       aws-cdk-lib: ^2.27.0
       constructs: ^10.0.0
     dependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c
-      aws-cdk-lib: 2.27.0_constructs@10.1.32
-      constructs: 10.1.32
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e
+      aws-cdk-lib: 2.27.0_constructs@10.1.205
+      constructs: 10.1.205
     dev: false
 
-  /@aws-cdk/aws-appsync-alpha/2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c:
+  /@aws-cdk/aws-appsync-alpha/2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e:
     resolution: {integrity: sha512-z7JNdK1BUGbe70KaDa2Hu69uIn3FG9GUJZ+mKyL0HW7r4PAtdmXSPKVumRa5niR/x6eaxtWvcAXaADNEYht4VQ==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       aws-cdk-lib: ^2.27.0
       constructs: ^10.0.0
     dependencies:
-      aws-cdk-lib: 2.27.0_constructs@10.1.32
-      constructs: 10.1.32
+      aws-cdk-lib: 2.27.0_constructs@10.1.205
+      constructs: 10.1.205
     dev: false
 
-  /@aws-cdk/aws-lambda-python-alpha/2.27.0-alpha.0_0980ab4a18f5f17ba07f2a19d1590f1c:
+  /@aws-cdk/aws-lambda-python-alpha/2.27.0-alpha.0_3096e58b210845f6f168dd74aa8c9b5e:
     resolution: {integrity: sha512-dgiwY4pjTMxAB1IlsyH+dmAgM/g+sfGfrdgsdr6rlHvR/ROE/MGbGBg70YBGZlhiW+qSjeWepp6jgDWxtkN50A==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       aws-cdk-lib: ^2.27.0
       constructs: ^10.0.0
     dependencies:
-      aws-cdk-lib: 2.27.0_constructs@10.1.32
-      constructs: 10.1.32
+      aws-cdk-lib: 2.27.0_constructs@10.1.205
+      constructs: 10.1.205
     dev: false
 
   /@aws-cdk/cfnspec/2.27.0:
@@ -1456,7 +1456,7 @@ packages:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
 
-  /aws-cdk-lib/2.27.0_constructs@10.1.32:
+  /aws-cdk-lib/2.27.0_constructs@10.1.205:
     resolution: {integrity: sha512-CsTy/+RIBMvP9LlZjkQakkKPpwU50+HAMCMaGOcyIHADDQdXobGcZXTO+Tq00sH2DoQjPV1ZhhBim5z3k/2KXw==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
@@ -1464,7 +1464,7 @@ packages:
     dependencies:
       '@balena/dockerignore': 1.0.2
       case: 1.6.3
-      constructs: 10.1.32
+      constructs: 10.1.205
       fs-extra: 9.1.0
       ignore: 5.2.0
       jsonschema: 1.4.1
@@ -1727,8 +1727,8 @@ packages:
       typedarray: 0.0.6
     dev: true
 
-  /constructs/10.1.32:
-    resolution: {integrity: sha512-ztRzzQqeqfj/LNaw46ctcR/mirjnnj8dVMd5edibwFa1Ih7J0NK2+BHbRhYE93W7Flvhk2cyLE2bNIu1cByHAQ==}
+  /constructs/10.1.205:
+    resolution: {integrity: sha512-7C8nFI1WyHu5pkiPa7suHCmBdkB+N6ilUd1WoMSh09XBsdxQmz+RU/mCjzr0ifFjD90v1F9L2FawAsNoqOEhrA==}
     engines: {node: '>= 14.17.0'}
 
   /conventional-changelog-angular/5.0.13:
