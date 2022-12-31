@@ -1,13 +1,14 @@
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 from datetime import datetime
 from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_single_thread(thread_id):
+def get_single_thread(board_id, thread_id):
 
     results = table.query(KeyConditionExpression=Key(
-        "thread_id").eq(thread_id))["Items"]
+        "board_id").eq(board_id),
+        ConditionExpression=Attr('thread_id').eq(thread_id))["Items"]
     if not results:
         raise LookupError
 
@@ -30,6 +31,7 @@ def get_single_thread(thread_id):
 
 def handler(event, context):
     params = {
+        "board_id": event["pathParameters"]["board_id"],
         "thread_id": event["pathParameters"]["thread_id"]
     }
 

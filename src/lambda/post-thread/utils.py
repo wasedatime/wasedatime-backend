@@ -6,22 +6,10 @@ import os
 from decimal import Decimal
 from datetime import datetime
 import uuid
-from google.cloud import translate
-from google.oauth2 import service_account
 
 # AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
-
-# Google Translation client and configs
-acct_info = json.loads(base64.b64decode(
-    os.environ.get('GOOGLE_API_SERVICE_ACCOUNT_INFO')))
-credentials = service_account.Credentials.from_service_account_info(acct_info)
-client = translate.TranslationServiceClient(credentials=credentials)
-parent = "projects/wasedatime/locations/global"
-
-# Supported languages
-langs = ['en', 'ja', 'ko', 'zh-CN', 'zh-TW']
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -80,33 +68,6 @@ def resp_handler(func=None, headers=None):
             return api_response(500, resp)
 
     return handle
-
-
-def translate_text(text):
-    src_lang = client.detect_language(request={
-        "parent": parent,
-        "content": text,
-        "mime_type": "text/plain"
-    }).languages[0].language_code
-
-    translations = {}
-
-    for lang in langs:
-        if lang == src_lang:
-            translations[lang] = text
-            continue
-
-        translated = client.translate_text(request={
-            "parent": parent,
-            "contents": [text],
-            "mime_type": "text/plain",
-            "source_language_code": src_lang,
-            "target_language_code": lang
-        }).translations[0].translated_text
-
-        translations[lang] = translated or ''
-
-    return src_lang, translations
 
 
 def build_thread_id(uid):
