@@ -4,8 +4,6 @@ import json
 import logging
 import os
 from decimal import Decimal
-from google.cloud import translate
-from google.oauth2 import service_account
 
 # AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
