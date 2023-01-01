@@ -464,9 +464,6 @@ export const forumThreadPostReqSchema: apigw.JsonSchema = {
         group_id: {
           type: apigw.JsonSchemaType.STRING,
         },
-        thread_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
         title: {
           type: apigw.JsonSchemaType.STRING,
         },
@@ -474,15 +471,7 @@ export const forumThreadPostReqSchema: apigw.JsonSchema = {
           type: apigw.JsonSchemaType.STRING,
         },
       },
-      required: [
-        'univ_id',
-        'board_id',
-        'tag_id',
-        'group_id',
-        'thread_id',
-        'title',
-        'body',
-      ],
+      required: ['univ_id', 'board_id', 'tag_id', 'group_id', 'title', 'body'],
     },
   },
   required: ['data'],
@@ -512,6 +501,91 @@ export const forumThreadPatchReqSchema: apigw.JsonSchema = {
         },
       },
       required: ['board_id', 'tag_id', 'thread_id', 'title', 'body'],
+    },
+  },
+  required: ['data'],
+};
+
+export const forumCommentGetRespSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        thread_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        comment_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        body: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        created_at: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        updated_at: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        mod: {
+          type: apigw.JsonSchemaType.BOOLEAN,
+        },
+      },
+      required: [
+        'thread_id',
+        'comment_id',
+        'body',
+        'create_at',
+        'update_at',
+        'mod',
+      ],
+    },
+    message: {
+      type: apigw.JsonSchemaType.STRING,
+    },
+  },
+  required: ['success', 'data', 'message'],
+};
+
+export const forumCommentPostReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        thread_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        body: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: ['thread_id', 'body'],
+    },
+  },
+  required: ['data'],
+};
+
+export const forumCommentPatchReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        thread_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        comment_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        body: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: ['thread_id', 'comment_id', 'body'],
     },
   },
   required: ['data'],

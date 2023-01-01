@@ -16,6 +16,9 @@ import {
   forumThreadGetRespSchema,
   forumThreadPatchReqSchema,
   forumThreadPostReqSchema,
+  forumCommentGetRespSchema,
+  forumCommentPostReqSchema,
+  forumCommentPatchReqSchema,
   syllabusSchema,
 } from '../../configs/api-gateway/schema';
 import { AwsServicePrincipal } from '../../configs/common/aws';
@@ -712,9 +715,6 @@ export class ForumThreadsApiService extends RestApiService {
     const root = scope.apiEndpoint.root.addResource('forum');
     const boardResource = root.addResource('{board_id}');
     const threadResource = boardResource.addResource('{thread_id}');
-    // const threadGroupResource = threadBoardResource.addResource("{group_id}");
-    // const threadTagResource = root.addResource("{tag_id}");
-    // const threadGroupTagResource = threadGroupResource.addResource("{tag_id}");
 
     const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -941,5 +941,47 @@ export class ForumCommentsApiService extends RestApiService {
     props: RestApiServiceProps,
   ) {
     super(scope, id, props);
+
+    const root = scope.apiEndpoint.root
+      .addResource('forum')
+      .addResource('{board_id}')
+      .addResource('{thread_id}');
+
+    const optionsForumThreadComment = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const getRespModel = scope.apiEndpoint.addModel('comment-get-resp-model', {
+      schema: forumCommentGetRespSchema,
+      contentType: 'application/json',
+      description:
+        'HTTP GET response body schema for fetching a comment of a thread.',
+      modelName: 'GetCommentsResp',
+    });
+    const postReqModel = scope.apiEndpoint.addModel('comment-post-req-model', {
+      schema: forumCommentPostReqSchema,
+      contentType: 'application/json',
+      description:
+        'HTTP POST request body schema for submitting a comment of a thread.',
+      modelName: 'PostCommentReq',
+    });
+    const patchReqModel = scope.apiEndpoint.addModel(
+      'comment-patch-req-model',
+      {
+        schema: forumCommentPatchReqSchema,
+        contentType: 'application/json',
+        description:
+          'HTTP PATCH request body schema for updating a comment of a thread',
+        modelName: 'PatchCommentReq',
+      },
+    );
   }
 }
