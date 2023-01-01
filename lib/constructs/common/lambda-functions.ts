@@ -693,9 +693,9 @@ export class ForumCommentFunctions extends Construct {
     );
 
     this.getFunction = new lambda_py.PythonFunction(this, 'get-comment', {
-      entry: 'src/lambda/get-comment',
-      description: 'get forum comment from the database.',
-      functionName: 'get-forum-comment',
+      entry: 'src/lambda/get-comments',
+      description: 'get forum comments from the database.',
+      functionName: 'get-forum-comments',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
       role: dynamoDBReadRole,

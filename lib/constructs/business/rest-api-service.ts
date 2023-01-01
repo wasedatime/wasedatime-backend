@@ -27,6 +27,7 @@ import {
   SyllabusFunctions,
   TimetableFunctions,
   ForumThreadFunctions,
+  ForumCommentFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -959,6 +960,33 @@ export class ForumCommentsApiService extends RestApiService {
       ],
     });
 
+    const forumCommentsFunctions = new ForumCommentFunctions(
+      this,
+      'crud-functions',
+      {
+        envVars: {
+          TABLE_NAME: props.dataSource!,
+        },
+      },
+    );
+
+    const getIntegration = new apigw.LambdaIntegration(
+      forumCommentsFunctions.getFunction,
+      { proxy: true },
+    );
+    const postIntegration = new apigw.LambdaIntegration(
+      forumCommentsFunctions.postFunction,
+      { proxy: true },
+    );
+    const patchIntegration = new apigw.LambdaIntegration(
+      forumCommentsFunctions.patchFunction,
+      { proxy: true },
+    );
+    const deleteIntegration = new apigw.LambdaIntegration(
+      forumCommentsFunctions.deleteFunction,
+      { proxy: true },
+    );
+
     const getRespModel = scope.apiEndpoint.addModel('comment-get-resp-model', {
       schema: forumCommentGetRespSchema,
       contentType: 'application/json',
@@ -983,5 +1011,87 @@ export class ForumCommentsApiService extends RestApiService {
         modelName: 'PatchCommentReq',
       },
     );
+
+    const getForumComments = root.addMethod(
+      apigw2.HttpMethod.GET,
+      getIntegration,
+      {
+        requestParameters: {
+          'method.request.querystring.uid': false,
+        },
+        operationName: 'GetComments',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+    const postForumComment = root.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        operationName: 'PostComment',
+        requestModels: { ['application/json']: postReqModel },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const patchForumComment = root.addMethod(
+      apigw2.HttpMethod.PATCH,
+      patchIntegration,
+      {
+        operationName: 'UpdateComment',
+        requestParameters: {
+          'method.request.querystring.ts': true,
+        },
+        requestModels: { ['application/json']: patchReqModel },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const deleteForumComment = root.addMethod(
+      apigw2.HttpMethod.DELETE,
+      deleteIntegration,
+      {
+        operationName: 'DeleteComment',
+        requestParameters: {
+          'method.request.querystring.ts': true,
+        },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+
+    this.resourceMapping = {
+      '/forum/{board_id}/{thread_id}': {
+        [apigw2.HttpMethod.GET]: getForumComments,
+        [apigw2.HttpMethod.OPTIONS]: optionsForumThreadComment,
+        [apigw2.HttpMethod.PATCH]: patchForumComment,
+        [apigw2.HttpMethod.POST]: postForumComment,
+        [apigw2.HttpMethod.DELETE]: deleteForumComment,
+      },
+    };
   }
 }
