@@ -6,11 +6,13 @@ from utils import table
 
 
 @resp_handler
-def patch_thread(board_id, uid, thread):
+def patch_thread(board_id, ts, thread_id, thread):
+
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     table.update_item(
         Key={
-            "uid": uid
+            "board_id": board_id,
+            "created_at": ts,
         },
         UpdateExpression='SET courses = :info, update_at = :ts',
         ExpressionAtrributeValues={
@@ -29,6 +31,7 @@ def handler(event, context):
     params = {
         "board_id": event["pathParameters"]["board_id"],
         "thread_id": event["pathParameters"]["thread_id"],
+        "ts": event["queryStringParameters"]["ts"],
         "uid": event['requestContext']['authorizer']['claims']['sub'],
         "thread": req["data"]
     }

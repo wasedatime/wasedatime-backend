@@ -516,9 +516,6 @@ export const forumCommentGetRespSchema: apigw.JsonSchema = {
         thread_id: {
           type: apigw.JsonSchemaType.STRING,
         },
-        comment_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
         body: {
           type: apigw.JsonSchemaType.STRING,
         },
@@ -532,14 +529,7 @@ export const forumCommentGetRespSchema: apigw.JsonSchema = {
           type: apigw.JsonSchemaType.BOOLEAN,
         },
       },
-      required: [
-        'thread_id',
-        'comment_id',
-        'body',
-        'create_at',
-        'update_at',
-        'mod',
-      ],
+      required: ['thread_id', 'body', 'create_at', 'update_at', 'mod'],
     },
     message: {
       type: apigw.JsonSchemaType.STRING,
@@ -578,14 +568,11 @@ export const forumCommentPatchReqSchema: apigw.JsonSchema = {
         thread_id: {
           type: apigw.JsonSchemaType.STRING,
         },
-        comment_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
         body: {
           type: apigw.JsonSchemaType.STRING,
         },
       },
-      required: ['thread_id', 'comment_id', 'body'],
+      required: ['thread_id', 'body'],
     },
   },
   required: ['data'],
