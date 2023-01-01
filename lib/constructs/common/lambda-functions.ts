@@ -1,5 +1,6 @@
 import * as lambda_py from '@aws-cdk/aws-lambda-python-alpha';
 import { Duration } from 'aws-cdk-lib';
+import { ApiGateway } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambda_js from 'aws-cdk-lib/aws-lambda-nodejs';
@@ -624,6 +625,119 @@ export class ForumThreadFunctions extends Construct {
       entry: 'src/lambda/delete-thread',
       description: 'Delete forum thread in the database.',
       functionName: 'delete-forum-thread',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+  }
+}
+
+export class ForumCommentFunctions extends Construct {
+  readonly getFunction: lambda.Function;
+  readonly postFunction: lambda.Function;
+  readonly patchFunction: lambda.Function;
+  readonly deleteFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const dynamoDBReadRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-read-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-lambda-read-comment',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-read-only',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+          ),
+        ],
+      },
+    );
+
+    const dynamoDBPutRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-put-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-lambda-write-comment',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+        ],
+      },
+    );
+
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-comment', {
+      entry: 'src/lambda/get-comment',
+      description: 'get forum comment from the database.',
+      functionName: 'get-forum-comment',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
+    this.postFunction = new lambda_py.PythonFunction(this, 'post-comment', {
+      entry: 'src/lambda/post-comment',
+      description: 'Save forum comment into the database.',
+      functionName: 'post-forum-comment',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    }).addEnvironment(
+      'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+      GOOGLE_API_SERVICE_ACCOUNT_INFO,
+    );
+
+    this.patchFunction = new lambda_py.PythonFunction(this, 'patch-comment', {
+      entry: 'src/lambda/patch-comment',
+      description: 'Update forum comment in the database.',
+      functionName: 'patch-forum-comment',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    }).addEnvironment(
+      'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+      GOOGLE_API_SERVICE_ACCOUNT_INFO,
+    );
+
+    this.deleteFunction = new lambda_py.PythonFunction(this, 'delete-comment', {
+      entry: 'src/lambda/delete-comment',
+      description: 'Delete forum comment in the database.',
+      functionName: 'delete-forum-comment',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
       role: dynamoDBPutRole,

@@ -716,7 +716,7 @@ export class ForumThreadsApiService extends RestApiService {
     // const threadTagResource = root.addResource("{tag_id}");
     // const threadGroupTagResource = threadGroupResource.addResource("{tag_id}");
 
-    const optionsForumThreads = root.addCorsPreflight({
+    const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
       allowMethods: [
@@ -728,17 +728,29 @@ export class ForumThreadsApiService extends RestApiService {
       ],
     });
 
-    // const optionsForumThreads = threadResource.addCorsPreflight({
-    //   allowOrigins: allowOrigins,
-    //   allowHeaders: allowHeaders,
-    //   allowMethods: [
-    //     apigw2.HttpMethod.GET,
-    //     apigw2.HttpMethod.POST,
-    //     apigw2.HttpMethod.PATCH,
-    //     apigw2.HttpMethod.DELETE,
-    //     apigw2.HttpMethod.OPTIONS,
-    //   ],
-    // });
+    const optionsForumBoards = threadResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const optionsForumThreads = threadResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
 
     const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
       schema: forumThreadGetRespSchema,
@@ -777,7 +789,7 @@ export class ForumThreadsApiService extends RestApiService {
       forumThreadsFunctions.getBoardFunction,
       { proxy: true },
     );
-    const getSingleIntegration = new apigw.LambdaIntegration(
+    const getThreadIntegration = new apigw.LambdaIntegration(
       forumThreadsFunctions.getSingleFunction,
       { proxy: true },
     );
@@ -828,7 +840,7 @@ export class ForumThreadsApiService extends RestApiService {
 
     const getForumThread = threadResource.addMethod(
       apigw2.HttpMethod.GET,
-      getSingleIntegration,
+      getThreadIntegration,
       {
         requestParameters: {
           'method.request.path.thread_id': true,
@@ -844,7 +856,7 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
-    const postForumThreads = root.addMethod(
+    const postForumThreads = boardResource.addMethod(
       apigw2.HttpMethod.POST,
       postIntegration,
       {
@@ -901,11 +913,12 @@ export class ForumThreadsApiService extends RestApiService {
     this.resourceMapping = {
       '/forum': {
         [apigw2.HttpMethod.GET]: getAllForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsForumHome,
       },
       '/forum/{board_id}': {
         [apigw2.HttpMethod.GET]: getBoardForumThreads,
         [apigw2.HttpMethod.POST]: postForumThreads,
-        [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsForumBoards,
       },
       '/forum/{board_id}/{thread_id}': {
         [apigw2.HttpMethod.GET]: getForumThread,
@@ -914,5 +927,19 @@ export class ForumThreadsApiService extends RestApiService {
         [apigw2.HttpMethod.DELETE]: deleteForumThreads,
       },
     };
+  }
+}
+
+export class ForumCommentsApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
   }
 }
