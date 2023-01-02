@@ -16,6 +16,9 @@ import {
   forumThreadGetRespSchema,
   forumThreadPatchReqSchema,
   forumThreadPostReqSchema,
+  forumCommentGetRespSchema,
+  forumCommentPostReqSchema,
+  forumCommentPatchReqSchema,
   syllabusSchema,
 } from '../../configs/api-gateway/schema';
 import { AwsServicePrincipal } from '../../configs/common/aws';
@@ -24,6 +27,7 @@ import {
   SyllabusFunctions,
   TimetableFunctions,
   ForumThreadFunctions,
+  ForumCommentFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -712,11 +716,8 @@ export class ForumThreadsApiService extends RestApiService {
     const root = scope.apiEndpoint.root.addResource('forum');
     const boardResource = root.addResource('{board_id}');
     const threadResource = boardResource.addResource('{thread_id}');
-    // const threadGroupResource = threadBoardResource.addResource("{group_id}");
-    // const threadTagResource = root.addResource("{tag_id}");
-    // const threadGroupTagResource = threadGroupResource.addResource("{tag_id}");
 
-    const optionsForumThreads = root.addCorsPreflight({
+    const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
       allowMethods: [
@@ -728,17 +729,29 @@ export class ForumThreadsApiService extends RestApiService {
       ],
     });
 
-    // const optionsForumThreads = threadResource.addCorsPreflight({
-    //   allowOrigins: allowOrigins,
-    //   allowHeaders: allowHeaders,
-    //   allowMethods: [
-    //     apigw2.HttpMethod.GET,
-    //     apigw2.HttpMethod.POST,
-    //     apigw2.HttpMethod.PATCH,
-    //     apigw2.HttpMethod.DELETE,
-    //     apigw2.HttpMethod.OPTIONS,
-    //   ],
-    // });
+    const optionsForumBoards = boardResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const optionsForumThreads = threadResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
 
     const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
       schema: forumThreadGetRespSchema,
@@ -777,7 +790,7 @@ export class ForumThreadsApiService extends RestApiService {
       forumThreadsFunctions.getBoardFunction,
       { proxy: true },
     );
-    const getSingleIntegration = new apigw.LambdaIntegration(
+    const getThreadIntegration = new apigw.LambdaIntegration(
       forumThreadsFunctions.getSingleFunction,
       { proxy: true },
     );
@@ -828,7 +841,7 @@ export class ForumThreadsApiService extends RestApiService {
 
     const getForumThread = threadResource.addMethod(
       apigw2.HttpMethod.GET,
-      getSingleIntegration,
+      getThreadIntegration,
       {
         requestParameters: {
           'method.request.path.thread_id': true,
@@ -844,7 +857,7 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
-    const postForumThreads = root.addMethod(
+    const postForumThreads = boardResource.addMethod(
       apigw2.HttpMethod.POST,
       postIntegration,
       {
@@ -901,17 +914,182 @@ export class ForumThreadsApiService extends RestApiService {
     this.resourceMapping = {
       '/forum': {
         [apigw2.HttpMethod.GET]: getAllForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsForumHome,
       },
       '/forum/{board_id}': {
         [apigw2.HttpMethod.GET]: getBoardForumThreads,
         [apigw2.HttpMethod.POST]: postForumThreads,
-        [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsForumBoards,
       },
       '/forum/{board_id}/{thread_id}': {
         [apigw2.HttpMethod.GET]: getForumThread,
         [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
         [apigw2.HttpMethod.PATCH]: patchForumThreads,
         [apigw2.HttpMethod.DELETE]: deleteForumThreads,
+      },
+    };
+  }
+}
+
+export class ForumCommentsApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
+
+    const root = scope.apiEndpoint.root
+      .addResource('forum-comment')
+      .addResource('{thread_id}');
+
+    const optionsForumThreadComment = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const forumCommentsFunctions = new ForumCommentFunctions(
+      this,
+      'crud-functions',
+      {
+        envVars: {
+          TABLE_NAME: props.dataSource!,
+        },
+      },
+    );
+
+    const getIntegration = new apigw.LambdaIntegration(
+      forumCommentsFunctions.getFunction,
+      { proxy: true },
+    );
+    const postIntegration = new apigw.LambdaIntegration(
+      forumCommentsFunctions.postFunction,
+      { proxy: true },
+    );
+    const patchIntegration = new apigw.LambdaIntegration(
+      forumCommentsFunctions.patchFunction,
+      { proxy: true },
+    );
+    const deleteIntegration = new apigw.LambdaIntegration(
+      forumCommentsFunctions.deleteFunction,
+      { proxy: true },
+    );
+
+    const getRespModel = scope.apiEndpoint.addModel('comment-get-resp-model', {
+      schema: forumCommentGetRespSchema,
+      contentType: 'application/json',
+      description:
+        'HTTP GET response body schema for fetching a comment of a thread.',
+      modelName: 'GetCommentsResp',
+    });
+    const postReqModel = scope.apiEndpoint.addModel('comment-post-req-model', {
+      schema: forumCommentPostReqSchema,
+      contentType: 'application/json',
+      description:
+        'HTTP POST request body schema for submitting a comment of a thread.',
+      modelName: 'PostCommentReq',
+    });
+    const patchReqModel = scope.apiEndpoint.addModel(
+      'comment-patch-req-model',
+      {
+        schema: forumCommentPatchReqSchema,
+        contentType: 'application/json',
+        description:
+          'HTTP PATCH request body schema for updating a comment of a thread',
+        modelName: 'PatchCommentReq',
+      },
+    );
+
+    const getForumComments = root.addMethod(
+      apigw2.HttpMethod.GET,
+      getIntegration,
+      {
+        requestParameters: {
+          'method.request.querystring.uid': false,
+        },
+        operationName: 'GetComments',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+    const postForumComment = root.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        operationName: 'PostComment',
+        requestModels: { ['application/json']: postReqModel },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const patchForumComment = root.addMethod(
+      apigw2.HttpMethod.PATCH,
+      patchIntegration,
+      {
+        operationName: 'UpdateComment',
+        requestParameters: {
+          'method.request.querystring.ts': true,
+        },
+        requestModels: { ['application/json']: patchReqModel },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const deleteForumComment = root.addMethod(
+      apigw2.HttpMethod.DELETE,
+      deleteIntegration,
+      {
+        operationName: 'DeleteComment',
+        requestParameters: {
+          'method.request.querystring.ts': true,
+        },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+
+    this.resourceMapping = {
+      '/forum-comment/{thread_id}': {
+        [apigw2.HttpMethod.GET]: getForumComments,
+        [apigw2.HttpMethod.OPTIONS]: optionsForumThreadComment,
+        [apigw2.HttpMethod.PATCH]: patchForumComment,
+        [apigw2.HttpMethod.POST]: postForumComment,
+        [apigw2.HttpMethod.DELETE]: deleteForumComment,
       },
     };
   }

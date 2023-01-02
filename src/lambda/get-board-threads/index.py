@@ -8,7 +8,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 def get_board_threads(board_id):
 
     results = table.query(KeyConditionExpression=Key(
-        "board_id").eq(board_id))["Items"]
+        "board_id").eq(board_id), ScanIndexForward=False)["Items"]
     if not results:
         raise LookupError
 

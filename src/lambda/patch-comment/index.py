@@ -1,27 +1,25 @@
 import json
-from datetime import datetime
 from boto3.dynamodb.conditions import Attr
-from utils import JsonPayloadBuilder
-from utils import resp_handler
-from utils import table
+from datetime import datetime
+
+from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def patch_thread(board_id, ts, thread_id, thread):
+def patch_comment(thread_id, ts, uid, comment):
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     table.update_item(
         Key={
-            "board_id": board_id,
+            "thread_id": thread_id,
             "created_at": ts,
         },
-        ConditionExpression=Attr('thread_id').eq(thread_id),
-        UpdateExpression='SET body = :tbody, title = :ttitle, update_at = :ts',
+        ConditionExpression=Attr('uid').eq(uid),
+        UpdateExpression='SET body = :cbody, update_at = :ts',
         ExpressionAtrributeValues={
-            ":tbody": [thread['body']],
-            ":ttitle": [thread['title']],
+            ":tbody": [comment['body']],
             ":ts": dt_now
-        },
+        }
     )
 
     body = JsonPayloadBuilder().add_status(
@@ -33,11 +31,10 @@ def handler(event, context):
 
     req = json.loads(event['body'])
     params = {
-        "board_id": event["pathParameters"]["board_id"],
         "thread_id": event["pathParameters"]["thread_id"],
         "ts": event["queryStringParameters"]["ts"],
         "uid": event['requestContext']['authorizer']['claims']['sub'],
-        "thread": req["data"]
+        "comment": req["data"]
     }
 
-    return patch_thread(**params)
+    return patch_comment(**params)

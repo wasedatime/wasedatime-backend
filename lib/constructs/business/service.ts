@@ -13,6 +13,7 @@ export type RestApiServiceId =
   | 'career'
   | 'timetable'
   | 'thread'
+  | 'comment'
   | 'graphql';
 
 export const restApiServiceMap: {
@@ -23,6 +24,7 @@ export const restApiServiceMap: {
   'career': rest.CareerApiService,
   'timetable': rest.TimetableApiService,
   'thread': rest.ForumThreadsApiService,
+  'comment': rest.ForumCommentsApiService,
   'graphql': rest.GraphqlApiService,
 };
 
