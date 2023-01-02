@@ -12,7 +12,7 @@ export type RestApiServiceId =
   | 'course-reviews'
   | 'career'
   | 'timetable'
-  // | 'thread'
+  | 'thread'
   | 'comment'
   | 'graphql';
 
@@ -23,7 +23,7 @@ export const restApiServiceMap: {
   'course-reviews': rest.CourseReviewsApiService,
   'career': rest.CareerApiService,
   'timetable': rest.TimetableApiService,
-  // 'thread': rest.ForumThreadsApiService,
+  'thread': rest.ForumThreadsApiService,
   'comment': rest.ForumCommentsApiService,
   'graphql': rest.GraphqlApiService,
 };
