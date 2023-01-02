@@ -13,9 +13,9 @@ import {
   courseReviewGetRespSchema,
   courseReviewPatchReqSchema,
   courseReviewPostReqSchema,
-  forumThreadGetRespSchema,
-  forumThreadPatchReqSchema,
-  forumThreadPostReqSchema,
+  // forumThreadGetRespSchema,
+  // forumThreadPatchReqSchema,
+  // forumThreadPostReqSchema,
   forumCommentGetRespSchema,
   forumCommentPostReqSchema,
   forumCommentPatchReqSchema,
@@ -26,7 +26,7 @@ import {
   CourseReviewsFunctions,
   SyllabusFunctions,
   TimetableFunctions,
-  ForumThreadFunctions,
+  // ForumThreadFunctions,
   ForumCommentFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
@@ -701,235 +701,235 @@ export class GraphqlApiService extends RestApiService {
   }
 }
 
-export class ForumThreadsApiService extends RestApiService {
-  readonly resourceMapping: {
-    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
-  };
+// export class ForumThreadsApiService extends RestApiService {
+//   readonly resourceMapping: {
+//     [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+//   };
 
-  constructor(
-    scope: AbstractRestApiEndpoint,
-    id: string,
-    props: RestApiServiceProps,
-  ) {
-    super(scope, id, props);
+//   constructor(
+//     scope: AbstractRestApiEndpoint,
+//     id: string,
+//     props: RestApiServiceProps
+//   ) {
+//     super(scope, id, props);
 
-    const root = scope.apiEndpoint.root.addResource('forum');
-    const boardResource = root.addResource('{board_id}');
-    const threadResource = boardResource.addResource('{thread_id}');
+//     const root = scope.apiEndpoint.root.addResource("forum");
+//     const boardResource = root.addResource("{board_id}");
+//     const threadResource = boardResource.addResource("{thread_id}");
 
-    const optionsForumHome = root.addCorsPreflight({
-      allowOrigins: allowOrigins,
-      allowHeaders: allowHeaders,
-      allowMethods: [
-        apigw2.HttpMethod.GET,
-        apigw2.HttpMethod.POST,
-        apigw2.HttpMethod.PATCH,
-        apigw2.HttpMethod.DELETE,
-        apigw2.HttpMethod.OPTIONS,
-      ],
-    });
+//     const optionsForumHome = root.addCorsPreflight({
+//       allowOrigins: allowOrigins,
+//       allowHeaders: allowHeaders,
+//       allowMethods: [
+//         apigw2.HttpMethod.GET,
+//         apigw2.HttpMethod.POST,
+//         apigw2.HttpMethod.PATCH,
+//         apigw2.HttpMethod.DELETE,
+//         apigw2.HttpMethod.OPTIONS,
+//       ],
+//     });
 
-    const optionsForumBoards = boardResource.addCorsPreflight({
-      allowOrigins: allowOrigins,
-      allowHeaders: allowHeaders,
-      allowMethods: [
-        apigw2.HttpMethod.GET,
-        apigw2.HttpMethod.POST,
-        apigw2.HttpMethod.PATCH,
-        apigw2.HttpMethod.DELETE,
-        apigw2.HttpMethod.OPTIONS,
-      ],
-    });
+//     const optionsForumBoards = boardResource.addCorsPreflight({
+//       allowOrigins: allowOrigins,
+//       allowHeaders: allowHeaders,
+//       allowMethods: [
+//         apigw2.HttpMethod.GET,
+//         apigw2.HttpMethod.POST,
+//         apigw2.HttpMethod.PATCH,
+//         apigw2.HttpMethod.DELETE,
+//         apigw2.HttpMethod.OPTIONS,
+//       ],
+//     });
 
-    const optionsForumThreads = threadResource.addCorsPreflight({
-      allowOrigins: allowOrigins,
-      allowHeaders: allowHeaders,
-      allowMethods: [
-        apigw2.HttpMethod.GET,
-        apigw2.HttpMethod.POST,
-        apigw2.HttpMethod.PATCH,
-        apigw2.HttpMethod.DELETE,
-        apigw2.HttpMethod.OPTIONS,
-      ],
-    });
+//     const optionsForumThreads = threadResource.addCorsPreflight({
+//       allowOrigins: allowOrigins,
+//       allowHeaders: allowHeaders,
+//       allowMethods: [
+//         apigw2.HttpMethod.GET,
+//         apigw2.HttpMethod.POST,
+//         apigw2.HttpMethod.PATCH,
+//         apigw2.HttpMethod.DELETE,
+//         apigw2.HttpMethod.OPTIONS,
+//       ],
+//     });
 
-    const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
-      schema: forumThreadGetRespSchema,
-      contentType: 'application/json',
-      description: 'HTTP GET response body schema for fetching threads.',
-      modelName: 'GetThreadsResp',
-    });
-    const postReqModel = scope.apiEndpoint.addModel('thread-post-req-model', {
-      schema: forumThreadPostReqSchema,
-      contentType: 'application/json',
-      description: 'HTTP POST request body schema for submitting a thread.',
-      modelName: 'PostThreadReq',
-    });
-    const patchReqModel = scope.apiEndpoint.addModel('thread-patch-req-model', {
-      schema: forumThreadPatchReqSchema,
-      contentType: 'application/json',
-      description: 'HTTP PATCH request body schema for updating a thread',
-      modelName: 'PatchThreadReq',
-    });
+//     const getRespModel = scope.apiEndpoint.addModel("threads-get-resp-model", {
+//       schema: forumThreadGetRespSchema,
+//       contentType: "application/json",
+//       description: "HTTP GET response body schema for fetching threads.",
+//       modelName: "GetThreadsResp",
+//     });
+//     const postReqModel = scope.apiEndpoint.addModel("thread-post-req-model", {
+//       schema: forumThreadPostReqSchema,
+//       contentType: "application/json",
+//       description: "HTTP POST request body schema for submitting a thread.",
+//       modelName: "PostThreadReq",
+//     });
+//     const patchReqModel = scope.apiEndpoint.addModel("thread-patch-req-model", {
+//       schema: forumThreadPatchReqSchema,
+//       contentType: "application/json",
+//       description: "HTTP PATCH request body schema for updating a thread",
+//       modelName: "PatchThreadReq",
+//     });
 
-    const forumThreadsFunctions = new ForumThreadFunctions(
-      this,
-      'crud-functions',
-      {
-        envVars: {
-          TABLE_NAME: props.dataSource!,
-        },
-      },
-    );
+//     const forumThreadsFunctions = new ForumThreadFunctions(
+//       this,
+//       "crud-functions",
+//       {
+//         envVars: {
+//           TABLE_NAME: props.dataSource!,
+//         },
+//       }
+//     );
 
-    const getAllInegration = new apigw.LambdaIntegration(
-      forumThreadsFunctions.getAllFunction,
-      { proxy: true },
-    );
-    const getBoardIntegration = new apigw.LambdaIntegration(
-      forumThreadsFunctions.getBoardFunction,
-      { proxy: true },
-    );
-    const getThreadIntegration = new apigw.LambdaIntegration(
-      forumThreadsFunctions.getSingleFunction,
-      { proxy: true },
-    );
-    const postIntegration = new apigw.LambdaIntegration(
-      forumThreadsFunctions.postFunction,
-      { proxy: true },
-    );
-    const patchIntegration = new apigw.LambdaIntegration(
-      forumThreadsFunctions.patchFunction,
-      { proxy: true },
-    );
-    const deleteIntegration = new apigw.LambdaIntegration(
-      forumThreadsFunctions.deleteFunction,
-      { proxy: true },
-    );
+//     const getAllInegration = new apigw.LambdaIntegration(
+//       forumThreadsFunctions.getAllFunction,
+//       { proxy: true }
+//     );
+//     const getBoardIntegration = new apigw.LambdaIntegration(
+//       forumThreadsFunctions.getBoardFunction,
+//       { proxy: true }
+//     );
+//     const getThreadIntegration = new apigw.LambdaIntegration(
+//       forumThreadsFunctions.getSingleFunction,
+//       { proxy: true }
+//     );
+//     const postIntegration = new apigw.LambdaIntegration(
+//       forumThreadsFunctions.postFunction,
+//       { proxy: true }
+//     );
+//     const patchIntegration = new apigw.LambdaIntegration(
+//       forumThreadsFunctions.patchFunction,
+//       { proxy: true }
+//     );
+//     const deleteIntegration = new apigw.LambdaIntegration(
+//       forumThreadsFunctions.deleteFunction,
+//       { proxy: true }
+//     );
 
-    const getAllForumThreads = root.addMethod(
-      apigw2.HttpMethod.GET,
-      getAllInegration,
-      {
-        operationName: 'GetAllThreads',
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseModels: { ['application/json']: getRespModel },
-            responseParameters: lambdaRespParams,
-          },
-        ],
-        requestValidator: props.validator,
-      },
-    );
+//     const getAllForumThreads = root.addMethod(
+//       apigw2.HttpMethod.GET,
+//       getAllInegration,
+//       {
+//         operationName: "GetAllThreads",
+//         methodResponses: [
+//           {
+//             statusCode: "200",
+//             responseModels: { ["application/json"]: getRespModel },
+//             responseParameters: lambdaRespParams,
+//           },
+//         ],
+//         requestValidator: props.validator,
+//       }
+//     );
 
-    const getBoardForumThreads = boardResource.addMethod(
-      apigw2.HttpMethod.GET,
-      getBoardIntegration,
-      {
-        operationName: 'GetBoardThreads',
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseModels: { ['application/json']: getRespModel },
-            responseParameters: lambdaRespParams,
-          },
-        ],
-        requestValidator: props.validator,
-      },
-    );
+//     const getBoardForumThreads = boardResource.addMethod(
+//       apigw2.HttpMethod.GET,
+//       getBoardIntegration,
+//       {
+//         operationName: "GetBoardThreads",
+//         methodResponses: [
+//           {
+//             statusCode: "200",
+//             responseModels: { ["application/json"]: getRespModel },
+//             responseParameters: lambdaRespParams,
+//           },
+//         ],
+//         requestValidator: props.validator,
+//       }
+//     );
 
-    const getForumThread = threadResource.addMethod(
-      apigw2.HttpMethod.GET,
-      getThreadIntegration,
-      {
-        requestParameters: {
-          'method.request.path.thread_id': true,
-        },
-        operationName: 'GetSingleThread',
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseModels: { ['application/json']: getRespModel },
-            responseParameters: lambdaRespParams,
-          },
-        ],
-        requestValidator: props.validator,
-      },
-    );
-    const postForumThreads = boardResource.addMethod(
-      apigw2.HttpMethod.POST,
-      postIntegration,
-      {
-        operationName: 'PostThread',
-        requestModels: { ['application/json']: postReqModel },
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseParameters: lambdaRespParams,
-          },
-        ],
-        authorizer: props.authorizer,
-        requestValidator: props.validator,
-      },
-    );
-    const patchForumThreads = threadResource.addMethod(
-      apigw2.HttpMethod.PATCH,
-      patchIntegration,
-      {
-        operationName: 'UpdateThread',
-        requestParameters: {
-          'method.request.querystring.ts': true,
-        },
-        requestModels: { ['application/json']: patchReqModel },
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseParameters: lambdaRespParams,
-          },
-        ],
-        authorizer: props.authorizer,
-        requestValidator: props.validator,
-      },
-    );
-    const deleteForumThreads = threadResource.addMethod(
-      apigw2.HttpMethod.DELETE,
-      deleteIntegration,
-      {
-        operationName: 'DeleteThread',
-        requestParameters: {
-          'method.request.querystring.ts': true,
-        },
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseParameters: lambdaRespParams,
-          },
-        ],
-        authorizer: props.authorizer,
-        requestValidator: props.validator,
-      },
-    );
+//     const getForumThread = threadResource.addMethod(
+//       apigw2.HttpMethod.GET,
+//       getThreadIntegration,
+//       {
+//         requestParameters: {
+//           "method.request.path.thread_id": true,
+//         },
+//         operationName: "GetSingleThread",
+//         methodResponses: [
+//           {
+//             statusCode: "200",
+//             responseModels: { ["application/json"]: getRespModel },
+//             responseParameters: lambdaRespParams,
+//           },
+//         ],
+//         requestValidator: props.validator,
+//       }
+//     );
+//     const postForumThreads = boardResource.addMethod(
+//       apigw2.HttpMethod.POST,
+//       postIntegration,
+//       {
+//         operationName: "PostThread",
+//         requestModels: { ["application/json"]: postReqModel },
+//         methodResponses: [
+//           {
+//             statusCode: "200",
+//             responseParameters: lambdaRespParams,
+//           },
+//         ],
+//         authorizer: props.authorizer,
+//         requestValidator: props.validator,
+//       }
+//     );
+//     const patchForumThreads = threadResource.addMethod(
+//       apigw2.HttpMethod.PATCH,
+//       patchIntegration,
+//       {
+//         operationName: "UpdateThread",
+//         requestParameters: {
+//           "method.request.querystring.ts": true,
+//         },
+//         requestModels: { ["application/json"]: patchReqModel },
+//         methodResponses: [
+//           {
+//             statusCode: "200",
+//             responseParameters: lambdaRespParams,
+//           },
+//         ],
+//         authorizer: props.authorizer,
+//         requestValidator: props.validator,
+//       }
+//     );
+//     const deleteForumThreads = threadResource.addMethod(
+//       apigw2.HttpMethod.DELETE,
+//       deleteIntegration,
+//       {
+//         operationName: "DeleteThread",
+//         requestParameters: {
+//           "method.request.querystring.ts": true,
+//         },
+//         methodResponses: [
+//           {
+//             statusCode: "200",
+//             responseParameters: lambdaRespParams,
+//           },
+//         ],
+//         authorizer: props.authorizer,
+//         requestValidator: props.validator,
+//       }
+//     );
 
-    this.resourceMapping = {
-      '/forum': {
-        [apigw2.HttpMethod.GET]: getAllForumThreads,
-        [apigw2.HttpMethod.OPTIONS]: optionsForumHome,
-      },
-      '/forum/{board_id}': {
-        [apigw2.HttpMethod.GET]: getBoardForumThreads,
-        [apigw2.HttpMethod.POST]: postForumThreads,
-        [apigw2.HttpMethod.OPTIONS]: optionsForumBoards,
-      },
-      '/forum/{board_id}/{thread_id}': {
-        [apigw2.HttpMethod.GET]: getForumThread,
-        [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
-        [apigw2.HttpMethod.PATCH]: patchForumThreads,
-        [apigw2.HttpMethod.DELETE]: deleteForumThreads,
-      },
-    };
-  }
-}
+//     this.resourceMapping = {
+//       "/forum": {
+//         [apigw2.HttpMethod.GET]: getAllForumThreads,
+//         [apigw2.HttpMethod.OPTIONS]: optionsForumHome,
+//       },
+//       "/forum/{board_id}": {
+//         [apigw2.HttpMethod.GET]: getBoardForumThreads,
+//         [apigw2.HttpMethod.POST]: postForumThreads,
+//         [apigw2.HttpMethod.OPTIONS]: optionsForumBoards,
+//       },
+//       "/forum/{board_id}/{thread_id}": {
+//         [apigw2.HttpMethod.GET]: getForumThread,
+//         [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
+//         [apigw2.HttpMethod.PATCH]: patchForumThreads,
+//         [apigw2.HttpMethod.DELETE]: deleteForumThreads,
+//       },
+//     };
+//   }
+// }
 
 export class ForumCommentsApiService extends RestApiService {
   readonly resourceMapping: {
