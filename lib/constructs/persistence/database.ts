@@ -8,7 +8,7 @@ export enum Collection {
   FEEDS,
   SYLLABUS,
   TIMETABLE,
-  THREAD,
+  // THREAD,
   COMMENT,
 }
 
@@ -82,30 +82,30 @@ export class DynamoDatabase extends Construct {
       },
     );
 
-    this.tables[Collection.THREAD] = new dynamodb.Table(
-      this,
-      'dynamodb-thread-table',
-      {
-        partitionKey: {
-          name: 'board_id',
-          type: dynamodb.AttributeType.STRING,
-        },
-        billingMode: dynamodb.BillingMode.PROVISIONED,
-        encryption: dynamodb.TableEncryption.DEFAULT,
-        removalPolicy: RemovalPolicy.RETAIN,
-        sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-        tableName: 'forum-threads',
-        readCapacity: 15,
-        writeCapacity: 15,
-        pointInTimeRecovery: true,
-      },
-    );
+    // this.tables[Collection.THREAD] = new dynamodb.Table(
+    //   this,
+    //   'dynamodb-thread-table',
+    //   {
+    //     partitionKey: {
+    //       name: 'board_id',
+    //       type: dynamodb.AttributeType.STRING,
+    //     },
+    //     billingMode: dynamodb.BillingMode.PROVISIONED,
+    //     encryption: dynamodb.TableEncryption.DEFAULT,
+    //     removalPolicy: RemovalPolicy.RETAIN,
+    //     sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
+    //     tableName: 'forum-threads',
+    //     readCapacity: 15,
+    //     writeCapacity: 15,
+    //     pointInTimeRecovery: true,
+    //   },
+    // );
 
-    this.tables[Collection.THREAD].addLocalSecondaryIndex({
-      indexName: 'GroupIndex',
-      sortKey: { name: 'group_id', type: dynamodb.AttributeType.STRING },
-      projectionType: dynamodb.ProjectionType.ALL,
-    });
+    // this.tables[Collection.THREAD].addLocalSecondaryIndex({
+    //   indexName: 'GroupIndex',
+    //   sortKey: { name: 'group_id', type: dynamodb.AttributeType.STRING },
+    //   projectionType: dynamodb.ProjectionType.ALL,
+    // });
 
     // this.tables[Collection.THREAD].addLocalSecondaryIndex({
     //   indexName: 'TagIndex',
