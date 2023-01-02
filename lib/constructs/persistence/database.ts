@@ -103,7 +103,7 @@ export class DynamoDatabase extends Construct {
 
     this.tables[Collection.THREAD].addLocalSecondaryIndex({
       indexName: 'GroupIndex',
-      sortKey: { name: 'group_id', type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: 'group_id', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,
     });
 
