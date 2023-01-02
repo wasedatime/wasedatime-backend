@@ -729,7 +729,7 @@ export class ForumThreadsApiService extends RestApiService {
       ],
     });
 
-    const optionsForumBoards = threadResource.addCorsPreflight({
+    const optionsForumBoards = boardResource.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
       allowMethods: [
