@@ -73,6 +73,7 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
       .addService(
         'comment',
         this.dataInterface.getEndpoint(DataEndpoint.COMMENT),
+        true,
       );
     // .addService("graphql", graphqlApiEndpoint.apiEndpoint.graphqlUrl);
     restApiEndpoint.deploy();

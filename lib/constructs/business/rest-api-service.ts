@@ -944,8 +944,7 @@ export class ForumCommentsApiService extends RestApiService {
     super(scope, id, props);
 
     const root = scope.apiEndpoint.root
-      .addResource('forum')
-      .addResource('{board_id}')
+      .addResource('forum-comment')
       .addResource('{thread_id}');
 
     const optionsForumThreadComment = root.addCorsPreflight({
@@ -1085,7 +1084,7 @@ export class ForumCommentsApiService extends RestApiService {
     );
 
     this.resourceMapping = {
-      '/forum/{board_id}/{thread_id}': {
+      '/forum-comment/{thread_id}': {
         [apigw2.HttpMethod.GET]: getForumComments,
         [apigw2.HttpMethod.OPTIONS]: optionsForumThreadComment,
         [apigw2.HttpMethod.PATCH]: patchForumComment,
