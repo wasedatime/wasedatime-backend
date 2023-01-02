@@ -27,7 +27,7 @@
 #         "view": 0,
 #     }
 
-table.put_item(Item=thread_item)
+#     table.put_item(Item=thread_item)
 
 #     body = JsonPayloadBuilder().add_status(
 #         True).add_data(None).add_message('').compile()
