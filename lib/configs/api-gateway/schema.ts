@@ -377,134 +377,134 @@ export const courseReviewPatchReqSchema: apigw.JsonSchema = {
   required: ['data'],
 };
 
-export const forumThreadGetRespSchema: apigw.JsonSchema = {
-  schema: apigw.JsonSchemaVersion.DRAFT7,
-  type: apigw.JsonSchemaType.OBJECT,
-  properties: {
-    success: {
-      type: apigw.JsonSchemaType.BOOLEAN,
-    },
-    data: {
-      type: apigw.JsonSchemaType.ARRAY,
-      items: {
-        type: apigw.JsonSchemaType.OBJECT,
-        properties: {
-          univ_id: {
-            type: apigw.JsonSchemaType.INTEGER,
-          },
-          board_id: {
-            type: apigw.JsonSchemaType.STRING,
-          },
-          updated_at: {
-            type: apigw.JsonSchemaType.STRING,
-          },
-          created_at: {
-            type: apigw.JsonSchemaType.STRING,
-          },
-          tag_id: {
-            type: apigw.JsonSchemaType.STRING,
-          },
-          group_id: {
-            type: apigw.JsonSchemaType.STRING,
-          },
-          thread_id: {
-            type: apigw.JsonSchemaType.STRING,
-          },
-          title: {
-            type: apigw.JsonSchemaType.STRING,
-          },
-          body: {
-            type: apigw.JsonSchemaType.STRING,
-          },
-          views: {
-            type: apigw.JsonSchemaType.INTEGER,
-          },
-          mod: {
-            type: apigw.JsonSchemaType.BOOLEAN,
-          },
-        },
-        required: [
-          'univ_id',
-          'board_id',
-          'updated_at',
-          'created_at',
-          'tag_id',
-          'group_id',
-          'thread_id',
-          'title',
-          'body',
-          'views',
-          'mod',
-        ],
-      },
-    },
-    message: {
-      type: apigw.JsonSchemaType.STRING,
-    },
-  },
-  required: ['success', 'data', 'message'],
-};
+// export const forumThreadGetRespSchema: apigw.JsonSchema = {
+//   schema: apigw.JsonSchemaVersion.DRAFT7,
+//   type: apigw.JsonSchemaType.OBJECT,
+//   properties: {
+//     success: {
+//       type: apigw.JsonSchemaType.BOOLEAN,
+//     },
+//     data: {
+//       type: apigw.JsonSchemaType.ARRAY,
+//       items: {
+//         type: apigw.JsonSchemaType.OBJECT,
+//         properties: {
+//           univ_id: {
+//             type: apigw.JsonSchemaType.INTEGER,
+//           },
+//           board_id: {
+//             type: apigw.JsonSchemaType.STRING,
+//           },
+//           updated_at: {
+//             type: apigw.JsonSchemaType.STRING,
+//           },
+//           created_at: {
+//             type: apigw.JsonSchemaType.STRING,
+//           },
+//           tag_id: {
+//             type: apigw.JsonSchemaType.STRING,
+//           },
+//           group_id: {
+//             type: apigw.JsonSchemaType.STRING,
+//           },
+//           thread_id: {
+//             type: apigw.JsonSchemaType.STRING,
+//           },
+//           title: {
+//             type: apigw.JsonSchemaType.STRING,
+//           },
+//           body: {
+//             type: apigw.JsonSchemaType.STRING,
+//           },
+//           views: {
+//             type: apigw.JsonSchemaType.INTEGER,
+//           },
+//           mod: {
+//             type: apigw.JsonSchemaType.BOOLEAN,
+//           },
+//         },
+//         required: [
+//           'univ_id',
+//           'board_id',
+//           'updated_at',
+//           'created_at',
+//           'tag_id',
+//           'group_id',
+//           'thread_id',
+//           'title',
+//           'body',
+//           'views',
+//           'mod',
+//         ],
+//       },
+//     },
+//     message: {
+//       type: apigw.JsonSchemaType.STRING,
+//     },
+//   },
+//   required: ['success', 'data', 'message'],
+// };
 
-export const forumThreadPostReqSchema: apigw.JsonSchema = {
-  schema: apigw.JsonSchemaVersion.DRAFT7,
-  type: apigw.JsonSchemaType.OBJECT,
-  properties: {
-    data: {
-      type: apigw.JsonSchemaType.OBJECT,
-      properties: {
-        univ_id: {
-          type: apigw.JsonSchemaType.INTEGER,
-        },
-        board_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        tag_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        group_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        title: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        body: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-      },
-      required: ['univ_id', 'board_id', 'tag_id', 'group_id', 'title', 'body'],
-    },
-  },
-  required: ['data'],
-};
+// export const forumThreadPostReqSchema: apigw.JsonSchema = {
+//   schema: apigw.JsonSchemaVersion.DRAFT7,
+//   type: apigw.JsonSchemaType.OBJECT,
+//   properties: {
+//     data: {
+//       type: apigw.JsonSchemaType.OBJECT,
+//       properties: {
+//         univ_id: {
+//           type: apigw.JsonSchemaType.INTEGER,
+//         },
+//         board_id: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//         tag_id: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//         group_id: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//         title: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//         body: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//       },
+//       required: ['univ_id', 'board_id', 'tag_id', 'group_id', 'title', 'body'],
+//     },
+//   },
+//   required: ['data'],
+// };
 
-export const forumThreadPatchReqSchema: apigw.JsonSchema = {
-  schema: apigw.JsonSchemaVersion.DRAFT7,
-  type: apigw.JsonSchemaType.OBJECT,
-  properties: {
-    data: {
-      type: apigw.JsonSchemaType.OBJECT,
-      properties: {
-        board_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        tag_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        thread_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        title: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        body: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-      },
-      required: ['board_id', 'tag_id', 'thread_id', 'title', 'body'],
-    },
-  },
-  required: ['data'],
-};
+// export const forumThreadPatchReqSchema: apigw.JsonSchema = {
+//   schema: apigw.JsonSchemaVersion.DRAFT7,
+//   type: apigw.JsonSchemaType.OBJECT,
+//   properties: {
+//     data: {
+//       type: apigw.JsonSchemaType.OBJECT,
+//       properties: {
+//         board_id: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//         tag_id: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//         thread_id: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//         title: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//         body: {
+//           type: apigw.JsonSchemaType.STRING,
+//         },
+//       },
+//       required: ['board_id', 'tag_id', 'thread_id', 'title', 'body'],
+//     },
+//   },
+//   required: ['data'],
+// };
 
 export const forumCommentGetRespSchema: apigw.JsonSchema = {
   schema: apigw.JsonSchemaVersion.DRAFT7,
