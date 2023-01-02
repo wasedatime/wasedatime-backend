@@ -6,7 +6,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def patch_comment(thread_id, ts, comment):
+def patch_comment(thread_id, ts, uid, comment):
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     table.update_item(
@@ -14,8 +14,8 @@ def patch_comment(thread_id, ts, comment):
             "thread_id": thread_id,
             "created_at": ts,
         },
-        ConditionExpression=Attr('thread_id').eq(thread_id),
-        UpdateExpression='SET body = :tbody, title = :ttitle, update_at = :ts',
+        ConditionExpression=Attr('uid').eq(uid),
+        UpdateExpression='SET body = :cbody, update_at = :ts',
         ExpressionAtrributeValues={
             ":tbody": [comment['body']],
             ":ts": dt_now
