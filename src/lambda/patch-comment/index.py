@@ -2,55 +2,39 @@ import json
 from boto3.dynamodb.conditions import Attr
 from datetime import datetime
 
-from utils import JsonPayloadBuilder, translate_text, format_update_expr, table, resp_handler
+from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def patch_review(key, ts, review, uid):
-    resp_body = JsonPayloadBuilder().add_status(True).add_data(None).add_message('').compile()
-    primary_key = {
-        "course_key": key,
-        "created_at": ts
-    }
+def patch_comment(thread_id, ts, comment):
 
-    if "comment" not in review:
-        dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-        table.update_item(
-            Key=primary_key,
-            ConditionExpression=Attr('uid').eq(uid),
-            UpdateExpression="SET updated_at = :ts, benefit = :ben, difficulty = :diff, satisfaction = :sat",
-            ExpressionAttributeValues={
-                ":ts": dt_now,
-                ":ben": review["benefit"],
-                ":diff": review["difficulty"],
-                ":sat": review["satisfaction"]
-            }
-        )
-        return resp_body
-
-    text = review["comment"]
-    src_lang, translated = translate_text(text)
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-    expr, expr_attr_name, expr_attr_val = format_update_expr(src_lang, translated, review, dt_now)
     table.update_item(
-        Key=primary_key,
-        ConditionExpression=Attr('uid').eq(uid),
-        UpdateExpression=expr,
-        ExpressionAttributeNames=expr_attr_name,
-        ExpressionAttributeValues=expr_attr_val
+        Key={
+            "thread_id": thread_id,
+            "created_at": ts,
+        },
+        ConditionExpression=Attr('thread_id').eq(thread_id),
+        UpdateExpression='SET body = :tbody, title = :ttitle, update_at = :ts',
+        ExpressionAtrributeValues={
+            ":tbody": [comment['body']],
+            ":ts": dt_now
+        }
     )
 
-    return resp_body
+    body = JsonPayloadBuilder().add_status(
+        True).add_data(None).add_message('').compile()
+    return body
 
 
 def handler(event, context):
-    req = json.loads(event['body'])
 
+    req = json.loads(event['body'])
     params = {
-        "key": event["pathParameters"]["key"],
+        "thread_id": event["pathParameters"]["thread_id"],
         "ts": event["queryStringParameters"]["ts"],
-        "review": req["data"],
-        "uid": event['requestContext']['authorizer']['claims']['sub']
+        "uid": event['requestContext']['authorizer']['claims']['sub'],
+        "comment": req["data"]
     }
 
-    return patch_review(**params)
+    return patch_comment(**params)

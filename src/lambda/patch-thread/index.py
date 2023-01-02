@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from boto3.dynamodb.conditions import Attr
 from utils import JsonPayloadBuilder
 from utils import resp_handler
 from utils import table
@@ -14,11 +15,13 @@ def patch_thread(board_id, ts, thread_id, thread):
             "board_id": board_id,
             "created_at": ts,
         },
-        UpdateExpression='SET courses = :info, update_at = :ts',
+        ConditionExpression=Attr('thread_id').eq(thread_id),
+        UpdateExpression='SET body = :tbody, title = :ttitle, update_at = :ts',
         ExpressionAtrributeValues={
-            ":info": [body['courses']],
+            ":tbody": [thread['body']],
+            ":ttitle": [thread['title']],
             ":ts": dt_now
-        }
+        },
     )
 
     body = JsonPayloadBuilder().add_status(
@@ -27,6 +30,7 @@ def patch_thread(board_id, ts, thread_id, thread):
 
 
 def handler(event, context):
+
     req = json.loads(event['body'])
     params = {
         "board_id": event["pathParameters"]["board_id"],

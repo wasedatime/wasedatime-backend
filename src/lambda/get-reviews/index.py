@@ -6,7 +6,8 @@ from utils import table
 
 @resp_handler
 def get_reviews(course_key, uid=""):
-    results = table.query(KeyConditionExpression=Key("course_key").eq(course_key), ScanIndexForward=False)["Items"]
+    results = table.query(KeyConditionExpression=Key(
+        "course_key").eq(course_key), ScanIndexForward=False)["Items"]
     for r in results:
         r.pop("course_key")
         r["benefit"] = int(r["benefit"])
@@ -18,7 +19,8 @@ def get_reviews(course_key, uid=""):
             r["mod"] = True
         del r["uid"]
 
-    body = JsonPayloadBuilder().add_status(True).add_data(results).add_message('').compile()
+    body = JsonPayloadBuilder().add_status(
+        True).add_data(results).add_message('').compile()
     return body
 
 
