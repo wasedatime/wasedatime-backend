@@ -77,8 +77,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
     });
 
-    this.exportValue(
-      'persistence:ExportsOutputRefdynamodbdynamodbthreadtable52550B410901B496',
-    );
+    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
   }
 }
