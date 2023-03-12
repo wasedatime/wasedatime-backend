@@ -76,5 +76,9 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     this.operationInterface.setEndpoint(OperationEndpoint.SYLLABUS, {
       [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
     });
+
+    this.exportValue(
+      'persistence:ExportsOutputRefdynamodbdynamodbthreadtable52550B410901B496',
+    );
   }
 }
