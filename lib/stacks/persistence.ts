@@ -60,10 +60,12 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       DataEndpoint.SYLLABUS,
       syllabusDataPipeline.dataWarehouse.bucketName,
     );
+
     this.dataInterface.setEndpoint(
       DataEndpoint.THREAD,
       dynamoDatabase.tables[Collection.THREAD].tableName,
     );
+    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
     this.dataInterface.setEndpoint(
       DataEndpoint.COMMENT,
       dynamoDatabase.tables[Collection.COMMENT].tableName,
@@ -76,7 +78,5 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     this.operationInterface.setEndpoint(OperationEndpoint.SYLLABUS, {
       [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
     });
-
-    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
   }
 }
