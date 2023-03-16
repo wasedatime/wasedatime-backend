@@ -1,5 +1,5 @@
-name: 'Install Dependencies'
-description: 'Workflow for installing dependencies'
+name: "Install Dependencies"
+description: "Workflow for installing dependencies"
 runs:
   using: "composite"
   steps:
@@ -10,7 +10,7 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: 16.x
-        cache: 'pnpm'
+        cache: "pnpm"
     - name: Setup CDK
       shell: bash
       run: |
