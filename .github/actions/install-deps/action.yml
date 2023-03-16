@@ -14,7 +14,6 @@ runs:
     - name: Setup CDK
       shell: bash
       run: |
-        pnpm setup
         pnpm install -g aws-cdk
         pnpm install
     - name: Diagnose
