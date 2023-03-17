@@ -92,20 +92,20 @@ export class DynamoDatabase extends Construct {
         },
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
-        removalPolicy: RemovalPolicy.RETAIN,
+        removalPolicy: RemovalPolicy.DESTROY,
         sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
-        tableName: 'forums-threads',
+        tableName: 'forum-threads',
         readCapacity: 15,
         writeCapacity: 15,
         pointInTimeRecovery: true,
       },
     );
 
-    // this.tables[Collection.THREAD].addLocalSecondaryIndex({
-    //   indexName: "GroupIndex",
-    //   sortKey: { name: "group_id", type: dynamodb.AttributeType.STRING },
-    //   projectionType: dynamodb.ProjectionType.ALL,
-    // });
+    this.tables[Collection.THREAD].addLocalSecondaryIndex({
+      indexName: 'GroupIndex',
+      sortKey: { name: 'group_id', type: dynamodb.AttributeType.NUMBER },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
 
     // this.tables[Collection.THREAD].addLocalSecondaryIndex({
     //   indexName: "TagIndex",
