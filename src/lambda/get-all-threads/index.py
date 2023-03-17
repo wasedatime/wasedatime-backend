@@ -1,22 +1,20 @@
-# from boto3.dynamodb.conditions import Key
-# import boto3
-# from datetime import datetime
-# from utils import JsonPayloadBuilder, table, resp_handler
+from boto3.dynamodb.conditions import Key
+import boto3
+from datetime import datetime
+from utils import JsonPayloadBuilder, table, resp_handler
 
 
-# @resp_handler
-# def get_all_threads():
+@resp_handler
+def get_all_threads():
 
-#     response = table.scan(TableName=table)
-#     items = response['Items']
+    response = table.scan(TableName=table)
+    items = response['Items']
 
-#     body = JsonPayloadBuilder().add_status(
-#         True).add_data(items).add_message('').compile()
-#     return body
+    body = JsonPayloadBuilder().add_status(
+        True).add_data(items).add_message('').compile()
+    return body
 
 
-# def handler(event, context):
-
-#     return get_all_threads()
 def handler(event, context):
-    pass
+
+    return get_all_threads()
