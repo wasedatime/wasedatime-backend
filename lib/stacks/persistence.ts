@@ -66,6 +66,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       dynamoDatabase.tables[Collection.THREAD].tableName,
     );
     this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
+    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
 
     this.dataInterface.setEndpoint(
       DataEndpoint.COMMENT,
