@@ -67,8 +67,7 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
       )
       .addService(
         'thread',
-        // this.dataInterface.getEndpoint(DataEndpoint.THREAD),
-        'Anystring',
+        this.dataInterface.getEndpoint(DataEndpoint.THREAD),
         true,
       )
       .addService(
