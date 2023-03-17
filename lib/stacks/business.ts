@@ -65,12 +65,11 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE),
         true,
       )
-      // .addService(
-      //   'thread',
-      //   // this.dataInterface.getEndpoint(DataEndpoint.THREAD),
-      //   'Anystring',
-      //   true,
-      // )
+      .addService(
+        'thread',
+        this.dataInterface.getEndpoint(DataEndpoint.THREAD),
+        true,
+      )
       .addService(
         'comment',
         this.dataInterface.getEndpoint(DataEndpoint.COMMENT),
