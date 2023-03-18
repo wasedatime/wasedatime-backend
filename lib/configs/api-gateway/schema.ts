@@ -47,12 +47,12 @@ export const syllabusSchema: apigw.JsonSchema = {
       d: {
         type: apigw.JsonSchemaType.STRING,
         title: 'Instructor',
-        description: 'Instructor\'s name in English.',
+        description: "Instructor's name in English.",
       },
       e: {
         type: apigw.JsonSchemaType.STRING,
         title: 'Instructor JP',
-        description: 'Instructor\'s name in Japanese.',
+        description: "Instructor's name in Japanese.",
       },
       f: {
         type: apigw.JsonSchemaType.ARRAY,
@@ -61,43 +61,23 @@ export const syllabusSchema: apigw.JsonSchema = {
         items: {
           type: apigw.JsonSchemaType.INTEGER,
           title: 'Language',
-          description: '-1 N/A | 0 Japanese | 1 English | 2 German | 3 French | 4 Chinese | 5 Spanish | 6 Korean | 7 Russia | 8 Italian | 9 other',
-          enum: [
-            -1,
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-          ],
+          description:
+            '-1 N/A | 0 Japanese | 1 English | 2 German | 3 French | 4 Chinese | 5 Spanish | 6 Korean | 7 Russia | 8 Italian | 9 other',
+          enum: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         },
       },
       g: {
         type: apigw.JsonSchemaType.INTEGER,
         title: 'Type',
-        description: 'Type of the course\n-1 N/A | 0 Lecture | 1 Seminar | 2 Work | 3 Foreign Langauge | 4 On-demand | 5 Thesis | 6 Graduate Research | 7 Practice | 8 Blended',
-        enum: [
-          -1,
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-        ],
+        description:
+          'Type of the course\n-1 N/A | 0 Lecture | 1 Seminar | 2 Work | 3 Foreign Langauge | 4 On-demand | 5 Thesis | 6 Graduate Research | 7 Practice | 8 Blended',
+        enum: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8],
       },
       h: {
         type: apigw.JsonSchemaType.STRING,
         title: 'Term',
-        description: 'The term in which the course is taught.\nseason := 0 Spring | 1 Summer | 2 Fall | 3 Winter\nperiod := \'s\' Semester| \'q\' Quarter | \'i\' Intensive Course | \'f\' Full Year | \'t\' Term\ndelimiter := \'/\' or | \'&\' and',
+        description:
+          "The term in which the course is taught.\nseason := 0 Spring | 1 Summer | 2 Fall | 3 Winter\nperiod := 's' Semester| 'q' Quarter | 'i' Intensive Course | 'f' Full Year | 't' Term\ndelimiter := '/' or | '&' and",
         enum: [
           '0s',
           '2s',
@@ -132,31 +112,20 @@ export const syllabusSchema: apigw.JsonSchema = {
           type: apigw.JsonSchemaType.OBJECT,
           title: 'Occurrence',
           description: 'Schedule and location',
-          required: [
-            'd',
-            'p',
-            'l',
-          ],
+          required: ['d', 'p', 'l'],
           properties: {
             d: {
               type: apigw.JsonSchemaType.INTEGER,
               title: 'Day',
-              description: 'The day on which the course is taught.\n-1 others | 0 Mon | 1 Tues | 2 Wed | 3 Thur | 4 Fri | 5 Sat | 6 Sun',
-              enum: [
-                -1,
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-              ],
+              description:
+                'The day on which the course is taught.\n-1 others | 0 Mon | 1 Tues | 2 Wed | 3 Thur | 4 Fri | 5 Sat | 6 Sun',
+              enum: [-1, 0, 1, 2, 3, 4, 5, 6],
             },
             p: {
               type: apigw.JsonSchemaType.INTEGER,
               title: 'Period',
-              description: 'The period on which the course is taught.\nstart_period := -1 others | 0 On-demand | 1 .. 9\nend_period := start_period ',
+              description:
+                'The period on which the course is taught.\nstart_period := -1 others | 0 On-demand | 1 .. 9\nend_period := start_period ',
             },
             l: {
               type: apigw.JsonSchemaType.STRING,
@@ -170,13 +139,7 @@ export const syllabusSchema: apigw.JsonSchema = {
         type: apigw.JsonSchemaType.INTEGER,
         title: 'Minimum Eligible Year',
         description: 'Minimum eligible year.\n-1 unknown | 1 .. 4',
-        enum: [
-          -1,
-          1,
-          2,
-          3,
-          4,
-        ],
+        enum: [-1, 1, 2, 3, 4],
       },
       k: {
         type: apigw.JsonSchemaType.STRING,
@@ -191,42 +154,27 @@ export const syllabusSchema: apigw.JsonSchema = {
       m: {
         type: apigw.JsonSchemaType.INTEGER,
         title: 'Level',
-        description: 'The level/difficulty of the course.\n-1 N/A | 0 Beginner | 1 Intermediate | 2 Advanced | 3 Final-stage | 4 Master | 5 Doctor',
-        enum: [
-          -1,
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-        ],
+        description:
+          'The level/difficulty of the course.\n-1 N/A | 0 Beginner | 1 Intermediate | 2 Advanced | 3 Final-stage | 4 Master | 5 Doctor',
+        enum: [-1, 0, 1, 2, 3, 4, 5],
       },
       n: {
         type: apigw.JsonSchemaType.ARRAY,
         title: 'Evaluations',
-        description: 'The distribution of evaluation criterion and their descriptions',
+        description:
+          'The distribution of evaluation criterion and their descriptions',
         items: {
           type: apigw.JsonSchemaType.OBJECT,
           title: 'Evaluation',
           description: 'Criteria and description',
-          required: [
-            't',
-            'p',
-            'c',
-          ],
+          required: ['t', 'p', 'c'],
           properties: {
             t: {
               type: apigw.JsonSchemaType.INTEGER,
               title: 'Type',
-              description: 'Type of the evaluation\n-1 Unknown | 0 Exam | 1 Papers | 2 Class Participation | 3 Others',
-              enum: [
-                -1,
-                0,
-                1,
-                2,
-                3,
-              ],
+              description:
+                'Type of the evaluation\n-1 Unknown | 0 Exam | 1 Papers | 2 Class Participation | 3 Others',
+              enum: [-1, 0, 1, 2, 3],
             },
             p: {
               type: apigw.JsonSchemaType.INTEGER,
@@ -349,11 +297,7 @@ export const courseReviewGetRespSchema: apigw.JsonSchema = {
       type: apigw.JsonSchemaType.STRING,
     },
   },
-  required: [
-    'success',
-    'data',
-    'message',
-  ],
+  required: ['success', 'data', 'message'],
 };
 
 export const courseReviewPostReqSchema: apigw.JsonSchema = {
@@ -404,9 +348,7 @@ export const courseReviewPostReqSchema: apigw.JsonSchema = {
       ],
     },
   },
-  required: [
-    'data',
-  ],
+  required: ['data'],
 };
 
 export const courseReviewPatchReqSchema: apigw.JsonSchema = {
@@ -429,17 +371,211 @@ export const courseReviewPatchReqSchema: apigw.JsonSchema = {
           type: apigw.JsonSchemaType.STRING,
         },
       },
-      required: [
-        'benefit',
-        'difficulty',
-        'satisfaction',
-        'comment',
-      ],
+      required: ['benefit', 'difficulty', 'satisfaction', 'comment'],
     },
   },
-  required: [
-    'data',
-  ],
+  required: ['data'],
+};
+
+export const forumThreadGetRespSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    success: {
+      type: apigw.JsonSchemaType.BOOLEAN,
+    },
+    data: {
+      type: apigw.JsonSchemaType.ARRAY,
+      items: {
+        type: apigw.JsonSchemaType.OBJECT,
+        properties: {
+          univ_id: {
+            type: apigw.JsonSchemaType.INTEGER,
+          },
+          board_id: {
+            type: apigw.JsonSchemaType.STRING,
+          },
+          updated_at: {
+            type: apigw.JsonSchemaType.STRING,
+          },
+          created_at: {
+            type: apigw.JsonSchemaType.STRING,
+          },
+          tag_id: {
+            type: apigw.JsonSchemaType.STRING,
+          },
+          group_id: {
+            type: apigw.JsonSchemaType.STRING,
+          },
+          thread_id: {
+            type: apigw.JsonSchemaType.STRING,
+          },
+          title: {
+            type: apigw.JsonSchemaType.STRING,
+          },
+          body: {
+            type: apigw.JsonSchemaType.STRING,
+          },
+          views: {
+            type: apigw.JsonSchemaType.INTEGER,
+          },
+          mod: {
+            type: apigw.JsonSchemaType.BOOLEAN,
+          },
+        },
+        required: [
+          'univ_id',
+          'board_id',
+          'updated_at',
+          'created_at',
+          'tag_id',
+          'group_id',
+          'thread_id',
+          'title',
+          'body',
+          'views',
+          'mod',
+        ],
+      },
+    },
+    message: {
+      type: apigw.JsonSchemaType.STRING,
+    },
+  },
+  required: ['success', 'data', 'message'],
+};
+
+export const forumThreadPostReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        univ_id: {
+          type: apigw.JsonSchemaType.INTEGER,
+        },
+        board_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        tag_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        group_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        title: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        body: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: ['univ_id', 'board_id', 'tag_id', 'group_id', 'title', 'body'],
+    },
+  },
+  required: ['data'],
+};
+
+export const forumThreadPatchReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        board_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        tag_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        thread_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        title: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        body: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: ['board_id', 'tag_id', 'thread_id', 'title', 'body'],
+    },
+  },
+  required: ['data'],
+};
+
+export const forumCommentGetRespSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        thread_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        body: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        created_at: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        updated_at: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        mod: {
+          type: apigw.JsonSchemaType.BOOLEAN,
+        },
+      },
+      required: ['thread_id', 'body', 'create_at', 'update_at', 'mod'],
+    },
+    message: {
+      type: apigw.JsonSchemaType.STRING,
+    },
+  },
+  required: ['success', 'data', 'message'],
+};
+
+export const forumCommentPostReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        thread_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        body: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: ['thread_id', 'body'],
+    },
+  },
+  required: ['data'],
+};
+
+export const forumCommentPatchReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        thread_id: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        body: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: ['thread_id', 'body'],
+    },
+  },
+  required: ['data'],
 };
 
 export const baseJsonApiSchema: apigw.JsonSchema = {
@@ -456,11 +592,7 @@ export const baseJsonApiSchema: apigw.JsonSchema = {
       type: apigw.JsonSchemaType.STRING,
     },
   },
-  required: [
-    'success',
-    'data',
-    'message',
-  ],
+  required: ['success', 'data', 'message'],
 };
 
 export const careerInfoSchema: apigw.JsonSchema = {};

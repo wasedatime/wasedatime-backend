@@ -9,22 +9,36 @@ import {
   AbstractRestApiEndpoint,
   WasedaTimeRestApiEndpoint,
 } from '../constructs/business/api-endpoint';
-import { AbstractAuthProvider, WasedaTimeUserAuth } from '../constructs/business/authentication';
+import {
+  AbstractAuthProvider,
+  WasedaTimeUserAuth,
+} from '../constructs/business/authentication';
 
 export class WasedaTimeBusinessLayer extends BusinessLayer {
   apiEndpoints: { [name: string]: AbstractApiEndpoint } = {};
   authProvider: AbstractAuthProvider;
 
-  constructor(scope: Construct, id: string, dataInterface: DataInterface, hostedZone: route53.IHostedZone, props: StackProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    dataInterface: DataInterface,
+    hostedZone: route53.IHostedZone,
+    props: StackProps,
+  ) {
     super(scope, id, dataInterface, props);
 
-    const authEndpoint = new WasedaTimeUserAuth(this, 'cognito-endpoint', hostedZone);
+    const authEndpoint = new WasedaTimeUserAuth(
+      this,
+      'cognito-endpoint',
+      hostedZone,
+    );
     this.authProvider = authEndpoint;
 
-    const restApiEndpoint: AbstractRestApiEndpoint = new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
-      zone: hostedZone,
-      authProvider: authEndpoint.pool,
-    });
+    const restApiEndpoint: AbstractRestApiEndpoint =
+      new WasedaTimeRestApiEndpoint(this, 'rest-api-endpoint', {
+        zone: hostedZone,
+        authProvider: authEndpoint.pool,
+      });
     this.apiEndpoints['rest-api'] = restApiEndpoint;
 
     // const graphqlApiEndpoint: AbstractGraphqlEndpoint = new WasedaTimeGraphqlEndpoint(this, 'graphql-api-endpoint', {
@@ -35,15 +49,43 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
     //
     // graphqlApiEndpoint.addService("course", this.dataInterface.getEndpoint(DataEndpoint.COURSE));
 
-    restApiEndpoint.addService('syllabus', this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS))
-      .addService('course-reviews', this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS), true)
+    restApiEndpoint
+      .addService(
+        'syllabus',
+        this.dataInterface.getEndpoint(DataEndpoint.SYLLABUS),
+      )
+      .addService(
+        'course-reviews',
+        this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),
+        true,
+      )
       .addService('career')
-      .addService('timetable', this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE), true);
+      .addService(
+        'timetable',
+        this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE),
+        true,
+      )
+      .addService(
+        'thread',
+        this.dataInterface.getEndpoint(DataEndpoint.THREAD),
+        true,
+      )
+      .addService(
+        'comment',
+        this.dataInterface.getEndpoint(DataEndpoint.COMMENT),
+        true,
+      );
     // .addService("graphql", graphqlApiEndpoint.apiEndpoint.graphqlUrl);
     restApiEndpoint.deploy();
 
-    this.serviceInterface.setEndpoint(ServiceEndpoint.API_REST, restApiEndpoint.getDomain());
+    this.serviceInterface.setEndpoint(
+      ServiceEndpoint.API_REST,
+      restApiEndpoint.getDomain(),
+    );
     // this.serviceInterface.setEndpoint(ServiceEndpoint.API_GRAPHQL, graphqlApiEndpoint.getDomain());
-    this.serviceInterface.setEndpoint(ServiceEndpoint.AUTH, authEndpoint.getDomain());
+    this.serviceInterface.setEndpoint(
+      ServiceEndpoint.AUTH,
+      authEndpoint.getDomain(),
+    );
   }
 }

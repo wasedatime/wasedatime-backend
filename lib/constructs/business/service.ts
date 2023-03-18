@@ -7,18 +7,31 @@ export enum ApiEndpoint {
   GRAPHQL,
 }
 
-export type RestApiServiceId = 'syllabus' | 'course-reviews' | 'career' | 'timetable' | 'graphql';
+export type RestApiServiceId =
+  | 'syllabus'
+  | 'course-reviews'
+  | 'career'
+  | 'timetable'
+  | 'thread'
+  | 'comment'
+  | 'graphql';
 
-export const restApiServiceMap: { [name in RestApiServiceId]: typeof rest.RestApiService } = {
+export const restApiServiceMap: {
+  [name in RestApiServiceId]: typeof rest.RestApiService;
+} = {
   'syllabus': rest.SyllabusApiService,
   'course-reviews': rest.CourseReviewsApiService,
   'career': rest.CareerApiService,
   'timetable': rest.TimetableApiService,
+  'thread': rest.ForumThreadsApiService,
+  'comment': rest.ForumCommentsApiService,
   'graphql': rest.GraphqlApiService,
 };
 
 export type GraphqlApiServiceId = 'course';
 
-export const graphqlApiServiceMap: { [name in GraphqlApiServiceId]: typeof gql.GraphqlApiService } = {
+export const graphqlApiServiceMap: {
+  [name in GraphqlApiServiceId]: typeof gql.GraphqlApiService;
+} = {
   course: gql.CourseApiService,
 };
