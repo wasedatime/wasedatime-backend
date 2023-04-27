@@ -25,7 +25,7 @@ def post_thread(board_id, thread, uid):
         "tag_id": thread["tag_id"],
         "group_id": thread["group_id"],
         "univ_id": thread["univ_id"],
-        "view": 0,
+        "views": 0,
     }
 
     table.put_item(Item=thread_item)

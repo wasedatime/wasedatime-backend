@@ -7,7 +7,7 @@ from utils import table
 
 
 @resp_handler
-def patch_thread(board_id, ts, thread_id, thread):
+def patch_thread(board_id, ts, uid, thread_id, thread):
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     table.update_item(
@@ -15,9 +15,10 @@ def patch_thread(board_id, ts, thread_id, thread):
             "board_id": board_id,
             "created_at": ts,
         },
-        ConditionExpression=Attr('thread_id').eq(thread_id),
+        ConditionExpression=Attr('thread_id').eq(
+            thread_id) & Attr('uid').eq(uid),
         UpdateExpression='SET body = :tbody, title = :ttitle, update_at = :ts',
-        ExpressionAtrributeValues={
+        ExpressionAttributeValues={
             ":tbody": [thread['body']],
             ":ttitle": [thread['title']],
             ":ts": dt_now

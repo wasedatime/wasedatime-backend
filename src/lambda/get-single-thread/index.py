@@ -18,7 +18,10 @@ def get_single_thread(board_id, ts, thread_id, uid):
             "created_at": ts,
         },
         ConditionExpression=Attr('thread_id').eq(thread_id),
-        UpdateExpression="SET views = views + :incr",
+        UpdateExpression="SET #v = #v + :incr",
+        ExpressionAttributeNames={
+            '#v': 'views'
+        },
         ExpressionAttributeValues={
             ":incr": 1
         }
