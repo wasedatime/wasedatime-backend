@@ -452,12 +452,6 @@ export const forumThreadPostReqSchema: apigw.JsonSchema = {
     data: {
       type: apigw.JsonSchemaType.OBJECT,
       properties: {
-        univ_id: {
-          type: apigw.JsonSchemaType.INTEGER,
-        },
-        board_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
         tag_id: {
           type: apigw.JsonSchemaType.STRING,
         },
@@ -471,7 +465,7 @@ export const forumThreadPostReqSchema: apigw.JsonSchema = {
           type: apigw.JsonSchemaType.STRING,
         },
       },
-      required: ['univ_id', 'board_id', 'tag_id', 'group_id', 'title', 'body'],
+      required: ['tag_id', 'group_id', 'title', 'body'],
     },
   },
   required: ['data'],
@@ -484,13 +478,10 @@ export const forumThreadPatchReqSchema: apigw.JsonSchema = {
     data: {
       type: apigw.JsonSchemaType.OBJECT,
       properties: {
-        board_id: {
-          type: apigw.JsonSchemaType.STRING,
-        },
         tag_id: {
           type: apigw.JsonSchemaType.STRING,
         },
-        thread_id: {
+        group_id: {
           type: apigw.JsonSchemaType.STRING,
         },
         title: {
@@ -500,7 +491,7 @@ export const forumThreadPatchReqSchema: apigw.JsonSchema = {
           type: apigw.JsonSchemaType.STRING,
         },
       },
-      required: ['board_id', 'tag_id', 'thread_id', 'title', 'body'],
+      required: ['tag_id', 'group_id', 'title', 'body'],
     },
   },
   required: ['data'],

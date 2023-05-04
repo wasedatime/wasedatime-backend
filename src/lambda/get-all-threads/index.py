@@ -8,7 +8,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 def get_all_threads():
     # respons will be table scan by TableName and return first 50 items
 
-    response = table.scan(TableName=table, Limit=50)
+    response = table.scan()
     items = response['Items']
 
     body = JsonPayloadBuilder().add_status(
