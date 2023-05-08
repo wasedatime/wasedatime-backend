@@ -28,7 +28,8 @@ class SyllabusCrawler:
         :return: list of courses
         """
         pages = self.get_max_page()
-        course_pages = run_concurrently(self.scrape_catalog, range(pages), self.worker)
+        course_pages = run_concurrently(
+            self.scrape_catalog, range(pages), self.worker)
         course_ids = (course_id for page in course_pages for course_id in page)
         results = run_concurrently(self.scrape_course, course_ids, self.worker)
         return results
@@ -86,8 +87,10 @@ class SyllabusCrawler:
                 "p": 'string', # subtitle
             }
         """
-        req_en = requests.Request(url=build_url(lang='en', course_id=course_id), headers=header)
-        req_jp = requests.Request(url=build_url(lang='jp', course_id=course_id), headers=header)
+        req_en = requests.Request(url=build_url(
+            lang='en', course_id=course_id), headers=header)
+        req_jp = requests.Request(url=build_url(
+            lang='jp', course_id=course_id), headers=header)
         parsed_en = html.fromstring(requests.urlopen(req_en).read())
         parsed_jp = html.fromstring(requests.urlopen(req_jp).read())
         info_en = parsed_en.xpath(query["info_table"])[0]
