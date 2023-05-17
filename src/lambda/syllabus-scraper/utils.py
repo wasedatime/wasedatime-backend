@@ -82,13 +82,13 @@ def get_eval_criteria(parsed):
     # Case 2: 2 or more rows
     for r in rows[1:]:
         elem = r.getchildren()
-        kind = elem[0].text
+        kind = elem[0].text_context()
         percent = elem[1].text.strip()[:-1] or -1
         try:
             percent = int(percent)
         except ValueError:
             logging.warning(f"Unable to parse percent: {percent}")
-        criteria = to_half_width(elem[2].text)
+        criteria = to_half_width(elem[2].text_context())
         cleaned_criteria = remove_format_chars(criteria)
         evals.append({
             "t": to_enum(eval_type_map)(kind),
