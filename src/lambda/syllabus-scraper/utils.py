@@ -203,15 +203,15 @@ def parse_location(loc):
     rooms = []
     locations = loc.split('／')
     for l in locations:
-        match = re.search(r'0(\d):(.*)', l)
-        count, classroom = int(match.group(1)) - 1, match.group(2)
-        classroom = rename_location(classroom)
-        # Sub-case: two location records for same period
-        if count >= len(rooms):
-            rooms.append(classroom)
-        else:
-            rooms.__setitem__(count, rooms[count] + "/" + classroom)
-        return rooms
+        matches = re.findall(r'0(\d):(.*)', l)
+        for match in matches:
+            count, classroom = int(match[0]) - 1, match[1]
+            classroom = rename_location(classroom)
+            if count >= len(rooms):
+                rooms.append([classroom])
+            else:
+                rooms[count].append(classroom)
+    return [room for sublist in rooms for room in sublist]
 
 
 def parse_lang(lang):
