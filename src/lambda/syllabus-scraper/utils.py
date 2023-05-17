@@ -144,11 +144,23 @@ def merge_period_location(periods, locations):
             p["l"] = locations[0]
         return periods
     # TODO find other cases
-    # Case 2: More no. of periods than no. of locations
-    zipped = list(itertools.zip_longest(periods, locations))
-    for (p, loc) in zipped:
-        p["l"] = loc
-        occurrences.append(p)
+    # Case 2: multiple periods and multiple locations string divided with a '/'
+    elif len(periods) == len(locations):
+        for i in range(len(periods)):
+            locs = locations[i].split('/')
+            temp_period = periods[i]
+            for loc in locs:
+                temp_period_copy = temp_period.copy()
+                temp_period_copy["l"] = loc.strip()
+                occurrences.append(temp_period_copy)
+        return occurrences
+
+    # Case 3: More no. of periods than no. of locations
+    else:
+        zipped = list(itertools.zip_longest(periods, locations))
+        for (p, loc) in zipped:
+            p["l"] = loc
+            occurrences.append(p)
     return occurrences
 
 
@@ -191,15 +203,15 @@ def parse_location(loc):
     rooms = []
     locations = loc.split('／')
     for l in locations:
-        match = re.search(r'0(\d):(.*)', l)
-        count, classroom = int(match.group(1)) - 1, match.group(2)
-        classroom = rename_location(classroom)
-        # Sub-case: two location records for same period
-        if count >= len(rooms):
-            rooms.append(classroom)
-        else:
-            rooms.__setitem__(count, rooms[count] + "/" + classroom)
-        return rooms
+        matches = re.findall(r'0(\d):(.*)', l)
+        for match in matches:
+            count, classroom = int(match[0]) - 1, match[1]
+            classroom = rename_location(classroom)
+            if count >= len(rooms):
+                rooms.append([classroom])
+            else:
+                rooms[count].append(classroom)
+    return [room for sublist in rooms for room in sublist]
 
 
 def parse_lang(lang):
@@ -243,7 +255,8 @@ def parse_period(schedule):
         return [{"d": -1, "p": -1}]
     if occ == "othersOn demand":
         return [{"d": -1, "p": 0}]
-    occ_matches = re.finditer(r'(Mon|Tues|Wed|Thur|Fri|Sat|Sun)\.(\d-\d|\d|On demand)', occ)
+    occ_matches = re.finditer(
+        r'(Mon|Tues|Wed|Thur|Fri|Sat|Sun)\.(\d-\d|\d|On demand)', occ)
     occurrences = []
     for match in occ_matches:
         day, period = match.group(1), match.group(2)
@@ -300,8 +313,10 @@ def upload_to_s3(syllabus, school):
             'RequestCharged': 'requester'
         }
     """
-    s3 = boto3.resource('s3', region_name="ap-northeast-1", verify=False, config=Config(signature_version='s3v4'))
-    syllabus_object = s3.Object(os.getenv('BUCKET_NAME'), os.getenv('OBJECT_PATH') + school + '.json')
+    s3 = boto3.resource('s3', region_name="ap-northeast-1",
+                        verify=False, config=Config(signature_version='s3v4'))
+    syllabus_object = s3.Object(
+        os.getenv('BUCKET_NAME'), os.getenv('OBJECT_PATH') + school + '.json')
     body = bytes(json.dumps(list(syllabus)).encode('UTF-8'))
     resp = syllabus_object.put(
         ACL='private',
