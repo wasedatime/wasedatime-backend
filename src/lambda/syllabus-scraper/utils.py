@@ -61,6 +61,11 @@ def to_half_width(s):
     return unicodedata.normalize('NFKC', s)
 
 
+def remove_format_chars(line):
+    cleaned_line = re.sub(r'[\n\r\t]', ' ', line)
+    return cleaned_line
+
+
 def get_eval_criteria(parsed):
     """
     Get the evaluation criteria from course detail page
@@ -82,13 +87,13 @@ def get_eval_criteria(parsed):
     # Case 2: 2 or more rows
     for r in rows[1:]:
         elem = r.getchildren()
-        kind = elem[0].text_context()
+        kind = elem[0].text_content()
         percent = elem[1].text.strip()[:-1] or -1
         try:
             percent = int(percent)
         except ValueError:
             logging.warning(f"Unable to parse percent: {percent}")
-        criteria = to_half_width(elem[2].text_context())
+        criteria = to_half_width(elem[2].text_content())
         cleaned_criteria = remove_format_chars(criteria)
         evals.append({
             "t": to_enum(eval_type_map)(kind),
@@ -351,8 +356,3 @@ def get_expire_date():
     next_dt = cron_schedule[idx + 1].split('-')
     next_time = now.replace(month=int(next_dt[0]), day=int(next_dt[1]))
     return next_time
-
-
-def remove_format_chars(line):
-    cleaned_line = re.sub(r'[\n\r\t]', ' ', line)
-    return cleaned_line
