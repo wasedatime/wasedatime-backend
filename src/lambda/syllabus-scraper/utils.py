@@ -61,6 +61,11 @@ def to_half_width(s):
     return unicodedata.normalize('NFKC', s)
 
 
+def remove_format_chars(line):
+    cleaned_line = re.sub(r'[\n\r\t]', ' ', line)
+    return cleaned_line
+
+
 def get_eval_criteria(parsed):
     """
     Get the evaluation criteria from course detail page
@@ -82,17 +87,18 @@ def get_eval_criteria(parsed):
     # Case 2: 2 or more rows
     for r in rows[1:]:
         elem = r.getchildren()
-        kind = elem[0].text
+        kind = elem[0].text_content()
         percent = elem[1].text.strip()[:-1] or -1
         try:
             percent = int(percent)
         except ValueError:
             logging.warning(f"Unable to parse percent: {percent}")
-        criteria = to_half_width(elem[2].text)
+        criteria = to_half_width(elem[2].text_content())
+        cleaned_criteria = remove_format_chars(criteria)
         evals.append({
             "t": to_enum(eval_type_map)(kind),
             "p": percent,
-            "c": criteria
+            "c": cleaned_criteria
         })
     return evals
 
@@ -243,7 +249,8 @@ def parse_period(schedule):
         return [{"d": -1, "p": -1}]
     if occ == "othersOn demand":
         return [{"d": -1, "p": 0}]
-    occ_matches = re.finditer(r'(Mon|Tues|Wed|Thur|Fri|Sat|Sun)\.(\d-\d|\d|On demand)', occ)
+    occ_matches = re.finditer(
+        r'(Mon|Tues|Wed|Thur|Fri|Sat|Sun)\.(\d-\d|\d|On demand)', occ)
     occurrences = []
     for match in occ_matches:
         day, period = match.group(1), match.group(2)
@@ -300,8 +307,10 @@ def upload_to_s3(syllabus, school):
             'RequestCharged': 'requester'
         }
     """
-    s3 = boto3.resource('s3', region_name="ap-northeast-1", verify=False, config=Config(signature_version='s3v4'))
-    syllabus_object = s3.Object(os.getenv('BUCKET_NAME'), os.getenv('OBJECT_PATH') + school + '.json')
+    s3 = boto3.resource('s3', region_name="ap-northeast-1",
+                        verify=False, config=Config(signature_version='s3v4'))
+    syllabus_object = s3.Object(
+        os.getenv('BUCKET_NAME'), os.getenv('OBJECT_PATH') + school + '.json')
     body = bytes(json.dumps(list(syllabus)).encode('UTF-8'))
     resp = syllabus_object.put(
         ACL='private',
