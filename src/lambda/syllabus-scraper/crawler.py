@@ -85,6 +85,8 @@ class SyllabusCrawler:
                 "n": 'array', # eval
                 "o": 'string', # code
                 "p": 'string', # subtitle
+                "q": 'string', #category
+                "r": 'string', #modality
             }
         """
         req_en = requests.Request(url=build_url(

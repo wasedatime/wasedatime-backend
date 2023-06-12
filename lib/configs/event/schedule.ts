@@ -4,7 +4,7 @@ export const syllabusSchedule: { [name: string]: events.Schedule } = {
   'regular': events.Schedule.cron({
     minute: '0',
     hour: '16',
-    day: '1,2',
+    day: '1,12',
     month: '*',
     year: '*',
   }),
