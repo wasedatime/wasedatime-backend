@@ -149,24 +149,27 @@ def merge_period_location(periods, locations):
         for p in periods:
             p["l"] = locations[0]
         return periods
-    # TODO find other cases
-    # Case 2: multiple periods and multiple locations string divided with a '/'
-    elif len(periods) == len(locations):
-        for i in range(len(periods)):
-            locs = locations[i].split('/')
-            temp_period = periods[i]
-            for loc in locs:
-                temp_period_copy = temp_period.copy()
-                temp_period_copy["l"] = loc.strip()
-                occurrences.append(temp_period_copy)
-        return occurrences
+    # Case 2: More no. of periods than no. of locations
+    zipped = list(itertools.zip_longest(periods, locations))
+    for (p, loc) in zipped:
+        if p is None:
+            logging.error(f"Unexpected None in periods. loc={loc}")
+            continue
 
-    # Case 3: More no. of periods than no. of locations
-    else:
-        zipped = list(itertools.zip_longest(periods, locations))
-        for (p, loc) in zipped:
+        if loc is not None:
             p["l"] = loc
-            occurrences.append(p)
+        else:
+            logging.warning(
+                f"Missing location for period {p}. Assigning default value.")
+            p["l"] = "undecided"
+
+        occurrences.append(p)
+
+    # Case 3: Logging error for unusual scenarios
+    if not occurrences:
+        logging.error(
+            f"merge_period_location resulted in no occurrences for input periods={periods}, locations={locations}")
+
     return occurrences
 
 
