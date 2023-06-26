@@ -15,7 +15,7 @@
     "lint": "eslint . --ext .ts"
   },
   "peerDependencies": {
-    "aws-cdk-lib": "2.69.0",
+    "aws-cdk-lib": "2.80.0",
     "constructs": "10.1.279"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "@types/pluralize": "0.0.29",
     "@typescript-eslint/eslint-plugin": "5.55.0",
     "@typescript-eslint/parser": "5.55.0",
-    "aws-cdk-lib": "2.69.0",
+    "aws-cdk-lib": "2.80.0",
     "constructs": "10.1.279",
     "esbuild": "^0.16.0",
     "eslint": "8.17.0",
