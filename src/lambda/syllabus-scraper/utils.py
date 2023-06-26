@@ -61,6 +61,11 @@ def to_half_width(s):
     return unicodedata.normalize('NFKC', s)
 
 
+def remove_format_chars(line):
+    cleaned_line = re.sub(r'[\n\r\t]', ' ', line)
+    return cleaned_line
+
+
 def get_eval_criteria(parsed):
     """
     Get the evaluation criteria from course detail page
@@ -82,17 +87,18 @@ def get_eval_criteria(parsed):
     # Case 2: 2 or more rows
     for r in rows[1:]:
         elem = r.getchildren()
-        kind = elem[0].text
+        kind = elem[0].text_content()
         percent = elem[1].text.strip()[:-1] or -1
         try:
             percent = int(percent)
         except ValueError:
             logging.warning(f"Unable to parse percent: {percent}")
-        criteria = to_half_width(elem[2].text)
+        criteria = to_half_width(elem[2].text_content())
+        cleaned_criteria = remove_format_chars(criteria)
         evals.append({
             "t": to_enum(eval_type_map)(kind),
             "p": percent,
-            "c": criteria
+            "c": cleaned_criteria
         })
     return evals
 
@@ -143,12 +149,27 @@ def merge_period_location(periods, locations):
         for p in periods:
             p["l"] = locations[0]
         return periods
-    # TODO find other cases
     # Case 2: More no. of periods than no. of locations
     zipped = list(itertools.zip_longest(periods, locations))
     for (p, loc) in zipped:
-        p["l"] = loc
+        if p is None:
+            logging.error(f"Unexpected None in periods. loc={loc}")
+            continue
+
+        if loc is not None:
+            p["l"] = loc
+        else:
+            logging.warning(
+                f"Missing location for period {p}. Assigning default value.")
+            p["l"] = "undecided"
+
         occurrences.append(p)
+
+    # Case 3: Logging error for unusual scenarios
+    if not occurrences:
+        logging.error(
+            f"merge_period_location resulted in no occurrences for input periods={periods}, locations={locations}")
+
     return occurrences
 
 
@@ -191,15 +212,15 @@ def parse_location(loc):
     rooms = []
     locations = loc.split('／')
     for l in locations:
-        match = re.search(r'0(\d):(.*)', l)
-        count, classroom = int(match.group(1)) - 1, match.group(2)
-        classroom = rename_location(classroom)
-        # Sub-case: two location records for same period
-        if count >= len(rooms):
-            rooms.append(classroom)
-        else:
-            rooms.__setitem__(count, rooms[count] + "/" + classroom)
-        return rooms
+        matches = re.findall(r'0(\d):(.*)', l)
+        for match in matches:
+            count, classroom = int(match[0]) - 1, match[1]
+            classroom = rename_location(classroom)
+            if count >= len(rooms):
+                rooms.append([classroom])
+            else:
+                rooms[count].append(classroom)
+    return [room for sublist in rooms for room in sublist]
 
 
 def parse_lang(lang):
@@ -243,7 +264,8 @@ def parse_period(schedule):
         return [{"d": -1, "p": -1}]
     if occ == "othersOn demand":
         return [{"d": -1, "p": 0}]
-    occ_matches = re.finditer(r'(Mon|Tues|Wed|Thur|Fri|Sat|Sun)\.(\d-\d|\d|On demand)', occ)
+    occ_matches = re.finditer(
+        r'(Mon|Tues|Wed|Thur|Fri|Sat|Sun)\.(\d-\d|\d|On demand)', occ)
     occurrences = []
     for match in occ_matches:
         day, period = match.group(1), match.group(2)
@@ -300,8 +322,10 @@ def upload_to_s3(syllabus, school):
             'RequestCharged': 'requester'
         }
     """
-    s3 = boto3.resource('s3', region_name="ap-northeast-1", verify=False, config=Config(signature_version='s3v4'))
-    syllabus_object = s3.Object(os.getenv('BUCKET_NAME'), os.getenv('OBJECT_PATH') + school + '.json')
+    s3 = boto3.resource('s3', region_name="ap-northeast-1",
+                        verify=False, config=Config(signature_version='s3v4'))
+    syllabus_object = s3.Object(
+        os.getenv('BUCKET_NAME'), os.getenv('OBJECT_PATH') + school + '.json')
     body = bytes(json.dumps(list(syllabus)).encode('UTF-8'))
     resp = syllabus_object.put(
         ACL='private',

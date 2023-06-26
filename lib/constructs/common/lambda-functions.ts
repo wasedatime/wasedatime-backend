@@ -584,7 +584,7 @@ export class ForumThreadFunctions extends Construct {
         functionName: 'get-single-thread',
         logRetention: logs.RetentionDays.ONE_MONTH,
         memorySize: 128,
-        role: dynamoDBReadRole,
+        role: dynamoDBPutRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.seconds(3),
         environment: props.envVars,
