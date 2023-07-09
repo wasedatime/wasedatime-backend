@@ -4,11 +4,13 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_single_thread(board_id, thread_id, uid):
+def get_single_thread(board_id, thread_id, uid=""):
 
-    results = table.query(KeyConditionExpression=Key(
-        "board_id").eq(board_id),
-        FilterExpression=Attr('thread_id').eq(thread_id))["Items"]
+    results = table.query(
+        KeyConditionExpression=Key("board_id").eq(
+            board_id) & Key("thread_id").eq(thread_id)
+    )["Items"]
+
     if not results:
         raise LookupError
 
@@ -43,7 +45,7 @@ def get_single_thread(board_id, thread_id, uid):
 def handler(event, context):
     params = {
         "board_id": event["pathParameters"]["board_id"],
-        "thread_id": event["pathParameters"]["thread_id"]
+        "thread_id": event["pathParameters"]["thread_id"],
     }
     if "uid" in event["queryStringParameters"]:
         params["uid"] = event["queryStringParameters"]["uid"]
