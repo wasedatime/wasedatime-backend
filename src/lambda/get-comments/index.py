@@ -21,9 +21,8 @@ def get_comments(thread_id, uid=""):
 
 def handler(event, context):
     params = {
-        "thread_id": event["pathParameters"]["thread_id"]
+        "thread_id": event["pathParameters"]["thread_id"],
+        "uid": event['requestContext']['authorizer']['claims']['sub']
     }
-    if "uid" in event["queryStringParameters"]:
-        params["uid"] = event["queryStringParameters"]["uid"]
 
     return get_comments(**params)
