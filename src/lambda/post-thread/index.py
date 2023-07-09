@@ -8,7 +8,7 @@ import uuid
 @resp_handler
 def post_thread(board_id, thread, uid):
 
-    thread_id = build_thread_id(uid)
+    thread_id = build_thread_id()
 
     text = thread["body"]
 

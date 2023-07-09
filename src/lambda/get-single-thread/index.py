@@ -4,7 +4,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_single_thread(board_id, ts, thread_id, uid):
+def get_single_thread(board_id, thread_id, uid):
 
     results = table.query(KeyConditionExpression=Key(
         "board_id").eq(board_id),
@@ -15,9 +15,8 @@ def get_single_thread(board_id, ts, thread_id, uid):
     table.update_item(
         Key={
             "board_id": board_id,
-            "created_at": ts,
+            "thread_id": thread_id,
         },
-        ConditionExpression=Attr('thread_id').eq(thread_id),
         UpdateExpression="SET #v = #v + :incr",
         ExpressionAttributeNames={
             '#v': 'views'
@@ -28,6 +27,8 @@ def get_single_thread(board_id, ts, thread_id, uid):
     )
 
     item = results[0]
+
+    del item["thread_id"]
 
     item["mod"] = False
     if item["uid"] == uid:
@@ -42,7 +43,6 @@ def get_single_thread(board_id, ts, thread_id, uid):
 def handler(event, context):
     params = {
         "board_id": event["pathParameters"]["board_id"],
-        "ts": event["queryStringParameters"]["ts"],
         "thread_id": event["pathParameters"]["thread_id"]
     }
     if "uid" in event["queryStringParameters"]:
