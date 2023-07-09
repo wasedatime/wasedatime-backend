@@ -70,15 +70,12 @@ def resp_handler(func=None, headers=None):
     return handle
 
 
-def build_thread_id(uid):
+def build_thread_id():
 
     unique_id = str(uuid.uuid4())
 
     ts = datetime.now().strftime('%Y%m%d%H%M%S')
 
-    first_half = uid[:5]
-    second_half = unique_id[5:]
-
-    thread_id = f"{ts}{first_half}{second_half}"
+    thread_id = f"{ts}_{unique_id}"
 
     return thread_id
