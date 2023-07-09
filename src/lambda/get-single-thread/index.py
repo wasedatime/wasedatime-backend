@@ -6,9 +6,11 @@ from utils import JsonPayloadBuilder, table, resp_handler
 @resp_handler
 def get_single_thread(board_id, thread_id, uid):
 
-    results = table.query(KeyConditionExpression=Key(
-        "board_id").eq(board_id),
-        FilterExpression=Attr('thread_id').eq(thread_id))["Items"]
+    results = table.query(
+        KeyConditionExpression=Key("board_id").eq(
+            board_id) & Key("thread_id").eq(thread_id)
+    )["Items"]
+
     if not results:
         raise LookupError
 
