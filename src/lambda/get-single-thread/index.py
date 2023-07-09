@@ -4,7 +4,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_single_thread(board_id, thread_id, uid):
+def get_single_thread(board_id, thread_id, uid=""):
 
     results = table.query(
         KeyConditionExpression=Key("board_id").eq(
