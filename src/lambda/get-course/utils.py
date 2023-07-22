@@ -172,7 +172,7 @@ def get_eval_criteria(parsed):
     for r in rows[1:]:
         elem = r.getchildren()
         # kind = elem[0].text
-        # new code for 2023
+        # New code to deal with the new line character
         kind = elem[0].text.rstrip()
         percent = elem[1].text.strip()[:-1] or -1
         try:
@@ -180,7 +180,7 @@ def get_eval_criteria(parsed):
         except ValueError:
             logging.warning(f"Unable to parse percent: {percent}")
         # criteria = to_half_width(elem[2].text)
-        # new code for 2023
+        # New code to deal with the breakline
         criteria_elements = elem[2].xpath('.//text()')
         criteria = to_half_width(''.join(criteria_elements))
         evals.append({
