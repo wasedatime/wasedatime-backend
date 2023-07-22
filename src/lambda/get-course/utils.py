@@ -149,7 +149,7 @@ def to_half_width(s):
         return ""
     return unicodedata.normalize('NFKC', s)
 
-
+# Fix the problem over here to get the correct evaluation criteria in the waseda time 
 def get_eval_criteria(parsed):
     """
     Get the evaluation criteria from course detail page
@@ -171,13 +171,18 @@ def get_eval_criteria(parsed):
     # Case 2: 2 or more rows
     for r in rows[1:]:
         elem = r.getchildren()
-        kind = elem[0].text
+        # kind = elem[0].text
+        # new code for 2023
+        kind = elem[0].text.rstrip()
         percent = elem[1].text.strip()[:-1] or -1
         try:
             percent = int(percent)
         except ValueError:
             logging.warning(f"Unable to parse percent: {percent}")
-        criteria = to_half_width(elem[2].text)
+        # criteria = to_half_width(elem[2].text)
+        # new code for 2023
+        criteria_elements = elem[2].xpath('.//text()')
+        criteria = to_half_width(''.join(criteria_elements))
         evals.append({
             "type": to_enum(eval_type_map)(kind),
             "percent": percent,
