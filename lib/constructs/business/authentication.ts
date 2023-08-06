@@ -5,9 +5,11 @@ import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
 import { Construct } from 'constructs';
 import {
   CALLBACK_URLS,
+  FLUTTER_CALLBACK_URL,
   GOOGLE_OAUTH_CLIENT_ID,
   GOOGLE_OAUTH_CLIENT_SECRET,
   LOGOUT_URLS,
+  FLUTTER_LOGOUT_URL,
 } from '../../configs/cognito/oauth';
 import { AUTH_CERT_ARN } from '../../configs/common/arn';
 import { AUTH_DOMAIN } from '../../configs/route53/domain';
@@ -70,21 +72,24 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
       },
       userPoolName: 'wasedatime-users',
       lambdaTriggers: {
-        preSignUp: new PreSignupWasedaMailValidator(this, 'presign-up-handle').baseFunction,
+        preSignUp: new PreSignupWasedaMailValidator(this, 'presign-up-handle')
+          .baseFunction,
       },
     });
 
-    this.pool.registerIdentityProvider(new cognito.UserPoolIdentityProviderGoogle(this, 'google-idp', {
-      clientId: GOOGLE_OAUTH_CLIENT_ID,
-      clientSecret: GOOGLE_OAUTH_CLIENT_SECRET,
-      userPool: this.pool,
-      attributeMapping: {
-        email: cognito.ProviderAttribute.GOOGLE_EMAIL,
-        preferredUsername: cognito.ProviderAttribute.GOOGLE_NAME,
-        profilePicture: cognito.ProviderAttribute.GOOGLE_PICTURE,
-      },
-      scopes: ['email', 'openid', 'profile'],
-    }));
+    this.pool.registerIdentityProvider(
+      new cognito.UserPoolIdentityProviderGoogle(this, 'google-idp', {
+        clientId: GOOGLE_OAUTH_CLIENT_ID,
+        clientSecret: GOOGLE_OAUTH_CLIENT_SECRET,
+        userPool: this.pool,
+        attributeMapping: {
+          email: cognito.ProviderAttribute.GOOGLE_EMAIL,
+          preferredUsername: cognito.ProviderAttribute.GOOGLE_NAME,
+          profilePicture: cognito.ProviderAttribute.GOOGLE_PICTURE,
+        },
+        scopes: ['email', 'openid', 'profile'],
+      }),
+    );
 
     this.clients['web-app'] = this.pool.addClient('web-app-client', {
       userPoolClientName: 'web-app',
@@ -100,6 +105,20 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
       preventUserExistenceErrors: true,
     });
 
+    this.clients['flutter-app'] = this.pool.addClient('flutter-app-client', {
+      userPoolClientName: 'flutter-app',
+      authFlows: {
+        custom: true,
+        userSrp: true,
+      },
+      generateSecret: false,
+      oAuth: {
+        callbackUrls: FLUTTER_CALLBACK_URL,
+        logoutUrls: FLUTTER_LOGOUT_URL,
+      },
+      preventUserExistenceErrors: true,
+    });
+
     // todo add custom ses in us-east-1
 
     // fixme cross region resource
@@ -110,12 +129,18 @@ export class WasedaTimeUserAuth extends AbstractAuthProvider {
     this.domain = this.pool.addDomain('auth-domain', {
       customDomain: {
         domainName: AUTH_DOMAIN,
-        certificate: acm.Certificate.fromCertificateArn(this, 'auth-domain-cert', AUTH_CERT_ARN),
+        certificate: acm.Certificate.fromCertificateArn(
+          this,
+          'auth-domain-cert',
+          AUTH_CERT_ARN,
+        ),
       },
     });
     new route53.ARecord(this, 'alias-record', {
       zone: zone,
-      target: route53.RecordTarget.fromAlias(new route53_targets.UserPoolDomainTarget(this.domain)),
+      target: route53.RecordTarget.fromAlias(
+        new route53_targets.UserPoolDomainTarget(this.domain),
+      ),
       recordName: AUTH_DOMAIN,
     });
   }
