@@ -7,7 +7,6 @@ export const CALLBACK_URLS = [
   'https://wasedatime.com/verify',
   'https://dev.wasedatime.com/verify',
   'localhost:3000/verify',
-  'wasedati',
 ];
 
 export const LOGOUT_URLS = [
