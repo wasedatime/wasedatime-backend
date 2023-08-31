@@ -12,7 +12,7 @@ def delete_thread(board_id, thread_id, uid):
             "thread_id": thread_id,
         },
         ConditionExpression=Attr('uid').eq(
-            uid) & Attr('thread_id').eq(thread_id)
+            uid)
     )
 
     resp_body = JsonPayloadBuilder().add_status(
