@@ -5,11 +5,15 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_all_threads():
-    # respons will be table scan by TableName and return first 50 items
+def get_all_threads(uid=""):
 
     response = table.scan()
     items = response['Items']
+
+    for item in items:
+        item['mod'] = False
+        if 'uid' in item and item['uid'] == uid:
+            item['mod'] = True
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(items).add_message('').compile()
@@ -18,4 +22,9 @@ def get_all_threads():
 
 def handler(event, context):
 
-    return get_all_threads()
+    uid = ""
+
+    if "uid" in event["queryStringParameters"]:
+        uid = event["queryStringParameters"]["uid"]
+
+    return get_all_threads(uid)
