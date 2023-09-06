@@ -79,7 +79,9 @@ location_name_map = {
     "14-809(院生指導室)": "14-809",
     "14-808(院生指導室)": "14-808",
     "Seminar room 2 50-303": "50-303",
-    "drafting room": "57-1F"
+    "drafting room": "57-1F",
+    "-": "undecided",
+    "Faculty Office": "Faculty Office"
 }
 
 user_agents = [
