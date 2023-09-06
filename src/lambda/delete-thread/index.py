@@ -6,9 +6,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 @resp_handler
 def delete_thread(board_id, thread_id, uid):
-    print(f"Board ID: {board_id}")
-    print(f"Thread ID: {thread_id}")
-    print(f"User ID: {uid}")
+
     table.delete_item(
         Key={
             "board_id": board_id,
