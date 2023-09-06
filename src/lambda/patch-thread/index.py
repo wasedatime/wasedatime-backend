@@ -9,6 +9,10 @@ from utils import table
 @resp_handler
 def patch_thread(board_id, uid, thread_id, thread):
 
+    print(f"Board ID: {board_id}")
+    print(f"Thread ID: {thread_id}")
+    print(f"User ID: {uid}")
+
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     table.update_item(
         Key={
