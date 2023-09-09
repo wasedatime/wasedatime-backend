@@ -7,7 +7,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 @resp_handler
 def get_all_threads(uid, index, num):
 
-    print(index)
+    print([index, num])
     response = table.scan()
     items = response['Items']
 
@@ -28,14 +28,11 @@ def get_all_threads(uid, index, num):
 
 
 def handler(event, context):
-    uid = ""
-    index = 1
-    num = 5
 
     if "queryStringParameters" in event:
         params = event["queryStringParameters"]
         uid = params.get("uid", "")
-        index = int(params.get("index"))
-        num = int(params.get("num"))
+        index = params.get("index")
+        num = params.get("num")
 
     return get_all_threads(uid, index, num)
