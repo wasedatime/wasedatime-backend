@@ -14,10 +14,10 @@ def get_all_threads(uid, index, num, school):
     response = table.scan()
     items = response['Items']
 
-    if school != "":
-        items = [item for item in items if item.get("group_id") == school]
+    if not school:
+        items = [item for item in items if item.get("group_id") in school]
 
-    start_index = index
+    start_index = 0 if not school else index
     end_index = min(len(items), start_index+num)
     paginated_items = items[start_index:end_index]
 
