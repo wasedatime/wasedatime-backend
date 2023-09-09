@@ -14,7 +14,7 @@ def get_all_threads(uid, index, num, school):
     response = table.scan()
     items = response['Items']
 
-    if not school:
+    if school:
         items = [item for item in items if item.get("group_id") in school]
 
     start_index = 0 if not school else index
