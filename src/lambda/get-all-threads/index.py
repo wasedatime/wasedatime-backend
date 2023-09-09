@@ -17,9 +17,13 @@ def get_all_threads(uid, index, num, school):
     if school:
         items = [item for item in items if item.get("group_id") in school]
 
+    print(f"All items fetched : {items}")
+
     start_index = 0 if school else index
     end_index = min(len(items), start_index+num)
     paginated_items = items[start_index:end_index]
+
+    print(f"Paginated items fetched : {paginated_items}")
 
     for item in paginated_items:
         item['mod'] = False
