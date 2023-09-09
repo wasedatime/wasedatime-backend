@@ -7,8 +7,6 @@ from utils import JsonPayloadBuilder, table, resp_handler
 @resp_handler
 def get_all_threads(uid, index, num, school):
 
-    print(school)
-
     index = int(index)
     num = int(num)
 
@@ -18,13 +16,15 @@ def get_all_threads(uid, index, num, school):
     if school:
         items = [item for item in items if item.get("group_id") in school]
 
-    print(f"All items fetched : {items}")
+    print(f"length of fetched items {len(items)}")
 
     start_index = index
     end_index = min(len(items), start_index+num)
     paginated_items = items[start_index:end_index]
 
-    print(f"Paginated items fetched : {paginated_items}")
+    print(f"Starting Index : {start_index}")
+    print(f"Ending Index : {end_index}")
+    print(f"Length of Paginated items : {len(paginated_items)}")
 
     for item in paginated_items:
         item['mod'] = False
