@@ -32,7 +32,7 @@ def get_all_threads(uid, index, num, school):
             item['mod'] = True
 
     body = JsonPayloadBuilder().add_status(
-        True).add_data(paginated_items).add_message('').compile()
+        True).add_data(paginated_items).add_message(end_index).compile()
 
     return body
 
