@@ -16,7 +16,7 @@ def patch_thread(board_id, uid, thread_id, thread):
             "thread_id": thread_id,
         },
         ConditionExpression=Attr('uid').eq(uid),
-        UpdateExpression='SET body = :tbody, title = :ttitle, update_at = :ts',
+        UpdateExpression='SET body = :tbody, title = :ttitle, updated_at = :ts',
         ExpressionAttributeValues={
             ":tbody": thread['body'],
             ":ttitle": thread['title'],
