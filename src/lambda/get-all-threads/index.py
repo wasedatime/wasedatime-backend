@@ -35,7 +35,7 @@ def handler(event, context):
     if "queryStringParameters" in event:
         params = event["queryStringParameters"]
         uid = params.get("uid", "")
-        index = int(params.get("page"))
+        index = int(params.get("index"))
         num = int(params.get("num"))
 
     return get_all_threads(uid, index, num)
