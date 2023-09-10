@@ -5,12 +5,17 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_all_threads(uid, index, num, school, tags):
+def get_all_threads(board_id, uid, index, num, school, tags):
 
     index = int(index)
     num = int(num)
 
-    response = table.scan()
+    if board_id:
+        response = table.query(KeyConditionExpression=Key(
+            "board_id").eq(board_id), ScanIndexForward=False)["Items"]
+    else:
+        response = table.scan()
+
     items = response['Items']
 
     if school:
@@ -27,8 +32,9 @@ def get_all_threads(uid, index, num, school, tags):
         if 'uid' in item and item['uid'] == uid:
             item['mod'] = True
 
-    paginated_items = sorted(paginated_items, key=lambda x: x.get(
-        'created_at', ''), reverse=True)
+    if not board_id:
+        paginated_items = sorted(paginated_items, key=lambda x: x.get(
+            'created_at', ''), reverse=True)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(paginated_items).add_message(end_index).compile()
@@ -38,6 +44,7 @@ def get_all_threads(uid, index, num, school, tags):
 
 def handler(event, context):
 
+    board_id = ""
     uid = ""
     index = "0"  # default index
     num = "10"  # default num
@@ -46,6 +53,7 @@ def handler(event, context):
 
     if "queryStringParameters" in event:
         params = event["queryStringParameters"]
+        board_id = params.get("board_id", "")
         uid = params.get("uid", "")
         index = params.get("index")
         num = params.get("num")
@@ -57,4 +65,4 @@ def handler(event, context):
         if tags:
             tags = tags.split(',')
 
-    return get_all_threads(uid, index, num, school, tags)
+    return get_all_threads(uid, index, num, school, tags, board_id)
