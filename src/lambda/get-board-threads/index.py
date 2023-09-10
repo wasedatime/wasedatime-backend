@@ -16,21 +16,21 @@ def get_board_threads(uid, index, num, school, board_id, tags):
         raise LookupError
 
     if school:
-        items = [item for item in items if item.get("group_id") in school]
+        results = [item for item in results if item.get("group_id") in school]
     if tags:
-        items = [item for item in items if item.get("tag_id") in tags]
+        results = [item for item in results if item.get("tag_id") in tags]
 
     start_index = index
-    end_index = min(len(items), start_index+num)
-    paginated_items = items[start_index:end_index]
+    end_index = min(len(results), start_index + num)
+    paginated_results = results[start_index:end_index]
 
-    for item in paginated_items:
+    for item in paginated_results:
         item['mod'] = False
         if 'uid' in item and item['uid'] == uid:
             item['mod'] = True
 
     body = JsonPayloadBuilder().add_status(
-        True).add_data(results).add_message(end_index).compile()
+        True).add_data(paginated_results).add_message(end_index).compile()
     return body
 
 
@@ -49,7 +49,7 @@ def handler(event, context):
         index = params.get("index", "0")
         num = params.get("num", "10")
         school = params.get("school", "")
-        tags = params.get("tags")
+        tags = params.get("tags", "")
 
         if school:
             school = school.split(',')
