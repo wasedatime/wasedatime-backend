@@ -55,8 +55,8 @@ def handler(event, context):
         params = event["queryStringParameters"]
         board_id = params.get("board_id", "")
         uid = params.get("uid", "")
-        index = params.get("index")
-        num = params.get("num")
+        index = params.get("index", 0)
+        num = params.get("num", 10)
         school = params.get("school")
         tags = params.get("tags")
 
