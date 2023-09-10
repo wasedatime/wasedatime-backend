@@ -5,7 +5,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_all_threads(board_id, uid, index, num, school, tags):
+def get_all_threads(uid, index, num, school, tags, board_id):
 
     index = int(index)
     num = int(num)
@@ -46,8 +46,8 @@ def handler(event, context):
 
     board_id = ""
     uid = ""
-    index = "0"  # default index
-    num = "10"  # default num
+    index = 0  # default index
+    num = 10  # default num
     school = ""  # default school
     tags = ""
 
