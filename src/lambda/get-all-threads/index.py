@@ -5,7 +5,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_all_threads(uid, index, num, school):
+def get_all_threads(uid, index, num, school, tags):
 
     index = int(index)
     num = int(num)
@@ -15,6 +15,8 @@ def get_all_threads(uid, index, num, school):
 
     if school:
         items = [item for item in items if item.get("group_id") in school]
+    if tags:
+        items = [item for item in items if item.get("tag_id") in tags]
 
     print(f"length of fetched items {len(items)}")
 
@@ -46,6 +48,7 @@ def handler(event, context):
     index = "0"  # default index
     num = "10"  # default num
     school = ""  # default school
+    tags = ""
 
     if "queryStringParameters" in event:
         params = event["queryStringParameters"]
@@ -53,8 +56,11 @@ def handler(event, context):
         index = params.get("index")
         num = params.get("num")
         school = params.get("school")
+        tags = params.get("tags")
 
         if school:
             school = school.split(',')
+        if tags:
+            tags = tags.split(',')
 
-    return get_all_threads(uid, index, num, school)
+    return get_all_threads(uid, index, num, school, tags)
