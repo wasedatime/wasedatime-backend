@@ -6,22 +6,31 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 @resp_handler
 def get_all_threads(uid, index, num, school, tags, board_id):
-
     index = int(index)
     num = int(num)
 
+    print(
+        f"Received parameters: uid={uid}, index={index}, num={num}, school={school}, tags={tags}, board_id={board_id}")
+
     if board_id:
+        print(f"Querying DynamoDB with board_id={board_id}")
         response = table.query(KeyConditionExpression=Key(
-            "board_id").eq(board_id), ScanIndexForward=False)["Items"]
+            "board_id").eq(board_id), ScanIndexForward=False)
+        print(f"Received response from DynamoDB: {response}")
     else:
+        print("Scanning DynamoDB")
         response = table.scan()
+        print(f"Received response from DynamoDB: {response}")
 
     items = response['Items']
+    print(f"Items before filtering: {items}")
 
     if school:
         items = [item for item in items if item.get("group_id") in school]
     if tags:
         items = [item for item in items if item.get("tag_id") in tags]
+
+    print(f"Items after filtering: {items}")
 
     start_index = index
     end_index = min(len(items), start_index+num)
