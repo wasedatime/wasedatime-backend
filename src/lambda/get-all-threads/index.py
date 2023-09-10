@@ -40,10 +40,11 @@ def get_all_threads(uid, index, num, school, tags, board_id):
         item['mod'] = False
         if 'uid' in item and item['uid'] == uid:
             item['mod'] = True
+        item.pop('uid', None)
 
     if not board_id:
         paginated_items = sorted(paginated_items, key=lambda x: x.get(
-            'created_at', ''), reverse=True)
+            'thread_id', ''), reverse=True)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(paginated_items).add_message(end_index).compile()
