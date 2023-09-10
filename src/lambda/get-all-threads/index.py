@@ -32,6 +32,10 @@ def get_all_threads(uid, index, num, school, tags, board_id):
 
     print(f"Items after filtering: {items}")
 
+    if not board_id:
+        items = sorted(items, key=lambda x: x.get(
+            'created_at', ''), reverse=True)
+
     start_index = index
     end_index = min(len(items), start_index+num)
     paginated_items = items[start_index:end_index]
@@ -42,9 +46,9 @@ def get_all_threads(uid, index, num, school, tags, board_id):
             item['mod'] = True
         item.pop('uid', None)
 
-    if not board_id:
-        paginated_items = sorted(paginated_items, key=lambda x: x.get(
-            'thread_id', ''), reverse=True)
+    # if not board_id:
+    #     paginated_items = sorted(paginated_items, key=lambda x: x.get(
+    #         'thread_id', ''), reverse=True)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(paginated_items).add_message(end_index).compile()
