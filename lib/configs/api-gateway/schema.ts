@@ -402,7 +402,7 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
             type: apigw.JsonSchemaType.STRING,
           },
           tag_id: {
-            type: apigw.JsonSchemaType.STRING,
+            type: apigw.JsonSchemaType.ARRAY,
           },
           group_id: {
             type: apigw.JsonSchemaType.STRING,

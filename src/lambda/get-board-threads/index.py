@@ -24,10 +24,20 @@ def get_board_threads(board_id, uid=''):
 
 def handler(event, context):
 
-    params = {
-        "board_id": event["pathParameters"]["board_id"]
-    }
-    if "uid" in event["queryStringParameters"]:
-        params["uid"] = event["queryStringParameters"]["uid"]
+    uid = ""
+    index = "0"  # default index
+    num = "10"  # default num
+    school = ""  # default school
+    board_id = event["pathParameters"]["board_id"]  # from path parameters
 
-    return get_board_threads(**params)
+    if "queryStringParameters" in event:
+        params = event["queryStringParameters"]
+        uid = params.get("uid", "")
+        index = params.get("index", "0")
+        num = params.get("num", "10")
+        school = params.get("school", "")
+
+        if school:
+            school = school.split(',')
+
+    return get_board_threads(uid, index, num, school, board_id)

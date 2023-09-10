@@ -31,6 +31,9 @@ def get_all_threads(uid, index, num, school):
         if 'uid' in item and item['uid'] == uid:
             item['mod'] = True
 
+    paginated_items = sorted(paginated_items, key=lambda x: x.get(
+        'created_at', ''), reverse=True)
+
     body = JsonPayloadBuilder().add_status(
         True).add_data(paginated_items).add_message(end_index).compile()
 
@@ -39,10 +42,10 @@ def get_all_threads(uid, index, num, school):
 
 def handler(event, context):
 
-    # uid = ""
-    # index = "0"  # default index
-    # num = "10"  # default num
-    # school = ""  # default school
+    uid = ""
+    index = "0"  # default index
+    num = "10"  # default num
+    school = ""  # default school
 
     if "queryStringParameters" in event:
         params = event["queryStringParameters"]
