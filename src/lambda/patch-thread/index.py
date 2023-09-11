@@ -42,11 +42,10 @@ def patch_thread(board_id, uid, thread_id, thread, action):
                 "board_id": board_id,
                 "thread_id": thread_id,
             },
-            UpdateExpression='DELETE likes :uid SET likes = if_not_exists(size(likes), :zero)',
+            UpdateExpression='DELETE likes :uid',
             ConditionExpression='attribute_exists(likes) AND contains (likes, :uid)',
             ExpressionAttributeValues={
-                ':uid': {uid},
-                ':zero': 0
+                ':uid': {uid}
             },
         )
 
