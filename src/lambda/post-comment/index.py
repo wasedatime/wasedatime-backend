@@ -21,6 +21,7 @@ def post_comment(thread_id, comment, uid=''):
     table.put_item(Item=thread_comment)
 
     thread_comment.pop('uid', None)
+    thread_comment["mod"] = True
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(thread_comment).add_message('').compile()
