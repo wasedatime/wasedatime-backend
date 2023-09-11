@@ -30,6 +30,8 @@ def post_thread(board_id, thread, uid):
 
     table.put_item(Item=thread_item)
 
+    thread_item.pop('uid', None)
+
     body = JsonPayloadBuilder().add_status(
         True).add_data(thread_item).add_message('').compile()
     return body
