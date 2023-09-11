@@ -9,28 +9,18 @@ def get_all_threads(uid, index, num, school, tags, board_id):
     index = int(index)
     num = int(num)
 
-    print(
-        f"Received parameters: uid={uid}, index={index}, num={num}, school={school}, tags={tags}, board_id={board_id}")
-
     if board_id:
-        print(f"Querying DynamoDB with board_id={board_id}")
         response = table.query(KeyConditionExpression=Key(
             "board_id").eq(board_id), ScanIndexForward=False)
-        print(f"Received response from DynamoDB: {response}")
     else:
-        print("Scanning DynamoDB")
         response = table.scan()
-        print(f"Received response from DynamoDB: {response}")
 
     items = response['Items']
-    print(f"Items before filtering: {items}")
 
     if school:
         items = [item for item in items if item.get("group_id") in school]
     if tags:
         items = [item for item in items if item.get("tag_id") in tags]
-
-    print(f"Items after filtering: {items}")
 
     if not board_id:
         items = sorted(items, key=lambda x: x.get(
@@ -44,7 +34,11 @@ def get_all_threads(uid, index, num, school, tags, board_id):
         item['mod'] = False
         if 'uid' in item and item['uid'] == uid:
             item['mod'] = True
+        item['userLiked'] = uid in item.get('likes', [])
+        item['totalLikes'] = len(item.get('likes', []))
+
         item.pop('uid', None)
+        item.pop('likes', None)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(paginated_items).add_message(end_index).compile()
@@ -54,21 +48,14 @@ def get_all_threads(uid, index, num, school, tags, board_id):
 
 def handler(event, context):
 
-    board_id = ""
-    uid = ""
-    index = 0  # default index
-    num = 10  # default num
-    school = ""  # default school
-    tags = ""
-
     if "queryStringParameters" in event:
         params = event["queryStringParameters"]
         board_id = params.get("board_id", "")
         uid = params.get("uid", "")
         index = params.get("index", 0)
         num = params.get("num", 10)
-        school = params.get("school")
-        tags = params.get("tags")
+        school = params.get("school", "")
+        tags = params.get("tags", "")
 
         if school:
             school = school.split(',')

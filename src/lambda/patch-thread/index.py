@@ -1,28 +1,53 @@
+from boto3.dynamodb.conditions import Attr
 import json
 from datetime import datetime
-from boto3.dynamodb.conditions import Attr
-from utils import JsonPayloadBuilder
-from utils import resp_handler
-from utils import table
+from utils import JsonPayloadBuilder, resp_handler, table
 
 
 @resp_handler
-def patch_thread(board_id, uid, thread_id, thread):
-
+def patch_thread(board_id, uid, thread_id, thread, action):
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-    table.update_item(
-        Key={
-            "board_id": board_id,
-            "thread_id": thread_id,
-        },
-        ConditionExpression=Attr('uid').eq(uid),
-        UpdateExpression='SET body = :tbody, title = :ttitle, updated_at = :ts',
-        ExpressionAttributeValues={
-            ":tbody": thread['body'],
-            ":ttitle": thread['title'],
-            ":ts": dt_now
-        },
-    )
+
+    if action == 'update':
+        table.update_item(
+            Key={
+                "board_id": board_id,
+                "thread_id": thread_id,
+            },
+            ConditionExpression=Attr('uid').eq(uid),
+            UpdateExpression='SET body = :tbody, title = :ttitle, updated_at = :ts',
+            ExpressionAttributeValues={
+                ":tbody": thread['body'],
+                ":ttitle": thread['title'],
+                ":ts": dt_now
+            },
+        )
+    elif action == 'like':
+        # Add uid to the 'likes' list if it's not already there
+        table.update_item(
+            Key={
+                "board_id": board_id,
+                "thread_id": thread_id,
+            },
+            UpdateExpression='ADD likes :uid',
+            ConditionExpression='NOT contains (likes, :uid)',
+            ExpressionAttributeValues={
+                ':uid': {uid}
+            },
+        )
+    elif action == 'dislike':
+        # Remove uid from the 'likes' list if it's already there
+        table.update_item(
+            Key={
+                "board_id": board_id,
+                "thread_id": thread_id,
+            },
+            UpdateExpression='DELETE likes :uid',
+            ConditionExpression='contains (likes, :uid)',
+            ExpressionAttributeValues={
+                ':uid': {uid}
+            },
+        )
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(None).add_message('').compile()
@@ -30,13 +55,13 @@ def patch_thread(board_id, uid, thread_id, thread):
 
 
 def handler(event, context):
-
     req = json.loads(event['body'])
     params = {
         "board_id": event["pathParameters"]["board_id"],
         "thread_id": event["pathParameters"]["thread_id"],
         "uid": event['requestContext']['authorizer']['claims']['sub'],
-        "thread": req["data"]
+        "thread": req.get("data", {}),
+        "action": req.get("action", "update")
     }
 
     return patch_thread(**params)

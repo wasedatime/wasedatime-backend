@@ -422,6 +422,12 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
           mod: {
             type: apigw.JsonSchemaType.BOOLEAN,
           },
+          userLiked: {
+            type: apigw.JsonSchemaType.BOOLEAN,
+          },
+          totalLikes: {
+            type: apigw.JsonSchemaType.INTEGER,
+          },
         },
         required: [
           'univ_id',
@@ -435,6 +441,8 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
           'body',
           'views',
           'mod',
+          'userLiked',
+          'totalLikes',
         ],
       },
     },
@@ -493,8 +501,12 @@ export const forumThreadPatchReqSchema: apigw.JsonSchema = {
       },
       required: ['tag_id', 'group_id', 'title', 'body'],
     },
+    action: {
+      type: apigw.JsonSchemaType.STRING,
+      enum: ['update', 'like', 'dislike'],
+    },
   },
-  required: ['data'],
+  required: ['data', 'action'],
 };
 
 export const forumCommentGetRespSchema: apigw.JsonSchema = {
