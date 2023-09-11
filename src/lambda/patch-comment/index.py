@@ -15,9 +15,9 @@ def patch_comment(thread_id, ts, uid, comment):
             "created_at": ts,
         },
         ConditionExpression=Attr('uid').eq(uid),
-        UpdateExpression='SET body = :cbody, update_at = :ts',
+        UpdateExpression='SET body = :cbody, updated_at = :ts',
         ExpressionAtrributeValues={
-            ":tbody": [comment['body']],
+            ":cbody": [comment['body']],
             ":ts": dt_now
         }
     )

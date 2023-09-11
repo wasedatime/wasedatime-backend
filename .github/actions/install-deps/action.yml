@@ -3,13 +3,13 @@ description: "Workflow for installing dependencies"
 runs:
   using: "composite"
   steps:
-    - uses: pnpm/action-setup@v2.2.2
+    - uses: pnpm/action-setup@v2.2.4
       with:
         version: latest
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 16.x
+        node-version: 18.x
         cache: "pnpm"
     - name: Setup CDK
       shell: bash

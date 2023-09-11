@@ -4,7 +4,7 @@ export const syllabusSchedule: { [name: string]: events.Schedule } = {
   'regular': events.Schedule.cron({
     minute: '0',
     hour: '16',
-    day: '1,2',
+    day: '1',
     month: '*',
     year: '*',
   }),
@@ -18,7 +18,7 @@ export const syllabusSchedule: { [name: string]: events.Schedule } = {
   'fall-reg1': events.Schedule.cron({
     minute: '0',
     hour: '16',
-    day: '4,7,10,13,15,17',
+    day: '4,7,10,13,15,17,19',
     month: 'SEP',
     year: '*',
   }),

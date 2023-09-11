@@ -8,7 +8,7 @@ import uuid
 @resp_handler
 def post_thread(board_id, thread, uid):
 
-    thread_id = build_thread_id(uid)
+    thread_id = build_thread_id()
 
     text = thread["body"]
 
@@ -25,13 +25,16 @@ def post_thread(board_id, thread, uid):
         "tag_id": thread["tag_id"],
         "group_id": thread["group_id"],
         "univ_id": thread["univ_id"],
-        "view": 0,
+        "views": 0,
     }
 
     table.put_item(Item=thread_item)
 
+    thread_item.pop('uid', None)
+    thread_item["mod"] = True
+
     body = JsonPayloadBuilder().add_status(
-        True).add_data(None).add_message('').compile()
+        True).add_data(thread_item).add_message('').compile()
     return body
 
 

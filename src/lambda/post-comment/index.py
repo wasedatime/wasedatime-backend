@@ -5,7 +5,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def post_review(thread_id, comment, uid):
+def post_comment(thread_id, comment, uid=''):
 
     text = comment["body"]
 
@@ -20,8 +20,11 @@ def post_review(thread_id, comment, uid):
     }
     table.put_item(Item=thread_comment)
 
+    thread_comment.pop('uid', None)
+    thread_comment["mod"] = True
+
     body = JsonPayloadBuilder().add_status(
-        True).add_data(None).add_message('').compile()
+        True).add_data(thread_comment).add_message('').compile()
     return body
 
 
@@ -33,4 +36,4 @@ def handler(event, context):
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 
-    return post_review(**params)
+    return post_comment(**params)

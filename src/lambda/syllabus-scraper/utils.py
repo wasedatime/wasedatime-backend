@@ -149,12 +149,27 @@ def merge_period_location(periods, locations):
         for p in periods:
             p["l"] = locations[0]
         return periods
-    # TODO find other cases
     # Case 2: More no. of periods than no. of locations
     zipped = list(itertools.zip_longest(periods, locations))
     for (p, loc) in zipped:
-        p["l"] = loc
+        if p is None:
+            logging.error(f"Unexpected None in periods. loc={loc}")
+            continue
+
+        if loc is not None:
+            p["l"] = loc
+        else:
+            logging.warning(
+                f"Missing location for period {p}. Assigning default value.")
+            p["l"] = "undecided"
+
         occurrences.append(p)
+
+    # Case 3: Logging error for unusual scenarios
+    if not occurrences:
+        logging.error(
+            f"merge_period_location resulted in no occurrences for input periods={periods}, locations={locations}")
+
     return occurrences
 
 
@@ -197,15 +212,15 @@ def parse_location(loc):
     rooms = []
     locations = loc.split('／')
     for l in locations:
-        match = re.search(r'0(\d):(.*)', l)
-        count, classroom = int(match.group(1)) - 1, match.group(2)
-        classroom = rename_location(classroom)
-        # Sub-case: two location records for same period
-        if count >= len(rooms):
-            rooms.append(classroom)
-        else:
-            rooms.__setitem__(count, rooms[count] + "/" + classroom)
-        return rooms
+        matches = re.findall(r'0(\d):(.*)', l)
+        for match in matches:
+            count, classroom = int(match[0]) - 1, match[1]
+            classroom = rename_location(classroom)
+            if count >= len(rooms):
+                rooms.append([classroom])
+            else:
+                rooms[count].append(classroom)
+    return [room for sublist in rooms for room in sublist]
 
 
 def parse_lang(lang):

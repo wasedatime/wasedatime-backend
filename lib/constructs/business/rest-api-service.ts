@@ -878,9 +878,6 @@ export class ForumThreadsApiService extends RestApiService {
       patchIntegration,
       {
         operationName: 'UpdateThread',
-        requestParameters: {
-          'method.request.querystring.ts': true,
-        },
         requestModels: { ['application/json']: patchReqModel },
         methodResponses: [
           {
@@ -897,9 +894,6 @@ export class ForumThreadsApiService extends RestApiService {
       deleteIntegration,
       {
         operationName: 'DeleteThread',
-        requestParameters: {
-          'method.request.querystring.ts': true,
-        },
         methodResponses: [
           {
             statusCode: '200',

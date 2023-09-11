@@ -75,6 +75,11 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     //     syllabusSyncPipeline.dataWarehouse.tableName,
     // );
 
+    // Note: These are the magic words to disconnect cross stack referencing.
+
+    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
+    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
+
     this.operationInterface.setEndpoint(OperationEndpoint.SYLLABUS, {
       [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
     });

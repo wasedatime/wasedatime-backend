@@ -93,7 +93,7 @@ export class DynamoDatabase extends Construct {
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.DESTROY,
-        sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'thread_id', type: dynamodb.AttributeType.STRING },
         tableName: 'forum-threads',
         readCapacity: 15,
         writeCapacity: 15,

@@ -5,14 +5,15 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def delete_thread(board_id, thread_id, ts, uid):
+def delete_thread(board_id, thread_id, uid):
+
     table.delete_item(
         Key={
             "board_id": board_id,
-            "created_at": ts
+            "thread_id": thread_id,
         },
         ConditionExpression=Attr('uid').eq(
-            uid) & Attr('thread_id').eq(thread_id)
+            uid)
     )
 
     resp_body = JsonPayloadBuilder().add_status(
@@ -24,7 +25,6 @@ def handler(event, context):
     params = {
         "board_id": event["pathParameters"]["board_id"],
         "thread_id": event["pathParameters"]["thread_id"],
-        "ts": event["queryStringParameters"]["ts"],
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
 
