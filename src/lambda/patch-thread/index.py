@@ -37,17 +37,39 @@ def patch_thread(board_id, uid, thread_id, thread, action):
         )
     elif action == 'dislike':
         # Remove uid from the 'likes' list if it's already there
-        table.update_item(
-            Key={
-                "board_id": board_id,
-                "thread_id": thread_id,
-            },
-            UpdateExpression='DELETE likes :uid',
-            ConditionExpression='attribute_exists(likes) AND contains (likes, :uid)',
-            ExpressionAttributeValues={
-                ':uid': {uid}
-            },
+
+        response = table.get_item(Key={
+            "board_id": board_id,
+            "thread_id": thread_id,
+        }
         )
+
+        current_likes = response['Item'].get('likes', set())
+
+        # if only one like, remove the set entirely
+        if len(current_likes) == 1 and uid in current_likes:
+            table.update_item(
+                Key={
+                    "board_id": board_id,
+                    "thread_id": thread_id,
+                },
+                UpdateExpression='REMOVE likes',
+                ConditionExpression='attribute_exists(likes)',
+            )
+
+        # else, just delete the uid from set likes
+        else:
+            table.update_item(
+                Key={
+                    "board_id": board_id,
+                    "thread_id": thread_id,
+                },
+                UpdateExpression='DELETE likes :uid',
+                ConditionExpression='attribute_exists(likes) AND contains (likes, :uid)',
+                ExpressionAttributeValues={
+                    ':uid': {uid}
+                },
+            )
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(None).add_message('').compile()
