@@ -20,8 +20,10 @@ def post_comment(thread_id, comment, uid=''):
     }
     table.put_item(Item=thread_comment)
 
+    thread_comment.pop('uid', None)
+
     body = JsonPayloadBuilder().add_status(
-        True).add_data(None).add_message('').compile()
+        True).add_data(thread_comment).add_message('').compile()
     return body
 
 
