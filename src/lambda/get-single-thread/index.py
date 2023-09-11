@@ -30,8 +30,6 @@ def get_single_thread(board_id, thread_id, uid=""):
 
     item = results[0]
 
-    del item["thread_id"]
-
     item["mod"] = False
     if item["uid"] == uid:
         item["mod"] = True
