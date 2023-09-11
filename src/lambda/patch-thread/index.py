@@ -30,7 +30,7 @@ def patch_thread(board_id, uid, thread_id, thread, action):
                 "thread_id": thread_id,
             },
             UpdateExpression='ADD likes :uid',
-            ConditionExpression='NOT contains (likes, :uid)',
+            ConditionExpression='attribute_not_exists(likes) OR NOT contains (likes, :uid)',
             ExpressionAttributeValues={
                 ':uid': {uid}
             },
@@ -42,10 +42,11 @@ def patch_thread(board_id, uid, thread_id, thread, action):
                 "board_id": board_id,
                 "thread_id": thread_id,
             },
-            UpdateExpression='DELETE likes :uid',
-            ConditionExpression='contains (likes, :uid)',
+            UpdateExpression='DELETE likes :uid SET likes = if_not_exists(size(likes), :zero)',
+            ConditionExpression='attribute_exists(likes) AND contains (likes, :uid)',
             ExpressionAttributeValues={
-                ':uid': {uid}
+                ':uid': {uid},
+                ':zero': 0
             },
         )
 

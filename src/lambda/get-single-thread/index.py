@@ -33,7 +33,11 @@ def get_single_thread(board_id, thread_id, uid=""):
     item["mod"] = False
     if item["uid"] == uid:
         item["mod"] = True
-    del item["uid"]
+    item['user_liked'] = uid in item.get('likes', [])
+    item['total_likes'] = len(item.get('likes', []))
+
+    item.pop('uid', None)
+    item.pop('likes', None)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(item).add_message('').compile()

@@ -34,8 +34,8 @@ def get_all_threads(uid, index, num, school, tags, board_id):
         item['mod'] = False
         if 'uid' in item and item['uid'] == uid:
             item['mod'] = True
-        item['userLiked'] = uid in item.get('likes', [])
-        item['totalLikes'] = len(item.get('likes', []))
+        item['user_liked'] = uid in item.get('likes', [])
+        item['total_likes'] = len(item.get('likes', []))
 
         item.pop('uid', None)
         item.pop('likes', None)
