@@ -61,10 +61,12 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       syllabusDataPipeline.dataWarehouse.bucketName,
     );
 
-    this.dataInterface.setEndpoint(
-      DataEndpoint.THREAD,
-      dynamoDatabase.tables[Collection.THREAD].tableName,
-    );
+    // this.dataInterface.setEndpoint(
+    //   DataEndpoint.THREAD,
+    //   dynamoDatabase.tables[Collection.THREAD].tableName
+    // );
+    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
+    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
 
     this.dataInterface.setEndpoint(
       DataEndpoint.COMMENT,
@@ -76,9 +78,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     // );
 
     // Note: These are the magic words to disconnect cross stack referencing.
-
-    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
-    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
 
     // preventing empty git commit
 

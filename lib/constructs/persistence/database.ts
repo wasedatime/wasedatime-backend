@@ -84,21 +84,21 @@ export class DynamoDatabase extends Construct {
 
     // this.tables[Collection.THREAD] = new dynamodb.Table(
     //   this,
-    //   'dynamodb-thread-table',
+    //   "dynamodb-thread-table",
     //   {
     //     partitionKey: {
-    //       name: 'board_id',
+    //       name: "board_id",
     //       type: dynamodb.AttributeType.STRING,
     //     },
     //     billingMode: dynamodb.BillingMode.PROVISIONED,
     //     encryption: dynamodb.TableEncryption.DEFAULT,
     //     removalPolicy: RemovalPolicy.DESTROY,
-    //     sortKey: { name: 'thread_id', type: dynamodb.AttributeType.STRING },
-    //     tableName: 'forum-threads',
+    //     sortKey: { name: "thread_id", type: dynamodb.AttributeType.STRING },
+    //     tableName: "forum-threads",
     //     readCapacity: 15,
     //     writeCapacity: 15,
     //     pointInTimeRecovery: true,
-    //   },
+    //   }
     // );
 
     // this.tables[Collection.THREAD].addLocalSecondaryIndex({
