@@ -5,7 +5,7 @@ export const BIT_TOKEN = process.env.BIT_TOKEN!;
 export const FEEDS_DEPLOY_KEY = process.env.DEPLOY_KEY!;
 
 const preBuild = {
-  commands: ['npm install -g pnpm@6', 'pnpm install --filter .'],
+  commands: ['npm install -g pnpm', 'pnpm install --filter .'],
 };
 
 const preBuildForFeeds = {
@@ -15,7 +15,7 @@ const preBuildForFeeds = {
     'git submodule init',
     'git submodule update --remote',
     'yum -y install make nasm autoconf automake libtool dpkg pkgconfig libpng libpng-dev g++',
-    'npm install -g pnpm@6',
+    'npm install -g pnpm',
     'pnpm install --filter .',
   ],
 };
