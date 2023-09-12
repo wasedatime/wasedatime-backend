@@ -55,7 +55,7 @@ export const microAppBuildSpec = (name: string) =>
             },
           ],
         },
-        appRoot: name,
+        appRoot: `apps/${name}`,
       },
     ],
   });
@@ -79,7 +79,7 @@ export const microAppDevBuildSpec = (name: string) =>
             },
           ],
         },
-        appRoot: name,
+        appRoot: `apps/${name}`,
       },
     ],
   });
