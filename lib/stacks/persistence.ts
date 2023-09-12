@@ -60,14 +60,10 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       DataEndpoint.SYLLABUS,
       syllabusDataPipeline.dataWarehouse.bucketName,
     );
-
-    // this.dataInterface.setEndpoint(
-    //   DataEndpoint.THREAD,
-    //   dynamoDatabase.tables[Collection.THREAD].tableName
-    // );
-    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
-    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
-
+    this.dataInterface.setEndpoint(
+      DataEndpoint.THREAD,
+      dynamoDatabase.tables[Collection.THREAD].tableName,
+    );
     this.dataInterface.setEndpoint(
       DataEndpoint.COMMENT,
       dynamoDatabase.tables[Collection.COMMENT].tableName,
@@ -87,5 +83,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
 // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
 // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
 // Then comment out setEndpoint and getEndpoint for the matching use case
+// setEndpoint is in stack persistence and getEndpoint is in business
 // after deploying, then delete or modify the table in need.
 // then un comment them back.
