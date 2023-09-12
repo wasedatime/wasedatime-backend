@@ -77,8 +77,10 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
 
     // Note: These are the magic words to disconnect cross stack referencing.
 
-    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
-    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
+    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
+    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
+
+    // preventing empty git commit
 
     this.operationInterface.setEndpoint(OperationEndpoint.SYLLABUS, {
       [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
