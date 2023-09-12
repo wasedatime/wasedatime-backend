@@ -65,8 +65,8 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     //   DataEndpoint.THREAD,
     //   dynamoDatabase.tables[Collection.THREAD].tableName
     // );
-    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
-    this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
+    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
+    // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
 
     this.dataInterface.setEndpoint(
       DataEndpoint.COMMENT,
@@ -88,3 +88,4 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
 // this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
 // Then comment out setEndpoint and getEndpoint for the matching use case
 // after deploying, then delete or modify the table in need.
+// then un comment them back.
