@@ -80,6 +80,8 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
     this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
 
+    // preventing empty git commit
+
     this.operationInterface.setEndpoint(OperationEndpoint.SYLLABUS, {
       [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
     });
