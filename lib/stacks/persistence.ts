@@ -60,7 +60,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       DataEndpoint.SYLLABUS,
       syllabusDataPipeline.dataWarehouse.bucketName,
     );
-
     this.dataInterface.setEndpoint(
       DataEndpoint.THREAD,
       dynamoDatabase.tables[Collection.THREAD].tableName,
