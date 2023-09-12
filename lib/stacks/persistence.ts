@@ -77,8 +77,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     //     syllabusSyncPipeline.dataWarehouse.tableName,
     // );
 
-    // Note: These are the magic words to disconnect cross stack referencing.
-
     // preventing empty git commit
 
     this.operationInterface.setEndpoint(OperationEndpoint.SYLLABUS, {
@@ -86,3 +84,9 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     });
   }
 }
+
+// Note: These are the magic words to disconnect cross stack referencing.
+// this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableName);
+// this.exportValue(dynamoDatabase.tables[Collection.THREAD].tableArn);
+// Then comment out setEndpoint and getEndpoint for the matching use case
+// after deploying, then delete or modify the table in need.
