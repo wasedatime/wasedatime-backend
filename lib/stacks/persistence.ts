@@ -77,8 +77,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     //     syllabusSyncPipeline.dataWarehouse.tableName,
     // );
 
-    // preventing empty git commit
-
     this.operationInterface.setEndpoint(OperationEndpoint.SYLLABUS, {
       [syllabusDataPipeline.processor.stateMachineArn]: 'scraper',
     });
