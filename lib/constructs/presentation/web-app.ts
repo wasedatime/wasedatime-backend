@@ -75,6 +75,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         buildSpec: microAppBuildSpec('root'),
       })
       .addEnvironment('REACT_APP_API_BASE_URL', `https://${props.apiDomain}/v1`)
+      .addEnvironment('VITE_API_BASE_URL', `https://${props.apiDomain}/v1`)
       .addEnvironment('VITE_GA_ID', MASTER_VITE_GA_ID)
       .addEnvironment('VITE_MF_HOME_BASE_PATH', `https://${ROOT_DOMAIN}`);
     this.branches.main = masterBranch;
@@ -91,6 +92,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         'REACT_APP_API_BASE_URL',
         `https://${props.apiDomain}/staging`,
       )
+      .addEnvironment('VITE_API_BASE_URL', `https://${props.apiDomain}/staging`)
       .addEnvironment('VITE_GA_ID', DEV_VITE_GA_ID)
       .addEnvironment('VITE_MF_HOME_BASE_PATH', `https://${DEV_DOMAIN}`);
     this.branches.dev = devBranch;
@@ -112,6 +114,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
       buildSpec: microAppBuildSpec(name),
       environmentVariables: {
         REACT_APP_API_BASE_URL: `https://${this.appProps.apiDomain}/v1`,
+        VITE_API_BASE_URL: `https://${this.appProps.apiDomain}/v1`,
         REACT_APP_OAUTH_URL: `https://${this.appProps.authDomain}`,
         NODE_OPTIONS: '--max-old-space-size=8192',
         BIT_TOKEN: BIT_TOKEN,
@@ -138,6 +141,10 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         'REACT_APP_API_BASE_URL',
         `https://${this.appProps.apiDomain}/v1`,
       )
+      .addEnvironment(
+        'VITE_API_BASE_URL',
+        `https://${this.appProps.apiDomain}/v1`,
+      )
       .addEnvironment('VITE_GA_ID', MASTER_VITE_GA_ID)
       .addEnvironment(
         'VITE_PUBLIC_BASE_PATH',
@@ -154,6 +161,10 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
       })
       .addEnvironment(
         'REACT_APP_API_BASE_URL',
+        `https://${this.appProps.apiDomain}/staging`,
+      )
+      .addEnvironment(
+        'VITE_API_BASE_URL',
         `https://${this.appProps.apiDomain}/staging`,
       )
       .addEnvironment('VITE_GA_ID', DEV_VITE_GA_ID)
