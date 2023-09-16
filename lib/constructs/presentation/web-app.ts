@@ -3,6 +3,8 @@ import { Construct } from 'constructs';
 import {
   BIT_TOKEN,
   FEEDS_DEPLOY_KEY,
+  MASTER_VITE_GA_ID,
+  DEV_VITE_GA_ID,
   microAppBuildSpec,
   microAppDevBuildSpec,
 } from '../../configs/amplify/build-setting';
@@ -42,10 +44,11 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
       appName: 'wasedatime-web-root',
       autoBranchDeletion: false,
       buildSpec: microAppBuildSpec('root'),
-      description: 'A web app aiming to provide better campus life at Waseda University.',
+      description:
+        'A web app aiming to provide better campus life at Waseda University.',
       environmentVariables: {
-        REACT_APP_API_BASE_URL: `https://${ props.apiDomain }/v1`,
-        REACT_APP_OAUTH_URL: `https://${ props.authDomain }`,
+        REACT_APP_API_BASE_URL: `https://${props.apiDomain}/v1`,
+        REACT_APP_OAUTH_URL: `https://${props.authDomain}`,
         NODE_OPTIONS: '--max-old-space-size=8192',
         BIT_TOKEN: BIT_TOKEN,
         DEPLOY_KEY: FEEDS_DEPLOY_KEY,
@@ -61,21 +64,32 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
     });
     this.microApps.root = this.app;
 
-    const masterBranch = this.app.addBranch('master', {
-      autoBuild: false,
-      branchName: 'master',
-      stage: 'PRODUCTION',
-      buildSpec: microAppBuildSpec('root'),
-    }).addEnvironment('REACT_APP_API_BASE_URL', `https://${ props.apiDomain }/v1`);
+    const masterBranch = this.app
+      .addBranch('master', {
+        autoBuild: false,
+        branchName: 'master',
+        stage: 'PRODUCTION',
+        buildSpec: microAppBuildSpec('root'),
+      })
+      .addEnvironment('REACT_APP_API_BASE_URL', `https://${props.apiDomain}/v1`)
+      .addEnvironment('VITE_GA_ID', MASTER_VITE_GA_ID)
+      .addEnvironment('VITE_MF_HOME_BASE_PATH', 'https://wasedatime.com');
     this.branches.main = masterBranch;
 
-    const devBranch = this.app.addBranch('dev', {
-      autoBuild: false,
-      basicAuth: developerAuth,
-      branchName: 'develop',
-      stage: 'DEVELOPMENT',
-      buildSpec: microAppDevBuildSpec('root'),
-    }).addEnvironment('REACT_APP_API_BASE_URL', `https://${ props.apiDomain }/staging`);
+    const devBranch = this.app
+      .addBranch('dev', {
+        autoBuild: false,
+        basicAuth: developerAuth,
+        branchName: 'develop',
+        stage: 'DEVELOPMENT',
+        buildSpec: microAppDevBuildSpec('root'),
+      })
+      .addEnvironment(
+        'REACT_APP_API_BASE_URL',
+        `https://${props.apiDomain}/staging`,
+      )
+      .addEnvironment('VITE_GA_ID', DEV_VITE_GA_ID)
+      .addEnvironment('VITE_MF_HOME_BASE_PATH', 'https://dev.wasedatime.com');
     this.branches.dev = devBranch;
 
     this.domain = this.app.addDomain('domain', {
@@ -89,13 +103,15 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
   }
 
   public addMicroApp(name: string) {
-    const microApp = new amplify.App(this, `${ name }-app`, {
-      appName: `wasedatime-web-${ name }`,
+    const appDomain = this.microApps[name].defaultDomain;
+
+    const microApp = new amplify.App(this, `${name}-app`, {
+      appName: `wasedatime-web-${name}`,
       autoBranchDeletion: false,
       buildSpec: microAppBuildSpec(name),
       environmentVariables: {
-        REACT_APP_API_BASE_URL: `https://${ this.appProps.apiDomain }/v1`,
-        REACT_APP_OAUTH_URL: `https://${ this.appProps.authDomain }`,
+        REACT_APP_API_BASE_URL: `https://${this.appProps.apiDomain}/v1`,
+        REACT_APP_OAUTH_URL: `https://${this.appProps.authDomain}`,
         NODE_OPTIONS: '--max-old-space-size=8192',
         BIT_TOKEN: BIT_TOKEN,
       },
@@ -110,26 +126,49 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
     });
     this.microApps[name] = microApp;
 
-    microApp.addBranch('master', {
-      autoBuild: false,
-      branchName: 'master',
-      stage: 'PRODUCTION',
-      buildSpec: microAppBuildSpec(name),
-    }).addEnvironment('REACT_APP_API_BASE_URL', `https://${ this.appProps.apiDomain }/v1`);
+    microApp
+      .addBranch('master', {
+        autoBuild: false,
+        branchName: 'master',
+        stage: 'PRODUCTION',
+        buildSpec: microAppBuildSpec(name),
+      })
+      .addEnvironment(
+        'REACT_APP_API_BASE_URL',
+        `https://${this.appProps.apiDomain}/v1`,
+      )
+      .addEnvironment('VITE_GA_ID', MASTER_VITE_GA_ID)
+      .addEnvironment(
+        'VITE_PUBLIC_BASE_PATH',
+        `https://wasedatime.com/${name}`,
+      );
 
-    microApp.addBranch('dev', {
-      autoBuild: false,
-      branchName: 'develop',
-      stage: 'DEVELOPMENT',
-      buildSpec: microAppDevBuildSpec(name),
-    }).addEnvironment('REACT_APP_API_BASE_URL', `https://${ this.appProps.apiDomain }/staging`);
+    microApp
+      .addBranch('dev', {
+        autoBuild: false,
+        branchName: 'develop',
+        stage: 'DEVELOPMENT',
+        buildSpec: microAppDevBuildSpec(name),
+      })
+      .addEnvironment(
+        'REACT_APP_API_BASE_URL',
+        `https://${this.appProps.apiDomain}/staging`,
+      )
+      .addEnvironment('VITE_GA_ID', DEV_VITE_GA_ID)
+      .addEnvironment('VITE_PUBLIC_BASE_PATH', `https://${appDomain}`);
 
-    const appDomain = this.microApps[name].defaultDomain;
-    this.app.addCustomRule(new amplify.CustomRule({
-      source: `/${ name }/<*>`,
-      target: `https://master.${ appDomain }/<*>`,
-      status: amplify.RedirectStatus.REWRITE,
-    }));
-    this.app.addEnvironment(`MF_${ name.toUpperCase() }_DOMAIN`, appDomain);
+    this.app.addCustomRule(
+      new amplify.CustomRule({
+        source: `/${name}/<*>`,
+        target: `https://master.${appDomain}/<*>`,
+        status: amplify.RedirectStatus.REWRITE,
+      }),
+    );
+    this.app.addEnvironment(
+      `VITE_MF_${name.toUpperCase()}_BASE_PATH`,
+      `https://${appDomain}`,
+    );
   }
 }
+
+//
