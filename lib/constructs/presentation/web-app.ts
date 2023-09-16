@@ -38,9 +38,17 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
   constructor(scope: Construct, id: string, props: WebAppProps) {
     super(scope, id, props);
 
-    if (!MASTER_VITE_GA_ID || !DEV_VITE_GA_ID) {
-      throw new Error('Required environment variables are missing.');
+    const missingVars = [];
+
+    if (!MASTER_VITE_GA_ID) missingVars.push('MASTER_VITE_GA_ID');
+    if (!DEV_VITE_GA_ID) missingVars.push('DEV_VITE_GA_ID');
+
+    if (missingVars.length > 0) {
+      throw new Error(
+        `Required environment variables are missing: ${missingVars.join(', ')}`,
+      );
     }
+
     this.appProps = props;
 
     this.app = new amplify.App(this, 'root-app', {
