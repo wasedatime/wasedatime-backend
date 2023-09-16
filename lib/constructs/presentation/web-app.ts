@@ -187,7 +187,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
     );
     this.app.addEnvironment(
       `VITE_MF_${name.toUpperCase()}_BASE_PATH`,
-      `https://${appDomain}`,
+      `https://dev.${appDomain}`,
     );
   }
 }
