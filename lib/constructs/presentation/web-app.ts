@@ -103,8 +103,6 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
   }
 
   public addMicroApp(name: string) {
-    const appDomain = this.microApps[name].defaultDomain;
-
     const microApp = new amplify.App(this, `${name}-app`, {
       appName: `wasedatime-web-${name}`,
       autoBranchDeletion: false,
@@ -125,6 +123,8 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
       },
     });
     this.microApps[name] = microApp;
+
+    const appDomain = this.microApps[name].defaultDomain;
 
     microApp
       .addBranch('master', {
