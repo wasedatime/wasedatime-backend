@@ -1,5 +1,7 @@
 export const ROOT_DOMAIN = 'wasedatime.com';
 
+export const DEV_DOMAIN = 'dev.wasedatime.com';
+
 export const API_DOMAIN = 'api.wasedatime.com';
 
 export const AUTH_DOMAIN = 'auth.wasedatime.com';
@@ -15,4 +17,7 @@ export const MX_VALUES = [
   { priority: 10, hostName: 'mx2.forwardemail.net' },
 ];
 
-export const EMAIL_TXT = ['v=spf1 a mx include:spf.forwardemail.net -all', 'forward-email=wasedatime@gmail.com'];
+export const EMAIL_TXT = [
+  'v=spf1 a mx include:spf.forwardemail.net -all',
+  'forward-email=wasedatime@gmail.com',
+];

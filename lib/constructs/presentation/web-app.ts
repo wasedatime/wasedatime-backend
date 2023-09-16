@@ -10,7 +10,7 @@ import {
 } from '../../configs/amplify/build-setting';
 import { webAppCode } from '../../configs/amplify/codebase';
 import { developerAuth } from '../../configs/amplify/website';
-import { ROOT_DOMAIN } from '../../configs/route53/domain';
+import { ROOT_DOMAIN, DEV_DOMAIN } from '../../configs/route53/domain';
 
 export interface WebAppProps {
   apiDomain?: string;
@@ -38,6 +38,9 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
   constructor(scope: Construct, id: string, props: WebAppProps) {
     super(scope, id, props);
 
+    if (!MASTER_VITE_GA_ID || !DEV_VITE_GA_ID) {
+      throw new Error('Required environment variables are missing.');
+    }
     this.appProps = props;
 
     this.app = new amplify.App(this, 'root-app', {
@@ -73,7 +76,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
       })
       .addEnvironment('REACT_APP_API_BASE_URL', `https://${props.apiDomain}/v1`)
       .addEnvironment('VITE_GA_ID', MASTER_VITE_GA_ID)
-      .addEnvironment('VITE_MF_HOME_BASE_PATH', 'https://wasedatime.com');
+      .addEnvironment('VITE_MF_HOME_BASE_PATH', `https://${ROOT_DOMAIN}`);
     this.branches.main = masterBranch;
 
     const devBranch = this.app
@@ -89,7 +92,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         `https://${props.apiDomain}/staging`,
       )
       .addEnvironment('VITE_GA_ID', DEV_VITE_GA_ID)
-      .addEnvironment('VITE_MF_HOME_BASE_PATH', 'https://dev.wasedatime.com');
+      .addEnvironment('VITE_MF_HOME_BASE_PATH', `https://${DEV_DOMAIN}`);
     this.branches.dev = devBranch;
 
     this.domain = this.app.addDomain('domain', {
@@ -124,8 +127,6 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
     });
     this.microApps[name] = microApp;
 
-    const appDomain = this.microApps[name].defaultDomain;
-
     microApp
       .addBranch('master', {
         autoBuild: false,
@@ -143,6 +144,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         `https://wasedatime.com/${name}`,
       );
 
+    const appDomain = this.microApps[name].defaultDomain;
     microApp
       .addBranch('dev', {
         autoBuild: false,
