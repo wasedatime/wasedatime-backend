@@ -176,7 +176,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         `https://${this.appProps.apiDomain}/staging`,
       )
       .addEnvironment('VITE_GA_ID', DEV_VITE_GA_ID)
-      .addEnvironment('VITE_PUBLIC_BASE_PATH', `https://${appDomain}`);
+      .addEnvironment('VITE_PUBLIC_BASE_PATH', `https://develop.${appDomain}`);
 
     this.app.addCustomRule(
       new amplify.CustomRule({
@@ -187,7 +187,7 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
     );
     this.app.addEnvironment(
       `VITE_MF_${name.toUpperCase()}_BASE_PATH`,
-      `https://dev.${appDomain}`,
+      `https://${appDomain}`,
     );
   }
 }
