@@ -19,12 +19,14 @@ def get_single_thread(board_id, thread_id, uid=""):
             "board_id": board_id,
             "thread_id": thread_id,
         },
-        UpdateExpression="SET #v = #v + :incr",
+        UpdateExpression="SET #v = #v + :incr, #nc = :newComment",
         ExpressionAttributeNames={
-            '#v': 'views'
+            '#v': 'views',
+            '#nc': 'comment_count'
         },
         ExpressionAttributeValues={
-            ":incr": 1
+            ":incr": 1,
+            ":newComment": False
         }
     )
 

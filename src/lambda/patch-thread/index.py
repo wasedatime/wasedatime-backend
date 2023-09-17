@@ -70,6 +70,23 @@ def patch_thread(board_id, uid, thread_id, thread, action):
                     ':uid': {uid}
                 },
             )
+    # Update comment_count by 1
+    elif action == 'update_count':
+        table.update_item(
+            Key={
+                "board_id": board_id,
+                "thread_id": thread_id,
+            },
+            UpdateExpression="SET #c = #c + :incr, #nc = :newComment",
+            ExpressionAttributeNames={
+                '#c': 'comment_count',
+                '#nc': 'new_comment'
+            },
+            ExpressionAttributeValues={
+                ":incr": 1,
+                ":newComment": True
+            }
+        )
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(None).add_message('').compile()
