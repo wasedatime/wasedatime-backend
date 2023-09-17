@@ -510,7 +510,7 @@ export const forumThreadPatchReqSchema: apigw.JsonSchema = {
     },
     action: {
       type: apigw.JsonSchemaType.STRING,
-      enum: ['update', 'like', 'dislike', 'update_count'],
+      enum: ['update', 'like', 'dislike', 'update_incr', 'update_decr'],
     },
   },
   required: ['data', 'action'],
