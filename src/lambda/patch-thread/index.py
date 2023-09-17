@@ -8,6 +8,9 @@ from utils import JsonPayloadBuilder, resp_handler, table
 def patch_thread(board_id, uid, thread_id, thread, action):
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
+    print(
+        f"Action: {action}, Board ID: {board_id}, Thread ID: {thread_id}, UID: {uid}")
+
     if action == 'update':
         print("action update triggered")
         table.update_item(
@@ -46,6 +49,15 @@ def patch_thread(board_id, uid, thread_id, thread, action):
             "thread_id": thread_id,
         }
         )
+        if 'Item' in response:
+            print(f"Current item: {response['Item']}")
+            current_likes = response['Item'].get('likes', set())
+            print(f"Current likes: {current_likes}")
+        else:
+            print("Item not found in DynamoDB")
+            return
+
+        print(f"Attempting to remove UID {uid} from likes")
 
         current_likes = response['Item'].get('likes', set())
         print("Current likes: ", current_likes)
@@ -63,17 +75,21 @@ def patch_thread(board_id, uid, thread_id, thread, action):
 
         # else, just delete the uid from set likes
         else:
-            table.update_item(
-                Key={
-                    "board_id": board_id,
-                    "thread_id": thread_id,
-                },
-                UpdateExpression='DELETE likes :uid',
-                ConditionExpression='attribute_exists(likes) AND contains(likes, :uid)',
-                ExpressionAttributeValues={
-                    ':uid': {uid}
-                },
-            )
+            print(f"ELSE statement triggered. UID: {uid}")
+            try:
+                table.update_item(
+                    Key={
+                        "board_id": board_id,
+                        "thread_id": thread_id,
+                    },
+                    UpdateExpression='DELETE likes :uid',
+                    ConditionExpression='attribute_exists(likes) AND contains(likes, :uid)',
+                    ExpressionAttributeValues={
+                        ':uid': [uid]
+                    },
+                )
+            except Exception as e:
+                print(f"Exception: {e}")
     # Increase comment_count by 1
     elif action == 'update_incr':
         print("action count increased triggered")
