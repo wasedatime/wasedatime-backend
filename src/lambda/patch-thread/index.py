@@ -71,8 +71,8 @@ def patch_thread(board_id, uid, thread_id, thread, action):
                     ':uid': {uid}
                 },
             )
-    # Update comment_count by 1
-    elif action == 'update_count':
+    # Increase comment_count by 1
+    elif action == 'update_incr':
         table.update_item(
             Key={
                 "board_id": board_id,
@@ -86,6 +86,39 @@ def patch_thread(board_id, uid, thread_id, thread, action):
             ExpressionAttributeValues={
                 ":incr": 1,
                 ":newComment": True
+            }
+        )
+
+    # Decrease comment_count by 1
+    elif action == 'update_decr':
+        # Fetch the current item to get the current comment_count
+        response = table.get_item(
+            Key={
+                "board_id": board_id,
+                "thread_id": thread_id,
+            }
+        )
+        current_comment_count = response['Item'].get('comment_count', 0)
+        new_comment_flag = True  # Default to True
+
+        # If decrementing would result in 0 comments, set newComment to False
+        if current_comment_count - 1 == 0:
+            new_comment_flag = False
+
+        # Update the comment_count and newComment flag
+        table.update_item(
+            Key={
+                "board_id": board_id,
+                "thread_id": thread_id,
+            },
+            UpdateExpression="SET #c = #c - :decr, #nc = :newComment",
+            ExpressionAttributeNames={
+                '#c': 'comment_count',
+                '#nc': 'new_comment'
+            },
+            ExpressionAttributeValues={
+                ":decr": 1,
+                ":newComment": new_comment_flag
             }
         )
 
