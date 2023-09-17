@@ -9,6 +9,7 @@ def patch_thread(board_id, uid, thread_id, thread, action):
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
     if action == 'update':
+        print("action update triggered")
         table.update_item(
             Key={
                 "board_id": board_id,
@@ -23,6 +24,7 @@ def patch_thread(board_id, uid, thread_id, thread, action):
             },
         )
     elif action == 'like':
+        print("action like triggered")
         # Add uid to the 'likes' list if it's not already there
         table.update_item(
             Key={
@@ -36,6 +38,7 @@ def patch_thread(board_id, uid, thread_id, thread, action):
             },
         )
     elif action == 'dislike':
+        print("action dislike triggered")
         # Remove uid from the 'likes' list if it's already there
 
         response = table.get_item(Key={
@@ -73,6 +76,7 @@ def patch_thread(board_id, uid, thread_id, thread, action):
             )
     # Increase comment_count by 1
     elif action == 'update_incr':
+        print("action count increased triggered")
         table.update_item(
             Key={
                 "board_id": board_id,
@@ -91,6 +95,7 @@ def patch_thread(board_id, uid, thread_id, thread, action):
 
     # Decrease comment_count by 1
     elif action == 'update_decr':
+        print("action count decrease triggered")
         # Fetch the current item to get the current comment_count
         response = table.get_item(
             Key={
