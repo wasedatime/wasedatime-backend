@@ -1,5 +1,6 @@
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 
+// test
 export const syllabusSchema: apigw.JsonSchema = {
   schema: apigw.JsonSchemaVersion.DRAFT7,
   type: apigw.JsonSchemaType.ARRAY,
