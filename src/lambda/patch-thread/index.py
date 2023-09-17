@@ -45,6 +45,7 @@ def patch_thread(board_id, uid, thread_id, thread, action):
         )
 
         current_likes = response['Item'].get('likes', set())
+        print("Current likes: ", current_likes)
 
         # if only one like, remove the set entirely
         if len(current_likes) == 1 and uid in current_likes:
