@@ -83,9 +83,9 @@ def patch_thread(board_id, uid, thread_id, thread, action):
                         "thread_id": thread_id,
                     },
                     UpdateExpression='DELETE likes :uid',
-                    ConditionExpression='attribute_exists(likes) AND contains(likes, :uid)',
+                    # ConditionExpression='attribute_exists(likes) AND contains(likes, :uid)',
                     ExpressionAttributeValues={
-                        ':uid': [uid]
+                        ':uid': {uid}
                     },
                 )
             except Exception as e:
