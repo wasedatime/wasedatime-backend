@@ -86,9 +86,7 @@ def patch_thread(board_id, uid, thread_id, thread, action):
                 ":incr": 1,
                 ":newComment": True
             }
-    )
-
-
+        )
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(None).add_message('').compile()
