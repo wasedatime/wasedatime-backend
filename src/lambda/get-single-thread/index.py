@@ -62,3 +62,14 @@ def get_single_thread(board_id, thread_id, uid=""):
     body = JsonPayloadBuilder().add_status(
         True).add_data(item).add_message('').compile()
     return body
+
+
+def handler(event, context):
+    params = {
+        "board_id": event["pathParameters"]["board_id"],
+        "thread_id": event["pathParameters"]["thread_id"],
+    }
+    if "uid" in event["queryStringParameters"]:
+        params["uid"] = event["queryStringParameters"]["uid"]
+
+    return get_single_thread(**params)
