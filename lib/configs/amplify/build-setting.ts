@@ -3,6 +3,8 @@ import { microAppCorsHeader, securityHeaders } from './website';
 
 export const BIT_TOKEN = process.env.BIT_TOKEN!;
 export const FEEDS_DEPLOY_KEY = process.env.DEPLOY_KEY!;
+export const MASTER_VITE_GA_ID = process.env.MASTER_VITE_GA_ID!;
+export const DEV_VITE_GA_ID = process.env.DEV_VITE_GA_ID!;
 
 const preBuild = {
   commands: ['npm install -g pnpm', 'pnpm install --filter .'],

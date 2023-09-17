@@ -26,6 +26,8 @@ def post_thread(board_id, thread, uid):
         "group_id": thread["group_id"],
         "univ_id": thread["univ_id"],
         "views": 0,
+        "comment_count": 0,
+        "new_comment": False
     }
 
     table.put_item(Item=thread_item)

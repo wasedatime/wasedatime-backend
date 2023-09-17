@@ -1,5 +1,6 @@
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 
+// test
 export const syllabusSchema: apigw.JsonSchema = {
   schema: apigw.JsonSchemaVersion.DRAFT7,
   type: apigw.JsonSchemaType.ARRAY,
@@ -428,6 +429,12 @@ export const forumThreadGetRespSchema: apigw.JsonSchema = {
           totalLikes: {
             type: apigw.JsonSchemaType.INTEGER,
           },
+          comment_count: {
+            type: apigw.JsonSchemaType.INTEGER,
+          },
+          new_comment: {
+            type: apigw.JsonSchemaType.BOOLEAN,
+          },
         },
         required: [
           'univ_id',
@@ -503,11 +510,13 @@ export const forumThreadPatchReqSchema: apigw.JsonSchema = {
     },
     action: {
       type: apigw.JsonSchemaType.STRING,
-      enum: ['update', 'like', 'dislike'],
+      enum: ['update', 'like', 'dislike', 'update_incr', 'update_decr'],
     },
   },
   required: ['data', 'action'],
 };
+
+// turn off double quotation
 
 export const forumCommentGetRespSchema: apigw.JsonSchema = {
   schema: apigw.JsonSchemaVersion.DRAFT7,
