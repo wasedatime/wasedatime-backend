@@ -27,7 +27,7 @@ def get_user_threads(uid=""):
     response_data = {
         'thread_ids': thread_ids,
         'new_comment_count': new_comment_count,
-        'new_comment_flag': new_comment_count > 1
+        'new_comment_flag': new_comment_count >= 1
     }
 
     body = JsonPayloadBuilder().add_status(True)\
