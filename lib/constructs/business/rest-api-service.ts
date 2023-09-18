@@ -836,7 +836,7 @@ export class ForumThreadsApiService extends RestApiService {
       },
     );
 
-    const getUserForumThreads = boardResource.addMethod(
+    const getUserForumThreads = userResource.addMethod(
       apigw2.HttpMethod.GET,
       getUserIntegration,
       {
