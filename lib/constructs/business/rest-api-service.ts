@@ -716,6 +716,7 @@ export class ForumThreadsApiService extends RestApiService {
     const root = scope.apiEndpoint.root.addResource('forum');
     const boardResource = root.addResource('{board_id}');
     const threadResource = boardResource.addResource('{thread_id}');
+    const userResource = root.addResource('{uid}');
 
     const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -742,6 +743,18 @@ export class ForumThreadsApiService extends RestApiService {
     });
 
     const optionsForumThreads = threadResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const optionsUserThreads = userResource.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
       allowMethods: [
@@ -786,8 +799,8 @@ export class ForumThreadsApiService extends RestApiService {
       forumThreadsFunctions.getAllFunction,
       { proxy: true },
     );
-    const getBoardIntegration = new apigw.LambdaIntegration(
-      forumThreadsFunctions.getBoardFunction,
+    const getUserIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.getUserFunction,
       { proxy: true },
     );
     const getThreadIntegration = new apigw.LambdaIntegration(
@@ -823,11 +836,11 @@ export class ForumThreadsApiService extends RestApiService {
       },
     );
 
-    const getBoardForumThreads = boardResource.addMethod(
+    const getUserForumThreads = boardResource.addMethod(
       apigw2.HttpMethod.GET,
-      getBoardIntegration,
+      getUserIntegration,
       {
-        operationName: 'GetBoardThreads',
+        operationName: 'GetUserThreads',
         methodResponses: [
           {
             statusCode: '200',
@@ -910,8 +923,11 @@ export class ForumThreadsApiService extends RestApiService {
         [apigw2.HttpMethod.GET]: getAllForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsForumHome,
       },
+      '/forum/{uid}': {
+        [apigw2.HttpMethod.GET]: getUserForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsUserThreads,
+      },
       '/forum/{board_id}': {
-        [apigw2.HttpMethod.GET]: getBoardForumThreads,
         [apigw2.HttpMethod.POST]: postForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsForumBoards,
       },
