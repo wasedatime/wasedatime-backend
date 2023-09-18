@@ -716,7 +716,7 @@ export class ForumThreadsApiService extends RestApiService {
     const root = scope.apiEndpoint.root.addResource('forum');
     const boardResource = root.addResource('{board_id}');
     const threadResource = boardResource.addResource('{thread_id}');
-    const userResource = root.addResource('{uid}');
+    const userResource = root.addResource('user');
 
     const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,

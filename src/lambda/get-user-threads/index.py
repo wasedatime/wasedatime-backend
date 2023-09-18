@@ -35,7 +35,9 @@ def get_user_threads(uid):
 
 
 def handler(event, context):
-    uid = event['queryStringParameters'].get('uid', '')
+
+    uid = event['requestContext']['authorizer']['claims']['sub']
+
     # index = event['queryStringParameters'].get('index', '0')
     # num = event['queryStringParameters'].get('num', '10')
 
