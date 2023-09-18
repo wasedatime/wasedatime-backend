@@ -5,7 +5,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_user_threads(uid):
+def get_user_threads(uid=""):
 
     # Query the GSI
     response = table.query(
@@ -38,10 +38,12 @@ def handler(event, context):
 
     print(event)
 
-    # uid = ['requestContext']['authorizer']['claims']['sub']
-    uid = "356defaa-8907-4003-be7e-f0e6502392d7"
+    params = {
+        "uid": event['requestContext']['authorizer']['claims']['sub']
+    }
+    # uid = "356defaa-8907-4003-be7e-f0e6502392d7"
 
     # index = event['queryStringParameters'].get('index', '0')
     # num = event['queryStringParameters'].get('num', '10')
 
-    return get_user_threads(uid)
+    return get_user_threads(**params)
