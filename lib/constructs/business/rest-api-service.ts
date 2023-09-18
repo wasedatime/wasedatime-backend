@@ -844,7 +844,7 @@ export class ForumThreadsApiService extends RestApiService {
         methodResponses: [
           {
             statusCode: '200',
-            responseModels: { ['application/json']: getRespModel },
+            responseModels: { ['application/json']: apigw.Model.EMPTY_MODEL },
             responseParameters: lambdaRespParams,
           },
         ],
