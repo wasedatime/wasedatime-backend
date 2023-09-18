@@ -24,12 +24,15 @@ def get_user_threads(uid=""):
     thread_ids = [item['thread_id'] for item in results]
 
     # Determine the response data based on new_comment_count
-    response_data = True if new_comment_count > 1 else {
-        'thread_ids': thread_ids, 'new_comment_count': new_comment_count}
+    response_data = {
+        'thread_ids': thread_ids,
+        'new_comment_count': new_comment_count,
+        'new_comment_flag': new_comment_count > 1
+    }
 
     body = JsonPayloadBuilder().add_status(True)\
                                .add_data(response_data)\
-                               .add_message('Fetched successfully').compile()
+                               .add_message('').compile()
 
     return body
 
