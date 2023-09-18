@@ -41,7 +41,6 @@ def handler(event, context):
     params = {
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
-    # uid = "356defaa-8907-4003-be7e-f0e6502392d7"
 
     # index = event['queryStringParameters'].get('index', '0')
     # num = event['queryStringParameters'].get('num', '10')

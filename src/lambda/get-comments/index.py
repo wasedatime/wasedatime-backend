@@ -7,7 +7,7 @@ from utils import table
 @resp_handler
 def get_comments(thread_id, uid=""):
     results = table.query(KeyConditionExpression=Key(
-        "thread_id").eq(thread_id), ScanIndexForward=False)["Items"]
+        "thread_id").eq(thread_id), ScanIndexForward=True)["Items"]
     for r in results:
         r["mod"] = False
         if r["uid"] == uid:
