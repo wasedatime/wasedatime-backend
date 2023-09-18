@@ -486,7 +486,7 @@ export class SyllabusUpdateFunction extends Construct {
 
 export class ForumThreadFunctions extends Construct {
   readonly getAllFunction: lambda.Function;
-  readonly getBoardFunction: lambda.Function;
+  readonly getUserFunction: lambda.Function;
   readonly getSingleFunction: lambda.Function;
   readonly postFunction: lambda.Function;
   readonly patchFunction: lambda.Function;
@@ -559,13 +559,13 @@ export class ForumThreadFunctions extends Construct {
       },
     );
 
-    this.getBoardFunction = new lambda_py.PythonFunction(
+    this.getUserFunction = new lambda_py.PythonFunction(
       this,
-      'get-board-threads',
+      'get-user-threads',
       {
-        entry: 'src/lambda/get-board-threads',
-        description: 'Get forum threads from the database.',
-        functionName: 'get-board-threads',
+        entry: 'src/lambda/get-user-threads',
+        description: "Get user's threads from the database.",
+        functionName: 'get-user-threads',
         logRetention: logs.RetentionDays.ONE_MONTH,
         memorySize: 128,
         role: dynamoDBReadRole,

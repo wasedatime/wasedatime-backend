@@ -13,7 +13,7 @@ def get_all_threads(uid, index, num, school, tags, board_id):
         response = table.query(KeyConditionExpression=Key(
             "board_id").eq(board_id), ScanIndexForward=False)
     else:
-        response = table.scan()
+        response = table.scan(ConsistentRead=False)
 
     items = response['Items']
 
