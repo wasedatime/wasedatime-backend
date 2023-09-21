@@ -1,4 +1,4 @@
-// import * as gql from './graphql-api-service';
+import * as gql from './graphql-api-service';
 import * as rest from './rest-api-service';
 
 export enum ApiEndpoint {
@@ -13,8 +13,8 @@ export type RestApiServiceId =
   | 'career'
   | 'timetable'
   | 'thread'
-  | 'comment';
-// | 'graphql';
+  | 'comment'
+  | 'graphql';
 
 export const restApiServiceMap: {
   [name in RestApiServiceId]: typeof rest.RestApiService;
@@ -25,13 +25,13 @@ export const restApiServiceMap: {
   'timetable': rest.TimetableApiService,
   'thread': rest.ForumThreadsApiService,
   'comment': rest.ForumCommentsApiService,
-  // 'graphql': rest.GraphqlApiService,
+  'graphql': rest.GraphqlApiService,
 };
 
-// export type GraphqlApiServiceId = "course";
+export type GraphqlApiServiceId = 'course';
 
-// export const graphqlApiServiceMap: {
-//   [name in GraphqlApiServiceId]: typeof gql.GraphqlApiService;
-// } = {
-//   course: gql.CourseApiService,
-// };
+export const graphqlApiServiceMap: {
+  [name in GraphqlApiServiceId]: typeof gql.GraphqlApiService;
+} = {
+  course: gql.CourseApiService,
+};

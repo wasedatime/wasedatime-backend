@@ -12,20 +12,10 @@ import * as flatted from 'flatted';
 import { defaultHeaders } from '../../configs/api-gateway/cors';
 import { STAGE } from '../../configs/common/aws';
 import { API_DOMAIN } from '../../configs/route53/domain';
-// import { GraphqlApiService } from './graphql-api-service';
+import { GraphqlApiService } from './graphql-api-service';
 import { AbstractHttpApiService } from './http-api-service';
 import { RestApiService } from './rest-api-service';
-import {
-  // GraphqlApiServiceId,
-  // graphqlApiServiceMap,
-  RestApiServiceId,
-  restApiServiceMap,
-} from './service';
-
-export interface ServiceDataSources {
-  tableName?: string;
-  bucketName?: string;
-}
+import { GraphqlApiServiceId, graphqlApiServiceMap, RestApiServiceId, restApiServiceMap } from './service';
 
 export interface ApiEndpointProps {
   zone: route53.IHostedZone;
@@ -33,18 +23,9 @@ export interface ApiEndpointProps {
 }
 
 export abstract class AbstractApiEndpoint extends Construct {
-  abstract readonly apiEndpoint:
-  | apigw.RestApi
-  | apigw.LambdaRestApi
-  | apigw.SpecRestApi
-  | apigw2.HttpApi
-  | appsync.GraphqlApi;
+  abstract readonly apiEndpoint: apigw.RestApi | apigw.LambdaRestApi | apigw.SpecRestApi | apigw2.HttpApi | appsync.GraphqlApi;
 
-  protected constructor(
-    scope: Construct,
-    id: string,
-    props?: ApiEndpointProps,
-  ) {
+  protected constructor(scope: Construct, id: string, props?: ApiEndpointProps) {
     super(scope, id);
   }
 }
@@ -63,8 +44,7 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
   }
 
   public getDomain(): string {
-    const domainName: apigw.DomainName | undefined =
-      this.apiEndpoint.domainName;
+    const domainName: apigw.DomainName | undefined = this.apiEndpoint.domainName;
 
     if (typeof domainName === 'undefined') {
       throw RangeError('Domain not configured for this API endpoint.');
@@ -72,12 +52,8 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     return domainName.domainName;
   }
 
-  public addService(
-    name: RestApiServiceId,
-    dataSource?: ServiceDataSources,
-    auth = false,
-  ): this {
-    this.apiServices[name] = new restApiServiceMap[name](this, `${name}-api`, {
+  public addService(name: RestApiServiceId, dataSource?: string, auth = false): this {
+    this.apiServices[name] = new restApiServiceMap[name](this, `${ name }-api`, {
       dataSource: dataSource,
       authorizer: auth ? this.authorizer : undefined,
       validator: this.reqValidator,
@@ -85,50 +61,36 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     return this;
   }
 
-  public abstract deploy(): void;
+  public abstract deploy(): void
 }
 
-// export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
-//   abstract readonly apiEndpoint: appsync.GraphqlApi;
+export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
+  abstract readonly apiEndpoint: appsync.GraphqlApi;
 
-//   readonly apiServices: { [name: string]: GraphqlApiService };
+  readonly apiServices: { [name: string]: GraphqlApiService };
 
-//   protected authMode: { [mode: string]: appsync.AuthorizationMode } = {};
+  protected authMode: { [mode: string]: appsync.AuthorizationMode } = {};
 
-//   protected constructor(scope: Construct, id: string, props: ApiEndpointProps) {
-//     super(scope, id, props);
-//   }
+  protected constructor(scope: Construct, id: string, props: ApiEndpointProps) {
+    super(scope, id, props);
+  }
 
-//   public addService(
-//     name: GraphqlApiServiceId,
-//     dataSource: string,
-//     auth = "apiKey"
-//   ): this {
-//     this.apiServices[name] = new graphqlApiServiceMap[name](
-//       this,
-//       `${name}-api`,
-//       {
-//         dataSource: dynamodb.Table.fromTableName(
-//           this,
-//           `${name}-table`,
-//           dataSource
-//         ),
-//         auth: this.authMode[auth],
-//       }
-//     );
-//     return this;
-//   }
+  public addService(name: GraphqlApiServiceId, dataSource: string, auth = 'apiKey'): this {
+    this.apiServices[name] = new graphqlApiServiceMap[name](this, `${ name }-api`, {
+      dataSource: dynamodb.Table.fromTableName(this, `${ name }-table`, dataSource),
+      auth: this.authMode[auth],
+    });
+    return this;
+  }
 
-//   public getDomain(): string {
-//     const domain = this.apiEndpoint.graphqlUrl.match(
-//       /https:\/\/(.*)\/graphql/g
-//     );
-//     if (domain === null) {
-//       return "";
-//     }
-//     return domain[1];
-//   }
-// }
+  public getDomain(): string {
+    const domain = this.apiEndpoint.graphqlUrl.match(/https:\/\/(.*)\/graphql/g);
+    if (domain === null) {
+      return '';
+    }
+    return domain[1];
+  }
+}
 
 export abstract class AbstractHttpApiEndpoint extends AbstractApiEndpoint {
   abstract readonly apiEndpoint: apigw2.HttpApi;
@@ -209,9 +171,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
     });
     new route53.ARecord(this, 'alias-record', {
       zone: props.zone,
-      target: route53.RecordTarget.fromAlias(
-        new route53_targets.ApiGatewayDomain(this.domain),
-      ),
+      target: route53.RecordTarget.fromAlias(new route53_targets.ApiGatewayDomain(this.domain)),
       recordName: API_DOMAIN,
     });
   }
@@ -226,10 +186,7 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
       api: this.apiEndpoint,
       retainDeployments: false,
     });
-    const hash = Buffer.from(
-      flatted.stringify(this.apiServices),
-      'binary',
-    ).toString('base64');
+    const hash = Buffer.from(flatted.stringify(this.apiServices), 'binary').toString('base64');
     if (STAGE === 'dev') {
       devDeployment.addToLogicalId(hash);
     } else if (STAGE === 'prod') {
@@ -270,41 +227,42 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
   }
 }
 
-// export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
-//   readonly apiEndpoint: appsync.GraphqlApi;
-//   readonly apiServices: { [name: string]: GraphqlApiService } = {};
+export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
+  readonly apiEndpoint: appsync.GraphqlApi;
+  readonly apiServices: { [name: string]: GraphqlApiService } = {};
 
-//   constructor(scope: Construct, id: string, props: ApiEndpointProps) {
-//     super(scope, id, props);
+  constructor(scope: Construct, id: string, props: ApiEndpointProps) {
 
-//     const apiKeyAuth: appsync.AuthorizationMode = {
-//       authorizationType: appsync.AuthorizationType.API_KEY,
-//       apiKeyConfig: {
-//         name: "dev",
-//         expires: Expiration.after(Duration.days(365)),
-//         description: "API Key for development environment.",
-//       },
-//     };
-//     this.authMode.apiKey = apiKeyAuth;
-//     const cognitoAuth: appsync.AuthorizationMode = {
-//       authorizationType: appsync.AuthorizationType.USER_POOL,
-//       userPoolConfig: {
-//         userPool: props.authProvider!,
-//         appIdClientRegex: "web-app",
-//       },
-//     };
-//     this.authMode.userPool = cognitoAuth;
+    super(scope, id, props);
 
-//     this.apiEndpoint = new appsync.GraphqlApi(this, "graphql-api", {
-//       name: "wasedatime-gql-api",
-//       authorizationConfig: {
-//         defaultAuthorization: apiKeyAuth,
-//         additionalAuthorizationModes: [cognitoAuth],
-//       },
-//       logConfig: {
-//         fieldLogLevel: appsync.FieldLogLevel.ALL,
-//       },
-//       xrayEnabled: true,
-//     });
-//   }
-// }
+    const apiKeyAuth: appsync.AuthorizationMode = {
+      authorizationType: appsync.AuthorizationType.API_KEY,
+      apiKeyConfig: {
+        name: 'dev',
+        expires: Expiration.after(Duration.days(365)),
+        description: 'API Key for development environment.',
+      },
+    };
+    this.authMode.apiKey = apiKeyAuth;
+    const cognitoAuth: appsync.AuthorizationMode = {
+      authorizationType: appsync.AuthorizationType.USER_POOL,
+      userPoolConfig: {
+        userPool: props.authProvider!,
+        appIdClientRegex: 'web-app',
+      },
+    };
+    this.authMode.userPool = cognitoAuth;
+
+    this.apiEndpoint = new appsync.GraphqlApi(this, 'graphql-api', {
+      name: 'wasedatime-gql-api',
+      authorizationConfig: {
+        defaultAuthorization: apiKeyAuth,
+        additionalAuthorizationModes: [cognitoAuth],
+      },
+      logConfig: {
+        fieldLogLevel: appsync.FieldLogLevel.ALL,
+      },
+      xrayEnabled: true,
+    });
+  }
+}

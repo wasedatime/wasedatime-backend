@@ -29,10 +29,10 @@ import {
   ForumThreadFunctions,
   ForumCommentFunctions,
 } from '../common/lambda-functions';
-import { AbstractRestApiEndpoint, ServiceDataSources } from './api-endpoint';
+import { AbstractRestApiEndpoint } from './api-endpoint';
 
 export interface RestApiServiceProps {
-  dataSource?: ServiceDataSources;
+  dataSource?: string;
   authorizer?: apigw.IAuthorizer;
   validator?: apigw.RequestValidator;
 }
@@ -92,7 +92,7 @@ export class SyllabusApiService extends RestApiService {
       service: 's3',
       integrationHttpMethod: apigw2.HttpMethod.GET,
       path: 'syllabus/{school}.json',
-      subdomain: props.dataSource?.bucketName,
+      subdomain: props.dataSource,
       options: {
         credentialsRole: apiGatewayRole,
         requestParameters: {
@@ -111,7 +111,7 @@ export class SyllabusApiService extends RestApiService {
       service: 's3',
       integrationHttpMethod: apigw2.HttpMethod.HEAD,
       path: 'syllabus/{school}.json',
-      subdomain: props.dataSource?.bucketName,
+      subdomain: props.dataSource,
       options: {
         credentialsRole: apiGatewayRole,
         requestParameters: {
@@ -277,7 +277,7 @@ export class CourseReviewsApiService extends RestApiService {
       'crud-functions',
       {
         envVars: {
-          TABLE_NAME: props.dataSource?.tableName ?? 'course-review',
+          TABLE_NAME: props.dataSource!,
         },
       },
     );
@@ -527,7 +527,7 @@ export class TimetableApiService extends RestApiService {
 
     const timetableFunctions = new TimetableFunctions(this, 'crud-functions', {
       envVars: {
-        TABLE_NAME: props.dataSource?.tableName ?? 'timetable',
+        TABLE_NAME: props.dataSource!,
       },
     });
     const getIntegration = new apigw.LambdaIntegration(
@@ -659,50 +659,47 @@ export class TimetableApiService extends RestApiService {
   }
 }
 
-// export class GraphqlApiService extends RestApiService {
-//   readonly resourceMapping: {
-//     [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
-//   };
+export class GraphqlApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
 
-//   constructor(
-//     scope: AbstractRestApiEndpoint,
-//     id: string,
-//     props: RestApiServiceProps
-//   ) {
-//     super(scope, id, props);
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
 
-//     const root = scope.apiEndpoint.root.addResource("graphql");
+    const root = scope.apiEndpoint.root.addResource('graphql');
 
-//     const postIntegration = new apigw.HttpIntegration(
-//       props.dataSource?.tableName!,
-//       {
-//         proxy: true,
-//         httpMethod: apigw2.HttpMethod.POST,
-//       }
-//     );
+    const postIntegration = new apigw.HttpIntegration(props.dataSource!, {
+      proxy: true,
+      httpMethod: apigw2.HttpMethod.POST,
+    });
 
-//     const optionsGql = root.addCorsPreflight({
-//       allowOrigins: allowOrigins,
-//       allowHeaders: allowHeaders,
-//       allowMethods: [apigw2.HttpMethod.POST, apigw2.HttpMethod.OPTIONS],
-//     });
-//     const postGql = root.addMethod(apigw2.HttpMethod.POST, postIntegration, {
-//       operationName: "PostGraphQL",
-//       methodResponses: [
-//         {
-//           statusCode: "200",
-//         },
-//       ],
-//     });
+    const optionsGql = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [apigw2.HttpMethod.POST, apigw2.HttpMethod.OPTIONS],
+    });
+    const postGql = root.addMethod(apigw2.HttpMethod.POST, postIntegration, {
+      operationName: 'PostGraphQL',
+      methodResponses: [
+        {
+          statusCode: '200',
+        },
+      ],
+    });
 
-//     this.resourceMapping = {
-//       "/graphql": {
-//         [apigw2.HttpMethod.OPTIONS]: optionsGql,
-//         [apigw2.HttpMethod.POST]: postGql,
-//       },
-//     };
-//   }
-// }
+    this.resourceMapping = {
+      '/graphql': {
+        [apigw2.HttpMethod.OPTIONS]: optionsGql,
+        [apigw2.HttpMethod.POST]: postGql,
+      },
+    };
+  }
+}
 
 export class ForumThreadsApiService extends RestApiService {
   readonly resourceMapping: {
@@ -793,8 +790,7 @@ export class ForumThreadsApiService extends RestApiService {
       'crud-functions',
       {
         envVars: {
-          TABLE_NAME: props.dataSource?.tableName ?? 'forum-threads',
-          BUKET_NAME: props.dataSource?.bucketName ?? 'wasedatime-thread-img',
+          TABLE_NAME: props.dataSource!,
         },
       },
     );
@@ -979,7 +975,7 @@ export class ForumCommentsApiService extends RestApiService {
       'crud-functions',
       {
         envVars: {
-          TABLE_NAME: props.dataSource?.tableName ?? 'forum-comments',
+          TABLE_NAME: props.dataSource!,
         },
       },
     );

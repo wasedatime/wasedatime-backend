@@ -7,7 +7,6 @@ import {
   CareerDataPipeline,
   SyllabusDataPipeline,
   SyllabusSyncPipeline,
-  ThreadImgDataPipeline,
   Worker,
 } from '../constructs/persistence/data-pipeline';
 import { Collection, DynamoDatabase } from '../constructs/persistence/database';
@@ -33,12 +32,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
         dataSource: syllabusDataPipeline.dataWarehouse,
       },
     );
-
-    const threadImgDataPipeline = new ThreadImgDataPipeline(
-      this,
-      'thread-img-data-pipeline',
-    );
-    this.dataPipelines[Worker.THREAD_IMG] = threadImgDataPipeline;
 
     const dynamoDatabase = new DynamoDatabase(this, 'dynamo-db');
     this.databases['dynamo-main'] = dynamoDatabase;
@@ -67,10 +60,10 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       DataEndpoint.SYLLABUS,
       syllabusDataPipeline.dataWarehouse.bucketName,
     );
-    this.dataInterface.setEndpoint(DataEndpoint.THREAD, {
-      dynamoTableName: dynamoDatabase.tables[Collection.THREAD].tableName,
-      s3BucketName: threadImgDataPipeline.dataSource.bucketName,
-    });
+    this.dataInterface.setEndpoint(
+      DataEndpoint.THREAD,
+      dynamoDatabase.tables[Collection.THREAD].tableName,
+    );
     this.dataInterface.setEndpoint(
       DataEndpoint.COMMENT,
       dynamoDatabase.tables[Collection.COMMENT].tableName,
