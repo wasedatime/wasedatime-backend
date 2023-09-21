@@ -1,4 +1,4 @@
-import * as gql from './graphql-api-service';
+// import * as gql from './graphql-api-service';
 import * as rest from './rest-api-service';
 
 export enum ApiEndpoint {

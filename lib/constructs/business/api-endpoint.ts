@@ -12,7 +12,7 @@ import * as flatted from 'flatted';
 import { defaultHeaders } from '../../configs/api-gateway/cors';
 import { STAGE } from '../../configs/common/aws';
 import { API_DOMAIN } from '../../configs/route53/domain';
-import { GraphqlApiService } from './graphql-api-service';
+// import { GraphqlApiService } from './graphql-api-service';
 import { AbstractHttpApiService } from './http-api-service';
 import { RestApiService } from './rest-api-service';
 import {
