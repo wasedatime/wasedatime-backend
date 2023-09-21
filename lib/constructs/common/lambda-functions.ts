@@ -536,13 +536,13 @@ export class ForumThreadFunctions extends Construct {
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            's3-full-access',
+            's3-full-access1',
             'arn:aws:iam::aws:policy/AmazonS3FullAccess',
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            'db-read-only',
-            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+            'db-full-access1',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
           ),
         ],
       },
@@ -565,12 +565,12 @@ export class ForumThreadFunctions extends Construct {
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            's3-read-only',
+            's3-read-only2',
             'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            'db-read-only',
+            'db-read-only2',
             'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
           ),
         ],
