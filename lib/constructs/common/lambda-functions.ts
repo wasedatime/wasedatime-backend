@@ -519,15 +519,15 @@ export class ForumThreadFunctions extends Construct {
       },
     );
 
-    const dynamoDBPutRole: iam.LazyRole = new iam.LazyRole(
+    const fullDBAccessRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-put-role',
+      'full-dynamo-s3-access-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
-          'Allow lambda function to perform crud operation on dynamodb',
+          'Allow lambda function to fully access s3 buckets and dynamodb',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-lambda-write-thread',
+        roleName: 's3-dynamodb-lambda-full-access-forums',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -536,8 +536,42 @@ export class ForumThreadFunctions extends Construct {
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            'db-full-access',
+            's3-full-access1',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access1',
             'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+        ],
+      },
+    );
+
+    const readOnlyDBAccessRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'readOnly-dynamo-s3-access-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to read access s3 buckets and dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 's3-dynamodb-lambda-full-access-forums',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec2',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-read-only2',
+            'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-read-only2',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
           ),
         ],
       },
@@ -552,7 +586,7 @@ export class ForumThreadFunctions extends Construct {
         functionName: 'get-all-threads',
         logRetention: logs.RetentionDays.ONE_MONTH,
         memorySize: 128,
-        role: dynamoDBReadRole,
+        role: readOnlyDBAccessRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.seconds(3),
         environment: props.envVars,
@@ -584,7 +618,7 @@ export class ForumThreadFunctions extends Construct {
         functionName: 'get-single-thread',
         logRetention: logs.RetentionDays.ONE_MONTH,
         memorySize: 128,
-        role: dynamoDBPutRole,
+        role: fullDBAccessRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.seconds(3),
         environment: props.envVars,
@@ -597,7 +631,7 @@ export class ForumThreadFunctions extends Construct {
       functionName: 'post-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
-      role: dynamoDBPutRole,
+      role: fullDBAccessRole,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(5),
       environment: props.envVars,
@@ -612,7 +646,7 @@ export class ForumThreadFunctions extends Construct {
       functionName: 'patch-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
-      role: dynamoDBPutRole,
+      role: fullDBAccessRole,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(5),
       environment: props.envVars,
@@ -627,7 +661,7 @@ export class ForumThreadFunctions extends Construct {
       functionName: 'delete-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
-      role: dynamoDBPutRole,
+      role: fullDBAccessRole,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(3),
       environment: props.envVars,
