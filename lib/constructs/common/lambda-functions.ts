@@ -531,7 +531,7 @@ export class ForumThreadFunctions extends Construct {
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            'basic-exec',
+            'basic-exec1',
             'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
@@ -560,7 +560,7 @@ export class ForumThreadFunctions extends Construct {
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            'basic-exec',
+            'basic-exec2',
             'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
