@@ -521,7 +521,7 @@ export class ForumThreadFunctions extends Construct {
 
     const fullDBAccessRole: iam.LazyRole = new iam.LazyRole(
       this,
-      's3-access-role',
+      'full-dynamo-s3-access-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
@@ -550,7 +550,7 @@ export class ForumThreadFunctions extends Construct {
 
     const readOnlyDBAccessRole: iam.LazyRole = new iam.LazyRole(
       this,
-      's3-access-role',
+      'readOnly-dynamo-s3-access-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
