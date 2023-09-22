@@ -9,7 +9,7 @@ def get_user_threads(uid=""):
 
     # Query the GSI
     response = table.query(
-        IndexName='UidbyThreadIDIndex',  # Replace with your actual GSI name
+        IndexName='UidbyThreadIDIndex',
         KeyConditionExpression=Key('uid').eq(uid),
         FilterExpression=Attr('new_comment').eq(True),
         ScanIndexForward=False  # Sorting by thread_id in descending order
