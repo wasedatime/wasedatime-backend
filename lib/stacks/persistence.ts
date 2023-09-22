@@ -49,6 +49,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       this,
       'thread-img-data-pipeline',
     );
+    this.dataPipelines[Worker.THREADIMG] = threadImgDataPipeline;
 
     this.dataInterface.setEndpoint(
       DataEndpoint.COURSE_REVIEWS,
