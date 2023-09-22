@@ -7,7 +7,7 @@ import base64
 
 
 @resp_handler
-def test_post_thread(board_id, thread, uid):
+def test_post_thread(thread, uid):
 
     thread_id = build_thread_id()
 
@@ -30,7 +30,7 @@ def test_post_thread(board_id, thread, uid):
                              Body=image_data, ContentType=content_type)
 
     thread_item = {
-        "board_id": board_id,
+        "board_id": thread["board_id"],
         "created_at": dt_now,
         "updated_at": dt_now,
         "title": thread["title"],
@@ -60,7 +60,7 @@ def handler(event, context):
 
     req = json.loads(event['body'])
     params = {
-        "board_id": event["pathParameters"]["board_id"],
+        # "board_id": event["pathParameters"]["board_id"],
         "thread": req["data"],
         "uid": event['requestContext']['authorizer']['claims']['sub']
     }
