@@ -20,6 +20,7 @@ export enum Worker {
   SYLLABUS,
   CAREER,
   FEEDS,
+  THREADIMG,
 }
 
 export interface DataPipelineProps {

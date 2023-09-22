@@ -7,6 +7,7 @@ import {
   CareerDataPipeline,
   SyllabusDataPipeline,
   SyllabusSyncPipeline,
+  ThreadImgDataPipeline,
   Worker,
 } from '../constructs/persistence/data-pipeline';
 import { Collection, DynamoDatabase } from '../constructs/persistence/database';
@@ -42,6 +43,11 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       {
         dataWarehouse: dynamoDatabase.tables[Collection.CAREER],
       },
+    );
+
+    const threadImgDataPipeline = new ThreadImgDataPipeline(
+      this,
+      'thread-img-data-pipeline',
     );
 
     this.dataInterface.setEndpoint(
