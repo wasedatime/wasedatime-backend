@@ -495,9 +495,9 @@ export class ForumThreadFunctions extends Construct {
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
 
-    const dynamoDBReadRole: iam.LazyRole = new iam.LazyRole(
+    const DBReadRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-read-role',
+      'dynamo-s3-read-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
@@ -515,33 +515,39 @@ export class ForumThreadFunctions extends Construct {
             'db-read-only',
             'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
           ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-read-only',
+            'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
+          ),
         ],
       },
     );
 
-    const dynamoDBPutRole: iam.LazyRole = new iam.LazyRole(
-      this,
-      'dynamo-put-role',
-      {
-        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
-        description:
-          'Allow lambda function to perform crud operation on dynamodb',
-        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-lambda-write-thread',
-        managedPolicies: [
-          iam.ManagedPolicy.fromManagedPolicyArn(
-            this,
-            'basic-exec1',
-            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
-          ),
-          iam.ManagedPolicy.fromManagedPolicyArn(
-            this,
-            'db-full-access',
-            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
-          ),
-        ],
-      },
-    );
+    const DBPutRole: iam.LazyRole = new iam.LazyRole(this, 'dynamo-put-role', {
+      assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+      description:
+        'Allow lambda function to perform crud operation on dynamodb',
+      path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+      roleName: 'dynamodb-s3-put-role',
+      managedPolicies: [
+        iam.ManagedPolicy.fromManagedPolicyArn(
+          this,
+          'basic-exec1',
+          'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+        ),
+        iam.ManagedPolicy.fromManagedPolicyArn(
+          this,
+          'db-full-access',
+          'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+        ),
+        iam.ManagedPolicy.fromManagedPolicyArn(
+          this,
+          's3-full-access',
+          'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+        ),
+      ],
+    });
 
     this.getAllFunction = new lambda_py.PythonFunction(
       this,
@@ -552,9 +558,9 @@ export class ForumThreadFunctions extends Construct {
         functionName: 'get-all-threads',
         logRetention: logs.RetentionDays.ONE_MONTH,
         memorySize: 128,
-        role: dynamoDBReadRole,
+        role: DBReadRole,
         runtime: lambda.Runtime.PYTHON_3_9,
-        timeout: Duration.seconds(3),
+        timeout: Duration.seconds(10),
         environment: props.envVars,
       },
     );
@@ -568,7 +574,7 @@ export class ForumThreadFunctions extends Construct {
         functionName: 'get-user-threads',
         logRetention: logs.RetentionDays.ONE_MONTH,
         memorySize: 128,
-        role: dynamoDBReadRole,
+        role: DBReadRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.seconds(3),
         environment: props.envVars,
@@ -584,7 +590,7 @@ export class ForumThreadFunctions extends Construct {
         functionName: 'get-single-thread',
         logRetention: logs.RetentionDays.ONE_MONTH,
         memorySize: 128,
-        role: dynamoDBPutRole,
+        role: DBPutRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.seconds(3),
         environment: props.envVars,
@@ -597,7 +603,7 @@ export class ForumThreadFunctions extends Construct {
       functionName: 'post-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
-      role: dynamoDBPutRole,
+      role: DBPutRole,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(5),
       environment: props.envVars,
@@ -612,7 +618,7 @@ export class ForumThreadFunctions extends Construct {
       functionName: 'patch-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
-      role: dynamoDBPutRole,
+      role: DBPutRole,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(5),
       environment: props.envVars,
@@ -627,7 +633,7 @@ export class ForumThreadFunctions extends Construct {
       functionName: 'delete-forum-thread',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
-      role: dynamoDBPutRole,
+      role: DBPutRole,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(3),
       environment: props.envVars,
