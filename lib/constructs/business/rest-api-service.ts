@@ -791,6 +791,7 @@ export class ForumThreadsApiService extends RestApiService {
       {
         envVars: {
           TABLE_NAME: props.dataSource!,
+          BUCKET_NAME: 'wasedatime-thread-img',
         },
       },
     );
