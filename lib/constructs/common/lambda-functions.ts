@@ -491,6 +491,7 @@ export class ForumThreadFunctions extends Construct {
   readonly postFunction: lambda.Function;
   readonly patchFunction: lambda.Function;
   readonly deleteFunction: lambda.Function;
+  readonly testPostFunction: lambda.Function;
 
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
@@ -642,6 +643,22 @@ export class ForumThreadFunctions extends Construct {
       timeout: Duration.seconds(3),
       environment: props.envVars,
     });
+
+    this.testPostFunction = new lambda_py.PythonFunction(
+      this,
+      'test-post-thread',
+      {
+        entry: 'src/lambda/test-post-thread',
+        description: 'lambda to test forum functionalities',
+        functionName: 'test-forum-thread',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 128,
+        role: DBPutRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(3),
+        environment: props.envVars,
+      },
+    );
   }
 }
 

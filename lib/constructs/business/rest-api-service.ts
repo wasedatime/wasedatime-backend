@@ -717,6 +717,7 @@ export class ForumThreadsApiService extends RestApiService {
     const boardResource = root.addResource('{board_id}');
     const threadResource = boardResource.addResource('{thread_id}');
     const userResource = root.addResource('user');
+    const testResource = root.addResource('test');
 
     const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -755,6 +756,18 @@ export class ForumThreadsApiService extends RestApiService {
     });
 
     const optionsUserThreads = userResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const optionsTestThreads = testResource.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
       allowMethods: [
@@ -818,6 +831,10 @@ export class ForumThreadsApiService extends RestApiService {
     );
     const deleteIntegration = new apigw.LambdaIntegration(
       forumThreadsFunctions.deleteFunction,
+      { proxy: true },
+    );
+    const testPostIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.testPostFunction,
       { proxy: true },
     );
 
@@ -919,13 +936,28 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
+    const testPostForumThreads = threadResource.addMethod(
+      apigw2.HttpMethod.POST,
+      testPostIntegration,
+      {
+        operationName: 'testThread',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
 
     this.resourceMapping = {
       '/forum': {
         [apigw2.HttpMethod.GET]: getAllForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsForumHome,
       },
-      '/forum/{uid}': {
+      '/forum/user': {
         [apigw2.HttpMethod.GET]: getUserForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsUserThreads,
       },
@@ -938,6 +970,10 @@ export class ForumThreadsApiService extends RestApiService {
         [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
         [apigw2.HttpMethod.PATCH]: patchForumThreads,
         [apigw2.HttpMethod.DELETE]: deleteForumThreads,
+      },
+      '/forum/test': {
+        [apigw2.HttpMethod.POST]: testPostForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsTestThreads,
       },
     };
   }
