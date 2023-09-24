@@ -56,15 +56,15 @@ def get_single_thread(board_id, thread_id, uid=""):
     item['user_liked'] = uid in item.get('likes', [])
     item['total_likes'] = len(item.get('likes', []))
 
-    if "object_key" in item:
+    if "obj_key" in item:
         bucket_name = bucket
-        presigned_url = generate_url(bucket_name, item["object_key"])
+        presigned_url = generate_url(bucket_name, item["obj_key"])
         if presigned_url:
             item["url"] = presigned_url
 
     item.pop('uid', None)
     item.pop('likes', None)
-    item.pop('object_key', None)
+    item.pop('obj_key', None)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(item).add_message('').compile()
