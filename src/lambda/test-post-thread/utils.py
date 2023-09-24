@@ -6,6 +6,7 @@ import os
 from decimal import Decimal
 from datetime import datetime
 import uuid
+from urllib.parse import quote
 
 # AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
@@ -82,3 +83,10 @@ def build_thread_id():
     thread_id = f"{ts}_{unique_id}"
 
     return thread_id
+
+
+def sanitize_title(title):
+    valid_chars = set(
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_- ")
+    sanitized_title = ''.join(c for c in title if c in valid_chars)
+    return quote(sanitized_title)  # URL encode the sanitized title

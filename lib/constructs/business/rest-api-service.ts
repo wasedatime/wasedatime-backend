@@ -936,7 +936,7 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
-    const testPostForumThreads = threadResource.addMethod(
+    const testPostForumThreads = testResource.addMethod(
       apigw2.HttpMethod.POST,
       testPostIntegration,
       {
