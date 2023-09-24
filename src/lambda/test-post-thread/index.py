@@ -17,7 +17,7 @@ def test_post_thread(thread, uid):
 
     object_key = None
     if "image" in thread:
-        image_data = base64.b64decode(thread["image"])
+        image_data = base64.b64decode(thread["image"].split(',')[1])
         content_type = thread.get("contentType", "image/jpeg")
         # Validate the content type
         if content_type not in ["image/jpeg", "image/png", "image/gif"]:
