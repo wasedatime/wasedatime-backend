@@ -837,6 +837,10 @@ export class ForumThreadsApiService extends RestApiService {
       forumThreadsFunctions.testPostFunction,
       { proxy: true },
     );
+    const testGetIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.testGetFunction,
+      { proxy: true },
+    );
 
     const getAllForumThreads = root.addMethod(
       apigw2.HttpMethod.GET,
@@ -940,7 +944,23 @@ export class ForumThreadsApiService extends RestApiService {
       apigw2.HttpMethod.POST,
       testPostIntegration,
       {
-        operationName: 'testThread',
+        operationName: 'testPostThread',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+
+    const testGetForumThreads = testResource.addMethod(
+      apigw2.HttpMethod.GET,
+      testGetIntegration,
+      {
+        operationName: 'testGetThread',
         methodResponses: [
           {
             statusCode: '200',
@@ -973,6 +993,7 @@ export class ForumThreadsApiService extends RestApiService {
       },
       '/forum/test': {
         [apigw2.HttpMethod.POST]: testPostForumThreads,
+        [apigw2.HttpMethod.GET]: testGetForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsTestThreads,
       },
     };

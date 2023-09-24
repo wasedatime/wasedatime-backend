@@ -1,7 +1,7 @@
 from boto3.dynamodb.conditions import Key
 import json
 from datetime import datetime
-from utils import JsonPayloadBuilder, table, resp_handler, build_thread_id, s3_client, bucket
+from utils import JsonPayloadBuilder, table, resp_handler, build_thread_id, s3_client, bucket, sanitize_title
 import uuid
 import base64
 
@@ -24,7 +24,8 @@ def test_post_thread(thread, uid):
             raise ValueError("Invalid content type")
         # Extracts 'jpeg', 'png', or 'gif' from the MIME type
         extension = content_type.split("/")[-1]
-        object_key = f"{thread_id}/image.{extension}"
+        sanitized_title = sanitize_title(thread["title"])
+        object_key = f"{thread_id}/{sanitized_title}.{extension}"
 
         s3_client.put_object(Bucket=bucket, Key=object_key,
                              Body=image_data, ContentType=content_type)
