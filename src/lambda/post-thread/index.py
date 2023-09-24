@@ -1,8 +1,8 @@
 from boto3.dynamodb.conditions import Key
 import json
 from datetime import datetime
-from utils import JsonPayloadBuilder, table, resp_handler, build_thread_id
-import uuid
+from utils import JsonPayloadBuilder, table, resp_handler, build_thread_id, s3_client, bucket, sanitize_title
+import base64
 
 
 @resp_handler
@@ -14,8 +14,23 @@ def post_thread(board_id, thread, uid):
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
+    object_key = None
+    if "image" in thread:
+        image_data = base64.b64decode(thread["image"].split(',')[1])
+        content_type = thread.get("contentType", "image/jpeg")
+        # Validate the content type
+        if content_type not in ["image/jpeg", "image/png", "image/gif"]:
+            raise ValueError("Invalid content type")
+        # Extracts 'jpeg', 'png', or 'gif' from the MIME type
+        extension = content_type.split("/")[-1]
+        sanitized_title = sanitize_title(thread["title"])
+        object_key = f"{thread_id}/{sanitized_title}.{extension}"
+
+        s3_client.put_object(Bucket=bucket, Key=object_key,
+                             Body=image_data, ContentType=content_type)
+
     thread_item = {
-        "board_id": board_id,
+        "board_id": thread["board_id"],
         "created_at": dt_now,
         "updated_at": dt_now,
         "title": thread["title"],
@@ -27,7 +42,8 @@ def post_thread(board_id, thread, uid):
         "univ_id": thread["univ_id"],
         "views": 0,
         "comment_count": 0,
-        "new_comment": False
+        "new_comment": False,
+        "obj_key": object_key,
     }
 
     table.put_item(Item=thread_item)
