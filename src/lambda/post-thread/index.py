@@ -30,7 +30,7 @@ def post_thread(board_id, thread, uid):
                              Body=image_data, ContentType=content_type)
 
     thread_item = {
-        "board_id": thread["board_id"],
+        "board_id": board_id,
         "created_at": dt_now,
         "updated_at": dt_now,
         "title": thread["title"],
