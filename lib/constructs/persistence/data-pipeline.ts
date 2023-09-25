@@ -209,11 +209,11 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
 
     // Initialize S3 bucket for storing thread images
     this.dataSource = new s3.Bucket(this, 'thread-img-bucket', {
-      accessControl: s3.BucketAccessControl.PRIVATE,
+      accessControl: s3.BucketAccessControl.PUBLIC_READ,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       bucketName: 'wasedatime-thread-img',
       encryption: s3.BucketEncryption.S3_MANAGED,
-      publicReadAccess: false,
+      publicReadAccess: true,
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: true,
     });
