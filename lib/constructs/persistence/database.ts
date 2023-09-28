@@ -138,6 +138,22 @@ export class DynamoDatabase extends Construct {
         pointInTimeRecovery: true,
       },
     );
+
+    this.tables[Collection.ADS] = new dynamodb.Table(
+      this,
+      'dynamodb-ads-table',
+      {
+        partitionKey: { name: 'board_id', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'ad_id', type: dynamodb.AttributeType.STRING },
+        billingMode: dynamodb.BillingMode.PROVISIONED,
+        encryption: dynamodb.TableEncryption.DEFAULT,
+        removalPolicy: RemovalPolicy.RETAIN,
+        timeToLiveAttribute: 'ttl',
+        tableName: 'waseda-abs-count',
+        readCapacity: 1,
+        writeCapacity: 1,
+      },
+    );
   }
 }
 //comment to prevent empty thread

@@ -227,7 +227,7 @@ export class AdsDataPipeline extends AbstractDataPipeline {
   readonly processor: lambda.Function;
   readonly dataWarehouse: dynamodb.Table;
 
-  constructor(scope: Construct, id: string, props?: DataPipelineProps) {
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
     super(scope, id);
 
     this.dataSource = new s3.Bucket(this, 'ads-bucket', {
@@ -241,18 +241,6 @@ export class AdsDataPipeline extends AbstractDataPipeline {
       versioned: false,
     });
 
-    this.dataWarehouse = new dynamodb.Table(this, 'dynamodb-ads-table', {
-      partitionKey: { name: 'school', type: dynamodb.AttributeType.STRING }, // Not sure what key to use
-      sortKey: { name: 'id', type: dynamodb.AttributeType.STRING }, // Same not sure what key to use
-      billingMode: dynamodb.BillingMode.PROVISIONED,
-      encryption: dynamodb.TableEncryption.DEFAULT,
-      removalPolicy: RemovalPolicy.RETAIN,
-      timeToLiveAttribute: 'ttl',
-      tableName: 'waseda-abs-count',
-      readCapacity: 1,
-      writeCapacity: 1,
-    });
-
-    // Maybe we need a lambda to use the data
+    this.dataWarehouse = props.dataWarehouse!;
   }
 }
