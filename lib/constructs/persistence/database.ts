@@ -10,6 +10,7 @@ export enum Collection {
   TIMETABLE,
   THREAD,
   COMMENT,
+  ADS, //! New ADS value
 }
 
 export class DynamoDatabase extends Construct {

@@ -21,6 +21,7 @@ export enum Worker {
   CAREER,
   FEEDS,
   THREADIMG,
+  ADS, //! New ADS value
 }
 
 export interface DataPipelineProps {
@@ -217,5 +218,41 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: true,
     });
+  }
+}
+
+//! New pipeline for ads
+export class AdsDataPipeline extends AbstractDataPipeline {
+  readonly dataSource?: s3.Bucket;
+  readonly processor: lambda.Function;
+  readonly dataWarehouse: dynamodb.Table;
+
+  constructor(scope: Construct, id: string, props?: DataPipelineProps) {
+    super(scope, id);
+
+    this.dataSource = new s3.Bucket(this, 'ads-bucket', {
+      accessControl: s3.BucketAccessControl.PRIVATE,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      bucketName: 'wasedatime-ads',
+      cors: prodCorsRule,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      publicReadAccess: false,
+      removalPolicy: RemovalPolicy.RETAIN,
+      versioned: false,
+    });
+
+    this.dataWarehouse = new dynamodb.Table(this, 'dynamodb-ads-table', {
+      partitionKey: { name: 'school', type: dynamodb.AttributeType.STRING }, // Not sure what key to use
+      sortKey: { name: 'id', type: dynamodb.AttributeType.STRING }, // Same not sure what key to use
+      billingMode: dynamodb.BillingMode.PROVISIONED,
+      encryption: dynamodb.TableEncryption.DEFAULT,
+      removalPolicy: RemovalPolicy.RETAIN,
+      timeToLiveAttribute: 'ttl',
+      tableName: 'waseda-abs-count',
+      readCapacity: 1,
+      writeCapacity: 1,
+    });
+
+    // Maybe we need a lambda to use the data
   }
 }
