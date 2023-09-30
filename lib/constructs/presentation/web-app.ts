@@ -185,9 +185,14 @@ export class AmplifyMonoWebApp extends AbstractWebApp {
         status: amplify.RedirectStatus.REWRITE,
       }),
     );
-    this.app.addEnvironment(
+    this.branches.dev.addEnvironment(
       `VITE_MF_${name.toUpperCase()}_BASE_PATH`,
       `https://develop.${appDomain}`,
+    );
+
+    this.branches.main.addEnvironment(
+      `VITE_MF_${name.toUpperCase()}_BASE_PATH`,
+      `https://wasedatime.com/${name}`,
     );
   }
 }
