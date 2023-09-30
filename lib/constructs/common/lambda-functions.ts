@@ -794,7 +794,7 @@ export class ForumCommentFunctions extends Construct {
 
 export class ImageProcessFunctions extends Construct {
   // readonly getFunction: lambda.Function;
-  readonly postFunction: lambda.Function;
+  readonly syncImageFunction: lambda.Function;
   readonly resizeImageFunction: lambda.Function;
   // readonly deleteFunction: lambda.Function;
 
@@ -859,11 +859,11 @@ export class ImageProcessFunctions extends Construct {
       },
     );
 
-    this.postFunction = new lambda_py.PythonFunction(this, 'post-image', {
-      entry: 'src/lambda/post-image',
+    this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-image', {
+      entry: 'src/lambda/sync-image',
       description:
         'post image to dyanamo db database when image inputed in s3 bucket',
-      functionName: 'post-image',
+      functionName: 'sync-image',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
       role: DBPutRole,
