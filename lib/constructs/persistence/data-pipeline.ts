@@ -15,7 +15,8 @@ import { allowApiGatewayPolicy, allowLambdaPolicy } from '../../utils/s3';
 import {
   SyllabusScraper,
   SyllabusUpdateFunction,
-  ImageProcessFunctions,
+  ThreadImageProcessFunctions,
+  AdsImageProcessFunctions,
 } from '../common/lambda-functions';
 
 export enum Worker {
@@ -242,13 +243,17 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
     });
     this.dataWarehouse.addToResourcePolicy(publicReadStatement);
 
-    this.processor = new ImageProcessFunctions(this, 'image-process-func', {
-      envVars: {
-        INPUT_BUCKET: this.dataSource.bucketName,
-        OUTPUT_BUCKET: this.dataWarehouse.bucketName,
-        TABLE_NAME: 'wasedatime-thread-img',
+    this.processor = new ThreadImageProcessFunctions(
+      this,
+      'image-process-func',
+      {
+        envVars: {
+          INPUT_BUCKET: this.dataSource.bucketName,
+          OUTPUT_BUCKET: this.dataWarehouse.bucketName,
+          TABLE_NAME: 'wasedatime-thread-img',
+        },
       },
-    }).resizeImageFunction;
+    ).resizeImageFunction;
 
     const supportedExtensions = ['jpeg', 'png', 'gif', 'jpg'];
 
@@ -285,7 +290,7 @@ export class AdsDataPipeline extends AbstractDataPipeline {
 
     this.dataWarehouse = props.dataWarehouse!;
 
-    this.processor = new ImageProcessFunctions(this, 'image-process-func', {
+    this.processor = new AdsImageProcessFunctions(this, 'image-process-func', {
       envVars: {
         ['BUCKET_NAME']: this.dataSource.bucketName,
         ['TABLE_NAME']: this.dataWarehouse.tableName,
