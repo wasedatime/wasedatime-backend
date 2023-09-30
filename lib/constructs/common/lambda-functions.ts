@@ -832,13 +832,13 @@ export class ThreadImageProcessFunctions extends Construct {
 
     const DBSyncRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-s3-sync-role',
+      'dynamo-s3-thread-sync-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
           'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-sync-role',
+        roleName: 'dynamodb-s3-thread-sync-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -859,18 +859,18 @@ export class ThreadImageProcessFunctions extends Construct {
       },
     );
 
-    this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-image', {
-      entry: 'src/lambda/sync-image',
-      description:
-        'post image to dyanamo db database when image inputed in s3 bucket',
-      functionName: 'sync-image',
-      logRetention: logs.RetentionDays.ONE_MONTH,
-      memorySize: 256,
-      role: DBSyncRole,
-      runtime: lambda.Runtime.PYTHON_3_9,
-      timeout: Duration.seconds(5),
-      environment: props.envVars,
-    });
+    // this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-image', {
+    //   entry: 'src/lambda/sync-image',
+    //   description:
+    //     'post image to dyanamo db database when image inputed in s3 bucket',
+    //   functionName: 'sync-image',
+    //   logRetention: logs.RetentionDays.ONE_MONTH,
+    //   memorySize: 256,
+    //   role: DBSyncRole,
+    //   runtime: lambda.Runtime.PYTHON_3_9,
+    //   timeout: Duration.seconds(5),
+    //   environment: props.envVars,
+    // });
 
     this.resizeImageFunction = new lambda_py.PythonFunction(
       this,
@@ -955,13 +955,13 @@ export class AdsImageProcessFunctions extends Construct {
 
     const DBSyncRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-s3-sync-role',
+      'dynamo-s3-ads-sync-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
           'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-sync-role',
+        roleName: 'dynamodb-s3-ads-sync-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -995,22 +995,22 @@ export class AdsImageProcessFunctions extends Construct {
       environment: props.envVars,
     });
 
-    this.resizeImageFunction = new lambda_py.PythonFunction(
-      this,
-      'resize-image',
-      {
-        entry: 'src/lambda/resize-image',
-        description:
-          'Resize uploaded image to a thumbnail and store in s3 bucket',
-        functionName: 'patch-image',
-        logRetention: logs.RetentionDays.ONE_MONTH,
-        memorySize: 256,
-        role: DBSyncRole,
-        runtime: lambda.Runtime.PYTHON_3_9,
-        timeout: Duration.seconds(5),
-        environment: props.envVars,
-      },
-    );
+    // this.resizeImageFunction = new lambda_py.PythonFunction(
+    //   this,
+    //   "resize-image",
+    //   {
+    //     entry: "src/lambda/resize-image",
+    //     description:
+    //       "Resize uploaded image to a thumbnail and store in s3 bucket",
+    //     functionName: "patch-image",
+    //     logRetention: logs.RetentionDays.ONE_MONTH,
+    //     memorySize: 256,
+    //     role: DBSyncRole,
+    //     runtime: lambda.Runtime.PYTHON_3_9,
+    //     timeout: Duration.seconds(5),
+    //     environment: props.envVars,
+    //   }
+    // );
 
     // this.getFunction = new lambda_py.PythonFunction(this, "get-comment", {
     //   entry: "src/lambda/get-comments",

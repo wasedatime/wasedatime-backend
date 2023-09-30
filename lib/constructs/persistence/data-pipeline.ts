@@ -225,7 +225,7 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
     this.dataWarehouse = new s3.Bucket(this, 'thumbnail-img-warehouse', {
       bucketName: 'wasedatime-thumbnail-img',
       encryption: s3.BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy: RemovalPolicy.DESTROY,
       versioned: false,
       blockPublicAccess: new s3.BlockPublicAccess({
         blockPublicAcls: true,
@@ -284,7 +284,7 @@ export class AdsDataPipeline extends AbstractDataPipeline {
       cors: prodCorsRule,
       encryption: s3.BucketEncryption.S3_MANAGED,
       publicReadAccess: false,
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy: RemovalPolicy.DESTROY,
       versioned: false,
     });
 
