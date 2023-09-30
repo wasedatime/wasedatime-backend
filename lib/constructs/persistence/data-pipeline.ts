@@ -222,49 +222,49 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       versioned: false,
     });
 
-    this.dataWarehouse = new s3.Bucket(this, 'thumbnail-img-warehouse', {
-      bucketName: 'wasedatime-thumbnail-img',
-      encryption: s3.BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.DESTROY,
-      versioned: false,
-      blockPublicAccess: new s3.BlockPublicAccess({
-        blockPublicAcls: true,
-        blockPublicPolicy: false,
-        ignorePublicAcls: true,
-        restrictPublicBuckets: false,
-      }),
-    });
+    // this.dataWarehouse = new s3.Bucket(this, "thumbnail-img-warehouse", {
+    //   bucketName: "wasedatime-thumbnail-img",
+    //   encryption: s3.BucketEncryption.S3_MANAGED,
+    //   removalPolicy: RemovalPolicy.DESTROY,
+    //   versioned: false,
+    //   blockPublicAccess: new s3.BlockPublicAccess({
+    //     blockPublicAcls: true,
+    //     blockPublicPolicy: false,
+    //     ignorePublicAcls: true,
+    //     restrictPublicBuckets: false,
+    //   }),
+    // });
 
-    const publicReadStatement = new iam.PolicyStatement({
-      actions: ['s3:GetObject'],
-      resources: [`${this.dataWarehouse.bucketArn}/*`],
-      effect: iam.Effect.ALLOW,
-      principals: [new iam.ArnPrincipal('*')],
-    });
-    this.dataWarehouse.addToResourcePolicy(publicReadStatement);
+    // const publicReadStatement = new iam.PolicyStatement({
+    //   actions: ["s3:GetObject"],
+    //   resources: [`${this.dataWarehouse.bucketArn}/*`],
+    //   effect: iam.Effect.ALLOW,
+    //   principals: [new iam.ArnPrincipal("*")],
+    // });
+    // this.dataWarehouse.addToResourcePolicy(publicReadStatement);
 
-    this.processor = new ThreadImageProcessFunctions(
-      this,
-      'image-process-func',
-      {
-        envVars: {
-          INPUT_BUCKET: this.dataSource.bucketName,
-          OUTPUT_BUCKET: this.dataWarehouse.bucketName,
-          TABLE_NAME: 'wasedatime-thread-img',
-        },
-      },
-    ).resizeImageFunction;
+    // this.processor = new ThreadImageProcessFunctions(
+    //   this,
+    //   'image-process-func',
+    //   {
+    //     envVars: {
+    //       INPUT_BUCKET: this.dataSource.bucketName,
+    //       OUTPUT_BUCKET: this.dataWarehouse.bucketName,
+    //       TABLE_NAME: 'wasedatime-thread-img',
+    //     },
+    //   },
+    // ).resizeImageFunction;
 
-    const supportedExtensions = ['jpeg', 'png', 'gif', 'jpg'];
+    // const supportedExtensions = ['jpeg', 'png', 'gif', 'jpg'];
 
-    for (const ext of supportedExtensions) {
-      this.processor.addEventSource(
-        new event_sources.S3EventSource(this.dataSource, {
-          events: [s3.EventType.OBJECT_CREATED_PUT],
-          filters: [{ prefix: `/image.${ext}` }],
-        }),
-      );
-    }
+    // for (const ext of supportedExtensions) {
+    //   this.processor.addEventSource(
+    //     new event_sources.S3EventSource(this.dataSource, {
+    //       events: [s3.EventType.OBJECT_CREATED_PUT],
+    //       filters: [{ prefix: `/image.${ext}` }],
+    //     }),
+    //   );
+    // }
   }
 }
 
@@ -277,32 +277,32 @@ export class AdsDataPipeline extends AbstractDataPipeline {
   constructor(scope: Construct, id: string, props: DataPipelineProps) {
     super(scope, id);
 
-    this.dataSource = new s3.Bucket(this, 'ads-bucket', {
-      accessControl: s3.BucketAccessControl.PRIVATE,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      bucketName: 'wasedatime-ads',
-      cors: prodCorsRule,
-      encryption: s3.BucketEncryption.S3_MANAGED,
-      publicReadAccess: false,
-      removalPolicy: RemovalPolicy.DESTROY,
-      versioned: false,
-    });
+    // this.dataSource = new s3.Bucket(this, "ads-bucket", {
+    //   accessControl: s3.BucketAccessControl.PRIVATE,
+    //   blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+    //   bucketName: "wasedatime-ads",
+    //   cors: prodCorsRule,
+    //   encryption: s3.BucketEncryption.S3_MANAGED,
+    //   publicReadAccess: false,
+    //   removalPolicy: RemovalPolicy.DESTROY,
+    //   versioned: false,
+    // });
 
     this.dataWarehouse = props.dataWarehouse!;
 
-    this.processor = new AdsImageProcessFunctions(this, 'image-process-func', {
-      envVars: {
-        ['BUCKET_NAME']: this.dataSource.bucketName,
-        ['TABLE_NAME']: this.dataWarehouse.tableName,
-        ['OBJECT_PATH']: 'syllabus/',
-      },
-    }).syncImageFunction;
+    // this.processor = new AdsImageProcessFunctions(this, "image-process-func", {
+    //   envVars: {
+    //     ["BUCKET_NAME"]: this.dataSource.bucketName,
+    //     ["TABLE_NAME"]: this.dataWarehouse.tableName,
+    //     ["OBJECT_PATH"]: "syllabus/",
+    //   },
+    // }).syncImageFunction;
 
-    this.processor.addEventSource(
-      new event_sources.S3EventSource(this.dataSource, {
-        events: [s3.EventType.OBJECT_CREATED_PUT],
-        filters: [{ prefix: 'syllabus/' }],
-      }),
-    );
+    // this.processor.addEventSource(
+    //   new event_sources.S3EventSource(this.dataSource, {
+    //     events: [s3.EventType.OBJECT_CREATED_PUT],
+    //     filters: [{ prefix: "syllabus/" }],
+    //   })
+    // );
   }
 }
