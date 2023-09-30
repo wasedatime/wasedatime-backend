@@ -226,7 +226,12 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: false,
       publicReadAccess: true,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      blockPublicAccess: new s3.BlockPublicAccess({
+        blockPublicAcls: true,
+        blockPublicPolicy: true,
+        ignorePublicAcls: true,
+        restrictPublicBuckets: false,
+      }),
     });
 
     this.processor = new ImageProcessFunctions(this, 'image-process-func', {
