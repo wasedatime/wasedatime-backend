@@ -166,7 +166,7 @@ export class SyllabusScraper extends Construct {
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 4096,
       runtime: lambda.Runtime.PYTHON_3_9,
-      timeout: Duration.seconds(210),
+      timeout: Duration.seconds(300),
       environment: props.envVars,
       role: s3AccessRole,
     });
@@ -789,5 +789,128 @@ export class ForumCommentFunctions extends Construct {
       timeout: Duration.seconds(3),
       environment: props.envVars,
     });
+  }
+}
+
+export class ImageProcessFunctions extends Construct {
+  // readonly getFunction: lambda.Function;
+  readonly syncImageFunction: lambda.Function;
+  readonly resizeImageFunction: lambda.Function;
+  // readonly deleteFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const DBReadRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-s3-read-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform read operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-lambda-read-thread',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-read-only',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-read-only',
+            'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
+          ),
+        ],
+      },
+    );
+
+    const DBPutRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-s3-put-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-put-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+
+    this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-image', {
+      entry: 'src/lambda/sync-image',
+      description:
+        'post image to dyanamo db database when image inputed in s3 bucket',
+      functionName: 'sync-image',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: DBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    });
+
+    this.resizeImageFunction = new lambda_py.PythonFunction(
+      this,
+      'resize-image',
+      {
+        entry: 'src/lambda/resize-image',
+        description:
+          'Resize uploaded image to a thumbnail and store in s3 bucket',
+        functionName: 'patch-image',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 256,
+        role: DBPutRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(5),
+        environment: props.envVars,
+      },
+    );
+
+    // this.getFunction = new lambda_py.PythonFunction(this, "get-comment", {
+    //   entry: "src/lambda/get-comments",
+    //   description: "get forum comments from the database.",
+    //   functionName: "get-forum-comments",
+    //   logRetention: logs.RetentionDays.ONE_MONTH,
+    //   memorySize: 128,
+    //   role: DBReadRole,
+    //   runtime: lambda.Runtime.PYTHON_3_9,
+    //   timeout: Duration.seconds(3),
+    //   environment: props.envVars,
+    // });
+
+    // this.deleteFunction = new lambda_py.PythonFunction(this, "delete-comment", {
+    //   entry: "src/lambda/delete-comment",
+    //   description: "Delete forum comment in the database.",
+    //   functionName: "delete-forum-comment",
+    //   logRetention: logs.RetentionDays.ONE_MONTH,
+    //   memorySize: 128,
+    //   role: DBPutRole,
+    //   runtime: lambda.Runtime.PYTHON_3_9,
+    //   timeout: Duration.seconds(3),
+    //   environment: props.envVars,
+    // });
   }
 }

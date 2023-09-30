@@ -14,6 +14,7 @@ import { allowApiGatewayPolicy, allowLambdaPolicy } from '../../utils/s3';
 import {
   SyllabusScraper,
   SyllabusUpdateFunction,
+  ImageProcessFunctions,
 } from '../common/lambda-functions';
 
 export enum Worker {
@@ -21,6 +22,7 @@ export enum Worker {
   CAREER,
   FEEDS,
   THREADIMG,
+  ADS, //! New ADS value
 }
 
 export interface DataPipelineProps {
@@ -209,13 +211,81 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
 
     // Initialize S3 bucket for storing thread images
     this.dataSource = new s3.Bucket(this, 'thread-img-bucket', {
-      accessControl: s3.BucketAccessControl.PUBLIC_READ,
-      // blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      accessControl: s3.BucketAccessControl.PRIVATE,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       bucketName: 'wasedatime-thread-img',
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      publicReadAccess: false,
+      removalPolicy: RemovalPolicy.RETAIN,
+      versioned: false,
+    });
+
+    this.dataWarehouse = new s3.Bucket(this, 'thumbnail-img-warehouse', {
+      accessControl: s3.BucketAccessControl.PUBLIC_READ,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
+      bucketName: 'wasedatime-thumbnail-img',
       encryption: s3.BucketEncryption.S3_MANAGED,
       publicReadAccess: true,
       removalPolicy: RemovalPolicy.RETAIN,
-      versioned: true,
+      versioned: false,
     });
+
+    this.processor = new ImageProcessFunctions(this, 'image-process-func', {
+      envVars: {
+        INPUT_BUCKET: this.dataSource.bucketName,
+        OUTPUT_BUCKET: this.dataWarehouse.bucketName,
+        TABLE_NAME: 'wasedatime-thread-img',
+      },
+    }).resizeImageFunction;
+
+    const supportedExtensions = ['jpeg', 'png', 'gif', 'jpg'];
+
+    for (const ext of supportedExtensions) {
+      this.processor.addEventSource(
+        new event_sources.S3EventSource(this.dataSource, {
+          events: [s3.EventType.OBJECT_CREATED_PUT],
+          filters: [{ prefix: `/image.${ext}` }],
+        }),
+      );
+    }
+  }
+}
+
+//! New pipeline for ads
+export class AdsDataPipeline extends AbstractDataPipeline {
+  readonly dataSource?: s3.Bucket;
+  readonly processor: lambda.Function;
+  readonly dataWarehouse: dynamodb.Table;
+
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
+    super(scope, id);
+
+    this.dataSource = new s3.Bucket(this, 'ads-bucket', {
+      accessControl: s3.BucketAccessControl.PRIVATE,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      bucketName: 'wasedatime-ads',
+      cors: prodCorsRule,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      publicReadAccess: false,
+      removalPolicy: RemovalPolicy.RETAIN,
+      versioned: false,
+    });
+
+    this.dataWarehouse = props.dataWarehouse!;
+
+    this.processor = new ImageProcessFunctions(this, 'image-process-func', {
+      envVars: {
+        ['BUCKET_NAME']: this.dataSource.bucketName,
+        ['TABLE_NAME']: this.dataWarehouse.tableName,
+        ['OBJECT_PATH']: 'syllabus/',
+      },
+    }).syncImageFunction;
+
+    this.processor.addEventSource(
+      new event_sources.S3EventSource(this.dataSource, {
+        events: [s3.EventType.OBJECT_CREATED_PUT],
+        filters: [{ prefix: 'syllabus/' }],
+      }),
+    );
   }
 }
