@@ -830,15 +830,15 @@ export class ImageProcessFunctions extends Construct {
       },
     );
 
-    const DBPutRole: iam.LazyRole = new iam.LazyRole(
+    const DBSyncRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-s3-put-role',
+      'dynamo-s3-sync-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
           'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-put-role',
+        roleName: 'dynamodb-s3-sync-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -866,7 +866,7 @@ export class ImageProcessFunctions extends Construct {
       functionName: 'sync-image',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
-      role: DBPutRole,
+      role: DBSyncRole,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(5),
       environment: props.envVars,
@@ -882,7 +882,7 @@ export class ImageProcessFunctions extends Construct {
         functionName: 'patch-image',
         logRetention: logs.RetentionDays.ONE_MONTH,
         memorySize: 256,
-        role: DBPutRole,
+        role: DBSyncRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.seconds(5),
         environment: props.envVars,
