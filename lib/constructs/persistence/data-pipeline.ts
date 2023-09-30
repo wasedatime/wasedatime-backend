@@ -261,7 +261,7 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       this.processor.addEventSource(
         new event_sources.S3EventSource(this.dataSource, {
           events: [s3.EventType.OBJECT_CREATED_PUT],
-          filters: [{ prefix: `image.${ext}` }],
+          filters: [{ prefix: `*/*/image.${ext}` }],
         }),
       );
     }
