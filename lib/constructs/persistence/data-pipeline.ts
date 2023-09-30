@@ -250,7 +250,7 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
         envVars: {
           INPUT_BUCKET: this.dataSource.bucketName,
           OUTPUT_BUCKET: this.dataWarehouse.bucketName,
-          TABLE_NAME: 'wasedatime-thread-img',
+          TABLE_NAME: 'forum-threads',
         },
       },
     ).resizeImageFunction;
@@ -261,7 +261,7 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       this.processor.addEventSource(
         new event_sources.S3EventSource(this.dataSource, {
           events: [s3.EventType.OBJECT_CREATED_PUT],
-          filters: [{ prefix: `/image.${ext}` }],
+          filters: [{ prefix: `image.${ext}` }],
         }),
       );
     }
