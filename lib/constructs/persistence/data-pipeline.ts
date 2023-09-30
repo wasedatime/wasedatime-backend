@@ -2,6 +2,7 @@ import { RemovalPolicy } from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as events_targets from 'aws-cdk-lib/aws-events-targets';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as event_sources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as s3 from 'aws-cdk-lib/aws-s3';
@@ -225,14 +226,21 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: false,
-      publicReadAccess: true,
       blockPublicAccess: new s3.BlockPublicAccess({
         blockPublicAcls: true,
-        blockPublicPolicy: true,
+        blockPublicPolicy: false,
         ignorePublicAcls: true,
         restrictPublicBuckets: false,
       }),
     });
+
+    const publicReadStatement = new iam.PolicyStatement({
+      actions: ['s3:GetObject'],
+      resources: [`${this.dataWarehouse.bucketArn}/*`],
+      effect: iam.Effect.ALLOW,
+      principals: [new iam.ArnPrincipal('*')],
+    });
+    this.dataWarehouse.addToResourcePolicy(publicReadStatement);
 
     this.processor = new ImageProcessFunctions(this, 'image-process-func', {
       envVars: {
