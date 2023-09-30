@@ -243,28 +243,28 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
     });
     this.dataWarehouse.addToResourcePolicy(publicReadStatement);
 
-    // this.processor = new ThreadImageProcessFunctions(
-    //   this,
-    //   'image-process-func',
-    //   {
-    //     envVars: {
-    //       INPUT_BUCKET: this.dataSource.bucketName,
-    //       OUTPUT_BUCKET: this.dataWarehouse.bucketName,
-    //       TABLE_NAME: 'wasedatime-thread-img',
-    //     },
-    //   },
-    // ).resizeImageFunction;
+    this.processor = new ThreadImageProcessFunctions(
+      this,
+      'image-process-func',
+      {
+        envVars: {
+          INPUT_BUCKET: this.dataSource.bucketName,
+          OUTPUT_BUCKET: this.dataWarehouse.bucketName,
+          TABLE_NAME: 'wasedatime-thread-img',
+        },
+      },
+    ).resizeImageFunction;
 
-    // const supportedExtensions = ['jpeg', 'png', 'gif', 'jpg'];
+    const supportedExtensions = ['jpeg', 'png', 'gif', 'jpg'];
 
-    // for (const ext of supportedExtensions) {
-    //   this.processor.addEventSource(
-    //     new event_sources.S3EventSource(this.dataSource, {
-    //       events: [s3.EventType.OBJECT_CREATED_PUT],
-    //       filters: [{ prefix: `/image.${ext}` }],
-    //     }),
-    //   );
-    // }
+    for (const ext of supportedExtensions) {
+      this.processor.addEventSource(
+        new event_sources.S3EventSource(this.dataSource, {
+          events: [s3.EventType.OBJECT_CREATED_PUT],
+          filters: [{ prefix: `/image.${ext}` }],
+        }),
+      );
+    }
   }
 }
 
