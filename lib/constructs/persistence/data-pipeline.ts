@@ -221,13 +221,12 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
     });
 
     this.dataWarehouse = new s3.Bucket(this, 'thumbnail-img-warehouse', {
-      accessControl: s3.BucketAccessControl.PUBLIC_READ,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
       bucketName: 'wasedatime-thumbnail-img',
       encryption: s3.BucketEncryption.S3_MANAGED,
-      publicReadAccess: true,
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: false,
+      publicReadAccess: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
 
     this.processor = new ImageProcessFunctions(this, 'image-process-func', {
