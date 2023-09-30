@@ -279,7 +279,7 @@ export class AdsDataPipeline extends AbstractDataPipeline {
         ['TABLE_NAME']: this.dataWarehouse.tableName,
         ['OBJECT_PATH']: 'syllabus/',
       },
-    }).postFunction;
+    }).syncImageFunction;
 
     this.processor.addEventSource(
       new event_sources.S3EventSource(this.dataSource, {
