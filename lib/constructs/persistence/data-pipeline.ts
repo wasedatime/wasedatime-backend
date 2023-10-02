@@ -221,6 +221,8 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: false,
     });
+    allowApiGatewayPolicy(this.dataWarehouse);
+    allowLambdaPolicy(this.dataWarehouse);
 
     this.dataWarehouse = new s3.Bucket(this, 'thumbnail-img-warehouse', {
       bucketName: 'wasedatime-thumbnail-img',
@@ -242,6 +244,9 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       principals: [new iam.ArnPrincipal('*')],
     });
     this.dataWarehouse.addToResourcePolicy(publicReadStatement);
+
+    allowApiGatewayPolicy(this.dataWarehouse);
+    allowLambdaPolicy(this.dataWarehouse);
 
     this.processor = new ThreadImageProcessFunctions(
       this,
