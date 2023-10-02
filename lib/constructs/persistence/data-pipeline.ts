@@ -255,16 +255,11 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
       },
     ).resizeImageFunction;
 
-    const supportedExtensions = ['jpeg', 'png', 'gif', 'jpg'];
-
-    for (const ext of supportedExtensions) {
-      this.processor.addEventSource(
-        new event_sources.S3EventSource(this.dataSource, {
-          events: [s3.EventType.OBJECT_CREATED_PUT],
-          filters: [{ prefix: `*/*/image.${ext}` }],
-        }),
-      );
-    }
+    this.processor.addEventSource(
+      new event_sources.S3EventSource(this.dataSource, {
+        events: [s3.EventType.OBJECT_CREATED],
+      }),
+    );
   }
 }
 
