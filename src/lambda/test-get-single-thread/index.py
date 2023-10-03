@@ -73,8 +73,8 @@ def get_single_thread(board_id, thread_id, uid=""):
 
 def handler(event, context):
     params = {
-        "board_id": event["pathParameters"]["board_id"],
-        "thread_id": event["pathParameters"]["thread_id"],
+        "board_id": event["queryStringParameters"]["board_id"],
+        "thread_id": event["queryStringParameters"]["thread_id"],
     }
     if "uid" in event["queryStringParameters"]:
         params["uid"] = event["queryStringParameters"]["uid"]

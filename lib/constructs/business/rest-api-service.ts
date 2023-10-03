@@ -717,6 +717,7 @@ export class ForumThreadsApiService extends RestApiService {
     const boardResource = root.addResource('{board_id}');
     const threadResource = boardResource.addResource('{thread_id}');
     const userResource = root.addResource('user');
+    const testResource = root.addResource('test');
 
     const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -766,6 +767,18 @@ export class ForumThreadsApiService extends RestApiService {
       ],
     });
 
+    const optionsTestThreads = testResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
     const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
       schema: forumThreadGetRespSchema,
       contentType: 'application/json',
@@ -791,6 +804,7 @@ export class ForumThreadsApiService extends RestApiService {
       {
         envVars: {
           TABLE_NAME: props.dataSource!,
+          BUCKET_NAME: 'wasedatime-thread-img',
         },
       },
     );
@@ -817,6 +831,14 @@ export class ForumThreadsApiService extends RestApiService {
     );
     const deleteIntegration = new apigw.LambdaIntegration(
       forumThreadsFunctions.deleteFunction,
+      { proxy: true },
+    );
+    const testPostIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.testPostFunction,
+      { proxy: true },
+    );
+    const testGetIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.testGetFunction,
       { proxy: true },
     );
 
@@ -918,13 +940,44 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
+    const testPostForumThreads = testResource.addMethod(
+      apigw2.HttpMethod.POST,
+      testPostIntegration,
+      {
+        operationName: 'testPostThread',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+
+    const testGetForumThreads = testResource.addMethod(
+      apigw2.HttpMethod.GET,
+      testGetIntegration,
+      {
+        operationName: 'testGetThread',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
 
     this.resourceMapping = {
       '/forum': {
         [apigw2.HttpMethod.GET]: getAllForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsForumHome,
       },
-      '/forum/{uid}': {
+      '/forum/user': {
         [apigw2.HttpMethod.GET]: getUserForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsUserThreads,
       },
@@ -937,6 +990,11 @@ export class ForumThreadsApiService extends RestApiService {
         [apigw2.HttpMethod.OPTIONS]: optionsForumThreads,
         [apigw2.HttpMethod.PATCH]: patchForumThreads,
         [apigw2.HttpMethod.DELETE]: deleteForumThreads,
+      },
+      '/forum/test': {
+        [apigw2.HttpMethod.POST]: testPostForumThreads,
+        [apigw2.HttpMethod.GET]: testGetForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsTestThreads,
       },
     };
   }

@@ -15,7 +15,12 @@ import { API_DOMAIN } from '../../configs/route53/domain';
 import { GraphqlApiService } from './graphql-api-service';
 import { AbstractHttpApiService } from './http-api-service';
 import { RestApiService } from './rest-api-service';
-import { GraphqlApiServiceId, graphqlApiServiceMap, RestApiServiceId, restApiServiceMap } from './service';
+import {
+  GraphqlApiServiceId,
+  graphqlApiServiceMap,
+  RestApiServiceId,
+  restApiServiceMap,
+} from './service';
 
 export interface ApiEndpointProps {
   zone: route53.IHostedZone;
@@ -23,9 +28,18 @@ export interface ApiEndpointProps {
 }
 
 export abstract class AbstractApiEndpoint extends Construct {
-  abstract readonly apiEndpoint: apigw.RestApi | apigw.LambdaRestApi | apigw.SpecRestApi | apigw2.HttpApi | appsync.GraphqlApi;
+  abstract readonly apiEndpoint:
+  | apigw.RestApi
+  | apigw.LambdaRestApi
+  | apigw.SpecRestApi
+  | apigw2.HttpApi
+  | appsync.GraphqlApi;
 
-  protected constructor(scope: Construct, id: string, props?: ApiEndpointProps) {
+  protected constructor(
+    scope: Construct,
+    id: string,
+    props?: ApiEndpointProps,
+  ) {
     super(scope, id);
   }
 }
@@ -44,7 +58,8 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
   }
 
   public getDomain(): string {
-    const domainName: apigw.DomainName | undefined = this.apiEndpoint.domainName;
+    const domainName: apigw.DomainName | undefined =
+      this.apiEndpoint.domainName;
 
     if (typeof domainName === 'undefined') {
       throw RangeError('Domain not configured for this API endpoint.');
@@ -52,8 +67,12 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     return domainName.domainName;
   }
 
-  public addService(name: RestApiServiceId, dataSource?: string, auth = false): this {
-    this.apiServices[name] = new restApiServiceMap[name](this, `${ name }-api`, {
+  public addService(
+    name: RestApiServiceId,
+    dataSource?: string,
+    auth = false,
+  ): this {
+    this.apiServices[name] = new restApiServiceMap[name](this, `${name}-api`, {
       dataSource: dataSource,
       authorizer: auth ? this.authorizer : undefined,
       validator: this.reqValidator,
@@ -61,7 +80,7 @@ export abstract class AbstractRestApiEndpoint extends AbstractApiEndpoint {
     return this;
   }
 
-  public abstract deploy(): void
+  public abstract deploy(): void;
 }
 
 export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
@@ -75,16 +94,30 @@ export abstract class AbstractGraphqlEndpoint extends AbstractApiEndpoint {
     super(scope, id, props);
   }
 
-  public addService(name: GraphqlApiServiceId, dataSource: string, auth = 'apiKey'): this {
-    this.apiServices[name] = new graphqlApiServiceMap[name](this, `${ name }-api`, {
-      dataSource: dynamodb.Table.fromTableName(this, `${ name }-table`, dataSource),
-      auth: this.authMode[auth],
-    });
+  public addService(
+    name: GraphqlApiServiceId,
+    dataSource: string,
+    auth = 'apiKey',
+  ): this {
+    this.apiServices[name] = new graphqlApiServiceMap[name](
+      this,
+      `${name}-api`,
+      {
+        dataSource: dynamodb.Table.fromTableName(
+          this,
+          `${name}-table`,
+          dataSource,
+        ),
+        auth: this.authMode[auth],
+      },
+    );
     return this;
   }
 
   public getDomain(): string {
-    const domain = this.apiEndpoint.graphqlUrl.match(/https:\/\/(.*)\/graphql/g);
+    const domain = this.apiEndpoint.graphqlUrl.match(
+      /https:\/\/(.*)\/graphql/g,
+    );
     if (domain === null) {
       return '';
     }
@@ -127,7 +160,12 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
       description: 'The main API endpoint for WasedaTime Web App.',
       endpointTypes: [apigw.EndpointType.REGIONAL],
       deploy: false,
-      binaryMediaTypes: ['application/pdf', 'image/png'],
+      binaryMediaTypes: [
+        'application/pdf',
+        'image/png',
+        'image/jpeg',
+        'image/gif',
+      ],
     });
     this.apiEndpoint.addGatewayResponse('4xx-resp', {
       type: apigw.ResponseType.DEFAULT_4XX,
@@ -171,7 +209,9 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
     });
     new route53.ARecord(this, 'alias-record', {
       zone: props.zone,
-      target: route53.RecordTarget.fromAlias(new route53_targets.ApiGatewayDomain(this.domain)),
+      target: route53.RecordTarget.fromAlias(
+        new route53_targets.ApiGatewayDomain(this.domain),
+      ),
       recordName: API_DOMAIN,
     });
   }
@@ -186,7 +226,10 @@ export class WasedaTimeRestApiEndpoint extends AbstractRestApiEndpoint {
       api: this.apiEndpoint,
       retainDeployments: false,
     });
-    const hash = Buffer.from(flatted.stringify(this.apiServices), 'binary').toString('base64');
+    const hash = Buffer.from(
+      flatted.stringify(this.apiServices),
+      'binary',
+    ).toString('base64');
     if (STAGE === 'dev') {
       devDeployment.addToLogicalId(hash);
     } else if (STAGE === 'prod') {
@@ -232,7 +275,6 @@ export class WasedaTimeGraphqlEndpoint extends AbstractGraphqlEndpoint {
   readonly apiServices: { [name: string]: GraphqlApiService } = {};
 
   constructor(scope: Construct, id: string, props: ApiEndpointProps) {
-
     super(scope, id, props);
 
     const apiKeyAuth: appsync.AuthorizationMode = {

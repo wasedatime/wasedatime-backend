@@ -8,7 +8,9 @@ db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
 
 s3_client = boto3.client('s3')
-bucket = os.getenv('BUCKET_NAME')
+
+input_bucket = os.environ['INPUT_BUCKET']
+output_bucket = os.environ['OUTPUT_BUCKET']
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -67,16 +69,3 @@ def resp_handler(func):
             return api_response(500, resp)
 
     return handle
-
-
-def generate_url(bucket_name, object_key, expiration=3600):
-    try:
-        response = s3_client.generate_presigned_url('get_object',
-                                                    Params={'Bucket': bucket_name,
-                                                            'Key': object_key},
-                                                    ExpiresIn=expiration)
-    except Exception as e:
-        logging.error(str(e))
-        return None
-
-    return response

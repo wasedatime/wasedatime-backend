@@ -1,7 +1,7 @@
 from boto3.dynamodb.conditions import Key
 import boto3
 from datetime import datetime
-from utils import JsonPayloadBuilder, table, resp_handler
+from utils import JsonPayloadBuilder, table, resp_handler, s3_client, bucket, generate_url
 
 
 @resp_handler
@@ -37,8 +37,17 @@ def get_all_threads(uid, index, num, school, tags, board_id):
         item['user_liked'] = uid in item.get('likes', [])
         item['total_likes'] = len(item.get('likes', []))
 
+        presigned_url = None
+
+        if "obj_key" in item:
+            bucket_name = bucket
+            presigned_url = generate_url(bucket_name, item["obj_key"])
+        if presigned_url:
+            item["url"] = presigned_url
+
         item.pop('uid', None)
         item.pop('likes', None)
+        item.pop('obj_key', None)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(paginated_items).add_message(end_index).compile()
