@@ -51,6 +51,141 @@ export class RestApiService extends Construct {
   }
 }
 
+//! New code for adsImgs
+export class ForumAdsApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
+
+    // Create resources for the api
+    const root = scope.apiEndpoint.root.addResource('imgs');
+    const imgsUrl = root.addResource('{url}');
+
+    const getRespModel = scope.apiEndpoint.addModel('review-get-resp-model', {
+      schema: courseReviewGetRespSchema,
+      contentType: 'application/json',
+      description: 'HTTP GET response body schema for fetching reviews.',
+      modelName: 'GetReviewsResp',
+    });
+
+    // const postRespModel =
+    // const deleteRespModel = ;
+
+    const apiGatewayRole = new iam.Role(this, 'rest-api-s3', {
+      assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
+      description: 'Allow API Gateway to fetch objects from s3 buckets.',
+      path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
+      roleName: 's3-apigateway-read',
+      managedPolicies: [
+        iam.ManagedPolicy.fromManagedPolicyArn(
+          this,
+          's3-read-only',
+          'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
+        ),
+      ],
+    });
+
+    const getIntegration = new apigw.AwsIntegration({
+      service: 's3',
+      integrationHttpMethod: apigw2.HttpMethod.GET,
+      path: 'ads.json', //TODO insert the actual name
+      subdomain: props.dataSource,
+      options: {
+        credentialsRole: apiGatewayRole,
+        requestParameters: {
+          ['integration.request.path.school']: 'method.request.path.school', //TODO insert the actual pathway
+        },
+        integrationResponses: [
+          {
+            statusCode: '200',
+            responseParameters: s3RespMapping,
+          },
+        ],
+      },
+    });
+
+    // const postIntegration = ss;
+    // const deleteIntegration = ss;
+
+    const optionsAdsImgs = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.DELETE,
+      ],
+    });
+
+    const getImgsUrl = imgsUrl.addMethod(
+      apigw2.HttpMethod.GET,
+      getIntegration,
+      {
+        requestParameters: { ['method.request.path.school']: true }, //TODO change the parameter
+        operationName: 'GetImgsUrl',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: syllabusRespParams, //TODO change this
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+
+    const postImgsUrl = imgsUrl.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        requestParameters: { ['method.request.path.school']: true },
+        operationName: 'PostImgsUrl',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: syllabusRespParams, //TODO change this
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+
+    const deleteImgsUrl = imgsUrl.addMethod(
+      apigw2.HttpMethod.DELETE,
+      deleteIntegration,
+      {
+        requestParameters: { ['method.request.path.school']: true },
+        operationName: 'DeleteImgsUrl',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: syllabusRespParams, //TODO change this
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+
+    this.resourceMapping = {
+      '/imgs/{key}': {
+        [apigw2.HttpMethod.GET]: getImgsUrl,
+        [apigw2.HttpMethod.OPTIONS]: optionsAdsImgs,
+        [apigw2.HttpMethod.POST]: postImgsUrl,
+        [apigw2.HttpMethod.DELETE]: deleteImgsUrl,
+      },
+    };
+  }
+}
+
 export class SyllabusApiService extends RestApiService {
   readonly resourceMapping: {
     [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };

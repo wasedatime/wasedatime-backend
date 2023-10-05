@@ -4,39 +4,39 @@ env:
   node: true
 root: true
 plugins:
-  - "@typescript-eslint"
+  - '@typescript-eslint'
   - import
-parser: "@typescript-eslint/parser"
+parser: '@typescript-eslint/parser'
 parserOptions:
   ecmaVersion: 2018
   sourceType: module
-  project: "./tsconfig.json"
+  project: './tsconfig.json'
 extends:
-  - "eslint:recommended"
-  - "plugin:@typescript-eslint/eslint-recommended"
-  - "plugin:@typescript-eslint/recommended"
-  - "plugin:import/typescript"
+  - 'eslint:recommended'
+  - 'plugin:@typescript-eslint/eslint-recommended'
+  - 'plugin:@typescript-eslint/recommended'
+  - 'plugin:import/typescript'
 settings:
   import/parsers:
-    "@typescript-eslint/parser":
-      - ".ts"
-      - ".tsx"
+    '@typescript-eslint/parser':
+      - '.ts'
+      - '.tsx'
   import/resolver:
-    node: { }
+    node: {}
     typescript:
-      project: "./tsconfig.json"
+      project: './tsconfig.json'
       alwaysTryTypes: true
 ignorePatterns:
-  - "*.js"
-  - "!.projenrc.js"
-  - "*.d.ts"
+  - '*.js'
+  - '!.projenrc.js'
+  - '*.d.ts'
   - node_modules/
-  - "*.generated.ts"
+  - '*.generated.ts'
   - coverage
 rules:
   indent:
     - 'off'
-  "@typescript-eslint/indent":
+  '@typescript-eslint/indent':
     - error
     - 2
   quotes:
@@ -81,7 +81,7 @@ rules:
     - error
     - multi-line
     - consistent
-  "@typescript-eslint/member-delimiter-style":
+  '@typescript-eslint/member-delimiter-style':
     - error
   semi:
     - error
@@ -97,13 +97,13 @@ rules:
   quote-props:
     - error
     - consistent-as-needed
-  "@typescript-eslint/no-require-imports":
+  '@typescript-eslint/no-require-imports':
     - error
   import/no-extraneous-dependencies:
     - error
     - devDependencies:
-        - "**/test/**"
-        - "**/build-tools/**"
+        - '**/test/**'
+        - '**/build-tools/**'
       optionalDependencies: false
       peerDependencies: true
   import/no-unresolved:
@@ -120,17 +120,17 @@ rules:
     - error
   no-shadow:
     - 'off'
-  "@typescript-eslint/no-shadow":
+  '@typescript-eslint/no-shadow':
     - error
   key-spacing:
     - error
   no-multiple-empty-lines:
     - error
-  "@typescript-eslint/no-floating-promises":
+  '@typescript-eslint/no-floating-promises':
     - error
   no-return-await:
     - 'off'
-  "@typescript-eslint/return-await":
+  '@typescript-eslint/return-await':
     - error
   no-trailing-spaces:
     - error
@@ -138,7 +138,7 @@ rules:
     - error
   no-bitwise:
     - error
-  "@typescript-eslint/member-ordering":
+  '@typescript-eslint/member-ordering':
     - error
     - default:
         - public-static-field

@@ -299,5 +299,9 @@ export class AdsDataPipeline extends AbstractDataPipeline {
     //     filters: [{ prefix: "syllabus/" }],
     //   })
     // );
+
+    this.processor = new sfn.StateMachine(this, 'state-machine', {
+      stateMachineName: '',
+    });
   }
 }
