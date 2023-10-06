@@ -107,12 +107,12 @@ export class DynamoDatabase extends Construct {
       sortKey: { name: 'thread_id', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,
     });
-    // this.tables[Collection.THREAD].addGlobalSecondaryIndex({
-    //   indexName: 'UniIDbyThreadIDIndex',
-    //   partitionKey: { name: 'univ_id', type: dynamodb.AttributeType.STRING },
-    //   sortKey: { name: 'thread_id', type: dynamodb.AttributeType.STRING },
-    //   projectionType: dynamodb.ProjectionType.ALL,
-    // });
+    this.tables[Collection.THREAD].addGlobalSecondaryIndex({
+      indexName: 'UnivIDbyThreadIDIndex',
+      partitionKey: { name: 'univ_id', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'thread_id', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
 
     // this.tables[Collection.THREAD].addLocalSecondaryIndex({
     //   indexName: 'GroupIndex',

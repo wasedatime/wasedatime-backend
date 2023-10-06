@@ -15,7 +15,7 @@ def get_thread_notify(last_checked_date):
 
     # Query the GSI
     response = table.query(
-        IndexName='UniIDbyThreadIDIndex',
+        IndexName='UnivIDbyThreadIDIndex',
         KeyConditionExpression=Key('univ_id').eq(univ_id) & Key(
             'thread_id').gt(lower_bound_thread_id),
         ScanIndexForward=False  # Sorting by thread_id in descending order
