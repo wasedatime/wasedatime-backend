@@ -491,6 +491,7 @@ export class ForumThreadFunctions extends Construct {
   readonly postFunction: lambda.Function;
   readonly patchFunction: lambda.Function;
   readonly deleteFunction: lambda.Function;
+  readonly getNotificationFunction: lambda.Function;
   readonly testPostFunction: lambda.Function;
   readonly testGetFunction: lambda.Function;
 
@@ -644,6 +645,23 @@ export class ForumThreadFunctions extends Construct {
       timeout: Duration.seconds(3),
       environment: props.envVars,
     });
+
+    this.getNotificationFunction = new lambda_py.PythonFunction(
+      this,
+      'notify-thread',
+      {
+        entry: 'src/lambda/get-thread-notify',
+        description:
+          'return forum thread count from given date in the database.',
+        functionName: 'get-thread-notify',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 128,
+        role: DBReadRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(3),
+        environment: props.envVars,
+      },
+    );
 
     this.testPostFunction = new lambda_py.PythonFunction(
       this,
