@@ -5,13 +5,13 @@ from utils import JsonPayloadBuilder, table, resp_handler
 @resp_handler
 def get_thread_notify(last_checked_date):
 
-    Univ_Id = 1
+    univ_id = 1
 
     lower_bound_thread_id = f"{last_checked_date}_"
     # Query the GSI
     response = table.query(
         IndexName='UnivIDbyThreadIDIndex',
-        KeyConditionExpression=Key('Univ_Id').eq(Univ_Id) & Key(
+        KeyConditionExpression=Key('univ_id').eq(univ_id) & Key(
             'thread_id').gt(lower_bound_thread_id),
         ScanIndexForward=False  # Sorting by thread_id in descending order
     )
