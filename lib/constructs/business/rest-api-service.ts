@@ -718,6 +718,7 @@ export class ForumThreadsApiService extends RestApiService {
     const threadResource = boardResource.addResource('{thread_id}');
     const userResource = root.addResource('user');
     const testResource = root.addResource('test');
+    const notificationResource = root.addResource('notify');
 
     const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -779,6 +780,12 @@ export class ForumThreadsApiService extends RestApiService {
       ],
     });
 
+    const optionsNotifyThreads = notificationResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [apigw2.HttpMethod.GET],
+    });
+
     const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
       schema: forumThreadGetRespSchema,
       contentType: 'application/json',
@@ -831,6 +838,10 @@ export class ForumThreadsApiService extends RestApiService {
     );
     const deleteIntegration = new apigw.LambdaIntegration(
       forumThreadsFunctions.deleteFunction,
+      { proxy: true },
+    );
+    const notifyIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.getNotificationFunction,
       { proxy: true },
     );
     const testPostIntegration = new apigw.LambdaIntegration(
@@ -940,6 +951,20 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
+    const notifyForumThreads = notificationResource.addMethod(
+      apigw2.HttpMethod.GET,
+      notifyIntegration,
+      {
+        operationName: 'NotifyThreadCount',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
     const testPostForumThreads = testResource.addMethod(
       apigw2.HttpMethod.POST,
       testPostIntegration,
@@ -980,6 +1005,10 @@ export class ForumThreadsApiService extends RestApiService {
       '/forum/user': {
         [apigw2.HttpMethod.GET]: getUserForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsUserThreads,
+      },
+      '/forum/notify': {
+        [apigw2.HttpMethod.GET]: notifyForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsNotifyThreads,
       },
       '/forum/{board_id}': {
         [apigw2.HttpMethod.POST]: postForumThreads,

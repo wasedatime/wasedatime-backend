@@ -1,37 +1,25 @@
 from boto3.dynamodb.conditions import Key, Attr
-import boto3
-from datetime import datetime
 from utils import JsonPayloadBuilder, table, resp_handler
 
 
 @resp_handler
-def get_thread_notify(Univ_Id=1):
+def get_thread_notify(last_checked_date):
 
+    Univ_Id = 1
+
+    lower_bound_thread_id = f"{last_checked_date}_"
     # Query the GSI
     response = table.query(
         IndexName='UnivIDbyThreadIDIndex',
-        KeyConditionExpression=Key('Univ_Id').eq(Univ_Id),
-        FilterExpression=Attr('new_comment').eq(True),
+        KeyConditionExpression=Key('Univ_Id').eq(Univ_Id) & Key(
+            'thread_id').gt(lower_bound_thread_id),
         ScanIndexForward=False  # Sorting by thread_id in descending order
     )
 
-    results = response['Items']
-
-    # Count the threads with new comments
-    new_comment_count = len(results)
-
-    # Collect the thread_ids
-    thread_ids = [item['thread_id'] for item in results]
-
-    # Determine the response data based on new_comment_count
-    response_data = {
-        'thread_ids': thread_ids,
-        'new_comment_count': new_comment_count,
-        'new_comment_flag': new_comment_count >= 1
-    }
+    count = len(response['Items'])
 
     body = JsonPayloadBuilder().add_status(True)\
-                               .add_data(response_data)\
+                               .add_data(count)\
                                .add_message('').compile()
 
     return body
@@ -39,13 +27,8 @@ def get_thread_notify(Univ_Id=1):
 
 def handler(event, context):
 
-    print(event)
-
     params = {
-        "uid": event['requestContext']['authorizer']['claims']['sub']
+        "last_checked_date": event['queryStringParameters'].get('lastChecked', '20230912201031')
     }
-
-    # index = event['queryStringParameters'].get('index', '0')
-    # num = event['queryStringParameters'].get('num', '10')
 
     return get_thread_notify(**params)
