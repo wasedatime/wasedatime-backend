@@ -109,7 +109,7 @@ export class DynamoDatabase extends Construct {
     });
     this.tables[Collection.THREAD].addGlobalSecondaryIndex({
       indexName: 'UnivIDbyThreadIDIndex',
-      partitionKey: { name: 'univ_id', type: dynamodb.AttributeType.NUMBER },
+      partitionKey: { name: 'univ_id', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'thread_id', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,
     });
