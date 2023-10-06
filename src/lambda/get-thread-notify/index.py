@@ -5,7 +5,7 @@ from utils import JsonPayloadBuilder, table, resp_handler
 @resp_handler
 def get_thread_notify(last_checked_date):
 
-    univ_id = 1
+    univ_id = "1"
 
     lower_bound_thread_id = f"{last_checked_date}_"
 
