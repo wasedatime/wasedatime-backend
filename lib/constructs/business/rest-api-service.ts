@@ -75,10 +75,10 @@ export class ForumAdsApiService extends RestApiService {
       modelName: 'GetReviewsResp',
     });
 
-    const getIntegration = new apigw.LambdaIntegration(
-      AdsImageProcessFunctions.getFunction,
-      { proxy: true },
-    );
+    // const getIntegration = new apigw.LambdaIntegration(
+    //   AdsImageProcessFunctions.getFunction,
+    //   { proxy: true },
+    // );
 
     const optionsAdsImgs = root.addCorsPreflight({
       allowOrigins: allowOrigins,
