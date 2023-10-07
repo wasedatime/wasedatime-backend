@@ -28,6 +28,7 @@ import {
   TimetableFunctions,
   ForumThreadFunctions,
   ForumCommentFunctions,
+  AdsImageProcessFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -65,8 +66,7 @@ export class ForumAdsApiService extends RestApiService {
     super(scope, id, props);
 
     // Create resources for the api
-    const root = scope.apiEndpoint.root.addResource('imgs');
-    const imgsUrl = root.addResource('{url}');
+    const root = scope.apiEndpoint.root.addResource('adsImgs');
 
     const getRespModel = scope.apiEndpoint.addModel('review-get-resp-model', {
       schema: courseReviewGetRespSchema,
@@ -75,44 +75,10 @@ export class ForumAdsApiService extends RestApiService {
       modelName: 'GetReviewsResp',
     });
 
-    // const postRespModel =
-    // const deleteRespModel = ;
-
-    const apiGatewayRole = new iam.Role(this, 'rest-api-s3', {
-      assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.API_GATEWAY),
-      description: 'Allow API Gateway to fetch objects from s3 buckets.',
-      path: `/service-role/${AwsServicePrincipal.API_GATEWAY}/`,
-      roleName: 's3-apigateway-read',
-      managedPolicies: [
-        iam.ManagedPolicy.fromManagedPolicyArn(
-          this,
-          's3-read-only',
-          'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
-        ),
-      ],
-    });
-
-    const getIntegration = new apigw.AwsIntegration({
-      service: 's3',
-      integrationHttpMethod: apigw2.HttpMethod.GET,
-      path: 'ads.json', //TODO insert the actual name
-      subdomain: props.dataSource,
-      options: {
-        credentialsRole: apiGatewayRole,
-        requestParameters: {
-          ['integration.request.path.school']: 'method.request.path.school', //TODO insert the actual pathway
-        },
-        integrationResponses: [
-          {
-            statusCode: '200',
-            responseParameters: s3RespMapping,
-          },
-        ],
-      },
-    });
-
-    // const postIntegration = ss;
-    // const deleteIntegration = ss;
+    const getIntegration = new apigw.LambdaIntegration(
+      AdsImageProcessFunctions.getFunction,
+      { proxy: true },
+    );
 
     const optionsAdsImgs = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -124,63 +90,23 @@ export class ForumAdsApiService extends RestApiService {
       ],
     });
 
-    const getImgsUrl = imgsUrl.addMethod(
-      apigw2.HttpMethod.GET,
-      getIntegration,
-      {
-        requestParameters: { ['method.request.path.school']: true }, //TODO change the parameter
-        operationName: 'GetImgsUrl',
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseModels: { ['application/json']: getRespModel },
-            responseParameters: syllabusRespParams, //TODO change this
-          },
-        ],
-        requestValidator: props.validator,
-      },
-    );
-
-    const postImgsUrl = imgsUrl.addMethod(
-      apigw2.HttpMethod.POST,
-      postIntegration,
-      {
-        requestParameters: { ['method.request.path.school']: true },
-        operationName: 'PostImgsUrl',
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseModels: { ['application/json']: getRespModel },
-            responseParameters: syllabusRespParams, //TODO change this
-          },
-        ],
-        requestValidator: props.validator,
-      },
-    );
-
-    const deleteImgsUrl = imgsUrl.addMethod(
-      apigw2.HttpMethod.DELETE,
-      deleteIntegration,
-      {
-        requestParameters: { ['method.request.path.school']: true },
-        operationName: 'DeleteImgsUrl',
-        methodResponses: [
-          {
-            statusCode: '200',
-            responseModels: { ['application/json']: getRespModel },
-            responseParameters: syllabusRespParams, //TODO change this
-          },
-        ],
-        requestValidator: props.validator,
-      },
-    );
+    const getImgsUrl = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
+      requestParameters: { ['method.request.path.school']: true }, //TODO change the parameter
+      operationName: 'GetImgsUrl',
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseModels: { ['application/json']: getRespModel },
+          responseParameters: syllabusRespParams, //TODO change this
+        },
+      ],
+      requestValidator: props.validator,
+    });
 
     this.resourceMapping = {
-      '/imgs/{key}': {
+      '/adsImgs': {
         [apigw2.HttpMethod.GET]: getImgsUrl,
         [apigw2.HttpMethod.OPTIONS]: optionsAdsImgs,
-        [apigw2.HttpMethod.POST]: postImgsUrl,
-        [apigw2.HttpMethod.DELETE]: deleteImgsUrl,
       },
     };
   }
