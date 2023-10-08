@@ -68,44 +68,32 @@ export class ForumAdsApiService extends RestApiService {
     // Create resources for the api
     const root = scope.apiEndpoint.root.addResource('adsImgs');
 
-    const getRespModel = scope.apiEndpoint.addModel('review-get-resp-model', {
-      schema: courseReviewGetRespSchema,
-      contentType: 'application/json',
-      description: 'HTTP GET response body schema for fetching reviews.',
-      modelName: 'GetReviewsResp',
-    });
-
-    // const getIntegration = new apigw.LambdaIntegration(
-    //   AdsImageProcessFunctions.getFunction,
-    //   { proxy: true },
-    // );
+    const getIntegration = new apigw.LambdaIntegration(
+      AdsImageProcessFunctions.getFunction, //* No f idea why this is an error
+      { proxy: true },
+    );
 
     const optionsAdsImgs = root.addCorsPreflight({
       allowOrigins: allowOrigins,
       allowHeaders: allowHeaders,
-      allowMethods: [
-        apigw2.HttpMethod.GET,
-        apigw2.HttpMethod.POST,
-        apigw2.HttpMethod.DELETE,
-      ],
+      allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.POST],
     });
 
-    const getImgsUrl = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
-      requestParameters: { ['method.request.path.school']: true }, //TODO change the parameter
-      operationName: 'GetImgsUrl',
+    const getImgsList = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
+      operationName: 'GetImgsList',
       methodResponses: [
         {
           statusCode: '200',
-          responseModels: { ['application/json']: getRespModel },
-          responseParameters: syllabusRespParams, //TODO change this
+          responseParameters: lambdaRespParams,
         },
       ],
+      authorizer: props.authorizer,
       requestValidator: props.validator,
     });
 
     this.resourceMapping = {
       '/adsImgs': {
-        [apigw2.HttpMethod.GET]: getImgsUrl,
+        [apigw2.HttpMethod.GET]: getImgsList,
         [apigw2.HttpMethod.OPTIONS]: optionsAdsImgs,
       },
     };

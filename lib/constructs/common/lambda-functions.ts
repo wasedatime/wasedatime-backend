@@ -995,6 +995,18 @@ export class AdsImageProcessFunctions extends Construct {
       environment: props.envVars,
     });
 
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-imgs-list', {
+      entry: 'src/lambda/get-imgs-list',
+      description: 'get imgs list from the database.',
+      functionName: 'get-imgs-list',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
     // this.resizeImageFunction = new lambda_py.PythonFunction(
     //   this,
     //   "resize-image",
@@ -1011,18 +1023,6 @@ export class AdsImageProcessFunctions extends Construct {
     //     environment: props.envVars,
     //   }
     // );
-
-    // this.getFunction = new lambda_py.PythonFunction(this, "get-comment", {
-    //   entry: "src/lambda/get-comments",
-    //   description: "get forum comments from the database.",
-    //   functionName: "get-forum-comments",
-    //   logRetention: logs.RetentionDays.ONE_MONTH,
-    //   memorySize: 128,
-    //   role: DBReadRole,
-    //   runtime: lambda.Runtime.PYTHON_3_9,
-    //   timeout: Duration.seconds(3),
-    //   environment: props.envVars,
-    // });
 
     // this.deleteFunction = new lambda_py.PythonFunction(this, "delete-comment", {
     //   entry: "src/lambda/delete-comment",
