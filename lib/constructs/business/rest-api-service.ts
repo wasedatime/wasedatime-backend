@@ -69,7 +69,7 @@ export class ForumAdsApiService extends RestApiService {
     const root = scope.apiEndpoint.root.addResource('adsImgs');
 
     const getIntegration = new apigw.LambdaIntegration(
-      AdsImageProcessFunctions.getFunction, //* No f idea why this is an error
+      AdsImageProcessFunctions.getFunction, //* No idea
       { proxy: true },
     );
 
