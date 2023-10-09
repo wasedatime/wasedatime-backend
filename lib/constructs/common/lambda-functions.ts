@@ -983,7 +983,7 @@ export class AdsImageProcessFunctions extends Construct {
     );
 
     this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-image', {
-      entry: 'src/lambda/sync-imscomsage',
+      entry: 'src/lambda/sync-image',
       description:
         'post image to dyanamo db database when image inputed in s3 bucket',
       functionName: 'sync-image',

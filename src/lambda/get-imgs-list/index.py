@@ -5,10 +5,18 @@ from utils import table
 
 
 @resp_handler
-def get_imgs_list():
-    response = table.scan()
+def get_imgs_list(board_id):
+
+    if board_id:
+        response = table.query(KeyConditionExpression=Key(
+            "board_id").eq(board_id), ScanIndexForward=False)
+    else:
+        response = table.scan(ConsistentRead=False)
+
     results = response.get('Items', [])
-    
+
+    # response = table.scan()
+    # results = response.get('Items', [])
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(results).add_message('').compile()
@@ -16,10 +24,7 @@ def get_imgs_list():
 
 
 def handler(event, context):
-    params = {
-        "thread_id": event["pathParameters"]["thread_id"],
-    }
-    if "uid" in event["queryStringParameters"]:
-        params["uid"] = event["queryStringParameters"]["uid"]
 
-    return get_imgs_list(**params)
+    params = event["queryStringParameters"]
+    board_id = params.get("board_id", "")
+    return get_imgs_list(board_id)

@@ -289,7 +289,7 @@ export class AdsDataPipeline extends AbstractDataPipeline {
       envVars: {
         ['BUCKET_NAME']: this.dataSource.bucketName,
         ['TABLE_NAME']: this.dataWarehouse.tableName,
-        ['OBJECT_PATH']: 'keys/',
+        ['OBJECT_PATH']: 'board_id/',
       },
     }).syncImageFunction;
 

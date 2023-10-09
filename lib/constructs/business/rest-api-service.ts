@@ -68,8 +68,18 @@ export class ForumAdsApiService extends RestApiService {
     // Create resources for the api
     const root = scope.apiEndpoint.root.addResource('adsImgs');
 
+    const adsImageProcessFunctions = new AdsImageProcessFunctions(
+      this,
+      'crud-functions',
+      {
+        envVars: {
+          TABLE_NAME: props.dataSource!,
+        },
+      },
+    );
+
     const getIntegration = new apigw.LambdaIntegration(
-      AdsImageProcessFunctions.getFunction, //* No idea
+      adsImageProcessFunctions.getFunction,
       { proxy: true },
     );
 
@@ -87,7 +97,6 @@ export class ForumAdsApiService extends RestApiService {
           responseParameters: lambdaRespParams,
         },
       ],
-      authorizer: props.authorizer,
       requestValidator: props.validator,
     });
 
@@ -99,7 +108,6 @@ export class ForumAdsApiService extends RestApiService {
     };
   }
 }
-
 export class SyllabusApiService extends RestApiService {
   readonly resourceMapping: {
     [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
