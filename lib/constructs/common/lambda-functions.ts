@@ -932,7 +932,7 @@ export class AdsImageProcessFunctions extends Construct {
         description:
           'Allow lambda function to perform read operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-lambda-read-ads-imgs', // Changed the role name
+        roleName: 'dynamodb-s3-lambda-read-ads-imgs', // Changed the new role name
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
