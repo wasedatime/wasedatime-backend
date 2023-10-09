@@ -16,7 +16,7 @@ import {
   SyllabusScraper,
   SyllabusUpdateFunction,
   ThreadImageProcessFunctions,
-  AdsImageProcessFunctions,
+  AdsImageProcessFunctionsPipeline,
 } from '../common/lambda-functions';
 
 export enum Worker {
@@ -285,12 +285,16 @@ export class AdsDataPipeline extends AbstractDataPipeline {
 
     this.dataWarehouse = props.dataWarehouse!;
 
-    this.processor = new AdsImageProcessFunctions(this, 'image-process-func', {
-      envVars: {
-        ['BUCKET_NAME']: this.dataSource.bucketName,
-        ['TABLE_NAME']: this.dataWarehouse.tableName,
+    this.processor = new AdsImageProcessFunctionsPipeline(
+      this,
+      'image-process-func',
+      {
+        envVars: {
+          ['BUCKET_NAME']: this.dataSource.bucketName,
+          ['TABLE_NAME']: this.dataWarehouse.tableName,
+        },
       },
-    }).syncImageFunction;
+    ).syncImageFunction;
 
     this.processor.addEventSource(
       new event_sources.S3EventSource(this.dataSource, {
