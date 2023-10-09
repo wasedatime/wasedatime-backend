@@ -931,13 +931,13 @@ export class AdsImageProcessFunctions extends Construct {
 
     const DBReadRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-s3-read-role',
+      'dynamodb-s3-lambda-ads-imgs-read',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
           'Allow lambda function to perform read operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-lambda-read-ads-imgs', // Changed the new role name
+        roleName: 'dynamodb-s3-lambda-ads-imgs-read',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -960,13 +960,13 @@ export class AdsImageProcessFunctions extends Construct {
 
     const DBSyncRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-s3-ads-sync-role',
+      'dynamo-s3-ads-imgs-sync-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
           'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-ads-sync-role',
+        roleName: 'dynamodb-s3-ads-imgs-sync-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
