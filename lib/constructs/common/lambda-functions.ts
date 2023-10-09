@@ -877,18 +877,18 @@ export class ThreadImageProcessFunctions extends Construct {
       },
     );
 
-    // this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-image', {
-    //   entry: 'src/lambda/sync-image',
-    //   description:
-    //     'post image to dyanamo db database when image inputed in s3 bucket',
-    //   functionName: 'sync-image',
-    //   logRetention: logs.RetentionDays.ONE_MONTH,
-    //   memorySize: 256,
-    //   role: DBSyncRole,
-    //   runtime: lambda.Runtime.PYTHON_3_9,
-    //   timeout: Duration.seconds(5),
-    //   environment: props.envVars,
-    // });
+    this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-image', {
+      entry: 'src/lambda/sync-image',
+      description:
+        'post image to dyanamo db database when image inputed in s3 bucket',
+      functionName: 'sync-image',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: DBSyncRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    });
 
     this.resizeImageFunction = new lambda_py.PythonFunction(
       this,
@@ -934,7 +934,7 @@ export class ThreadImageProcessFunctions extends Construct {
 }
 
 export class AdsImageProcessFunctions extends Construct {
-  // readonly getFunction: lambda.Function;
+  readonly getFunction: lambda.Function;
   readonly syncImageFunction: lambda.Function;
   readonly resizeImageFunction: lambda.Function;
   // readonly deleteFunction: lambda.Function;
@@ -1013,6 +1013,18 @@ export class AdsImageProcessFunctions extends Construct {
       environment: props.envVars,
     });
 
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-imgs-list', {
+      entry: 'src/lambda/get-imgs-list',
+      description: 'get imgs list from the database.',
+      functionName: 'get-imgs-list',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
     // this.resizeImageFunction = new lambda_py.PythonFunction(
     //   this,
     //   "resize-image",
@@ -1029,18 +1041,6 @@ export class AdsImageProcessFunctions extends Construct {
     //     environment: props.envVars,
     //   }
     // );
-
-    // this.getFunction = new lambda_py.PythonFunction(this, "get-comment", {
-    //   entry: "src/lambda/get-comments",
-    //   description: "get forum comments from the database.",
-    //   functionName: "get-forum-comments",
-    //   logRetention: logs.RetentionDays.ONE_MONTH,
-    //   memorySize: 128,
-    //   role: DBReadRole,
-    //   runtime: lambda.Runtime.PYTHON_3_9,
-    //   timeout: Duration.seconds(3),
-    //   environment: props.envVars,
-    // });
 
     // this.deleteFunction = new lambda_py.PythonFunction(this, "delete-comment", {
     //   entry: "src/lambda/delete-comment",

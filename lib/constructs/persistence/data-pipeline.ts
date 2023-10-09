@@ -285,19 +285,17 @@ export class AdsDataPipeline extends AbstractDataPipeline {
 
     this.dataWarehouse = props.dataWarehouse!;
 
-    // this.processor = new AdsImageProcessFunctions(this, "image-process-func", {
-    //   envVars: {
-    //     ["BUCKET_NAME"]: this.dataSource.bucketName,
-    //     ["TABLE_NAME"]: this.dataWarehouse.tableName,
-    //     ["OBJECT_PATH"]: "syllabus/",
-    //   },
-    // }).syncImageFunction;
+    this.processor = new AdsImageProcessFunctions(this, 'image-process-func', {
+      envVars: {
+        ['BUCKET_NAME']: this.dataSource.bucketName,
+        ['TABLE_NAME']: this.dataWarehouse.tableName,
+      },
+    }).syncImageFunction;
 
-    // this.processor.addEventSource(
-    //   new event_sources.S3EventSource(this.dataSource, {
-    //     events: [s3.EventType.OBJECT_CREATED_PUT],
-    //     filters: [{ prefix: "syllabus/" }],
-    //   })
-    // );
+    this.processor.addEventSource(
+      new event_sources.S3EventSource(this.dataSource, {
+        events: [s3.EventType.OBJECT_CREATED],
+      }),
+    );
   }
 }

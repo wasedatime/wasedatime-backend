@@ -28,6 +28,7 @@ import {
   TimetableFunctions,
   ForumThreadFunctions,
   ForumCommentFunctions,
+  AdsImageProcessFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -51,6 +52,62 @@ export class RestApiService extends Construct {
   }
 }
 
+//! New code for adsImgs
+export class ForumAdsApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
+
+    // Create resources for the api
+    const root = scope.apiEndpoint.root.addResource('adsImgs');
+
+    const adsImageProcessFunctions = new AdsImageProcessFunctions(
+      this,
+      'crud-functions',
+      {
+        envVars: {
+          TABLE_NAME: props.dataSource!,
+        },
+      },
+    );
+
+    const getIntegration = new apigw.LambdaIntegration(
+      adsImageProcessFunctions.getFunction,
+      { proxy: true },
+    );
+
+    const optionsAdsImgs = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.POST],
+    });
+
+    const getImgsList = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
+      operationName: 'GetImgsList',
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseParameters: lambdaRespParams,
+        },
+      ],
+      requestValidator: props.validator,
+    });
+
+    this.resourceMapping = {
+      '/adsImgs': {
+        [apigw2.HttpMethod.GET]: getImgsList,
+        [apigw2.HttpMethod.OPTIONS]: optionsAdsImgs,
+      },
+    };
+  }
+}
 export class SyllabusApiService extends RestApiService {
   readonly resourceMapping: {
     [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
