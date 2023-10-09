@@ -289,13 +289,12 @@ export class AdsDataPipeline extends AbstractDataPipeline {
       envVars: {
         ['BUCKET_NAME']: this.dataSource.bucketName,
         ['TABLE_NAME']: this.dataWarehouse.tableName,
-        ['OBJECT_PATH']: 'board_id/',
       },
     }).syncImageFunction;
 
     this.processor.addEventSource(
       new event_sources.S3EventSource(this.dataSource, {
-        events: [s3.EventType.OBJECT_CREATED_POST],
+        events: [s3.EventType.OBJECT_CREATED],
       }),
     );
   }

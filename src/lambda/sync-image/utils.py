@@ -5,9 +5,7 @@ import os
 from decimal import Decimal
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
-table = db.Table(os.getenv('TABLE_NAME')) # Use in index to post ads info
-
-output_table = os.environ['TABLE_NAME']
+table = db.Table(os.getenv('TABLE_NAME'))  # Use in index to post ads info
 
 
 class DecimalEncoder(json.JSONEncoder):
