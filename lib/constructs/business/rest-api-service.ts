@@ -28,7 +28,7 @@ import {
   TimetableFunctions,
   ForumThreadFunctions,
   ForumCommentFunctions,
-  AdsImageProcessFunctions,
+  AdsImageProcessFunctionsAPI,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -68,7 +68,7 @@ export class ForumAdsApiService extends RestApiService {
     // Create resources for the api
     const root = scope.apiEndpoint.root.addResource('adsImgs');
 
-    const adsImageProcessFunctions = new AdsImageProcessFunctions(
+    const adsImageProcessFunctionsAPI = new AdsImageProcessFunctionsAPI(
       this,
       'crud-functions',
       {
@@ -79,7 +79,7 @@ export class ForumAdsApiService extends RestApiService {
     );
 
     const getIntegration = new apigw.LambdaIntegration(
-      adsImageProcessFunctions.getFunction,
+      adsImageProcessFunctionsAPI.getFunction,
       { proxy: true },
     );
 
