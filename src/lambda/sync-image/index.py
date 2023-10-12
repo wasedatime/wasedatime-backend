@@ -11,7 +11,7 @@ def post_imgskey(key):
 
     # Creaet board_id, ads_id from the event payload we got
     board_id, ad_id = key.split('/')
-    
+
     # Create new item in the dynamoDB
     item = {
         'board_id': board_id,
