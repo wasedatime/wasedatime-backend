@@ -33,5 +33,6 @@ def handler(event, context):
 
     # Get event payload and get imgs information
     key = event['Records'][0]['s3']['object']['key']
+    print(key)
 
     return post_imgskey(key)
