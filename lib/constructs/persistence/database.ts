@@ -147,7 +147,7 @@ export class DynamoDatabase extends Construct {
 
     this.tables[Collection.ADS] = new dynamodb.Table(
       this,
-      'dynamodb-ads-table',
+      'dynamodb-abs-table',
       {
         partitionKey: { name: 'board_id', type: dynamodb.AttributeType.STRING },
         sortKey: { name: 'ad_id', type: dynamodb.AttributeType.STRING },
