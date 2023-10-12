@@ -150,7 +150,7 @@ export class DynamoDatabase extends Construct {
       'dynamodb-ads-table',
       {
         partitionKey: { name: 'board_id', type: dynamodb.AttributeType.STRING },
-        sortKey: { name: 'ad_id', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'ads_id', type: dynamodb.AttributeType.STRING },
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.RETAIN,
