@@ -37,4 +37,5 @@ def handler(event, context):
     board_id, ads_id = key.split('/')
     print(board_id, ads_id)
 
+
     return post_imgskey(key)
