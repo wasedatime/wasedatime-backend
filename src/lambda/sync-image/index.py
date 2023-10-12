@@ -16,7 +16,7 @@ def post_imgskey(key):
     item = {
         'board_id': board_id,
         'ads_id': ads_id,
-        'timestamp': dt_now,
+        'timestamp': dt_now
     }
 
     table.put_item(
