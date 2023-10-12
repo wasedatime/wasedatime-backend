@@ -33,8 +33,8 @@ def handler(event, context):
 
     # Get event payload and get imgs information
     key = event['Records'][0]['s3']['object']['key']
-    print(key)  # Try out the code
     board_id, ad_id = key.split('/')
     print(board_id, ad_id)
 
     return post_imgskey(key)
+# just for commit
