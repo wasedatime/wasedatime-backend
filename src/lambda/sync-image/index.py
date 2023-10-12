@@ -10,7 +10,7 @@ def post_imgskey(key):
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
     # Creaet board_id, ads_id from the event payload we got
-    board_id, ads_id, _ = key.split('/')
+    board_id, ads_id = key.split('/')
 
     # Create new item in the dynamoDB
     item = {
@@ -29,6 +29,7 @@ def post_imgskey(key):
 
 
 def handler(event, context):
+    print(event)
 
     # Get event payload and get imgs information
     key = event['Records'][0]['s3']['object']['key']
