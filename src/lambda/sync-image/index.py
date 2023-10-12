@@ -14,9 +14,9 @@ def post_imgskey(key):
 
     # Create new item in the dynamoDB
     item = {
-        'board_id': {board_id},
-        'ads_id': {ads_id},
-        'timestamp': {dt_now}
+        'board_id': board_id,
+        'ads_id': ads_id,
+        'timestamp': dt_now,
     }
 
     table.put_item(
@@ -36,6 +36,5 @@ def handler(event, context):
     print(key)  # Try out the code
     board_id, ads_id = key.split('/')
     print(board_id, ads_id)
-
 
     return post_imgskey(key)
