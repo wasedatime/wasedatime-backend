@@ -42,8 +42,7 @@ def uid_encoder(uid):
     :return: Sha256 encoded uid
     """
     hashed_uid = hashlib.sha256(uid.encode()).hexdigest()
-    transformed_uid = hashed_uid
-    # transformed_uid = hashed_uid[:6] #! Might cause collision if shorten it
+    transformed_uid = hashed_uid[:6]
     return transformed_uid
 
 

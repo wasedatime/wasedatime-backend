@@ -14,7 +14,8 @@ def get_comments(thread_id, uid=""):
         r["mod"] = False
         if r["uid"] == uid:
             r["mod"] = True
-        r["uid"] = uid_encoder(uid)
+        del r["uid"]
+        r["uid_mod"] = uid_encoder(uid)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(results).add_message('').compile()
