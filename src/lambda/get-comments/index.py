@@ -1,7 +1,9 @@
+from encodings import utf_8
 from boto3.dynamodb.conditions import Key
 from utils import JsonPayloadBuilder
 from utils import resp_handler
 from utils import table
+from utils import uid_encoder
 
 
 @resp_handler
@@ -12,12 +14,11 @@ def get_comments(thread_id, uid=""):
         r["mod"] = False
         if r["uid"] == uid:
             r["mod"] = True
-        del r["uid"]
+        r["uid"] = uid_encoder(uid)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(results).add_message('').compile()
     return body
-
 
 def handler(event, context):
     params = {
