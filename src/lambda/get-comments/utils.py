@@ -3,6 +3,7 @@ import json
 import logging
 import os
 from decimal import Decimal
+import hashlib
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
@@ -32,6 +33,18 @@ class JsonPayloadBuilder:
 
     def compile(self):
         return json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
+    
+# New code for returning encoded uid
+def uid_encoder(uid):
+    """Trnasform the uid so that it does not resemble the original one
+
+    :param uid: Original uid
+    :return: Sha256 encoded uid
+    """
+    hashed_uid = hashlib.sha256(uid.encode()).hexdigest()
+    transformed_uid = hashed_uid
+    # transformed_uid = hashed_uid[:6] #! Might cause collision if shorten it
+    return transformed_uid
 
 
 def api_response(code, body):

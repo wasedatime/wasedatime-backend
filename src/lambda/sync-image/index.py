@@ -16,6 +16,7 @@ def post_imgskey(key):
     item = {
         'board_id': board_id,
         'ad_id': ad_id,
+        # Do not use `{}` to enclose the item, it will make it into a SS type which will cause error
         'timestamp': dt_now
     }
 
