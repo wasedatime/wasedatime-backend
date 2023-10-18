@@ -15,11 +15,12 @@ def get_comments(thread_id, uid=""):
         if r["uid"] == uid:
             r["mod"] = True
         del r["uid"]
-        r["authro"] = uid_encoder(uid)
+        r["author"] = uid_encoder(uid)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(results).add_message('').compile()
     return body
+
 
 def handler(event, context):
     params = {
