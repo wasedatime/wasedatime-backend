@@ -1028,7 +1028,7 @@ export class AdsImageProcessFunctionsAPI extends Construct {
 }
 
 export class CareerDBSyncFunction extends Construct {
-  readonly syncImageFunction: lambda.Function;
+  readonly syncCareerFunction: lambda.Function;
 
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
@@ -1062,17 +1062,21 @@ export class CareerDBSyncFunction extends Construct {
       },
     );
 
-    this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-career', {
-      entry: 'src/lambda/sync-career',
-      description: 'sync career info inputed in s3 to dynamodb',
-      functionName: 'sync-career',
-      logRetention: logs.RetentionDays.ONE_MONTH,
-      memorySize: 256,
-      role: DBSyncRole,
-      runtime: lambda.Runtime.PYTHON_3_9,
-      timeout: Duration.seconds(5),
-      environment: props.envVars,
-    });
+    this.syncCareerFunction = new lambda_py.PythonFunction(
+      this,
+      'sync-career',
+      {
+        entry: 'src/lambda/sync-career',
+        description: 'sync career info inputed in s3 to dynamodb',
+        functionName: 'sync-career',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 256,
+        role: DBSyncRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(5),
+        environment: props.envVars,
+      },
+    );
   }
 }
 
