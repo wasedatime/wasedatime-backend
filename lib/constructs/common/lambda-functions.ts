@@ -987,13 +987,13 @@ export class AdsImageProcessFunctionsAPI extends Construct {
     //! Update to put role
     const DBPutRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-s3-put-role',
+      'dynamo-s3-ads-put-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
           'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-put-role',
+        roleName: 'dynamodb-s3-ads-put-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
