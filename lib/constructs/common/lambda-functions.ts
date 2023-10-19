@@ -1026,3 +1026,101 @@ export class AdsImageProcessFunctionsAPI extends Construct {
     });
   }
 }
+
+export class CareerDBSyncFunction extends Construct {
+  readonly syncImageFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const DBSyncRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-career-sync-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-career-sync-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+
+    this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-career', {
+      entry: 'src/lambda/sync-career',
+      description: 'sync career info inputed in s3 to dynamodb',
+      functionName: 'sync-career',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: DBSyncRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    });
+  }
+}
+
+export class CareerRestFunctions extends Construct {
+  readonly getFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const DBReadRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-career-rest-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform read operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-career-rest-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-read-only',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-read-only',
+            'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
+          ),
+        ],
+      },
+    );
+
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-career', {
+      entry: 'src/lambda/get-career',
+      description: 'get career data from the database',
+      functionName: 'get-career',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+  }
+}
