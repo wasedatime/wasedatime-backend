@@ -9,8 +9,6 @@ from utils import resp_handler, table, bucket, generate_url
 
 @resp_handler
 def get_imgs_list(board_id, ad_id):
-    
-    results = []
 
     # typeIII 
     if board_id and ad_id: 
@@ -18,20 +16,18 @@ def get_imgs_list(board_id, ad_id):
         key = "/".join([board_id, ad_id])
         bucket_name = bucket
         ad_url = generate_url(bucket_name, key)
+        results = ad_url
     
     # typeII
     elif board_id:
         response = table.query(KeyConditionExpression=Key(
             "board_id").eq(board_id), ScanIndexForward=False)
+        results = response
 
     # typeI
     else:
         response = table.scan(ConsistentRead=False)
-    
-    if response:
-        results = response.get('Items', [])
-    elif ad_url:
-        results = ad_url
+        results = response
 
     # response = table.scan()
     # results = response.get('Items', [])
