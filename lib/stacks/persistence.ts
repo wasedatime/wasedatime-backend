@@ -85,7 +85,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       dynamoDatabase.tables[Collection.COMMENT].tableName,
     );
 
-    //! new endpoint for adsPipeline
+    //! new endpoint for ads
     this.dataInterface.setEndpoint(
       DataEndpoint.ADS,
       dynamoDatabase.tables[Collection.ADS].tableName,
