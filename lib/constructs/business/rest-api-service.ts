@@ -74,6 +74,7 @@ export class ForumAdsApiService extends RestApiService {
       {
         envVars: {
           TABLE_NAME: props.dataSource!,
+          BUCKET_NAME: 'wasedatime-ads',
         },
       },
     );
@@ -89,8 +90,8 @@ export class ForumAdsApiService extends RestApiService {
       allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.POST],
     });
 
-    const getImgsList = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
-      operationName: 'GetImgsList',
+    const getAds = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
+      operationName: 'GetAds',
       methodResponses: [
         {
           statusCode: '200',
@@ -102,7 +103,7 @@ export class ForumAdsApiService extends RestApiService {
 
     this.resourceMapping = {
       '/adsImgs': {
-        [apigw2.HttpMethod.GET]: getImgsList,
+        [apigw2.HttpMethod.GET]: getAds,
         [apigw2.HttpMethod.OPTIONS]: optionsAdsImgs,
       },
     };

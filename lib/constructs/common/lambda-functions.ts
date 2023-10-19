@@ -984,42 +984,43 @@ export class AdsImageProcessFunctionsAPI extends Construct {
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
 
-    const DBReadRole: iam.LazyRole = new iam.LazyRole(
+    //! Update to put role
+    const DBPutRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamodb-s3-lambda-ads-imgs-read',
+      'dynamo-s3-put-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
-          'Allow lambda function to perform read operation on dynamodb and s3',
+          'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-lambda-ads-imgs-read',
+        roleName: 'dynamodb-s3-put-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            'basic-exec',
+            'basic-exec1',
             'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            'db-read-only',
-            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
           ),
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
-            's3-read-only',
-            'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
           ),
         ],
       },
     );
 
-    this.getFunction = new lambda_py.PythonFunction(this, 'get-imgs-list', {
-      entry: 'src/lambda/get-imgs-list',
-      description: 'get imgs list from the database.',
-      functionName: 'get-imgs-list',
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-ads', {
+      entry: 'src/lambda/get-ads',
+      description: 'get ads list or specific url from the database.',
+      functionName: 'get-ads',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
-      role: DBReadRole,
+      role: DBPutRole, //! Change to put role since we now have to read and write
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(3),
       environment: props.envVars,
