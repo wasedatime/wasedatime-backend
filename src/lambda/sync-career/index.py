@@ -1,33 +1,43 @@
 import json
 from datetime import datetime
 from utils import JsonPayloadBuilder
-from utils import resp_handler, table
+from utils import resp_handler, table, bucket, s3_client
 
 
-# @resp_handler
-# def post_imgskey(key):
-#     # Get the crrent time
-#     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+@resp_handler
+def sync_career(key):
 
-#     # Creaet board_id, ads_id from the event payload we got
-#     board_id, ad_id = key.split('/')
+    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
-#     # Create new item in the dynamoDB
-#     item = {
-#         'board_id': board_id,
-#         'ad_id': ad_id,
-#         # Do not use `{}` to enclose the item, it will make it into a SS type which will cause error
-#         'timestamp': dt_now
-#     }
+    s3_object = s3_client.get_object(Bucket=bucket, Key=key)
+    file_content = s3_object['Body'].read().decode('utf-8')
+    json_content = json.loads(file_content)
 
-#     table.put_item(
-#         Item=item
-#     )
+    # Get folder
+    prefix = '/'.join(key.split('/')[:-1])
+    objects_in_folder = s3_client.list_objects_v2(
+        Bucket=bucket, Prefix=prefix)['Contents']
 
-#     body = JsonPayloadBuilder().add_status(True).add_data(
-#         None).add_message('Imgs key load to table successfully.').compile()
-#     return body
+    # Extract image object keys (filter out the JSON file)
+    image_object_keys = [obj['Key']
+                         for obj in objects_in_folder if not obj['Key'].endswith('.json')]
+
+    item = {
+        'type': json_content['type'],
+        'created_at': datetime.now().isoformat(),
+        'description': json_content['description'],
+        'image_object_keys': image_object_keys
+    }
+    table.put_item(Item=item)
+
+    body = JsonPayloadBuilder().add_status(True).add_data(
+        None).add_message('Imgs key load to table successfully.').compile()
+    return body
 
 
 def handler(event, context):
-    pass
+
+    # Get the object from the event
+    key = event['Records'][0]['s3']['object']['key']
+
+    return sync_career(key)

@@ -5,7 +5,10 @@ import os
 from decimal import Decimal
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
-table = db.Table(os.getenv('TABLE_NAME'))  # Use in index to post ads info
+table = db.Table(os.getenv('TABLE_NAME'))
+
+s3_client = boto3.client('s3')
+bucket = os.getenv('BUCKET_NAME')
 
 
 class DecimalEncoder(json.JSONEncoder):

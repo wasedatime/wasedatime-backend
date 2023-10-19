@@ -166,6 +166,13 @@ export class CareerDataPipeline extends AbstractDataPipeline {
         ['TABLE_NAME']: this.dataWarehouse.tableName,
       },
     }).syncCareerFunction;
+
+    this.processor.addEventSource(
+      new event_sources.S3EventSource(this.dataSource, {
+        events: [s3.EventType.OBJECT_CREATED],
+        filters: [{ suffix: '.json' }],
+      }),
+    );
   }
 }
 
