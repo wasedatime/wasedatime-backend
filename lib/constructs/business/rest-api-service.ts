@@ -29,6 +29,7 @@ import {
   ForumThreadFunctions,
   ForumCommentFunctions,
   AdsImageProcessFunctionsAPI,
+  CareerRestFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -463,6 +464,46 @@ export class CareerApiService extends RestApiService {
     super(scope, id, props);
 
     const root = scope.apiEndpoint.root.addResource('career');
+
+    const careerFunctions = new CareerRestFunctions(this, 'crud-functions', {
+      envVars: {
+        TABLE_NAME: props.dataSource!,
+        BUCKET_NAME: 'wasedatime-career',
+      },
+    });
+    const getIntegration = new apigw.LambdaIntegration(
+      careerFunctions.getFunction,
+      { proxy: true },
+    );
+
+    const optionsCareer = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+    const getCareer = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
+      operationName: 'GetReviews',
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseParameters: lambdaRespParams,
+        },
+      ],
+      requestValidator: props.validator,
+    });
+
+    this.resourceMapping = {
+      '/career': {
+        [apigw2.HttpMethod.GET]: getCareer,
+        [apigw2.HttpMethod.OPTIONS]: optionsCareer,
+      },
+    };
   }
 }
 
