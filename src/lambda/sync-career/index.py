@@ -24,8 +24,11 @@ def sync_career(key):
 
     item = {
         'type': json_content['type'],
-        'created_at': datetime.now().isoformat(),
+        'created_at': dt_now,
         'description': json_content['description'],
+        'title': json_content['title'],
+        'position': json_content['position'],
+        'location': json_content['location'],
         'image_object_keys': image_object_keys
     }
     table.put_item(Item=item)
