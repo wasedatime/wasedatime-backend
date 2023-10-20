@@ -17,7 +17,23 @@ def get_imgs_list(board_id, ad_id):
         bucket_name = bucket
         ad_url = generate_url(bucket_name, key)
         results = ad_url
-    
+        
+        # If the count propperty doesn't exist yet, set to 1, if existed increase by 1
+        table.update_item(
+                Key={
+                "board_id": board_id,
+                "ad_id": ad_id,
+            },
+            UpdateExpression="SET #c = if_not_exists(#c, :initial) + :incr",
+            ExpressionAttributeNames={
+                '#c': 'use_count'
+            },
+            ExpressionAttributeValues={
+                ":initial": 1,  # Initial value
+                ":incr": 1
+            }
+        )
+
     # typeII
     elif board_id:
         response = table.query(KeyConditionExpression=Key(
