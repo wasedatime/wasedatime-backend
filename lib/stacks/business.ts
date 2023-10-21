@@ -59,7 +59,11 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),
         true,
       )
-      // .addService('career')
+      .addService(
+        'career',
+        this.dataInterface.getEndpoint(DataEndpoint.CAREER),
+        true,
+      )
       .addService(
         'timetable',
         this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE),

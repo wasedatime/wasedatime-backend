@@ -17,6 +17,7 @@ import {
   SyllabusUpdateFunction,
   ThreadImageProcessFunctions,
   AdsImageProcessFunctionsPipeline,
+  CareerDBSyncFunction,
 } from '../common/lambda-functions';
 
 export enum Worker {
@@ -143,7 +144,7 @@ export class CareerDataPipeline extends AbstractDataPipeline {
   readonly processor: lambda.Function;
   readonly dataWarehouse: dynamodb.Table;
 
-  constructor(scope: Construct, id: string, props?: DataPipelineProps) {
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
     super(scope, id);
 
     this.dataSource = new s3.Bucket(this, 'career-bucket', {
@@ -156,6 +157,22 @@ export class CareerDataPipeline extends AbstractDataPipeline {
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: false,
     });
+
+    this.dataWarehouse = props.dataWarehouse!;
+
+    this.processor = new CareerDBSyncFunction(this, 'career-sync-function', {
+      envVars: {
+        ['BUCKET_NAME']: this.dataSource.bucketName,
+        ['TABLE_NAME']: this.dataWarehouse.tableName,
+      },
+    }).syncCareerFunction;
+
+    this.processor.addEventSource(
+      new event_sources.S3EventSource(this.dataSource, {
+        events: [s3.EventType.OBJECT_CREATED],
+        filters: [{ suffix: '.json' }],
+      }),
+    );
   }
 }
 
