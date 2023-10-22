@@ -14,7 +14,7 @@ def get_threads():
     # Use the query method to fetch recent one month's data using the secondary index
     response = table.query(
         IndexName='UnivIDbyThreadIDIndex',
-        KeyConditionExpression=Key('univ_id').begins_with(1) & Key('thread_id').gt(
+        KeyConditionExpression=Key('univ_id').begins_with("1") & Key('thread_id').gt(
             thread_id_for_last_month)
     )
 
