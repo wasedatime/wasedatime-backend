@@ -43,7 +43,7 @@ class JsonPayloadBuilder:
         return self
 
     def compile(self):
-        return json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
+        return json.dumps(self.payload, cls=ExtendedEncoder, ensure_ascii=False).encode('utf8')
 
 
 def api_response(code, body):
