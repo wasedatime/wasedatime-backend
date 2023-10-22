@@ -991,7 +991,6 @@ export class ForumThreadsApiService extends RestApiService {
             responseParameters: lambdaRespParams,
           },
         ],
-        authorizer: props.authorizer,
         requestValidator: props.validator,
       },
     );
