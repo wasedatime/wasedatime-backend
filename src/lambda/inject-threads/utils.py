@@ -165,7 +165,7 @@ def generate_prompt():
     and the your timetable: {classes} 
     for context. Generate 3 new forum posts based on the examples, but do repeat the examples. One forum post must be related to international student life in Japan.
     The group_id and board_id must be one provided in the example.
-    The response must be in JSON format.
+    The response must be in JSON format which includes group_id, board_id and body.
     '''
 
     print(prompt)
