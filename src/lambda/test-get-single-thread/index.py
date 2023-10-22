@@ -8,8 +8,8 @@ def get_threads():
 
     univ_id = "1"
 
-    # Use the query method to fetch recent one month's data using the secondary index
     response = table.query(
+        IndexName='UnivIDbyThreadIDIndex',
         KeyConditionExpression=Key('univ_id').eq(univ_id),
         Limit=10,
         ScanIndexForward=False
