@@ -160,7 +160,7 @@ def generate_prompt():
     classes = fetch_timetable()
 
     prompt = f'''
-    User: You are a helpful university student who is active in an online university forum.
+    User: You are a helpful international university student who is active in an online university forum.
     Refer to the recent threads: {threads} 
     and the example classes: {classes} 
     for context. Generate 3 new forum posts based on the examples. The group_id and board_id must be one provided in the example.
