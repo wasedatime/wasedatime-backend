@@ -5,17 +5,14 @@ from utils import JsonPayloadBuilder, table, resp_handler, s3_client, bucket, ge
 
 @resp_handler
 def get_threads():
-    # Calculate the timestamp for one month ago
-    one_month_ago = (datetime.utcnow() - timedelta(days=30)).timestamp()
 
-    thread_id_for_last_month = str(int(one_month_ago)) + \
-        "_00000000-0000-0000-0000-000000000000"
+    univ_id = "1"
 
     # Use the query method to fetch recent one month's data using the secondary index
     response = table.query(
-        IndexName='UnivIDbyThreadIDIndex',
-        KeyConditionExpression=Key('univ_id').begins_with("1") & Key('thread_id').gt(
-            thread_id_for_last_month)
+        KeyConditionExpression=Key('univ_id').eq(univ_id),
+        Limit=10,
+        ScanIndexForward=False
     )
 
     items = response['Items']
