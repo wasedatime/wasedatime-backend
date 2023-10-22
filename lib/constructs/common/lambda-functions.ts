@@ -1180,7 +1180,7 @@ export class ForumThreadAIFunctions extends Construct {
       memorySize: 128,
       role: DBSyncRole,
       runtime: lambda.Runtime.PYTHON_3_9,
-      timeout: Duration.seconds(3),
+      timeout: Duration.seconds(60),
       environment: props.envVars,
     });
   }
