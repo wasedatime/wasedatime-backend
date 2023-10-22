@@ -152,7 +152,7 @@ def fetch_timetable():
 
     timetable = random.sample(tmp_timetable, 6)
 
-    return tmp_timetable
+    return timetable
 
 
 def generate_prompt():
