@@ -18,6 +18,7 @@ import {
   ThreadImageProcessFunctions,
   AdsImageProcessFunctionsPipeline,
   CareerDBSyncFunction,
+  ForumThreadAIFunctions,
 } from '../common/lambda-functions';
 
 export enum Worker {
@@ -25,18 +26,21 @@ export enum Worker {
   CAREER,
   FEEDS,
   THREADIMG,
-  ADS, //! New ADS value
+  ADS,
+  FORUMAI,
 }
 
 export interface DataPipelineProps {
   dataSource?: s3.Bucket;
   dataWarehouse?: dynamodb.Table;
+  threadWareHouse?: dynamodb.Table;
+  commentWareHouse?: dynamodb.Table;
 }
 
 export abstract class AbstractDataPipeline extends Construct {
   abstract readonly dataSource?: s3.Bucket;
   abstract readonly processor: lambda.Function | sfn.StateMachine;
-  abstract readonly dataWarehouse: s3.Bucket | dynamodb.Table;
+  abstract readonly dataWarehouse?: s3.Bucket | dynamodb.Table;
 }
 
 export class SyllabusDataPipeline extends AbstractDataPipeline {
@@ -318,5 +322,28 @@ export class AdsDataPipeline extends AbstractDataPipeline {
         events: [s3.EventType.OBJECT_CREATED],
       }),
     );
+  }
+}
+
+export class ForumThreadAIDataPipeline extends AbstractDataPipeline {
+  readonly dataSource?: s3.Bucket;
+  readonly processor: lambda.Function;
+  readonly dataWarehouse: dynamodb.Table;
+  readonly commentWarehouse: dynamodb.Table;
+
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
+    super(scope, id);
+
+    this.dataSource = props.dataSource!;
+    this.dataWarehouse = props.threadWareHouse!;
+    this.commentWarehouse = props.commentWareHouse!;
+
+    this.processor = new ForumThreadAIFunctions(this, 'career-sync-function', {
+      envVars: {
+        ['BUCKET_NAME']: this.dataSource.bucketName,
+        ['THREAD_TABLE_NAME']: this.dataWarehouse.tableName,
+        ['COMMENT_TABLE_NAME']: this.commentWarehouse.tableName,
+      },
+    }).injectFunction;
   }
 }

@@ -1129,3 +1129,59 @@ export class CareerRestFunctions extends Construct {
     });
   }
 }
+
+export class ForumThreadAIFunctions extends Construct {
+  readonly injectFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const bedrockAccessPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['bedrock:InvokeModel'],
+      resources: ['*'],
+    });
+
+    const DBSyncRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-forum-thread-ai-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-career-sync-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+    DBSyncRole.addToPolicy(bedrockAccessPolicy);
+
+    this.injectFunction = new lambda_py.PythonFunction(this, 'inject-threads', {
+      entry: 'src/lambda/inject-threads',
+      description: 'inject ai generated thread data into the database',
+      functionName: 'inject-thread',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBSyncRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+  }
+}
