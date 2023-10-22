@@ -338,12 +338,16 @@ export class ForumThreadAIDataPipeline extends AbstractDataPipeline {
     this.dataWarehouse = props.threadWareHouse!;
     this.commentWarehouse = props.commentWareHouse!;
 
-    this.processor = new ForumThreadAIFunctions(this, 'career-sync-function', {
-      envVars: {
-        ['BUCKET_NAME']: this.dataSource.bucketName,
-        ['THREAD_TABLE_NAME']: this.dataWarehouse.tableName,
-        ['COMMENT_TABLE_NAME']: this.commentWarehouse.tableName,
+    this.processor = new ForumThreadAIFunctions(
+      this,
+      'forum-thread-ai-function',
+      {
+        envVars: {
+          ['BUCKET_NAME']: this.dataSource.bucketName,
+          ['THREAD_TABLE_NAME']: this.dataWarehouse.tableName,
+          ['COMMENT_TABLE_NAME']: this.commentWarehouse.tableName,
+        },
       },
-    }).injectFunction;
+    ).injectFunction;
   }
 }
