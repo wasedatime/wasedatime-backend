@@ -9,7 +9,7 @@ from boto3.dynamodb.conditions import Key
 import random
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
-table = db.Table(os.getenv('TABLE_NAME'))
+table = db.Table(os.getenv('THREAD_TABLE_NAME'))
 
 s3_client = boto3.client('s3')
 bucket = os.getenv('BUCKET_NAME')
