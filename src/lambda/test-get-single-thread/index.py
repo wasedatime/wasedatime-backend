@@ -11,6 +11,7 @@ def get_threads():
     response = table.query(
         IndexName='UnivIDbyThreadIDIndex',
         KeyConditionExpression=Key('univ_id').eq(univ_id),
+        ProjectionExpression="group_id, board_id, body",
         Limit=10,
         ScanIndexForward=False
     )

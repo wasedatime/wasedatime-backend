@@ -3,12 +3,18 @@ import json
 import logging
 import os
 from decimal import Decimal
+import datetime
+import uuid
+from boto3.dynamodb.conditions import Key
+import random
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
 
 s3_client = boto3.client('s3')
 bucket = os.getenv('BUCKET_NAME')
+
+file_key = 'syllabus/SILS.json'
 
 bedrock_client = boto3.client('bedrock-runtime', region_name='ap-northeast-1')
 
@@ -80,14 +86,91 @@ def resp_handler(func):
     return handle
 
 
-def generate_url(bucket_name, object_key, expiration=3600):
-    try:
-        response = s3_client.generate_presigned_url('get_object',
-                                                    Params={'Bucket': bucket_name,
-                                                            'Key': object_key},
-                                                    ExpiresIn=expiration)
-    except Exception as e:
-        logging.error(str(e))
-        return None
+def get_bedrock_response(input_text):
+    prompt = f'\n\nHuman: 200字以内で答えてください。答える際、200字以内と言わなくてよいです。{input_text}\n\nAssistant:'
 
-    return response
+    modelId = 'anthropic.claude-instant-v1'
+    accept = 'application/json'
+    contentType = 'application/json'
+
+    body = json.dumps({
+        "prompt": prompt,
+        "max_tokens_to_sample": 1000
+    })
+
+    response = bedrock_client.invoke_model(
+        modelId=modelId,
+        accept=accept,
+        contentType=contentType,
+        body=body
+    )
+
+    response_body = json.loads(response.get('body').read())
+
+    return response_body.get('completion')
+
+
+def build_thread_id():
+
+    unique_id = str(uuid.uuid4())
+
+    ts = datetime.now().strftime('%Y%m%d%H%M%S')
+
+    thread_id = f"{ts}_{unique_id}"
+
+    return thread_id
+
+
+def fetch_threads():
+    univ_id = "1"
+    response = table.query(
+        IndexName='UnivIDbyThreadIDIndex',
+        KeyConditionExpression=Key('univ_id').eq(univ_id),
+        ProjectionExpression="group_id, board_id, body",
+        Limit=10,
+        ScanIndexForward=False
+    )
+
+    return response['Items']
+
+
+def fetch_timetable():
+    response = s3_client.get_object(Bucket=bucket, Key=file_key)
+    file_content = response['Body'].read().decode('utf-8')
+
+    syllabus = json.loads(file_content)
+
+    tmp_timetable = []
+
+    for item in syllabus:
+        # Check if 'm' is 0 and 'h' is '2s'
+        if item.get('m') == 0 and item.get('h') == '2s':
+            # Extract fields b, d, k
+            extracted_dict = {
+                'title': item['b'], 'prof': item['d'], 'category': item['k']}
+            tmp_timetable.append(extracted_dict)
+
+    timetable = random.sample(tmp_timetable, 6)
+
+    return timetable
+
+
+def generate_prompt():
+    threads = fetch_threads()
+    classes = fetch_timetable()
+
+    prompt = f'''
+    User: You are a helpful international university student who is active in an online university forum.
+    Given the recent threads you have read : {threads} 
+    and the your timetable: {classes} 
+    for context, generate 3 new forum posts based on the examples.
+    Ensure: 
+    - Do not repeat the examples. 
+    - One forum post must be related to international student life in Japan.
+    - Posts use the group_id and board_id from the example threads.
+    Provide the forum posts in JSON format.
+    '''
+
+    print(prompt)
+
+    return prompt
