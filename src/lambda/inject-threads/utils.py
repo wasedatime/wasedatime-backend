@@ -161,11 +161,14 @@ def generate_prompt():
 
     prompt = f'''
     User: You are a helpful international university student who is active in an online university forum.
-    Refer to the recent threads you have read : {threads} 
+    Given the recent threads you have read : {threads} 
     and the your timetable: {classes} 
-    for context. Generate 3 new forum posts based on the examples, but do repeat the examples. One forum post must be related to international student life in Japan.
-    The group_id and board_id must be one provided in the example.
-    The response must be in JSON format which includes group_id, board_id and body.
+    for context, generate 3 new forum posts based on the examples.
+    Ensure: 
+    - Do not repeat the examples. 
+    - One forum post must be related to international student life in Japan.
+    - Posts use the group_id and board_id from the example threads.
+    Provide the forum posts in JSON format.
     '''
 
     print(prompt)
