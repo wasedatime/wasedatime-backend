@@ -272,6 +272,7 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
           INPUT_BUCKET: this.dataSource.bucketName,
           OUTPUT_BUCKET: this.dataWarehouse.bucketName,
           TABLE_NAME: 'forum-threads',
+          UID: '',
         },
       },
     ).resizeImageFunction;
@@ -338,6 +339,8 @@ export class ForumThreadAIDataPipeline extends AbstractDataPipeline {
     this.dataWarehouse = props.threadWareHouse!;
     this.commentWarehouse = props.commentWareHouse!;
 
+    const UID = process.env.UID!;
+
     this.processor = new ForumThreadAIFunctions(
       this,
       'forum-thread-ai-function',
@@ -346,6 +349,7 @@ export class ForumThreadAIDataPipeline extends AbstractDataPipeline {
           ['BUCKET_NAME']: this.dataSource.bucketName,
           ['THREAD_TABLE_NAME']: this.dataWarehouse.tableName,
           ['COMMENT_TABLE_NAME']: this.commentWarehouse.tableName,
+          ['UID']: UID,
         },
       },
     ).injectFunction;

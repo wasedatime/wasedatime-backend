@@ -31,6 +31,7 @@ env:
   DEPLOY_KEY: ${{ secrets.FEEDS_DEPLOY_PRIVATE_KEY }}
   MASTER_VITE_GA_ID: ${{secrets.VITE_GA_ID}}
   DEV_VITE_GA_ID: ${{secrets.DEV_VITE_GA_ID}}
+  UID: ${{secrets.UID}}
   STAGE: dev
 
 jobs:
