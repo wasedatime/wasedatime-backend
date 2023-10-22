@@ -8,7 +8,8 @@ import {
   SyllabusDataPipeline,
   SyllabusSyncPipeline,
   ThreadImgDataPipeline,
-  AdsDataPipeline, //! New value
+  AdsDataPipeline,
+  ForumThreadAIDataPipeline,
   Worker,
 } from '../constructs/persistence/data-pipeline';
 import { Collection, DynamoDatabase } from '../constructs/persistence/database';
@@ -52,6 +53,17 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     );
     this.dataPipelines[Worker.THREADIMG] = threadImgDataPipeline;
 
+    const forumThreadAIDataPipeline = new ForumThreadAIDataPipeline(
+      this,
+      'forum-thread-ai-data-pipeline',
+      {
+        dataSource: syllabusDataPipeline.dataWarehouse,
+        threadWareHouse: dynamoDatabase.tables[Collection.THREAD],
+        commentWareHouse: dynamoDatabase.tables[Collection.COMMENT],
+      },
+    );
+    this.dataPipelines[Worker.FORUMAI] = forumThreadAIDataPipeline;
+
     //! New pipeline for ads
     const adsDataPipeline = new AdsDataPipeline(this, 'ads-data-pipeline', {
       dataWarehouse: dynamoDatabase.tables[Collection.ADS],
@@ -83,7 +95,6 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       dynamoDatabase.tables[Collection.COMMENT].tableName,
     );
 
-    //! new endpoint for ads
     this.dataInterface.setEndpoint(
       DataEndpoint.ADS,
       dynamoDatabase.tables[Collection.ADS].tableName,
