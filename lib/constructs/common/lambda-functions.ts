@@ -1142,7 +1142,7 @@ export class ForumThreadAIFunctions extends Construct {
       {
         code: lambda.Code.fromAsset('lib/configs/lambda/boto3-layer.zip'),
         compatibleRuntimes: [lambda.Runtime.PYTHON_3_9],
-        layerVersionName: 'latest boto3 layer',
+        layerVersionName: 'latest-boto3-layer',
         description: 'Layer containing updated boto3 and botocore',
       },
     );
