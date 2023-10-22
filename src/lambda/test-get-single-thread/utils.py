@@ -18,6 +18,15 @@ class DecimalEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+class ExtendedEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        if isinstance(obj, set):
+            return list(obj)
+        return super(ExtendedEncoder, self).default(obj)
+
+
 class JsonPayloadBuilder:
     payload = {}
 

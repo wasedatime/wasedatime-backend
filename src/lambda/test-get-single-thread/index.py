@@ -15,7 +15,11 @@ def get_threads():
         ScanIndexForward=False
     )
 
+    print(response)
+
     items = response['Items']
+
+    print(items)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(items).add_message('').compile()
