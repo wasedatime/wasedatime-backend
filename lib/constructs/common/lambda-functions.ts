@@ -1136,13 +1136,13 @@ export class ForumThreadAIFunctions extends Construct {
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
 
-    const latestBoto3Layer = new lambda.LayerVersion(
+    const latestBoto3Layer = new lambda_py.PythonLayerVersion(
       this,
-      'Boto3LayerVersion',
+      'Boto3PythonLayerVersion',
       {
-        code: lambda.Code.fromAsset('lib/configs/lambda/boto3-layer.zip'),
+        entry: 'lib/configs/lambda/python_packages',
         compatibleRuntimes: [lambda.Runtime.PYTHON_3_9],
-        layerVersionName: 'latest-boto3-layer',
+        layerVersionName: 'latest-boto3-python-layer',
         description: 'Layer containing updated boto3 and botocore',
       },
     );
