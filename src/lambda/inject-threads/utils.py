@@ -86,30 +86,6 @@ def resp_handler(func):
     return handle
 
 
-def get_bedrock_response(input_text):
-    prompt = f'\n\nHuman: 200字以内で答えてください。答える際、200字以内と言わなくてよいです。{input_text}\n\nAssistant:'
-
-    modelId = 'anthropic.claude-instant-v1'
-    accept = 'application/json'
-    contentType = 'application/json'
-
-    body = json.dumps({
-        "prompt": prompt,
-        "max_tokens_to_sample": 1000
-    })
-
-    response = bedrock_client.invoke_model(
-        modelId=modelId,
-        accept=accept,
-        contentType=contentType,
-        body=body
-    )
-
-    response_body = json.loads(response.get('body').read())
-
-    return response_body.get('completion')
-
-
 def build_thread_id():
 
     unique_id = str(uuid.uuid4())
@@ -169,8 +145,34 @@ def generate_prompt():
     - One forum post must be related to international student life in Japan.
     - Posts use the group_id and board_id from the example threads.
     Provide the forum posts in JSON format.
+    Assistant:
     '''
 
-    print(prompt)
-
     return prompt
+
+
+def get_bedrock_response():
+
+    prompt = generate_prompt()
+
+    modelId = 'anthropic.claude-instant-v1'
+    accept = 'application/json'
+    contentType = 'application/json'
+
+    body = json.dumps({
+        "prompt": prompt,
+        "max_tokens_to_sample": 2000
+    })
+
+    response = bedrock_client.invoke_model(
+        modelId=modelId,
+        accept=accept,
+        contentType=contentType,
+        body=body
+    )
+
+    response_body = json.loads(response.get('body').read())
+
+    completion = response_body.get('completion')
+
+    return completion
