@@ -151,10 +151,11 @@ def generate_prompt():
     prompt_recent_threads = f'''\n\nHuman:
     Use the following example threads as your reference for topics and writing style of the students : {threads}
     You are a helpful international university student who is active in an online university forum.
-    Generate 1 new forum posts for each given topics like if you are an university student.
+    Generate 1 new forum post for each given topics like if you are an university student.
     Ensure: 
     - Do not repeat the examples. 
     - Do not make any offers.
+    - Respond in format TOPIC: CONTENT
     Assistant:
     '''
 
