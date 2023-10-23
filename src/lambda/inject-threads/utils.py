@@ -16,7 +16,7 @@ bucket = os.getenv('BUCKET_NAME')
 
 file_key = 'syllabus/SILS.json'
 
-# bedrock_client = boto3.client('bedrock-runtime', region_name='ap-northeast-1')
+bedrock_client = boto3.client('bedrock-runtime', region_name='ap-northeast-1')
 
 
 class DecimalEncoder(json.JSONEncoder):
