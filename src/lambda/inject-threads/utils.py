@@ -155,7 +155,7 @@ def generate_prompt():
     Ensure: 
     - Do not repeat the examples. 
     - Do not make any offers.
-    - Respond in format TOPIC: CONTENT
+    - Respond strictly in format TOPIC: CONTENT
     Assistant:
     '''
 
