@@ -107,7 +107,18 @@ def fetch_threads():
         ScanIndexForward=False
     )
 
-    return response['Items']
+    items: dict = response['Items']
+
+    data = [message for message in dict.get(items, 'data')]
+
+    categorized_messages = {
+        board: [item['body'] for item in data if item['board_id'] == board]
+        for board in ['wtf', 'life', 'job', 'academic']
+    }
+
+    logging.debug(f"categorized : {categorized_messages}")
+
+    return json.dumps(categorized_messages)
 
 
 def fetch_timetable():
@@ -127,27 +138,29 @@ def fetch_timetable():
             tmp_timetable.append(extracted_dict)
 
     timetable = random.sample(tmp_timetable, 6)
-
-    return timetable
+    classes = ', '.join(timetable)
+    return classes
 
 
 def generate_prompt():
     threads = fetch_threads()
     classes = fetch_timetable()
 
-    prompt_recent_threads = f'''\n\nHuman: You are a helpful international university student who is active in an online university forum.
+    prompt_recent_threads = f'''\n\nHuman:
     Use the following example threads as your reference for topics and writing style of the students : {threads}
-    Generate 3 new forum posts based on the examples.
+    You are a helpful international university student who is active in an online university forum.
+    Generate 3 new forum posts based on given topics like if you are an university student.
     Ensure: 
     - Do not repeat the examples. 
     Assistant:
     '''
 
-    prompt_timetable = f'''\n\nHuman: You are a helpful international university student who is active in an online university forum.
+    prompt_timetable = f'''\n\nHuman: 
     Use the following syllabus data as your timetable as reference : {classes}
-    Generate 3 new forum posts based on the examples.
+    Generate 3 new forum posts based on the given topics like if you are an university student.
     Ensure: 
     - Do not repeat the examples. 
+    You are a helpful international university student who is active in an online university forum.
     Assistant:
     '''
 
@@ -157,7 +170,7 @@ def generate_prompt():
 
     logging.debug(f"Chosen Prompt : {chosen_prompt}")
 
-    return chosen_prompt
+    return chosen_prompt[0]
 
 
 def get_bedrock_response():
