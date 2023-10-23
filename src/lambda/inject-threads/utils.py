@@ -135,19 +135,29 @@ def generate_prompt():
     threads = fetch_threads()
     classes = fetch_timetable()
 
-    prompt = f'''\n\nHuman: You are a helpful international university student who is active in an online university forum.
-    Given the recent threads you have read : {threads} 
-    and the your timetable: {classes}
-    for context, generate 3 new forum posts based on the examples.
+    prompt_recent_threads = f'''\n\nHuman: You are a helpful international university student who is active in an online university forum.
+    Use the following example threads as your reference for topics and writing style of the students : {threads}
+    Generate 3 new forum posts based on the examples.
     Ensure: 
     - Do not repeat the examples. 
-    - One forum post must be related to international student life in Japan.
-    - Posts use the group_id and board_id from the example threads.
-    Provide the forum posts in JSON format.
     Assistant:
     '''
 
-    return prompt
+    prompt_timetable = f'''\n\nHuman: You are a helpful international university student who is active in an online university forum.
+    Use the following syllabus data as your timetable as reference : {classes}
+    Generate 3 new forum posts based on the examples.
+    Ensure: 
+    - Do not repeat the examples. 
+    Assistant:
+    '''
+
+    prompt_list = [prompt_recent_threads, prompt_timetable]
+
+    chosen_prompt = random.sample(prompt_list, 1)
+
+    logging.debug(f"Chosen Prompt : {chosen_prompt}")
+
+    return chosen_prompt
 
 
 def get_bedrock_response():
@@ -160,7 +170,8 @@ def get_bedrock_response():
 
     body = json.dumps({
         "prompt": prompt,
-        "max_tokens_to_sample": 2000
+        "max_tokens_to_sample": 2000,
+        "temperature": 0.8
     })
 
     response = bedrock_client.invoke_model(
