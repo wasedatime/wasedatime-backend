@@ -7,12 +7,18 @@ import datetime
 import uuid
 from boto3.dynamodb.conditions import Key
 import random
+import re
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('THREAD_TABLE_NAME'))
 
 s3_client = boto3.client('s3')
 bucket = os.getenv('BUCKET_NAME')
+
+UID = os.getenv('UID')
+
+UNIV_ID = "1"
+
 
 file_key = 'syllabus/SILS.json'
 
@@ -141,33 +147,20 @@ def fetch_timetable():
 
 def generate_prompt():
     threads = fetch_threads()
-    classes = fetch_timetable()
 
     prompt_recent_threads = f'''\n\nHuman:
     Use the following example threads as your reference for topics and writing style of the students : {threads}
     You are a helpful international university student who is active in an online university forum.
-    Generate 3 new forum posts based on given topics like if you are an university student.
+    Generate 4 new forum posts based on given topics like if you are an university student.
     Ensure: 
     - Do not repeat the examples. 
+    - Do not make any offers.
     Assistant:
     '''
 
-    prompt_timetable = f'''\n\nHuman: 
-    Use the following syllabus data as your timetable as reference : {classes}
-    Generate 3 new forum posts based on the given topics like if you are an university student.
-    Ensure: 
-    - Do not repeat the examples. 
-    You are a helpful international university student who is active in an online university forum.
-    Assistant:
-    '''
+    logging.debug(f"Chosen Prompt : {prompt_recent_threads}")
 
-    prompt_list = [prompt_recent_threads, prompt_timetable]
-
-    chosen_prompt = random.sample(prompt_list, 1)
-
-    logging.debug(f"Chosen Prompt : {chosen_prompt}")
-
-    return chosen_prompt[0]
+    return prompt_recent_threads
 
 
 def get_bedrock_response():
@@ -196,3 +189,31 @@ def get_bedrock_response():
     completion: dict = response_body.get('completion')
 
     return completion
+
+
+def select_thread():
+    completion = get_bedrock_response()
+
+    pattern = re.compile(
+        r"(Academic|Job|Life|WTF):([\s\S]*?)(?=(Academic|Job|Life|WTF):|$)", re.IGNORECASE)
+
+    matches = pattern.findall(completion)
+
+    forum_posts = [{"topic": match[0], "content": match[1].strip()}
+                   for match in matches]
+
+    for post in forum_posts:
+        post['topic'] = post['topic'].lower()
+
+    selected_thread = random.choice(forum_posts)
+
+    return selected_thread
+
+
+def select_school():
+    school_options = ['SILS', 'PSE', 'SSS',
+                      'FSE', 'SOC', 'CSE', 'CJL', 'G_SICCS']
+
+    selected_school = random.choice(school_options)
+
+    return selected_school
