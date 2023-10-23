@@ -107,12 +107,10 @@ def fetch_threads():
         ScanIndexForward=False
     )
 
-    items: dict = response['Items']
-
-    data = [message for message in dict.get(items, 'data')]
+    items: list = response['Items']
 
     categorized_messages = {
-        board: [item['body'] for item in data if item['board_id'] == board]
+        board: [item['body'] for item in items if item['board_id'] == board]
         for board in ['wtf', 'life', 'job', 'academic']
     }
 
@@ -196,6 +194,6 @@ def get_bedrock_response():
 
     response_body = json.loads(response.get('body').read())
 
-    completion = response_body.get('completion')
+    completion: dict = response_body.get('completion')
 
     return completion
