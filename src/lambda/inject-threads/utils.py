@@ -136,8 +136,7 @@ def fetch_timetable():
             tmp_timetable.append(extracted_dict)
 
     timetable = random.sample(tmp_timetable, 6)
-    classes = ', '.join(timetable)
-    return classes
+    return timetable
 
 
 def generate_prompt():
