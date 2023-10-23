@@ -135,10 +135,9 @@ def generate_prompt():
     threads = fetch_threads()
     classes = fetch_timetable()
 
-    prompt = f'''
-    User: You are a helpful international university student who is active in an online university forum.
+    prompt = f'''\n\nHuman: You are a helpful international university student who is active in an online university forum.
     Given the recent threads you have read : {threads} 
-    and the your timetable: {classes} 
+    and the your timetable: {classes}
     for context, generate 3 new forum posts based on the examples.
     Ensure: 
     - Do not repeat the examples. 
