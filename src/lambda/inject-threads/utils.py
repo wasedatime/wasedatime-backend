@@ -3,7 +3,7 @@ import json
 import logging
 import os
 from decimal import Decimal
-import datetime
+from datetime import datetime
 import uuid
 from boto3.dynamodb.conditions import Key
 import random
@@ -115,14 +115,14 @@ def fetch_threads():
 
     items: list = response['Items']
 
-    categorized_messages = {
+    categorized_threads = {
         board: [item['body'] for item in items if item['board_id'] == board]
         for board in ['wtf', 'life', 'job', 'academic']
     }
 
-    logging.debug(f"categorized : {categorized_messages}")
+    logging.info(f"categorized : {categorized_threads}")
 
-    return json.dumps(categorized_messages)
+    return json.dumps(categorized_threads)
 
 
 def fetch_timetable():
@@ -151,14 +151,14 @@ def generate_prompt():
     prompt_recent_threads = f'''\n\nHuman:
     Use the following example threads as your reference for topics and writing style of the students : {threads}
     You are a helpful international university student who is active in an online university forum.
-    Generate 4 new forum posts based on given topics like if you are an university student.
+    Generate 4 new forum posts for each given topics like if you are an university student.
     Ensure: 
     - Do not repeat the examples. 
     - Do not make any offers.
     Assistant:
     '''
 
-    logging.debug(f"Chosen Prompt : {prompt_recent_threads}")
+    logging.info(f"Chosen Prompt : {prompt_recent_threads}")
 
     return prompt_recent_threads
 
@@ -205,9 +205,13 @@ def select_thread():
     for post in forum_posts:
         post['topic'] = post['topic'].lower()
 
-    selected_thread = random.choice(forum_posts)
-
-    return selected_thread
+    try:
+        selected_thread = random.choice(forum_posts)
+        logging.info(selected_thread)
+        return selected_thread
+    except IndexError:
+        logging.warning("LLM anomaly: No matching threads found.")
+        return None
 
 
 def select_school():
@@ -215,5 +219,7 @@ def select_school():
                       'FSE', 'SOC', 'CSE', 'CJL', 'G_SICCS']
 
     selected_school = random.choice(school_options)
+
+    logging.info(selected_school)
 
     return selected_school

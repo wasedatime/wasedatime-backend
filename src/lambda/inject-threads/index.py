@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from utils import JsonPayloadBuilder, resp_handler, select_thread, build_thread_id, UID, table, select_school, UNIV_ID
 
 
@@ -34,5 +34,9 @@ def inject_thread(topic, content):
 
 def handler(event, context):
     resp = select_thread()
+
+    if resp is None:
+        # No threads were found; end the Lambda function.
+        return
 
     return inject_thread(**resp)
