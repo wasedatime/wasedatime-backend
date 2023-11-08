@@ -28,6 +28,7 @@ export enum Worker {
   THREADIMG,
   ADS,
   FORUMAI,
+  COMMENTAI,
 }
 
 export interface DataPipelineProps {
@@ -347,6 +348,36 @@ export class ForumThreadAIDataPipeline extends AbstractDataPipeline {
       {
         envVars: {
           ['BUCKET_NAME']: this.dataSource.bucketName,
+          ['THREAD_TABLE_NAME']: this.dataWarehouse.tableName,
+          ['COMMENT_TABLE_NAME']: this.commentWarehouse.tableName,
+          ['UID']: UID,
+        },
+      },
+    ).injectFunction;
+  }
+}
+
+export class ForumCommentAIDataPipeline extends AbstractDataPipeline {
+  readonly dataSource?: s3.Bucket;
+  readonly processor: lambda.Function;
+  readonly dataWarehouse: dynamodb.Table;
+  readonly commentWarehouse: dynamodb.Table;
+
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
+    super(scope, id);
+
+    // this.dataSource = props.dataSource!;
+    this.dataWarehouse = props.threadWareHouse!;
+    this.commentWarehouse = props.commentWareHouse!;
+
+    const UID = process.env.UID!;
+
+    this.processor = new ForumThreadAIFunctions(
+      this,
+      'forum-thread-ai-function',
+      {
+        envVars: {
+          // ['BUCKET_NAME']: this.dataSource.bucketName,
           ['THREAD_TABLE_NAME']: this.dataWarehouse.tableName,
           ['COMMENT_TABLE_NAME']: this.commentWarehouse.tableName,
           ['UID']: UID,
