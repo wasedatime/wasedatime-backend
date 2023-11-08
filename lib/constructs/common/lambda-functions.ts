@@ -1223,13 +1223,13 @@ export class ForumCommentAIFunctions extends Construct {
 
     const DBSyncRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamodb-s3-forum-comment-ai-role',
+      'dynamodb-s3-ai-comment-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
           'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-forum-comment-ai-role',
+        roleName: 'dynamodb-s3-ai-comment-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
