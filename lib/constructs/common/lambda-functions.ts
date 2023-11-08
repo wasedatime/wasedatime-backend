@@ -1229,7 +1229,7 @@ export class ForumCommentAIFunctions extends Construct {
         description:
           'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-forum-thread-ai-role',
+        roleName: 'dynamodb-s3-forum-comment-ai-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
