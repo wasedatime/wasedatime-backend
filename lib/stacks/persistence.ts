@@ -10,6 +10,7 @@ import {
   ThreadImgDataPipeline,
   AdsDataPipeline,
   ForumThreadAIDataPipeline,
+  ForumCommentAIDataPipeline,
   Worker,
 } from '../constructs/persistence/data-pipeline';
 import { Collection, DynamoDatabase } from '../constructs/persistence/database';
@@ -63,6 +64,17 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       },
     );
     this.dataPipelines[Worker.FORUMAI] = forumThreadAIDataPipeline;
+
+    const forumCommentAIDataPipeline = new ForumCommentAIDataPipeline(
+      this,
+      'forum-thread-ai-data-pipeline',
+      {
+        // dataSource: syllabusDataPipeline.dataWarehouse,
+        threadWareHouse: dynamoDatabase.tables[Collection.THREAD],
+        commentWareHouse: dynamoDatabase.tables[Collection.COMMENT],
+      },
+    );
+    this.dataPipelines[Worker.COMMENTAI] = forumCommentAIDataPipeline;
 
     //! New pipeline for ads
     const adsDataPipeline = new AdsDataPipeline(this, 'ads-data-pipeline', {

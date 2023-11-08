@@ -20,7 +20,7 @@ def get_imgs_list(board_id, ad_id):
         
         # If the count propperty doesn't exist yet, set to 1, if existed increase by 1
         table.update_item(
-                Key={
+            Key={
                 "board_id": board_id,
                 "ad_id": ad_id,
             },
