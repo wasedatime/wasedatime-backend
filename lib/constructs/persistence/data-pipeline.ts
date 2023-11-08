@@ -19,6 +19,7 @@ import {
   AdsImageProcessFunctionsPipeline,
   CareerDBSyncFunction,
   ForumThreadAIFunctions,
+  ForumCommentAIFunctions,
 } from '../common/lambda-functions';
 
 export enum Worker {
@@ -372,9 +373,9 @@ export class ForumCommentAIDataPipeline extends AbstractDataPipeline {
 
     const UID = process.env.UID!;
 
-    this.processor = new ForumThreadAIFunctions(
+    this.processor = new ForumCommentAIFunctions(
       this,
-      'forum-thread-ai-function',
+      'forum-comment-ai-function',
       {
         envVars: {
           // ['BUCKET_NAME']: this.dataSource.bucketName,
