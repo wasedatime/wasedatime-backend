@@ -1197,3 +1197,75 @@ export class ForumThreadAIFunctions extends Construct {
     });
   }
 }
+
+export class ForumCommentAIFunctions extends Construct {
+  readonly injectFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const latestBoto3Layer = new lambda_py.PythonLayerVersion(
+      this,
+      'Boto3PythonLayerVersion',
+      {
+        entry: 'lib/configs/lambda/python_packages',
+        compatibleRuntimes: [lambda.Runtime.PYTHON_3_9],
+        layerVersionName: 'latest-boto3-python-layer',
+        description: 'Layer containing updated boto3 and botocore',
+      },
+    );
+
+    const bedrockAccessPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['bedrock:InvokeModel'],
+      resources: ['*'],
+    });
+
+    const DBSyncRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-ai-comment-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-ai-comment-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+    DBSyncRole.addToPolicy(bedrockAccessPolicy);
+
+    this.injectFunction = new lambda_py.PythonFunction(
+      this,
+      'inject-comments',
+      {
+        entry: 'src/lambda/inject-comments',
+        description: 'inject ai generated comment data into the database',
+        functionName: 'inject-comment',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 128,
+        role: DBSyncRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(60),
+        environment: props.envVars,
+        layers: [latestBoto3Layer],
+      },
+    );
+  }
+}
