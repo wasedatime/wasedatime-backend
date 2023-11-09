@@ -99,7 +99,7 @@ def fetch_top_thread():
         # make all itmes sort in thread__id, which mean sort in created time in our case.
         IndexName='UnivIDbyThreadIDIndex',
         KeyConditionExpression=Key('univ_id').eq(univ_id),
-        ProjectionExpression="group_id, board_id, body", # This will reduce the information that is reuturned, but PK, SK is always returned.
+        ProjectionExpression="thread_id, group_id, board_id, body", # This will reduce the information that is reuturned, but PK, SK is always returned.
         Limit=1,
         ScanIndexForward=False
     )
