@@ -93,9 +93,14 @@ def fetch_top_thread():
 
     :return: Body and thread_id of the latest thread
     """
-    response = table_thread.scan(
+    univ_id = "1"
+    response = table_thread.query(
+        # If query in this way, it will get the latest thread that is created. Since when query with GSI, the current case will
+        # make all itmes sort in thread__id, which mean sort in created time in our case.
+        IndexName='UnivIDbyThreadIDIndex',
+        KeyConditionExpression=Key('univ_id').eq(univ_id),
+        ProjectionExpression="group_id, board_id, body", # This will reduce the information that is reuturned, but PK, SK is always returned.
         Limit=1,
-        Select='ALL_ATTRIBUTES',
         ScanIndexForward=False
     )
 

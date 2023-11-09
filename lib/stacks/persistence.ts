@@ -67,7 +67,7 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
 
     const forumCommentAIDataPipeline = new ForumCommentAIDataPipeline(
       this,
-      'forum-comment-ai-data-pipeline', // Error fixed
+      'forum-ai-comment-data-pipeline', // Error fixed
       {
         // dataSource: syllabusDataPipeline.dataWarehouse,
         threadWareHouse: dynamoDatabase.tables[Collection.THREAD],
