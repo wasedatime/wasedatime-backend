@@ -2,13 +2,14 @@ import email
 import json
 from datetime import datetime
 
-from utils import JsonPayloadBuilder, table, resp_handler
+from utils import JsonPayloadBuilder, table, resp_handler, get_user_creation_date
 
 
 @resp_handler
 def post_profile(profile, uid):
 
-    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+    # dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+    created_date = get_user_creation_date(uid)  
 
     user_profile = {
         "uid": uid,
@@ -19,8 +20,8 @@ def post_profile(profile, uid):
         "languages" : profile["languages"],
         "interests" : profile["interests"],
         "school" : profile["school"],
-        "created_at": dt_now,
-        "updated_at": dt_now,
+        "created_at": created_date,
+        "updated_at": created_date,
     }
     table.put_item(Item=user_profile)
 
