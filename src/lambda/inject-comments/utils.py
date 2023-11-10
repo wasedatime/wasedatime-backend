@@ -147,6 +147,7 @@ def generate_prompt():
     
     comments = fetch_comments(thread_id)
 
+    #! Adjust the prompt so that we get a better generated comment from bedrock
     prompt_recent_threads = f'''\n\nHuman:
     Use the following example threads as your reference for topics and writing style of the students : original thread={thread_body}, comments={comments}
     You are a helpful international university student who is active in an online university forum.

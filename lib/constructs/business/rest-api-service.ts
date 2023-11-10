@@ -20,6 +20,9 @@ import {
   forumCommentPostReqSchema,
   forumCommentPatchReqSchema,
   syllabusSchema,
+  userProfileGetRespSchema,
+  userProfilePostReqSchema,
+  userProfilePatchReqSchema,
 } from '../../configs/api-gateway/schema';
 import { AwsServicePrincipal } from '../../configs/common/aws';
 import {
@@ -30,6 +33,7 @@ import {
   ForumCommentFunctions,
   AdsImageProcessFunctionsAPI,
   CareerRestFunctions,
+  ProfileProcessFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -53,7 +57,6 @@ export class RestApiService extends Construct {
   }
 }
 
-//! New code for adsImgs
 export class ForumAdsApiService extends RestApiService {
   readonly resourceMapping: {
     [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
@@ -1186,6 +1189,168 @@ export class ForumCommentsApiService extends RestApiService {
         [apigw2.HttpMethod.PATCH]: patchForumComment,
         [apigw2.HttpMethod.POST]: postForumComment,
         [apigw2.HttpMethod.DELETE]: deleteForumComment,
+      },
+    };
+  }
+}
+
+export class ProfileProcessApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
+
+    const root = scope.apiEndpoint.root.addResource('profile');
+
+    const optionsProfileProcess = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const profileProcessFunctions = new ProfileProcessFunctions(
+      this,
+      'crud-functions',
+      {
+        envVars: {
+          TABLE_NAME: props.dataSource!,
+        },
+      },
+    );
+
+    const getIntegration = new apigw.LambdaIntegration(
+      profileProcessFunctions.getFunction,
+      { proxy: true },
+    );
+    const postIntegration = new apigw.LambdaIntegration(
+      profileProcessFunctions.postFunction,
+      { proxy: true },
+    );
+    const patchIntegration = new apigw.LambdaIntegration(
+      profileProcessFunctions.patchFunction,
+      { proxy: true },
+    );
+    const deleteIntegration = new apigw.LambdaIntegration(
+      profileProcessFunctions.deleteFunction,
+      { proxy: true },
+    );
+
+    const getRespModel = scope.apiEndpoint.addModel('comment-get-resp-model', {
+      schema: userProfileGetRespSchema,
+      contentType: 'application/json',
+      description:
+        'HTTP GET response body schema for fetching a comment of a thread.',
+      modelName: 'GetCommentsResp',
+    });
+    const postReqModel = scope.apiEndpoint.addModel('comment-post-req-model', {
+      schema: userProfilePostReqSchema,
+      contentType: 'application/json',
+      description:
+        'HTTP POST request body schema for submitting a comment of a thread.',
+      modelName: 'PostCommentReq',
+    });
+    const patchReqModel = scope.apiEndpoint.addModel(
+      'comment-patch-req-model',
+      {
+        schema: userProfilePatchReqSchema,
+        contentType: 'application/json',
+        description:
+          'HTTP PATCH request body schema for updating a comment of a thread',
+        modelName: 'PatchCommentReq',
+      },
+    );
+
+    const getUserProfile = root.addMethod(
+      apigw2.HttpMethod.GET,
+      getIntegration,
+      {
+        requestParameters: {
+          'method.request.querystring.uid': false,
+        },
+        operationName: 'GetUserProfile',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+    const postUserProfile = root.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        operationName: 'PostUserProfile',
+        requestModels: { ['application/json']: postReqModel },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const patchUserProfile = root.addMethod(
+      apigw2.HttpMethod.PATCH,
+      patchIntegration,
+      {
+        operationName: 'UpdateUseProfile',
+        requestParameters: {
+          'method.request.querystring.ts': true,
+        },
+        requestModels: { ['application/json']: patchReqModel },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const deleteUserProfile = root.addMethod(
+      apigw2.HttpMethod.DELETE,
+      deleteIntegration,
+      {
+        operationName: 'DeleteUserProfile',
+        requestParameters: {
+          'method.request.querystring.ts': true,
+        },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+
+    this.resourceMapping = {
+      '/profile': {
+        [apigw2.HttpMethod.GET]: getUserProfile,
+        [apigw2.HttpMethod.OPTIONS]: optionsProfileProcess,
+        [apigw2.HttpMethod.PATCH]: patchUserProfile,
+        [apigw2.HttpMethod.POST]: postUserProfile,
+        [apigw2.HttpMethod.DELETE]: deleteUserProfile,
       },
     };
   }

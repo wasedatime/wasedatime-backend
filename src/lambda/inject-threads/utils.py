@@ -149,7 +149,7 @@ def generate_prompt():
     threads = fetch_threads()
 
     prompt_recent_threads = f'''\n\nHuman:
-    Use the following example threads as your reference for topics and writing style of the students : {threads}
+    Use the following example threads as your reference for topics of the students : {threads}
     You are a helpful international university student who is active in an online university forum.
     Generate 1 new forum post for each given topics like if you are an university student.
     Ensure: 
