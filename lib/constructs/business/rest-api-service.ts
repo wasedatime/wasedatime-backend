@@ -1246,7 +1246,7 @@ export class ProfileProcessApiService extends RestApiService {
       profileProcessFunctions.deleteFunction,
       { proxy: true },
     );
-
+    // bug fixed
     const getRespModel = scope.apiEndpoint.addModel('profile-get-resp-model', {
       schema: userProfileGetRespSchema,
       contentType: 'application/json',
