@@ -1247,27 +1247,27 @@ export class ProfileProcessApiService extends RestApiService {
       { proxy: true },
     );
 
-    const getRespModel = scope.apiEndpoint.addModel('comment-get-resp-model', {
+    const getRespModel = scope.apiEndpoint.addModel('profile-get-resp-model', {
       schema: userProfileGetRespSchema,
       contentType: 'application/json',
       description:
-        'HTTP GET response body schema for fetching a comment of a thread.',
+        'HTTP GET response body schema for fetching user profile.',
       modelName: 'GetCommentsResp',
     });
-    const postReqModel = scope.apiEndpoint.addModel('comment-post-req-model', {
+    const postReqModel = scope.apiEndpoint.addModel('profile-post-req-model', {
       schema: userProfilePostReqSchema,
       contentType: 'application/json',
       description:
-        'HTTP POST request body schema for submitting a comment of a thread.',
+        'HTTP POST request body schema for submitting a user profile.',
       modelName: 'PostCommentReq',
     });
     const patchReqModel = scope.apiEndpoint.addModel(
-      'comment-patch-req-model',
+      'profile-patch-req-model',
       {
         schema: userProfilePatchReqSchema,
         contentType: 'application/json',
         description:
-          'HTTP PATCH request body schema for updating a comment of a thread',
+          'HTTP PATCH request body schema for updating a user profile',
         modelName: 'PatchCommentReq',
       },
     );
