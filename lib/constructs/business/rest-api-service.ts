@@ -1252,14 +1252,14 @@ export class ProfileProcessApiService extends RestApiService {
       contentType: 'application/json',
       description:
         'HTTP GET response body schema for fetching user profile.',
-      modelName: 'GetCommentsResp',
+      modelName: 'GetProfileResp',
     });
     const postReqModel = scope.apiEndpoint.addModel('profile-post-req-model', {
       schema: userProfilePostReqSchema,
       contentType: 'application/json',
       description:
         'HTTP POST request body schema for submitting a user profile.',
-      modelName: 'PostCommentReq',
+      modelName: 'PostProfileReq',
     });
     const patchReqModel = scope.apiEndpoint.addModel(
       'profile-patch-req-model',
@@ -1268,7 +1268,7 @@ export class ProfileProcessApiService extends RestApiService {
         contentType: 'application/json',
         description:
           'HTTP PATCH request body schema for updating a user profile',
-        modelName: 'PatchCommentReq',
+        modelName: 'PatchProfileReq',
       },
     );
 
