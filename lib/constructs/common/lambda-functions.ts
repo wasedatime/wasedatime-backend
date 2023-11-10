@@ -1287,7 +1287,7 @@ export class ProfileProcessFunctions extends Construct {
         description:
           'Allow lambda function to perform crud operation on dynamodb',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-lambda-read-comment',
+        roleName: 'dynamodb-lambda-read-profile',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -1311,7 +1311,7 @@ export class ProfileProcessFunctions extends Construct {
         description:
           'Allow lambda function to perform crud operation on dynamodb',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-lambda-write-comment',
+        roleName: 'dynamodb-lambda-write-profile',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
