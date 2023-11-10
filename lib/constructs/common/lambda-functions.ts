@@ -1269,3 +1269,116 @@ export class ForumCommentAIFunctions extends Construct {
     );
   }
 }
+
+export class ProfileProcessFunctions extends Construct {
+  readonly getFunction: lambda.Function;
+  readonly postFunction: lambda.Function;
+  readonly patchFunction: lambda.Function;
+  readonly deleteFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const dynamoDBReadRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-read-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-lambda-read-comment',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-read-only',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+          ),
+        ],
+      },
+    );
+
+    const dynamoDBPutRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-put-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-lambda-write-comment',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+        ],
+      },
+    );
+
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-profile', {
+      entry: 'src/lambda/get-profile',
+      description: 'get user profile from the database.',
+      functionName: 'get-user-profile',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
+    this.postFunction = new lambda_py.PythonFunction(this, 'post-profile', {
+      entry: 'src/lambda/post-profile',
+      description: 'Save user profile into the database.',
+      functionName: 'post-user-profile',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    }).addEnvironment(
+      'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+      GOOGLE_API_SERVICE_ACCOUNT_INFO,
+    );
+
+    this.patchFunction = new lambda_py.PythonFunction(this, 'patch-profile', {
+      entry: 'src/lambda/patch-comment',
+      description: 'Update user profile in the database.',
+      functionName: 'patch-user-profile',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    }).addEnvironment(
+      'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+      GOOGLE_API_SERVICE_ACCOUNT_INFO,
+    );
+
+    this.deleteFunction = new lambda_py.PythonFunction(this, 'delete-profile', {
+      entry: 'src/lambda/delete-profile',
+      description: 'Delete user profile in the database.',
+      functionName: 'delete-user-profile',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+  }
+}

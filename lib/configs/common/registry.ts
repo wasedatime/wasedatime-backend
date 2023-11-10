@@ -12,7 +12,8 @@ export const enum DataEndpoint {
   COURSE,
   THREAD,
   COMMENT,
-  ADS, //! New ADS value
+  ADS,
+  PROFILE, //! New ADS value
 }
 
 export enum OperationEndpoint {

@@ -76,12 +76,12 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     );
     this.dataPipelines[Worker.COMMENTAI] = forumCommentAIDataPipeline;
 
-    //! New pipeline for ads
     const adsDataPipeline = new AdsDataPipeline(this, 'ads-data-pipeline', {
       dataWarehouse: dynamoDatabase.tables[Collection.ADS],
     });
     this.dataPipelines[Worker.ADS] = adsDataPipeline;
 
+    //! End points for database
     this.dataInterface.setEndpoint(
       DataEndpoint.COURSE_REVIEWS,
       dynamoDatabase.tables[Collection.COURSE_REVIEW].tableName,
@@ -106,10 +106,13 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       DataEndpoint.COMMENT,
       dynamoDatabase.tables[Collection.COMMENT].tableName,
     );
-
     this.dataInterface.setEndpoint(
       DataEndpoint.ADS,
       dynamoDatabase.tables[Collection.ADS].tableName,
+    );
+    this.dataInterface.setEndpoint(
+      DataEndpoint.PROFILE,
+      dynamoDatabase.tables[Collection.PROFILE].tableName,
     );
 
     // this.dataInterface.setEndpoint(
