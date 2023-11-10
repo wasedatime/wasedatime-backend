@@ -172,7 +172,7 @@ export class DynamoDatabase extends Construct {
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.RETAIN,
         timeToLiveAttribute: 'ttl',
-        tableName: 'waseda-user-profile',
+        tableName: 'waseda-profile',
         readCapacity: 1,
         writeCapacity: 1,
       },
