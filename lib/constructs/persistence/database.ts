@@ -167,7 +167,7 @@ export class DynamoDatabase extends Construct {
       'dynamodb-profile-table',
       {
         partitionKey: { name: 'uid', type: dynamodb.AttributeType.STRING },
-        sortKey: { name: 'class_of', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
         billingMode: dynamodb.BillingMode.PROVISIONED,
         encryption: dynamodb.TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.RETAIN,
