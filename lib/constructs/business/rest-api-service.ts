@@ -1250,8 +1250,7 @@ export class ProfileProcessApiService extends RestApiService {
     const getRespModel = scope.apiEndpoint.addModel('profile-get-resp-model', {
       schema: userProfileGetRespSchema,
       contentType: 'application/json',
-      description:
-        'HTTP GET response body schema for fetching user profile.',
+      description: 'HTTP GET response body schema for fetching user profile.',
       modelName: 'GetProfileResp',
     });
     const postReqModel = scope.apiEndpoint.addModel('profile-post-req-model', {
@@ -1287,6 +1286,7 @@ export class ProfileProcessApiService extends RestApiService {
             responseParameters: lambdaRespParams,
           },
         ],
+        authorizer: props.authorizer,
         requestValidator: props.validator,
       },
     );
