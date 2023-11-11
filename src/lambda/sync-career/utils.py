@@ -67,3 +67,11 @@ def resp_handler(func):
             return api_response(500, resp)
 
     return handle
+
+def get_image_key(folder, image_name):
+    response = s3_client.list_objects_v2(Bucket=bucket, Prefix=f"{folder}/")
+    for obj in response.get('Contents', []):
+        key = obj['Key']
+        if key.startswith(f"{folder}/{image_name}"):
+            return key
+    return None

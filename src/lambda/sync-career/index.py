@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from utils import JsonPayloadBuilder
-from utils import resp_handler, table, bucket, s3_client
+from utils import resp_handler, table, bucket, s3_client, get_image_key
 
 
 @resp_handler
@@ -15,12 +15,11 @@ def sync_career(key):
         json_content = json.loads(file_content)
 
         # Get folder (company name)
-        folder = key.split('/')[0]  # Assuming the folder is the first part of the key
+        folder = key.split('/')[0]
 
         # Construct keys for images
-        hero_image_key = f"{folder}/hero_image"
-        company_logo_key = f"{folder}/company_logo"
-    
+        hero_image_key = get_image_key(folder, "hero_image")
+        company_logo_key = get_image_key(folder, "company_logo")
 
         item = {
             'job_id': json_content['job_id'],
