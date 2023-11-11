@@ -82,6 +82,10 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
       .addService(
         'ads',
         this.dataInterface.getEndpoint(DataEndpoint.ADS),
+        true)
+      .addService(
+        'profile',
+        this.dataInterface.getEndpoint(DataEndpoint.PROFILE),
         true,
       );
     // .addService("graphql", graphqlApiEndpoint.apiEndpoint.graphqlUrl);

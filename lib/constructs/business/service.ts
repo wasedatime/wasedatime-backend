@@ -15,7 +15,8 @@ export type RestApiServiceId =
   | 'thread'
   | 'comment'
   | 'ads'
-  | 'graphql';
+  | 'graphql'
+  | 'profile';
 
 export const restApiServiceMap: {
   [name in RestApiServiceId]: typeof rest.RestApiService;
@@ -26,8 +27,9 @@ export const restApiServiceMap: {
   'timetable': rest.TimetableApiService,
   'thread': rest.ForumThreadsApiService,
   'comment': rest.ForumCommentsApiService,
-  'ads': rest.ForumAdsApiService, //TODO Add service in construct/business/restapi
+  'ads': rest.ForumAdsApiService,
   'graphql': rest.GraphqlApiService,
+  'profile': rest.ProfileProcessApiService,
 };
 
 export type GraphqlApiServiceId = 'course';
