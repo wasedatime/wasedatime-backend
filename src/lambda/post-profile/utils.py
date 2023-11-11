@@ -71,26 +71,32 @@ def resp_handler(func=None, headers=None):
 
     return handle
 
-def format_time(timestamp):
-    
-    timestamp_ms = timestamp
-    timestamp_s = timestamp_ms/1000.0
-    
-    dt = datetime.fromtimestamp(timestamp_s, tz=timezone.utc)
-    
-    formatted_time = dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-    
-    return formatted_time
-    
 def extract_and_format_date(event):
     try:
+        # Extract the 'identities' JSON string from the event
         identities_str = event['requestContext']['authorizer']['claims']['identities']
+        # Parse the JSON string into a Python list
         identities = json.loads(identities_str)
 
+        # Check if 'identities' is a list and has at least one item
         if identities and isinstance(identities, list):
+            # Extract 'dateCreated' from the first item in the list
             date_created_at = identities[0].get("dateCreated")
             if date_created_at:
+                # Format the 'dateCreated' timestamp
                 return format_time(date_created_at)
+            else:
+                print("dateCreated not found in identities")
+        else:
+            print("No identities found or identities is not a list.")
     except Exception as e:
         print(f"Error in extract_and_format_date: {e}")
     return None
+
+def format_time(timestamp_ms):
+    # Convert milliseconds to seconds
+    timestamp_s = timestamp_ms / 1000.0
+    # Create a datetime object from the timestamp
+    dt = datetime.fromtimestamp(timestamp_s, tz=timezone.utc)
+    # Format the datetime object to the desired format
+    return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
