@@ -1275,9 +1275,6 @@ export class ProfileProcessApiService extends RestApiService {
       apigw2.HttpMethod.GET,
       getIntegration,
       {
-        requestParameters: {
-          'method.request.querystring.uid': false,
-        },
         operationName: 'GetUserProfile',
         methodResponses: [
           {
@@ -1311,9 +1308,6 @@ export class ProfileProcessApiService extends RestApiService {
       patchIntegration,
       {
         operationName: 'UpdateUseProfile',
-        requestParameters: {
-          'method.request.querystring.ts': true,
-        },
         requestModels: { ['application/json']: patchReqModel },
         methodResponses: [
           {
@@ -1330,9 +1324,6 @@ export class ProfileProcessApiService extends RestApiService {
       deleteIntegration,
       {
         operationName: 'DeleteUserProfile',
-        requestParameters: {
-          'method.request.querystring.ts': true,
-        },
         methodResponses: [
           {
             statusCode: '200',
