@@ -14,7 +14,7 @@ def patch_profile(uid, profile):
             "uid": uid,
         },
         ConditionExpression=Attr('uid').eq(uid),
-        UpdateExpression='SET #nm = :name, email = :email, year = :year, class_of = :class_of, languages = :languages, interests = :interests, school = :school, updated_at = :ts',
+        UpdateExpression='SET #nm = :name, email = :email, year = :#yr, class_of = :class_of, languages = :languages, interests = :interests, school = :school, updated_at = :ts',
         ExpressionAttributeValues={
             ":name": profile["name"],
             ":email": profile["email"],
@@ -26,7 +26,8 @@ def patch_profile(uid, profile):
             ":ts": dt_now
         },
         ExpressionAttributeNames = {
-            "#nm": "name"
+            "#nm": "name",
+            "#yr": "year"
         }
     )
 
