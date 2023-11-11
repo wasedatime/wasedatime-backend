@@ -73,30 +73,21 @@ def resp_handler(func=None, headers=None):
 
 def extract_and_format_date(event):
     try:
-        # Debug print to check what's in the event
-        print("Event Data:", event)
-
         identities_str = event['requestContext']['authorizer']['claims']['identities']
         
         # Debug print to see the identities string
         print("Identities String:", identities_str)
 
         identities = json.loads(identities_str)
+        
+        date_created_at = identities.get("dateCreated")
+        formatted_time = format_time(date_created_at)
+        
+        return formatted_time
 
-        # Debug print to see the parsed identities
-        print("Parsed Identities:", identities)
-
-        if identities and isinstance(identities, list):
-            date_created_at = identities[0].get("dateCreated")
-            if date_created_at:
-                return format_time(date_created_at)
-            else:
-                print("dateCreated not found in identities")
-        else:
-            print("No identities found or identities is not a list.")
     except Exception as e:
         print(f"Error in extract_and_format_date: {e}")
-    return None
+        return None
 
 def format_time(timestamp_ms):
     timestamp_s = timestamp_ms / 1000.0
