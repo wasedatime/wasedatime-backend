@@ -90,6 +90,7 @@ def extract_and_format_date(event):
         return None
 
 def format_time(timestamp_ms):
-    timestamp_s = timestamp_ms / 1000.0
+    
+    timestamp_s = int(timestamp_ms) / 1000.0
     dt = datetime.fromtimestamp(timestamp_s, tz=timezone.utc)
     return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
