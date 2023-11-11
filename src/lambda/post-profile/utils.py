@@ -73,17 +73,22 @@ def resp_handler(func=None, headers=None):
 
 def extract_and_format_date(event):
     try:
-        # Extract the 'identities' JSON string from the event
+        # Debug print to check what's in the event
+        print("Event Data:", event)
+
         identities_str = event['requestContext']['authorizer']['claims']['identities']
-        # Parse the JSON string into a Python list
+        
+        # Debug print to see the identities string
+        print("Identities String:", identities_str)
+
         identities = json.loads(identities_str)
 
-        # Check if 'identities' is a list and has at least one item
+        # Debug print to see the parsed identities
+        print("Parsed Identities:", identities)
+
         if identities and isinstance(identities, list):
-            # Extract 'dateCreated' from the first item in the list
             date_created_at = identities[0].get("dateCreated")
             if date_created_at:
-                # Format the 'dateCreated' timestamp
                 return format_time(date_created_at)
             else:
                 print("dateCreated not found in identities")
@@ -94,9 +99,6 @@ def extract_and_format_date(event):
     return None
 
 def format_time(timestamp_ms):
-    # Convert milliseconds to seconds
     timestamp_s = timestamp_ms / 1000.0
-    # Create a datetime object from the timestamp
     dt = datetime.fromtimestamp(timestamp_s, tz=timezone.utc)
-    # Format the datetime object to the desired format
     return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
