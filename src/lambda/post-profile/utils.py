@@ -4,11 +4,12 @@ import json
 import logging
 import os
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timezone
 
 # AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
+userpool_id = os.getenv('AWS_USER_POOL_ID'),
 
 # cognito client use to extract user created time
 cognito_client = boto3.client('cognito-idp')
@@ -70,19 +71,14 @@ def resp_handler(func=None, headers=None):
 
     return handle
 
-
-def get_user_creation_date(uid):
-
-    # Make the API call to get the user details
-    response = cognito_client.admin_get_user(
-        UserPoolId='ap-northeast-1_dKhj1aZQy',
-        Username=uid
-    )
-
-    user_created_date_str = response['UserCreateDate']
-
-    date_created = datetime.strptime(user_created_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+def format_time(timestamp):
     
-    formatted_date = date_created.strftime('%Y-%m-%d %H:%M:%S')
+    timestamp_ms = timestamp
+    timestamp_s = timestamp_ms/1000.0
     
-    return formatted_date
+    dt = datetime.fromtimestamp(timestamp_s, tz=timezone.utc)
+    
+    formatted_time = dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+    
+    return formatted_time
+    

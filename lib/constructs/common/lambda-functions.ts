@@ -10,6 +10,7 @@ import { AwsServicePrincipal } from '../../configs/common/aws';
 import {
   GOOGLE_API_SERVICE_ACCOUNT_INFO,
   SLACK_WEBHOOK_URL,
+  AWS_USER_POOL_ID,
 } from '../../configs/lambda/environment';
 
 interface FunctionsProps {
@@ -1349,13 +1350,15 @@ export class ProfileProcessFunctions extends Construct {
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(5),
       environment: props.envVars,
-    }).addEnvironment(
-      'GOOGLE_API_SERVICE_ACCOUNT_INFO',
-      GOOGLE_API_SERVICE_ACCOUNT_INFO,
-    );
+    })
+      .addEnvironment(
+        'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+        GOOGLE_API_SERVICE_ACCOUNT_INFO,
+      )
+      .addEnvironment('AWS_USER_POOL_ID', AWS_USER_POOL_ID);
 
     this.patchFunction = new lambda_py.PythonFunction(this, 'patch-profile', {
-      entry: 'src/lambda/patch-comment',
+      entry: 'src/lambda/patch-profile',
       description: 'Update user profile in the database.',
       functionName: 'patch-profile',
       logRetention: logs.RetentionDays.ONE_MONTH,
