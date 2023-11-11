@@ -23,13 +23,22 @@ def sync_career(key):
                          for obj in objects_in_folder if not obj['Key'].endswith('.json')]
 
     item = {
-        'type': json_content['type'],
-        'created_at': dt_now,
-        'description': json_content['description'],
+        'job_id': json_content['job_id'],
         'title': json_content['title'],
-        'position': json_content['position'],
+        'company_discription': json_content['company_discription'],
         'location': json_content['location'],
-        'image_object_keys': image_object_keys
+        'created_at': dt_now,
+        'company': json_content['company'],
+        'job_description': json_content['job_description'],
+        'responsibilities': json_content['responsibilities'],
+        'qualifications': json_content['qualifications'],
+        'appeal': json_content['appeal'],
+        'min_hour': json_content['min_hour'],
+        'salary': json_content['salary'],
+        'website': json_content['website'],
+        'type': json_content['type'],
+        'hero_image_urls': image_object_keys[0],
+        'company_logo_urls': image_object_keys[1],
     }
     table.put_item(Item=item)
 
