@@ -1330,7 +1330,7 @@ export class ProfileProcessFunctions extends Construct {
     this.getFunction = new lambda_py.PythonFunction(this, 'get-profile', {
       entry: 'src/lambda/get-profile',
       description: 'get user profile from the database.',
-      functionName: 'get-user-profile',
+      functionName: 'get-profile',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
       role: dynamoDBReadRole,
@@ -1342,7 +1342,7 @@ export class ProfileProcessFunctions extends Construct {
     this.postFunction = new lambda_py.PythonFunction(this, 'post-profile', {
       entry: 'src/lambda/post-profile',
       description: 'Save user profile into the database.',
-      functionName: 'post-user-profile',
+      functionName: 'post-profile',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
       role: dynamoDBPutRole,
@@ -1357,7 +1357,7 @@ export class ProfileProcessFunctions extends Construct {
     this.patchFunction = new lambda_py.PythonFunction(this, 'patch-profile', {
       entry: 'src/lambda/patch-comment',
       description: 'Update user profile in the database.',
-      functionName: 'patch-user-profile',
+      functionName: 'patch-profile',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
       role: dynamoDBPutRole,
@@ -1372,7 +1372,7 @@ export class ProfileProcessFunctions extends Construct {
     this.deleteFunction = new lambda_py.PythonFunction(this, 'delete-profile', {
       entry: 'src/lambda/delete-profile',
       description: 'Delete user profile in the database.',
-      functionName: 'delete-user-profile',
+      functionName: 'delete-profile',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
       role: dynamoDBPutRole,
