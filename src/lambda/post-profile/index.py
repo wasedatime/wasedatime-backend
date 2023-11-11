@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-from utils import JsonPayloadBuilder, table, resp_handler, format_time
+from utils import JsonPayloadBuilder, table, resp_handler, extract_and_format_date
 
 
 @resp_handler
@@ -35,21 +35,14 @@ def handler(event, context):
     params = {
         "profile": req["data"],
         "uid": event['requestContext']['authorizer']['claims']['sub'],
+        "school_email" : event['requestContext']['authorizer']['claims']['email']
     }
-    
+
     try:
-        email = event['requestContext']['authorizer']['claims']['email']
-        date_created_At = event['requestContext']['authorizer']['claims']['identities']["dateCreated"]
-        print(email)
-        print(date_created_At)
-        
-        formatted_time = format_time(date_created_At)
-        
-        params["created_date"] = formatted_time
-        params["school_email"] = email
+        formatted_time = extract_and_format_date(event)
+        if formatted_time:
+            params["created_date"] = formatted_time
     except Exception as e:
-        print(e)
-        
-   
-    
+        print(f"An error occurred: {e}")
+
     return post_profile(**params)

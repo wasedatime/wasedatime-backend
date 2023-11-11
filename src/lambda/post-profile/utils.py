@@ -82,3 +82,15 @@ def format_time(timestamp):
     
     return formatted_time
     
+def extract_and_format_date(event):
+    try:
+        identities_str = event['requestContext']['authorizer']['claims']['identities']
+        identities = json.loads(identities_str)
+
+        if identities and isinstance(identities, list):
+            date_created_at = identities[0].get("dateCreated")
+            if date_created_at:
+                return format_time(date_created_at)
+    except Exception as e:
+        print(f"Error in extract_and_format_date: {e}")
+    return None
