@@ -9,42 +9,48 @@ def sync_career(key):
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
-    s3_object = s3_client.get_object(Bucket=bucket, Key=key)
-    file_content = s3_object['Body'].read().decode('utf-8')
-    json_content = json.loads(file_content)
+    try:
+        s3_object = s3_client.get_object(Bucket=bucket, Key=key)
+        file_content = s3_object['Body'].read().decode('utf-8')
+        json_content = json.loads(file_content)
 
-    # Get folder
-    prefix = '/'.join(key.split('/')[:-1])
-    objects_in_folder = s3_client.list_objects_v2(
-        Bucket=bucket, Prefix=prefix)['Contents']
+        # Get folder (company name)
+        folder = key.split('/')[0]  # Assuming the folder is the first part of the key
 
-    # Extract image object keys (filter out the JSON file)
-    image_object_keys = [obj['Key']
-                         for obj in objects_in_folder if not obj['Key'].endswith('.json')]
+        # Construct keys for images
+        hero_image_key = f"{folder}/hero_image"
+        company_logo_key = f"{folder}/company_logo"
+    
 
-    item = {
-        'job_id': json_content['job_id'],
-        'title': json_content['title'],
-        'company_discription': json_content['company_discription'],
-        'location': json_content['location'],
-        'created_at': dt_now,
-        'company': json_content['company'],
-        'job_description': json_content['job_description'],
-        'responsibilities': json_content['responsibilities'],
-        'qualifications': json_content['qualifications'],
-        'appeal': json_content['appeal'],
-        'min_hour': json_content['min_hour'],
-        'salary': json_content['salary'],
-        'website': json_content['website'],
-        'type': json_content['type'],
-        'hero_image_urls': image_object_keys[0],
-        'company_logo_urls': image_object_keys[1],
-    }
-    table.put_item(Item=item)
+        item = {
+            'job_id': json_content['job_id'],
+            'title': json_content['title'],
+            'company_description': json_content['company_description'],
+            'location': json_content['location'],
+            'created_at': dt_now,
+            'company': json_content['company'],
+            'job_description': json_content['job_description'],
+            'responsibilities': json_content['responsibilities'],
+            'qualifications': json_content['qualifications'],
+            'appeal': json_content['appeal'],
+            'min_hours': json_content['min_hours'],
+            'salary': json_content['salary'],
+            'website': json_content['website'],
+            'type': json_content['type'],
+            'hero_image': hero_image_key,
+            'company_logo': company_logo_key,
+        }
 
-    body = JsonPayloadBuilder().add_status(True).add_data(
-        None).add_message('Imgs key load to table successfully.').compile()
-    return body
+
+        table.put_item(Item=item)
+
+        body = JsonPayloadBuilder().add_status(True).add_data(
+            None).add_message('Imgs key load to table successfully.').compile()
+        return body
+    
+    except Exception as e:
+        # Handle any exceptions that occur
+        return JsonPayloadBuilder().add_status(False).add_message(str(e)).compile()
 
 
 def handler(event, context):
