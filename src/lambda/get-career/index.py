@@ -20,7 +20,7 @@ def get_career(job_type):
         hero_image_key = item.get('hero_image', "")
         company_logo_key = item.get('company_logo', "")
         hero_image = generate_url(bucket, hero_image_key)
-        company_logo = generate_url(bucket, hero_image_key)
+        company_logo = generate_url(bucket, company_logo_key)
         item['hero_image'] = hero_image
         item['company_logo'] = company_logo
 
