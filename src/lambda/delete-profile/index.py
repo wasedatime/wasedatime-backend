@@ -20,10 +20,8 @@ def delete_profile(uid):
 
 
 def handler(event, context):
-    if "uid" in event["queryStringParameters"]:
-        uid = event["queryStringParameters"]["uidid"]
-        
-        return delete_profile(uid)
-
-    else:
-        return
+    params = {
+        "uid": event['requestContext']['authorizer']['claims']['sub']
+    }
+    
+    delete_profile(**params)

@@ -19,10 +19,9 @@ def get_profile(uid):
 
 
 def handler(event, context):
-    if "uid" in event["queryStringParameters"]:
-        uid = event["queryStringParameters"]["uid"]
-
-        return get_profile(uid)
+        
+    params = {
+        "uid": event['requestContext']['authorizer']['claims']['sub']
+    }
     
-    else:
-        logging.error("Failed to fetch user profile")
+    return get_profile(**params)
