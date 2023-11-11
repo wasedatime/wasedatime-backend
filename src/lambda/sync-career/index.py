@@ -37,6 +37,7 @@ def sync_career(key):
             'salary': json_content['salary'],
             'website': json_content['website'],
             'type': json_content['type'],
+            'apply': json_content['apply_link'],
             'hero_image': hero_image_key,
             'company_logo': company_logo_key,
         }

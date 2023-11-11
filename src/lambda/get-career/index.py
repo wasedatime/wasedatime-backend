@@ -17,12 +17,12 @@ def get_career(job_type):
     items = response.get('Items', [])
 
     for item in items:
-        hero_image_keys = item.get('hero_image', [])
-        company_logo_keys = item.get('compnay_logo', [])
-        item['hero_image_urls'] = [generate_url(
-            bucket, key) for key in hero_image_keys]
-        item['company_logo_urls'] = [generate_url(
-            bucket, key) for key in company_logo_keys]
+        hero_image_keys = item.get('hero_image', "")
+        company_logo_keys = item.get('company_logo', "")
+        hero_image = generate_url(hero_image_keys)
+        company_logo = generate_url(company_logo_keys)
+        item['hero_image_url'] = hero_image
+        item['company_logo'] = company_logo
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(response).add_message("").compile()
