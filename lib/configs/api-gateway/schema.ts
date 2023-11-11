@@ -605,9 +605,17 @@ export const userProfileGetRespSchema: apigw.JsonSchema = {
         },
         language: {
           type: apigw.JsonSchemaType.ARRAY,
+          items: {
+            type: apigw.JsonSchemaType.OBJECT,
+            properties: {
+              language: { type: apigw.JsonSchemaType.STRING },
+              level: { type: apigw.JsonSchemaType.STRING },
+            },
+          },
         },
-        interest: {
+        interests: {
           type: apigw.JsonSchemaType.ARRAY,
+          items: { type: apigw.JsonSchemaType.STRING },
         },
         school: {
           type: apigw.JsonSchemaType.STRING,
@@ -624,7 +632,7 @@ export const userProfileGetRespSchema: apigw.JsonSchema = {
         'email',
         'year',
         'class_of',
-        'language',
+        'languages',
         'interests',
         'school',
         'create_at',
@@ -657,19 +665,21 @@ export const userProfilePostReqSchema: apigw.JsonSchema = {
         class_of: {
           type: apigw.JsonSchemaType.STRING,
         },
-        language: {
+        languages: {
           type: apigw.JsonSchemaType.ARRAY,
+          items: {
+            type: apigw.JsonSchemaType.OBJECT,
+            properties: {
+              language: { type: apigw.JsonSchemaType.STRING },
+              level: { type: apigw.JsonSchemaType.STRING },
+            },
+          },
         },
-        interest: {
+        interests: {
           type: apigw.JsonSchemaType.ARRAY,
+          items: { type: apigw.JsonSchemaType.STRING },
         },
         school: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        created_at: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        updated_at: {
           type: apigw.JsonSchemaType.STRING,
         },
       },
@@ -678,11 +688,9 @@ export const userProfilePostReqSchema: apigw.JsonSchema = {
         'email',
         'year',
         'class_of',
-        'language',
+        'languages',
         'interests',
         'school',
-        'create_at',
-        'updated_at',
       ],
     },
   },
@@ -708,19 +716,21 @@ export const userProfilePatchReqSchema: apigw.JsonSchema = {
         class_of: {
           type: apigw.JsonSchemaType.STRING,
         },
-        language: {
+        languages: {
           type: apigw.JsonSchemaType.ARRAY,
+          items: {
+            type: apigw.JsonSchemaType.OBJECT,
+            properties: {
+              language: { type: apigw.JsonSchemaType.STRING },
+              level: { type: apigw.JsonSchemaType.STRING },
+            },
+          },
         },
-        interest: {
+        interests: {
           type: apigw.JsonSchemaType.ARRAY,
+          items: { type: apigw.JsonSchemaType.STRING },
         },
         school: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        created_at: {
-          type: apigw.JsonSchemaType.STRING,
-        },
-        updated_at: {
           type: apigw.JsonSchemaType.STRING,
         },
       },
@@ -729,11 +739,9 @@ export const userProfilePatchReqSchema: apigw.JsonSchema = {
         'email',
         'year',
         'class_of',
-        'language',
+        'languages',
         'interests',
         'school',
-        'create_at',
-        'updated_at',
       ],
     },
   },
