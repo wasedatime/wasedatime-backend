@@ -1,3 +1,4 @@
+import * as lambda_py from '@aws-cdk/aws-lambda-python-alpha';
 import { RemovalPolicy } from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as events from 'aws-cdk-lib/aws-events';
@@ -5,6 +6,7 @@ import * as events_targets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as event_sources from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as sfn_tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
@@ -148,6 +150,7 @@ export class SyllabusDataPipeline extends AbstractDataPipeline {
 export class CareerDataPipeline extends AbstractDataPipeline {
   readonly dataSource?: s3.Bucket;
   readonly processor: lambda.Function;
+  readonly streamProcessor: lambda.Function;
   readonly dataWarehouse: dynamodb.Table;
 
   constructor(scope: Construct, id: string, props: DataPipelineProps) {
@@ -178,6 +181,22 @@ export class CareerDataPipeline extends AbstractDataPipeline {
         events: [s3.EventType.OBJECT_CREATED],
         filters: [{ suffix: '.json' }],
       }),
+    );
+
+    this.streamProcessor = new lambda_py.PythonFunction(
+      this,
+      'career-stream-processor',
+      {
+        entry: 'src/lambda/sync-career',
+        description: 'sync career info inputed in s3 to dynamodb',
+        functionName: 'sync-career',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 256,
+        role: DBSyncRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(5),
+        environment: props.envVars,
+      },
     );
   }
 }

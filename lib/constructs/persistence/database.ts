@@ -51,6 +51,7 @@ export class DynamoDatabase extends Construct {
         tableName: 'career',
         readCapacity: 1,
         writeCapacity: 1,
+        stream: dynamodb.StreamViewType.NEW_IMAGE,
       },
     );
 
