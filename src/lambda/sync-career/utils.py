@@ -3,6 +3,8 @@ import json
 import logging
 import os
 from decimal import Decimal
+import uuid
+from datetime import datetime
 
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
 table = db.Table(os.getenv('TABLE_NAME'))
@@ -75,3 +77,9 @@ def get_image_key(folder, image_name):
         if key.startswith(f"{folder}/{image_name}"):
             return key
     return None
+
+def build_job_id():
+
+    unique_id = str(uuid.uuid4())
+
+    return unique_id
