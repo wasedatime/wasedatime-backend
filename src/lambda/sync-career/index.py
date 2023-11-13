@@ -29,7 +29,6 @@ def sync_career(key):
             'created_at': dt_now,
             'company': json_content['company'],
             'job_description': json_content['job_description'],
-            'responsibilities': json_content['responsibilities'],
             'qualifications': json_content['qualifications'],
             'appeal': json_content['appeal'],
             'min_hours': json_content['min_hours'],

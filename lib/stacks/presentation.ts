@@ -29,6 +29,7 @@ export class WasedaTimePresentationLayer extends PresentationLayer {
     monoApp.addMicroApp('campus');
     monoApp.addMicroApp('feeds');
     monoApp.addMicroApp('forum');
+    monoApp.addMicroApp('career');
 
     monoApp.microApps.feeds.addEnvironment('DEPLOY_KEY', FEEDS_DEPLOY_KEY);
 
