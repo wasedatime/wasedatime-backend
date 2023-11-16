@@ -6,11 +6,9 @@ from decimal import Decimal
 
 # AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
+dynamodb_client = boto3.client('dynamodb')
 table = db.Table(os.getenv('TABLE_NAME'))
 table_name = os.getenv('TABLE_NAME')
-
-# cognito client use to extract user created time
-cognito_client = boto3.client('cognito-idp')
 
 
 class DecimalEncoder(json.JSONEncoder):

@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 import logging
 
-from utils import JsonPayloadBuilder, db, resp_handler, table_name
+from utils import JsonPayloadBuilder, dynamodb_client, resp_handler, table_name
 
 
 @resp_handler
@@ -61,7 +61,7 @@ def post_application(application, uid):
     ]
 
     try:
-        db.transact_write_items(TransactItems=transact_items)
+        dynamodb_client.transact_write_items(TransactItems=transact_items)
         logging.error(
             "Transaction successful: Application submitted and Internship record updated.")
     except Exception as e:
