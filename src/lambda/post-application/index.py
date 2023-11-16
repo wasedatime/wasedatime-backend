@@ -18,18 +18,6 @@ def post_application(application, uid):
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
-    application_data = {
-        "type": "application",
-        "created_at": dt_now,
-        "uid": uid,
-        "title": application["title"],
-        "job_id": application["job_id"],
-        "company": application["company"],
-        "email": application["email"],
-        "name": application["name"],
-        "agreed": application["agreed"],
-    }
-
     '''
     transact items, ensures that both operations succeed. 
     If one fails the other automatically fails. 
@@ -41,20 +29,30 @@ def post_application(application, uid):
         {
             'Put': {
                 'TableName': table_name,
-                'Item': application_data
+                'Item': {
+                "type": {"S": "application"},
+                "created_at": {"S": dt_now},
+                "uid": {"S": uid},
+                "title": {"S": application["title"]},
+                "job_id": {"S": application["job_id"]},
+                "company": {"S": application["company"]},
+                "email": {"S": application["email"]},
+                "name": {"S": application["name"]},
+                "agreed": {"BOOL": application["agreed"]},
+                }
             }
         },
         {
             'Update': {
                 'TableName': table_name,
                 'Key': {
-                    "type": "internship",
-                    "created_at": application["created_at"],
+                    "type": {"S": "internship"},
+                    "created_at": {"S": application["created_at"]},
                 },
                 'UpdateExpression': 'ADD applicants :uid',
                 'ConditionExpression': 'attribute_not_exists(applicants) OR NOT contains(applicants, :uid)',
                 'ExpressionAttributeValues': {
-                    ':uid': {uid}
+                    ':uid': {"S": uid}
                 }
             }
         }

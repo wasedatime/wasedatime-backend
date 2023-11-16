@@ -12,6 +12,11 @@ def get_profile(uid):
         "uid").eq(uid), ScanIndexForward=True)["Items"]
     
     item = response[0]
+    
+    item.pop('uid', None)
+    item.pop('created_at', None)
+    item.pop('school_email', None)
+    item.pop('updated_at', None)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(item).add_message('').compile()
