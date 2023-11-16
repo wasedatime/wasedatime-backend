@@ -25,6 +25,9 @@ def post_application(application, uid):
         "title": application["title"],
         "job_id": application["job_id"],
         "company": application["company"],
+        "email": application["email"],
+        "name": application["name"],
+        "agreed": application["agreed"],
     }
 
     '''
