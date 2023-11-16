@@ -4,6 +4,7 @@ import json
 import logging
 import os
 from decimal import Decimal
+from datetime import datetime, timezone
 
 # AWS DynamoDB Resources
 db = boto3.resource("dynamodb", region_name="ap-northeast-1")
@@ -66,3 +67,27 @@ def resp_handler(func=None, headers=None):
             return api_response(500, resp)
 
     return handle
+
+def extract_and_format_date(event):
+    try:
+        identities_str = event['requestContext']['authorizer']['claims']['identities']
+        
+        # Debug print to see the identities string
+        print("Identities String:", identities_str)
+
+        identities = json.loads(identities_str)
+        
+        date_created_at = identities.get("dateCreated")
+        formatted_time = format_time(date_created_at)
+        
+        return formatted_time
+
+    except Exception as e:
+        print(f"Error in extract_and_format_date: {e}")
+        return None
+
+def format_time(timestamp_ms):
+    
+    timestamp_s = int(timestamp_ms) / 1000.0
+    dt = datetime.fromtimestamp(timestamp_s, tz=timezone.utc)
+    return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'

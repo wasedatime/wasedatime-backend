@@ -2,16 +2,17 @@ import json
 from boto3.dynamodb.conditions import Attr
 from datetime import datetime
 
-from utils import JsonPayloadBuilder, table, resp_handler
+from utils import JsonPayloadBuilder, table, resp_handler, extract_and_format_date
 
 
 @resp_handler
-def patch_profile(uid, profile):
+def patch_profile(uid, profile, created_date):
 
     dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     table.update_item(
         Key={
             "uid": uid,
+            "created_at": created_date
         },
         ConditionExpression=Attr('uid').eq(uid),
         UpdateExpression='SET #nm = :name, email = :email,  #yr = :year, class_of = :class_of, languages = :languages, interests = :interests, school = :school, updated_at = :ts',
@@ -37,11 +38,17 @@ def patch_profile(uid, profile):
 
 
 def handler(event, context):
-
     req = json.loads(event['body'])
     params = {
+        "profile": req["data"],
         "uid": event['requestContext']['authorizer']['claims']['sub'],
-        "profile": req["data"]
     }
+
+    try:
+        formatted_time = extract_and_format_date(event)
+        if formatted_time:
+            params["created_date"] = formatted_time
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
     return patch_profile(**params)
