@@ -1,11 +1,9 @@
 from boto3.dynamodb.conditions import Key
-import boto3
-from datetime import datetime
-from utils import JsonPayloadBuilder, table, resp_handler, s3_client, bucket, generate_url
+from utils import JsonPayloadBuilder, table, resp_handler, bucket, generate_url
 
 
 @resp_handler
-def get_career(job_type):
+def get_career(job_type, uid):
 
     if job_type:
         response = table.query(
@@ -22,14 +20,11 @@ def get_career(job_type):
         hero_image = generate_url(bucket, hero_image_key)
         company_logo = generate_url(bucket, company_logo_key)
         item['hero_image'] = hero_image
-        item['company_logo'] = company_logo
-        
-        if 'applicants' in item:
-            count = len(item['applicants'])
-            item['applicant_count'] = count
-            
-        else: 
-            item['applicant_count'] = 0
+        item['company_logo'] = company_logo       
+        applicants = item.get('applicants', set())
+        item['applicant_count'] = len(applicants)
+        item['applied'] = uid in applicants
+        item.pop('applicants', None)
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(response).add_message("").compile()
@@ -42,5 +37,6 @@ def handler(event, context):
     if "queryStringParameters" in event:
         params = event["queryStringParameters"]
         job_type = params.get("type", "")
+        uid = params.get("uid", "")
 
-    return get_career(job_type)
+    return get_career(job_type, uid)
