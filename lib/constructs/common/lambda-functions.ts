@@ -1084,6 +1084,7 @@ export class CareerDBSyncFunction extends Construct {
 
 export class CareerRestFunctions extends Construct {
   readonly getFunction: lambda.Function;
+  readonly postFunction: lambda.Function;
 
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
@@ -1117,6 +1118,30 @@ export class CareerRestFunctions extends Construct {
       },
     );
 
+    const DBApplicationPutRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-career-put-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-ads-put-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+        ],
+      },
+    );
+
     this.getFunction = new lambda_py.PythonFunction(this, 'get-career', {
       entry: 'src/lambda/get-career',
       description: 'get career data from the database',
@@ -1124,6 +1149,18 @@ export class CareerRestFunctions extends Construct {
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 128,
       role: DBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
+    this.postFunction = new lambda_py.PythonFunction(this, 'post-application', {
+      entry: 'src/lambda/post-application',
+      description: 'post application data in career table',
+      functionName: 'post-application',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBApplicationPutRole,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(3),
       environment: props.envVars,

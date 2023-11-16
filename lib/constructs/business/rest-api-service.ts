@@ -479,6 +479,10 @@ export class CareerApiService extends RestApiService {
       careerFunctions.getFunction,
       { proxy: true },
     );
+    const postIntegration = new apigw.LambdaIntegration(
+      careerFunctions.postFunction,
+      { proxy: true },
+    );
 
     const optionsCareer = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -492,7 +496,7 @@ export class CareerApiService extends RestApiService {
       ],
     });
     const getCareer = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
-      operationName: 'GetReviews',
+      operationName: 'GetCareers',
       methodResponses: [
         {
           statusCode: '200',
@@ -502,9 +506,26 @@ export class CareerApiService extends RestApiService {
       requestValidator: props.validator,
     });
 
+    const postApplication = root.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        operationName: 'PostApplication',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+
     this.resourceMapping = {
       '/career': {
         [apigw2.HttpMethod.GET]: getCareer,
+        [apigw2.HttpMethod.POST]: postApplication,
         [apigw2.HttpMethod.OPTIONS]: optionsCareer,
       },
     };
