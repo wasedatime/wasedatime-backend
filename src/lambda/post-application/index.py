@@ -41,7 +41,17 @@ def post_application(application, uid):
         {
             'Put': {
                 'TableName': table_name,
-                'Item': application_data
+                'Item': {
+                "type": {"S": "application"},
+                "created_at": {"S": dt_now},
+                "uid": {"S": uid},
+                "title": {"S": application["title"]},
+                "job_id": {"S": application["job_id"]},
+                "company": {"S": application["company"]},
+                "email": {"S": application["email"]},
+                "name": {"S": application["name"]},
+                "agreed": {"BOOL": application["agreed"]},
+            }
             }
         },
         {
