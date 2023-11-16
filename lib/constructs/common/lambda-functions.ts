@@ -1120,13 +1120,13 @@ export class CareerRestFunctions extends Construct {
 
     const DBApplicationPutRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-career-put-role',
+      'dynamo-career-application-put-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
-          'Allow lambda function to perform crud operation on dynamodb and s3',
+          'Allow lambda function to perform crud operation on dynamodb',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-ads-put-role',
+        roleName: 'dynamodb-application-put-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
