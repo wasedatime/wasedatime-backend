@@ -508,7 +508,7 @@ export class CareerApiService extends RestApiService {
 
     const postApplication = root.addMethod(
       apigw2.HttpMethod.POST,
-      getIntegration,
+      postIntegration,
       {
         operationName: 'PostApplication',
         methodResponses: [
