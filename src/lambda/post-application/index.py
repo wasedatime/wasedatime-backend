@@ -50,9 +50,9 @@ def post_application(application, uid):
                     "created_at": {"S": application["created_at"]},
                 },
                 'UpdateExpression': 'ADD applicants :uid',
-                'ConditionExpression': 'attribute_not_exists(applicants) OR NOT contains(applicants, :uid)',
+                'ConditionExpression': 'NOT contains(applicants, :uid)',
                 'ExpressionAttributeValues': {
-                    ':uid': {"S": uid}
+                    ':uid': {"SS": uid}
                 }
             }
         }

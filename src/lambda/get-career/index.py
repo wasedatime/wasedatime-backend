@@ -23,6 +23,13 @@ def get_career(job_type):
         company_logo = generate_url(bucket, company_logo_key)
         item['hero_image'] = hero_image
         item['company_logo'] = company_logo
+        
+        if 'applicants' in item:
+            count = len(item['applicants'])
+            item['applicant_count'] = count
+            
+        else: 
+            item['applicant_count'] = 0
 
     body = JsonPayloadBuilder().add_status(
         True).add_data(response).add_message("").compile()
