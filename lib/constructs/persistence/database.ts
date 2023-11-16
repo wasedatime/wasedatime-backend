@@ -49,8 +49,8 @@ export class DynamoDatabase extends Construct {
         removalPolicy: RemovalPolicy.RETAIN,
         sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
         tableName: 'career',
-        readCapacity: 1,
-        writeCapacity: 1,
+        readCapacity: 10,
+        writeCapacity: 10,
         stream: dynamodb.StreamViewType.NEW_IMAGE,
       },
     );
