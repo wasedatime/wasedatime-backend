@@ -52,7 +52,7 @@ def post_application(application, uid):
                 'UpdateExpression': 'ADD applicants :uid',
                 'ConditionExpression': 'NOT contains(applicants, :uid)',
                 'ExpressionAttributeValues': {
-                    ':uid': {"SS": uid}
+                    ':uid': {"SS": [uid]}
                 }
             }
         }
