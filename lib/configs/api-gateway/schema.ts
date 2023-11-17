@@ -584,6 +584,170 @@ export const forumCommentPatchReqSchema: apigw.JsonSchema = {
   required: ['data'],
 };
 
+export const userProfileGetRespSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        name: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        email: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        year: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        class_of: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        language: {
+          type: apigw.JsonSchemaType.ARRAY,
+          items: {
+            type: apigw.JsonSchemaType.OBJECT,
+            properties: {
+              language: { type: apigw.JsonSchemaType.STRING },
+              level: { type: apigw.JsonSchemaType.STRING },
+            },
+          },
+        },
+        interests: {
+          type: apigw.JsonSchemaType.ARRAY,
+          items: { type: apigw.JsonSchemaType.STRING },
+        },
+        school: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        created_at: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        updated_at: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: [
+        'name',
+        'email',
+        'year',
+        'class_of',
+        'languages',
+        'interests',
+        'school',
+        'create_at',
+        'updated_at',
+      ],
+    },
+    message: {
+      type: apigw.JsonSchemaType.STRING,
+    },
+  },
+  required: ['success', 'data', 'message'],
+};
+
+export const userProfilePostReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        name: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        email: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        year: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        class_of: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        languages: {
+          type: apigw.JsonSchemaType.ARRAY,
+          items: {
+            type: apigw.JsonSchemaType.OBJECT,
+            properties: {
+              language: { type: apigw.JsonSchemaType.STRING },
+              level: { type: apigw.JsonSchemaType.STRING },
+            },
+          },
+        },
+        interests: {
+          type: apigw.JsonSchemaType.ARRAY,
+          items: { type: apigw.JsonSchemaType.STRING },
+        },
+        school: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: [
+        'name',
+        'email',
+        'year',
+        'class_of',
+        'languages',
+        'interests',
+        'school',
+      ],
+    },
+  },
+  required: ['data'],
+};
+
+export const userProfilePatchReqSchema: apigw.JsonSchema = {
+  schema: apigw.JsonSchemaVersion.DRAFT7,
+  type: apigw.JsonSchemaType.OBJECT,
+  properties: {
+    data: {
+      type: apigw.JsonSchemaType.OBJECT,
+      properties: {
+        name: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        email: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        year: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        class_of: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+        languages: {
+          type: apigw.JsonSchemaType.ARRAY,
+          items: {
+            type: apigw.JsonSchemaType.OBJECT,
+            properties: {
+              language: { type: apigw.JsonSchemaType.STRING },
+              level: { type: apigw.JsonSchemaType.STRING },
+            },
+          },
+        },
+        interests: {
+          type: apigw.JsonSchemaType.ARRAY,
+          items: { type: apigw.JsonSchemaType.STRING },
+        },
+        school: {
+          type: apigw.JsonSchemaType.STRING,
+        },
+      },
+      required: [
+        'name',
+        'email',
+        'year',
+        'class_of',
+        'languages',
+        'interests',
+        'school',
+      ],
+    },
+  },
+  required: ['data'],
+};
+
 export const baseJsonApiSchema: apigw.JsonSchema = {
   schema: apigw.JsonSchemaVersion.DRAFT7,
   type: apigw.JsonSchemaType.OBJECT,

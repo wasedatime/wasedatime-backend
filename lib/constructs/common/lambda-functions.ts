@@ -10,6 +10,7 @@ import { AwsServicePrincipal } from '../../configs/common/aws';
 import {
   GOOGLE_API_SERVICE_ACCOUNT_INFO,
   SLACK_WEBHOOK_URL,
+  AWS_USER_POOL_ID,
 } from '../../configs/lambda/environment';
 
 interface FunctionsProps {
@@ -491,6 +492,7 @@ export class ForumThreadFunctions extends Construct {
   readonly postFunction: lambda.Function;
   readonly patchFunction: lambda.Function;
   readonly deleteFunction: lambda.Function;
+  readonly getNotificationFunction: lambda.Function;
   readonly testPostFunction: lambda.Function;
   readonly testGetFunction: lambda.Function;
 
@@ -645,6 +647,23 @@ export class ForumThreadFunctions extends Construct {
       environment: props.envVars,
     });
 
+    this.getNotificationFunction = new lambda_py.PythonFunction(
+      this,
+      'notify-thread',
+      {
+        entry: 'src/lambda/get-thread-notify',
+        description:
+          'return forum thread count from given date in the database.',
+        functionName: 'get-thread-notify',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 128,
+        role: DBReadRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(3),
+        environment: props.envVars,
+      },
+    );
+
     this.testPostFunction = new lambda_py.PythonFunction(
       this,
       'test-post-thread',
@@ -794,7 +813,7 @@ export class ForumCommentFunctions extends Construct {
 
 export class ThreadImageProcessFunctions extends Construct {
   // readonly getFunction: lambda.Function;
-  readonly syncImageFunction: lambda.Function;
+  // readonly syncImageFunction: lambda.Function;
   readonly resizeImageFunction: lambda.Function;
   // readonly deleteFunction: lambda.Function;
 
@@ -809,7 +828,7 @@ export class ThreadImageProcessFunctions extends Construct {
         description:
           'Allow lambda function to perform read operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-lambda-read-thread',
+        roleName: 'dynamodb-s3-lambda-read-thread-imgs', // Changed the role name
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -859,19 +878,6 @@ export class ThreadImageProcessFunctions extends Construct {
       },
     );
 
-    // this.syncImageFunction = new lambda_py.PythonFunction(this, 'sync-image', {
-    //   entry: 'src/lambda/sync-image',
-    //   description:
-    //     'post image to dyanamo db database when image inputed in s3 bucket',
-    //   functionName: 'sync-image',
-    //   logRetention: logs.RetentionDays.ONE_MONTH,
-    //   memorySize: 256,
-    //   role: DBSyncRole,
-    //   runtime: lambda.Runtime.PYTHON_3_9,
-    //   timeout: Duration.seconds(5),
-    //   environment: props.envVars,
-    // });
-
     this.resizeImageFunction = new lambda_py.PythonFunction(
       this,
       'resize-image',
@@ -915,53 +921,25 @@ export class ThreadImageProcessFunctions extends Construct {
   }
 }
 
-export class AdsImageProcessFunctions extends Construct {
+// Function for pipeline
+export class AdsImageProcessFunctionsPipeline extends Construct {
   // readonly getFunction: lambda.Function;
   readonly syncImageFunction: lambda.Function;
-  readonly resizeImageFunction: lambda.Function;
+  // readonly resizeImageFunction: lambda.Function;
   // readonly deleteFunction: lambda.Function;
 
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
 
-    const DBReadRole: iam.LazyRole = new iam.LazyRole(
-      this,
-      'dynamo-s3-read-role',
-      {
-        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
-        description:
-          'Allow lambda function to perform read operation on dynamodb and s3',
-        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-lambda-read-thread',
-        managedPolicies: [
-          iam.ManagedPolicy.fromManagedPolicyArn(
-            this,
-            'basic-exec',
-            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
-          ),
-          iam.ManagedPolicy.fromManagedPolicyArn(
-            this,
-            'db-read-only',
-            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
-          ),
-          iam.ManagedPolicy.fromManagedPolicyArn(
-            this,
-            's3-read-only',
-            'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
-          ),
-        ],
-      },
-    );
-
     const DBSyncRole: iam.LazyRole = new iam.LazyRole(
       this,
-      'dynamo-s3-ads-sync-role',
+      'dynamo-s3-ads-imgs-sync-role',
       {
         assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
         description:
           'Allow lambda function to perform crud operation on dynamodb and s3',
         path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
-        roleName: 'dynamodb-s3-ads-sync-role',
+        roleName: 'dynamodb-s3-ads-imgs-sync-role',
         managedPolicies: [
           iam.ManagedPolicy.fromManagedPolicyArn(
             this,
@@ -994,46 +972,453 @@ export class AdsImageProcessFunctions extends Construct {
       timeout: Duration.seconds(5),
       environment: props.envVars,
     });
+  }
+}
 
-    // this.resizeImageFunction = new lambda_py.PythonFunction(
-    //   this,
-    //   "resize-image",
-    //   {
-    //     entry: "src/lambda/resize-image",
-    //     description:
-    //       "Resize uploaded image to a thumbnail and store in s3 bucket",
-    //     functionName: "patch-image",
-    //     logRetention: logs.RetentionDays.ONE_MONTH,
-    //     memorySize: 256,
-    //     role: DBSyncRole,
-    //     runtime: lambda.Runtime.PYTHON_3_9,
-    //     timeout: Duration.seconds(5),
-    //     environment: props.envVars,
-    //   }
-    // );
+// Function for api
+export class AdsImageProcessFunctionsAPI extends Construct {
+  readonly getFunction: lambda.Function;
+  // readonly syncImageFunction: lambda.Function;
+  // readonly resizeImageFunction: lambda.Function;
+  // readonly deleteFunction: lambda.Function;
 
-    // this.getFunction = new lambda_py.PythonFunction(this, "get-comment", {
-    //   entry: "src/lambda/get-comments",
-    //   description: "get forum comments from the database.",
-    //   functionName: "get-forum-comments",
-    //   logRetention: logs.RetentionDays.ONE_MONTH,
-    //   memorySize: 128,
-    //   role: DBReadRole,
-    //   runtime: lambda.Runtime.PYTHON_3_9,
-    //   timeout: Duration.seconds(3),
-    //   environment: props.envVars,
-    // });
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
 
-    // this.deleteFunction = new lambda_py.PythonFunction(this, "delete-comment", {
-    //   entry: "src/lambda/delete-comment",
-    //   description: "Delete forum comment in the database.",
-    //   functionName: "delete-forum-comment",
-    //   logRetention: logs.RetentionDays.ONE_MONTH,
-    //   memorySize: 128,
-    //   role: DBPutRole,
-    //   runtime: lambda.Runtime.PYTHON_3_9,
-    //   timeout: Duration.seconds(3),
-    //   environment: props.envVars,
-    // });
+    //! Update to put role
+    const DBPutRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-s3-ads-put-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-ads-put-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-ads', {
+      entry: 'src/lambda/get-ads',
+      description: 'get ads list or specific url from the database.',
+      functionName: 'get-ads',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBPutRole, //! Change to put role since we now have to read and write
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+  }
+}
+
+export class CareerDBSyncFunction extends Construct {
+  readonly syncCareerFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const DBSyncRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-career-sync-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-career-sync-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+
+    this.syncCareerFunction = new lambda_py.PythonFunction(
+      this,
+      'sync-career',
+      {
+        entry: 'src/lambda/sync-career',
+        description: 'sync career info inputed in s3 to dynamodb',
+        functionName: 'sync-career',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 256,
+        role: DBSyncRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(5),
+        environment: props.envVars,
+      },
+    );
+  }
+}
+
+export class CareerRestFunctions extends Construct {
+  readonly getFunction: lambda.Function;
+  readonly postFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const DBReadRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-career-rest-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform read operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-career-rest-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-read-only',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-read-only',
+            'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess',
+          ),
+        ],
+      },
+    );
+
+    const DBApplicationPutRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-career-application-put-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-application-put-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+        ],
+      },
+    );
+
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-career', {
+      entry: 'src/lambda/get-career',
+      description: 'get career data from the database',
+      functionName: 'get-career',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
+    this.postFunction = new lambda_py.PythonFunction(this, 'post-application', {
+      entry: 'src/lambda/post-application',
+      description: 'post application data in career table',
+      functionName: 'post-application',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBApplicationPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+  }
+}
+
+export class ForumThreadAIFunctions extends Construct {
+  readonly injectFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const latestBoto3Layer = new lambda_py.PythonLayerVersion(
+      this,
+      'Boto3PythonLayerVersion',
+      {
+        entry: 'lib/configs/lambda/python_packages',
+        compatibleRuntimes: [lambda.Runtime.PYTHON_3_9],
+        layerVersionName: 'latest-boto3-python-layer',
+        description: 'Layer containing updated boto3 and botocore',
+      },
+    );
+
+    const bedrockAccessPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['bedrock:InvokeModel'],
+      resources: ['*'],
+    });
+
+    const DBSyncRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-forum-thread-ai-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-forum-thread-ai-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+    DBSyncRole.addToPolicy(bedrockAccessPolicy);
+
+    this.injectFunction = new lambda_py.PythonFunction(this, 'inject-threads', {
+      entry: 'src/lambda/inject-threads',
+      description: 'inject ai generated thread data into the database',
+      functionName: 'inject-thread',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: DBSyncRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(60),
+      environment: props.envVars,
+      layers: [latestBoto3Layer],
+    });
+  }
+}
+
+export class ForumCommentAIFunctions extends Construct {
+  readonly injectFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const latestBoto3Layer = new lambda_py.PythonLayerVersion(
+      this,
+      'Boto3PythonLayerVersion',
+      {
+        entry: 'lib/configs/lambda/python_packages',
+        compatibleRuntimes: [lambda.Runtime.PYTHON_3_9],
+        layerVersionName: 'latest-boto3-python-layer',
+        description: 'Layer containing updated boto3 and botocore',
+      },
+    );
+
+    const bedrockAccessPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['bedrock:InvokeModel'],
+      resources: ['*'],
+    });
+
+    const DBSyncRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-ai-comment-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-ai-comment-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+    DBSyncRole.addToPolicy(bedrockAccessPolicy);
+
+    this.injectFunction = new lambda_py.PythonFunction(
+      this,
+      'inject-comments',
+      {
+        entry: 'src/lambda/inject-comments',
+        description: 'inject ai generated comment data into the database',
+        functionName: 'inject-comment',
+        logRetention: logs.RetentionDays.ONE_MONTH,
+        memorySize: 128,
+        role: DBSyncRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.seconds(60),
+        environment: props.envVars,
+        layers: [latestBoto3Layer],
+      },
+    );
+  }
+}
+
+export class ProfileProcessFunctions extends Construct {
+  readonly getFunction: lambda.Function;
+  readonly postFunction: lambda.Function;
+  readonly patchFunction: lambda.Function;
+  readonly deleteFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    const dynamoDBReadRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-read-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-lambda-read-profile',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-read-only',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
+          ),
+        ],
+      },
+    );
+
+    const dynamoDBPutRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamo-put-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-lambda-write-profile',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+        ],
+      },
+    );
+
+    this.getFunction = new lambda_py.PythonFunction(this, 'get-profile', {
+      entry: 'src/lambda/get-profile',
+      description: 'get user profile from the database.',
+      functionName: 'get-profile',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBReadRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
+
+    this.postFunction = new lambda_py.PythonFunction(this, 'post-profile', {
+      entry: 'src/lambda/post-profile',
+      description: 'Save user profile into the database.',
+      functionName: 'post-profile',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    })
+      .addEnvironment(
+        'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+        GOOGLE_API_SERVICE_ACCOUNT_INFO,
+      )
+      .addEnvironment('AWS_USER_POOL_ID', AWS_USER_POOL_ID);
+
+    this.patchFunction = new lambda_py.PythonFunction(this, 'patch-profile', {
+      entry: 'src/lambda/patch-profile',
+      description: 'Update user profile in the database.',
+      functionName: 'patch-profile',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    }).addEnvironment(
+      'GOOGLE_API_SERVICE_ACCOUNT_INFO',
+      GOOGLE_API_SERVICE_ACCOUNT_INFO,
+    );
+
+    this.deleteFunction = new lambda_py.PythonFunction(this, 'delete-profile', {
+      entry: 'src/lambda/delete-profile',
+      description: 'Delete user profile in the database.',
+      functionName: 'delete-profile',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 128,
+      role: dynamoDBPutRole,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(3),
+      environment: props.envVars,
+    });
   }
 }

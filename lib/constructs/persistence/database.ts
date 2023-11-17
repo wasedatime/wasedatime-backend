@@ -10,7 +10,8 @@ export enum Collection {
   TIMETABLE,
   THREAD,
   COMMENT,
-  ADS, //! New ADS value
+  ADS,
+  PROFILE, //! New profile value
 }
 
 export class DynamoDatabase extends Construct {
@@ -48,8 +49,8 @@ export class DynamoDatabase extends Construct {
         removalPolicy: RemovalPolicy.RETAIN,
         sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING },
         tableName: 'career',
-        readCapacity: 1,
-        writeCapacity: 1,
+        readCapacity: 10,
+        writeCapacity: 10,
       },
     );
 
@@ -107,6 +108,12 @@ export class DynamoDatabase extends Construct {
       sortKey: { name: 'thread_id', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,
     });
+    this.tables[Collection.THREAD].addGlobalSecondaryIndex({
+      indexName: 'UnivIDbyThreadIDIndex',
+      partitionKey: { name: 'univ_id', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'thread_id', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
 
     // this.tables[Collection.THREAD].addLocalSecondaryIndex({
     //   indexName: 'GroupIndex',
@@ -150,6 +157,22 @@ export class DynamoDatabase extends Construct {
         removalPolicy: RemovalPolicy.RETAIN,
         timeToLiveAttribute: 'ttl',
         tableName: 'waseda-abs-count',
+        readCapacity: 1,
+        writeCapacity: 1,
+      },
+    );
+
+    this.tables[Collection.PROFILE] = new dynamodb.Table(
+      this,
+      'dynamodb-profile-table',
+      {
+        partitionKey: { name: 'uid', type: dynamodb.AttributeType.STRING },
+        sortKey: { name: 'created_at', type: dynamodb.AttributeType.STRING }, // Change sk to created_at
+        billingMode: dynamodb.BillingMode.PROVISIONED,
+        encryption: dynamodb.TableEncryption.DEFAULT,
+        removalPolicy: RemovalPolicy.RETAIN,
+        timeToLiveAttribute: 'ttl',
+        tableName: 'waseda-profile',
         readCapacity: 1,
         writeCapacity: 1,
       },

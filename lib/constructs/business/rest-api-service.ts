@@ -20,6 +20,9 @@ import {
   forumCommentPostReqSchema,
   forumCommentPatchReqSchema,
   syllabusSchema,
+  userProfileGetRespSchema,
+  userProfilePostReqSchema,
+  userProfilePatchReqSchema,
 } from '../../configs/api-gateway/schema';
 import { AwsServicePrincipal } from '../../configs/common/aws';
 import {
@@ -28,6 +31,9 @@ import {
   TimetableFunctions,
   ForumThreadFunctions,
   ForumCommentFunctions,
+  AdsImageProcessFunctionsAPI,
+  CareerRestFunctions,
+  ProfileProcessFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -51,6 +57,62 @@ export class RestApiService extends Construct {
   }
 }
 
+export class ForumAdsApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
+
+    // Create resources for the api
+    const root = scope.apiEndpoint.root.addResource('adsImgs');
+
+    const adsImageProcessFunctionsAPI = new AdsImageProcessFunctionsAPI(
+      this,
+      'crud-functions',
+      {
+        envVars: {
+          TABLE_NAME: props.dataSource!,
+          BUCKET_NAME: 'wasedatime-ads',
+        },
+      },
+    );
+
+    const getIntegration = new apigw.LambdaIntegration(
+      adsImageProcessFunctionsAPI.getFunction,
+      { proxy: true },
+    );
+
+    const optionsAdsImgs = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.POST],
+    });
+
+    const getAds = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
+      operationName: 'GetAds',
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseParameters: lambdaRespParams,
+        },
+      ],
+      requestValidator: props.validator,
+    });
+
+    this.resourceMapping = {
+      '/adsImgs': {
+        [apigw2.HttpMethod.GET]: getAds,
+        [apigw2.HttpMethod.OPTIONS]: optionsAdsImgs,
+      },
+    };
+  }
+}
 export class SyllabusApiService extends RestApiService {
   readonly resourceMapping: {
     [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
@@ -406,106 +468,67 @@ export class CareerApiService extends RestApiService {
     super(scope, id, props);
 
     const root = scope.apiEndpoint.root.addResource('career');
-    const intern = root.addResource('intern');
-    const part = root.addResource('part-time');
-    const seminar = root.addResource('seminar');
 
-    const internGetIntegration = new apigw.MockIntegration({
-      requestTemplates: { ['application/json']: '{"statusCode": 200}' },
-      passthroughBehavior: apigw.PassthroughBehavior.WHEN_NO_TEMPLATES,
-      integrationResponses: [
-        {
-          statusCode: '200',
-          responseTemplates: { ['application/json']: '{}' },
-        },
-      ],
+    const careerFunctions = new CareerRestFunctions(this, 'crud-functions', {
+      envVars: {
+        TABLE_NAME: props.dataSource!,
+        BUCKET_NAME: 'wasedatime-career',
+      },
     });
-    const partGetIntegration = new apigw.MockIntegration({
-      requestTemplates: { ['application/json']: '{"statusCode": 200}' },
-      passthroughBehavior: apigw.PassthroughBehavior.WHEN_NO_TEMPLATES,
-      integrationResponses: [
-        {
-          statusCode: '200',
-          responseTemplates: { ['application/json']: '{}' },
-        },
-      ],
-    });
-    const seminarGetIntegration = new apigw.MockIntegration({
-      requestTemplates: { ['application/json']: '{"statusCode": 200}' },
-      passthroughBehavior: apigw.PassthroughBehavior.WHEN_NO_TEMPLATES,
-      integrationResponses: [
-        {
-          statusCode: '200',
-          responseTemplates: { ['application/json']: '{}' },
-        },
-      ],
-    });
-
-    [intern, part, seminar].forEach((value) =>
-      value.addCorsPreflight({
-        allowOrigins: allowOrigins,
-        allowHeaders: allowHeaders,
-        allowMethods: [apigw2.HttpMethod.GET, apigw2.HttpMethod.OPTIONS],
-      }),
+    const getIntegration = new apigw.LambdaIntegration(
+      careerFunctions.getFunction,
+      { proxy: true },
     );
-    intern.addMethod(apigw2.HttpMethod.GET, internGetIntegration, {
-      requestParameters: {
-        'method.request.querystring.offset': true,
-        'method.request.querystring.limit': true,
-        'method.request.querystring.ind': false,
-        'method.request.querystring.dl': false,
-        'method.request.querystring.lang': false,
-      },
-      operationName: 'GetInternInfo',
+    const postIntegration = new apigw.LambdaIntegration(
+      careerFunctions.postFunction,
+      { proxy: true },
+    );
+
+    const optionsCareer = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+    const getCareer = root.addMethod(apigw2.HttpMethod.GET, getIntegration, {
+      operationName: 'GetCareers',
       methodResponses: [
         {
           statusCode: '200',
-          responseModels: { ['application/json']: apigw.Model.EMPTY_MODEL },
           responseParameters: lambdaRespParams,
         },
       ],
       requestValidator: props.validator,
     });
-    part.addMethod(apigw2.HttpMethod.GET, partGetIntegration, {
-      requestParameters: {
-        'method.request.querystring.offset': true,
-        'method.request.querystring.limit': true,
-        'method.request.querystring.loc': false,
-        'method.request.querystring.dl': false,
-        'method.request.querystring.lang': false,
-        'method.request.querystring.pay': false,
-        'method.request.querystring.freq': false,
+
+    const postApplication = root.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        operationName: 'PostApplication',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
       },
-      operationName: 'GetParttimeInfo',
-      methodResponses: [
-        {
-          statusCode: '200',
-          responseModels: { ['application/json']: apigw.Model.EMPTY_MODEL },
-          responseParameters: lambdaRespParams,
-        },
-      ],
-      requestValidator: props.validator,
-    });
-    seminar.addMethod(apigw2.HttpMethod.GET, seminarGetIntegration, {
-      requestParameters: {
-        'method.request.querystring.offset': true,
-        'method.request.querystring.limit': true,
-        'method.request.querystring.ind': false,
-        'method.request.querystring.duration': false,
-        'method.request.querystring.lang': false,
-        'method.request.querystring.dl': false,
-        'method.request.querystring.major': false,
+    );
+
+    this.resourceMapping = {
+      '/career': {
+        [apigw2.HttpMethod.GET]: getCareer,
+        [apigw2.HttpMethod.POST]: postApplication,
+        [apigw2.HttpMethod.OPTIONS]: optionsCareer,
       },
-      operationName: 'GetSeminarInfo',
-      methodResponses: [
-        {
-          statusCode: '200',
-          responseModels: { ['application/json']: apigw.Model.EMPTY_MODEL },
-          responseParameters: lambdaRespParams,
-        },
-      ],
-      requestValidator: props.validator,
-    });
+    };
   }
 }
 
@@ -718,6 +741,7 @@ export class ForumThreadsApiService extends RestApiService {
     const threadResource = boardResource.addResource('{thread_id}');
     const userResource = root.addResource('user');
     const testResource = root.addResource('test');
+    const notificationResource = root.addResource('notify');
 
     const optionsForumHome = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -779,6 +803,12 @@ export class ForumThreadsApiService extends RestApiService {
       ],
     });
 
+    const optionsNotifyThreads = notificationResource.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [apigw2.HttpMethod.GET],
+    });
+
     const getRespModel = scope.apiEndpoint.addModel('threads-get-resp-model', {
       schema: forumThreadGetRespSchema,
       contentType: 'application/json',
@@ -831,6 +861,10 @@ export class ForumThreadsApiService extends RestApiService {
     );
     const deleteIntegration = new apigw.LambdaIntegration(
       forumThreadsFunctions.deleteFunction,
+      { proxy: true },
+    );
+    const notifyIntegration = new apigw.LambdaIntegration(
+      forumThreadsFunctions.getNotificationFunction,
       { proxy: true },
     );
     const testPostIntegration = new apigw.LambdaIntegration(
@@ -940,6 +974,20 @@ export class ForumThreadsApiService extends RestApiService {
         requestValidator: props.validator,
       },
     );
+    const notifyForumThreads = notificationResource.addMethod(
+      apigw2.HttpMethod.GET,
+      notifyIntegration,
+      {
+        operationName: 'NotifyThreadCount',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
     const testPostForumThreads = testResource.addMethod(
       apigw2.HttpMethod.POST,
       testPostIntegration,
@@ -967,7 +1015,6 @@ export class ForumThreadsApiService extends RestApiService {
             responseParameters: lambdaRespParams,
           },
         ],
-        authorizer: props.authorizer,
         requestValidator: props.validator,
       },
     );
@@ -980,6 +1027,10 @@ export class ForumThreadsApiService extends RestApiService {
       '/forum/user': {
         [apigw2.HttpMethod.GET]: getUserForumThreads,
         [apigw2.HttpMethod.OPTIONS]: optionsUserThreads,
+      },
+      '/forum/notify': {
+        [apigw2.HttpMethod.GET]: notifyForumThreads,
+        [apigw2.HttpMethod.OPTIONS]: optionsNotifyThreads,
       },
       '/forum/{board_id}': {
         [apigw2.HttpMethod.POST]: postForumThreads,
@@ -1159,6 +1210,159 @@ export class ForumCommentsApiService extends RestApiService {
         [apigw2.HttpMethod.PATCH]: patchForumComment,
         [apigw2.HttpMethod.POST]: postForumComment,
         [apigw2.HttpMethod.DELETE]: deleteForumComment,
+      },
+    };
+  }
+}
+
+export class ProfileProcessApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
+
+    const root = scope.apiEndpoint.root.addResource('profile');
+
+    const optionsProfileProcess = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const profileProcessFunctions = new ProfileProcessFunctions(
+      this,
+      'crud-functions',
+      {
+        envVars: {
+          TABLE_NAME: props.dataSource!,
+        },
+      },
+    );
+
+    const getIntegration = new apigw.LambdaIntegration(
+      profileProcessFunctions.getFunction,
+      { proxy: true },
+    );
+    const postIntegration = new apigw.LambdaIntegration(
+      profileProcessFunctions.postFunction,
+      { proxy: true },
+    );
+    const patchIntegration = new apigw.LambdaIntegration(
+      profileProcessFunctions.patchFunction,
+      { proxy: true },
+    );
+    const deleteIntegration = new apigw.LambdaIntegration(
+      profileProcessFunctions.deleteFunction,
+      { proxy: true },
+    );
+    // bug fixed
+    const getRespModel = scope.apiEndpoint.addModel('profile-get-resp-model', {
+      schema: userProfileGetRespSchema,
+      contentType: 'application/json',
+      description: 'HTTP GET response body schema for fetching user profile.',
+      modelName: 'GetProfileResp',
+    });
+    const postReqModel = scope.apiEndpoint.addModel('profile-post-req-model', {
+      schema: userProfilePostReqSchema,
+      contentType: 'application/json',
+      description:
+        'HTTP POST request body schema for submitting a user profile.',
+      modelName: 'PostProfileReq',
+    });
+    const patchReqModel = scope.apiEndpoint.addModel(
+      'profile-patch-req-model',
+      {
+        schema: userProfilePatchReqSchema,
+        contentType: 'application/json',
+        description:
+          'HTTP PATCH request body schema for updating a user profile',
+        modelName: 'PatchProfileReq',
+      },
+    );
+
+    const getUserProfile = root.addMethod(
+      apigw2.HttpMethod.GET,
+      getIntegration,
+      {
+        operationName: 'GetUserProfile',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseModels: { ['application/json']: getRespModel },
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const postUserProfile = root.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        operationName: 'PostUserProfile',
+        requestModels: { ['application/json']: postReqModel },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const patchUserProfile = root.addMethod(
+      apigw2.HttpMethod.PATCH,
+      patchIntegration,
+      {
+        operationName: 'UpdateUseProfile',
+        requestModels: { ['application/json']: patchReqModel },
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+    const deleteUserProfile = root.addMethod(
+      apigw2.HttpMethod.DELETE,
+      deleteIntegration,
+      {
+        operationName: 'DeleteUserProfile',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+
+    this.resourceMapping = {
+      '/profile': {
+        [apigw2.HttpMethod.GET]: getUserProfile,
+        [apigw2.HttpMethod.OPTIONS]: optionsProfileProcess,
+        [apigw2.HttpMethod.PATCH]: patchUserProfile,
+        [apigw2.HttpMethod.POST]: postUserProfile,
+        [apigw2.HttpMethod.DELETE]: deleteUserProfile,
       },
     };
   }

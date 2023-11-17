@@ -16,7 +16,10 @@ import {
   SyllabusScraper,
   SyllabusUpdateFunction,
   ThreadImageProcessFunctions,
-  AdsImageProcessFunctions,
+  AdsImageProcessFunctionsPipeline,
+  CareerDBSyncFunction,
+  ForumThreadAIFunctions,
+  ForumCommentAIFunctions,
 } from '../common/lambda-functions';
 
 export enum Worker {
@@ -24,18 +27,22 @@ export enum Worker {
   CAREER,
   FEEDS,
   THREADIMG,
-  ADS, //! New ADS value
+  ADS,
+  FORUMAI,
+  COMMENTAI,
 }
 
 export interface DataPipelineProps {
   dataSource?: s3.Bucket;
   dataWarehouse?: dynamodb.Table;
+  threadWareHouse?: dynamodb.Table;
+  commentWareHouse?: dynamodb.Table;
 }
 
 export abstract class AbstractDataPipeline extends Construct {
   abstract readonly dataSource?: s3.Bucket;
   abstract readonly processor: lambda.Function | sfn.StateMachine;
-  abstract readonly dataWarehouse: s3.Bucket | dynamodb.Table;
+  abstract readonly dataWarehouse?: s3.Bucket | dynamodb.Table;
 }
 
 export class SyllabusDataPipeline extends AbstractDataPipeline {
@@ -143,7 +150,7 @@ export class CareerDataPipeline extends AbstractDataPipeline {
   readonly processor: lambda.Function;
   readonly dataWarehouse: dynamodb.Table;
 
-  constructor(scope: Construct, id: string, props?: DataPipelineProps) {
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
     super(scope, id);
 
     this.dataSource = new s3.Bucket(this, 'career-bucket', {
@@ -156,6 +163,22 @@ export class CareerDataPipeline extends AbstractDataPipeline {
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: false,
     });
+
+    this.dataWarehouse = props.dataWarehouse!;
+
+    this.processor = new CareerDBSyncFunction(this, 'career-sync-function', {
+      envVars: {
+        ['BUCKET_NAME']: this.dataSource.bucketName,
+        ['TABLE_NAME']: this.dataWarehouse.tableName,
+      },
+    }).syncCareerFunction;
+
+    this.processor.addEventSource(
+      new event_sources.S3EventSource(this.dataSource, {
+        events: [s3.EventType.OBJECT_CREATED],
+        filters: [{ suffix: '.json' }],
+      }),
+    );
   }
 }
 
@@ -251,6 +274,7 @@ export class ThreadImgDataPipeline extends AbstractDataPipeline {
           INPUT_BUCKET: this.dataSource.bucketName,
           OUTPUT_BUCKET: this.dataWarehouse.bucketName,
           TABLE_NAME: 'forum-threads',
+          UID: '',
         },
       },
     ).resizeImageFunction;
@@ -285,19 +309,81 @@ export class AdsDataPipeline extends AbstractDataPipeline {
 
     this.dataWarehouse = props.dataWarehouse!;
 
-    // this.processor = new AdsImageProcessFunctions(this, "image-process-func", {
-    //   envVars: {
-    //     ["BUCKET_NAME"]: this.dataSource.bucketName,
-    //     ["TABLE_NAME"]: this.dataWarehouse.tableName,
-    //     ["OBJECT_PATH"]: "syllabus/",
-    //   },
-    // }).syncImageFunction;
+    this.processor = new AdsImageProcessFunctionsPipeline(
+      this,
+      'image-process-func',
+      {
+        envVars: {
+          ['BUCKET_NAME']: this.dataSource.bucketName,
+          ['TABLE_NAME']: this.dataWarehouse.tableName,
+        },
+      },
+    ).syncImageFunction;
 
-    // this.processor.addEventSource(
-    //   new event_sources.S3EventSource(this.dataSource, {
-    //     events: [s3.EventType.OBJECT_CREATED_PUT],
-    //     filters: [{ prefix: "syllabus/" }],
-    //   })
-    // );
+    this.processor.addEventSource(
+      new event_sources.S3EventSource(this.dataSource, {
+        events: [s3.EventType.OBJECT_CREATED],
+      }),
+    );
+  }
+}
+
+export class ForumThreadAIDataPipeline extends AbstractDataPipeline {
+  readonly dataSource?: s3.Bucket;
+  readonly processor: lambda.Function;
+  readonly dataWarehouse: dynamodb.Table;
+  readonly commentWarehouse: dynamodb.Table;
+
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
+    super(scope, id);
+
+    this.dataSource = props.dataSource!;
+    this.dataWarehouse = props.threadWareHouse!;
+    this.commentWarehouse = props.commentWareHouse!;
+
+    const UID = process.env.UID!;
+
+    this.processor = new ForumThreadAIFunctions(
+      this,
+      'forum-thread-ai-function',
+      {
+        envVars: {
+          ['BUCKET_NAME']: this.dataSource.bucketName,
+          ['THREAD_TABLE_NAME']: this.dataWarehouse.tableName,
+          ['COMMENT_TABLE_NAME']: this.commentWarehouse.tableName,
+          ['UID']: UID,
+        },
+      },
+    ).injectFunction;
+  }
+}
+
+export class ForumCommentAIDataPipeline extends AbstractDataPipeline {
+  readonly dataSource?: s3.Bucket;
+  readonly processor: lambda.Function;
+  readonly dataWarehouse: dynamodb.Table;
+  readonly commentWarehouse: dynamodb.Table;
+
+  constructor(scope: Construct, id: string, props: DataPipelineProps) {
+    super(scope, id);
+
+    // this.dataSource = props.dataSource!;
+    this.dataWarehouse = props.threadWareHouse!;
+    this.commentWarehouse = props.commentWareHouse!;
+
+    const UID = process.env.UID!;
+
+    this.processor = new ForumCommentAIFunctions(
+      this,
+      'forum-comment-ai-function',
+      {
+        envVars: {
+          // ['BUCKET_NAME']: this.dataSource.bucketName,
+          ['THREAD_TABLE_NAME']: this.dataWarehouse.tableName,
+          ['COMMENT_TABLE_NAME']: this.commentWarehouse.tableName,
+          ['UID']: UID,
+        },
+      },
+    ).injectFunction;
   }
 }

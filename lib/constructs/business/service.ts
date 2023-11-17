@@ -14,7 +14,9 @@ export type RestApiServiceId =
   | 'timetable'
   | 'thread'
   | 'comment'
-  | 'graphql';
+  | 'ads'
+  | 'graphql'
+  | 'profile';
 
 export const restApiServiceMap: {
   [name in RestApiServiceId]: typeof rest.RestApiService;
@@ -25,7 +27,9 @@ export const restApiServiceMap: {
   'timetable': rest.TimetableApiService,
   'thread': rest.ForumThreadsApiService,
   'comment': rest.ForumCommentsApiService,
+  'ads': rest.ForumAdsApiService,
   'graphql': rest.GraphqlApiService,
+  'profile': rest.ProfileProcessApiService,
 };
 
 export type GraphqlApiServiceId = 'course';

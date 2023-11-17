@@ -59,7 +59,11 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
         this.dataInterface.getEndpoint(DataEndpoint.COURSE_REVIEWS),
         true,
       )
-      .addService('career')
+      .addService(
+        'career',
+        this.dataInterface.getEndpoint(DataEndpoint.CAREER),
+        true,
+      )
       .addService(
         'timetable',
         this.dataInterface.getEndpoint(DataEndpoint.TIMETABLE),
@@ -73,6 +77,15 @@ export class WasedaTimeBusinessLayer extends BusinessLayer {
       .addService(
         'comment',
         this.dataInterface.getEndpoint(DataEndpoint.COMMENT),
+        true,
+      )
+      .addService(
+        'ads',
+        this.dataInterface.getEndpoint(DataEndpoint.ADS),
+        true)
+      .addService(
+        'profile',
+        this.dataInterface.getEndpoint(DataEndpoint.PROFILE),
         true,
       );
     // .addService("graphql", graphqlApiEndpoint.apiEndpoint.graphqlUrl);

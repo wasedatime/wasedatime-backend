@@ -1,82 +1,32 @@
 from boto3.dynamodb.conditions import Key, Attr
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils import JsonPayloadBuilder, table, resp_handler, s3_client, bucket, generate_url
 
 
 @resp_handler
-def get_single_thread(board_id, thread_id, uid=""):
-    results = table.query(
-        KeyConditionExpression=Key("board_id").eq(
-            board_id) & Key("thread_id").eq(thread_id)
-    )["Items"]
+def get_threads():
 
-    if not results:
-        raise LookupError
+    univ_id = "1"
 
-    item = results[0]
+    response = table.query(
+        IndexName='UnivIDbyThreadIDIndex',
+        KeyConditionExpression=Key('univ_id').eq(univ_id),
+        ProjectionExpression="group_id, board_id, body",
+        Limit=10,
+        ScanIndexForward=False
+    )
 
-    if item["uid"] == uid:
-        table.update_item(
-            Key={
-                "board_id": board_id,
-                "thread_id": thread_id,
-            },
-            UpdateExpression="SET #v = #v + :incr, #nc = :newComment",
-            ConditionExpression="#uid = :uidValue",
-            ExpressionAttributeNames={
-                '#v': 'views',
-                '#nc': 'new_comment',
-                '#uid': 'uid'
-            },
-            ExpressionAttributeValues={
-                ":incr": 1,
-                ":newComment": False,
-                ":uidValue": uid
-            }
-        )
-    else:
-        # Increment the view count but do not update new_comment
-        table.update_item(
-            Key={
-                "board_id": board_id,
-                "thread_id": thread_id,
-            },
-            UpdateExpression="SET #v = #v + :incr",
-            ExpressionAttributeNames={
-                '#v': 'views'
-            },
-            ExpressionAttributeValues={
-                ":incr": 1
-            }
-        )
+    print(response)
 
-    item["mod"] = False
-    if item["uid"] == uid:
-        item["mod"] = True
-    item['user_liked'] = uid in item.get('likes', [])
-    item['total_likes'] = len(item.get('likes', []))
+    items = response['Items']
 
-    if "obj_key" in item:
-        bucket_name = bucket
-        presigned_url = generate_url(bucket_name, item["obj_key"])
-        if presigned_url:
-            item["url"] = presigned_url
-
-    item.pop('uid', None)
-    item.pop('likes', None)
-    item.pop('obj_key', None)
+    print(items)
 
     body = JsonPayloadBuilder().add_status(
-        True).add_data(item).add_message('').compile()
+        True).add_data(items).add_message('').compile()
     return body
 
 
 def handler(event, context):
-    params = {
-        "board_id": event["queryStringParameters"]["board_id"],
-        "thread_id": event["queryStringParameters"]["thread_id"],
-    }
-    if "uid" in event["queryStringParameters"]:
-        params["uid"] = event["queryStringParameters"]["uid"]
 
-    return get_single_thread(**params)
+    return get_threads()

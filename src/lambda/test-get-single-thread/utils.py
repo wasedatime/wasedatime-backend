@@ -18,6 +18,15 @@ class DecimalEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+class ExtendedEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        if isinstance(obj, set):
+            return list(obj)
+        return super(ExtendedEncoder, self).default(obj)
+
+
 class JsonPayloadBuilder:
     payload = {}
 
@@ -34,7 +43,7 @@ class JsonPayloadBuilder:
         return self
 
     def compile(self):
-        return json.dumps(self.payload, cls=DecimalEncoder, ensure_ascii=False).encode('utf8')
+        return json.dumps(self.payload, cls=ExtendedEncoder, ensure_ascii=False).encode('utf8')
 
 
 def api_response(code, body):
