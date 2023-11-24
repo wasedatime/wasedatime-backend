@@ -34,6 +34,7 @@ import {
   AdsImageProcessFunctionsAPI,
   CareerRestFunctions,
   ProfileProcessFunctions,
+  CourseGPTAIFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -1363,6 +1364,72 @@ export class ProfileProcessApiService extends RestApiService {
         [apigw2.HttpMethod.PATCH]: patchUserProfile,
         [apigw2.HttpMethod.POST]: postUserProfile,
         [apigw2.HttpMethod.DELETE]: deleteUserProfile,
+      },
+    };
+  }
+}
+
+export class CourseGPTAiApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
+
+    const root = scope.apiEndpoint.root.addResource('coursegpt');
+
+    const optionsProfileProcess = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const courseGPTAIFunctions = new CourseGPTAIFunctions(
+      this,
+      'crud-functions',
+      {
+        envVars: {
+          TABLE_NAME: props.dataSource!,
+        },
+      },
+    );
+
+    const postIntegration = new apigw.LambdaIntegration(
+      courseGPTAIFunctions.postFunction,
+      { proxy: true },
+    );
+
+    const postUserProfile = root.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        operationName: 'PostUserProfile',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        authorizer: props.authorizer,
+        requestValidator: props.validator,
+      },
+    );
+
+    this.resourceMapping = {
+      '/coursegpt': {
+        [apigw2.HttpMethod.OPTIONS]: optionsProfileProcess,
+        [apigw2.HttpMethod.POST]: postUserProfile,
       },
     };
   }

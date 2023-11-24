@@ -1422,3 +1422,22 @@ export class ProfileProcessFunctions extends Construct {
     });
   }
 }
+
+export class CourseGPTAIFunctions extends Construct {
+  readonly postFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: FunctionsProps) {
+    super(scope, id);
+
+    this.postFunction = new lambda_py.PythonFunction(this, 'post-prompt', {
+      entry: 'src/lambda/post-prompt',
+      description: 'Return result from GPT API.',
+      functionName: 'post-prompt',
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      memorySize: 256,
+      runtime: lambda.Runtime.PYTHON_3_9,
+      timeout: Duration.seconds(5),
+      environment: props.envVars,
+    });
+  }
+}

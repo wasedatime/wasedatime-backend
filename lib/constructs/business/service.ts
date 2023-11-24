@@ -16,7 +16,8 @@ export type RestApiServiceId =
   | 'comment'
   | 'ads'
   | 'graphql'
-  | 'profile';
+  | 'profile'
+  | 'coursegpt';
 
 export const restApiServiceMap: {
   [name in RestApiServiceId]: typeof rest.RestApiService;
@@ -30,6 +31,7 @@ export const restApiServiceMap: {
   'ads': rest.ForumAdsApiService,
   'graphql': rest.GraphqlApiService,
   'profile': rest.ProfileProcessApiService,
+  'coursegpt': rest.CourseGPTAiApiService,
 };
 
 export type GraphqlApiServiceId = 'course';
