@@ -26,6 +26,7 @@ env:
   MASTER_VITE_GA_ID: ${{secrets.VITE_GA_ID}}
   DEV_VITE_GA_ID: ${{secrets.DEV_VITE_GA_ID}}
   UID: ${{secrets.UID}}
+  OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
   STAGE: dev
 
 jobs:

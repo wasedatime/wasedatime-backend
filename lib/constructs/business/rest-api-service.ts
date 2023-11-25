@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 import { allowHeaders, allowOrigins } from '../../configs/api-gateway/cors';
 import {
   lambdaRespParams,
+  mockRespMapping,
   s3RespMapping,
   syllabusRespParams,
 } from '../../configs/api-gateway/mapping';
@@ -34,7 +35,7 @@ import {
   AdsImageProcessFunctionsAPI,
   CareerRestFunctions,
   ProfileProcessFunctions,
-  CourseGPTAIFunctions,
+  TestAIFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -1369,7 +1370,7 @@ export class ProfileProcessApiService extends RestApiService {
   }
 }
 
-export class CourseGPTAiApiService extends RestApiService {
+export class testAiApiService extends RestApiService {
   readonly resourceMapping: {
     [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
   };
@@ -1381,7 +1382,7 @@ export class CourseGPTAiApiService extends RestApiService {
   ) {
     super(scope, id, props);
 
-    const root = scope.apiEndpoint.root.addResource('coursegpt');
+    const root = scope.apiEndpoint.root.addResource('test');
 
     const optionsProfileProcess = root.addCorsPreflight({
       allowOrigins: allowOrigins,
@@ -1395,18 +1396,14 @@ export class CourseGPTAiApiService extends RestApiService {
       ],
     });
 
-    const courseGPTAIFunctions = new CourseGPTAIFunctions(
-      this,
-      'crud-functions',
-      {
-        envVars: {
-          TABLE_NAME: props.dataSource!,
-        },
+    const testAiFunctions = new TestAIFunctions(this, 'crud-functions', {
+      envVars: {
+        TABLE_NAME: props.dataSource!,
       },
-    );
+    });
 
     const postIntegration = new apigw.LambdaIntegration(
-      courseGPTAIFunctions.postFunction,
+      testAiFunctions.postFunction,
       { proxy: true },
     );
 
@@ -1421,13 +1418,12 @@ export class CourseGPTAiApiService extends RestApiService {
             responseParameters: lambdaRespParams,
           },
         ],
-        authorizer: props.authorizer,
         requestValidator: props.validator,
       },
     );
 
     this.resourceMapping = {
-      '/coursegpt': {
+      '/test': {
         [apigw2.HttpMethod.OPTIONS]: optionsProfileProcess,
         [apigw2.HttpMethod.POST]: postUserProfile,
       },

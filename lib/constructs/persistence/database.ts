@@ -11,7 +11,8 @@ export enum Collection {
   THREAD,
   COMMENT,
   ADS,
-  PROFILE, //! New profile value
+  PROFILE,
+  TEST,
 }
 
 export class DynamoDatabase extends Construct {

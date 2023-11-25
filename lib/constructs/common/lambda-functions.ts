@@ -11,6 +11,7 @@ import {
   GOOGLE_API_SERVICE_ACCOUNT_INFO,
   SLACK_WEBHOOK_URL,
   AWS_USER_POOL_ID,
+  OPENAI_API_KEY,
 } from '../../configs/lambda/environment';
 
 interface FunctionsProps {
@@ -1423,21 +1424,23 @@ export class ProfileProcessFunctions extends Construct {
   }
 }
 
-export class CourseGPTAIFunctions extends Construct {
+export class TestAIFunctions extends Construct {
   readonly postFunction: lambda.Function;
 
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
 
-    this.postFunction = new lambda_py.PythonFunction(this, 'post-prompt', {
-      entry: 'src/lambda/post-prompt',
+    this.postFunction = new lambda_py.PythonFunction(this, 'post-chat', {
+      entry: 'src/lambda/post-chat',
       description: 'Return result from GPT API.',
-      functionName: 'post-prompt',
+      functionName: 'post-chat',
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(5),
       environment: props.envVars,
-    });
+    })
+      .addEnvironment('SYLLABUS_BUCKET_NAME', 'wasedatime-syllabus-prod')
+      .addEnvironment('OPENAI_API_KEY', OPENAI_API_KEY);
   }
 }
