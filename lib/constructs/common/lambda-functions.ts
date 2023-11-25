@@ -1430,6 +1430,53 @@ export class TestAIFunctions extends Construct {
   constructor(scope: Construct, id: string, props: FunctionsProps) {
     super(scope, id);
 
+    const latestBoto3Layer = new lambda_py.PythonLayerVersion(
+      this,
+      'Boto3PythonLayerVersion',
+      {
+        entry: 'lib/configs/lambda/python_packages',
+        compatibleRuntimes: [lambda.Runtime.PYTHON_3_9],
+        layerVersionName: 'latest-boto3-python-layer',
+        description: 'Layer containing updated boto3 and botocore',
+      },
+    );
+
+    const bedrockAccessPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['bedrock:InvokeModel'],
+      resources: ['*'],
+    });
+
+    const DBFullRole: iam.LazyRole = new iam.LazyRole(
+      this,
+      'dynamodb-s3-test-ai-role',
+      {
+        assumedBy: new iam.ServicePrincipal(AwsServicePrincipal.LAMBDA),
+        description:
+          'Allow lambda function to perform crud operation on dynamodb and s3',
+        path: `/service-role/${AwsServicePrincipal.LAMBDA}/`,
+        roleName: 'dynamodb-s3-test-ai-role',
+        managedPolicies: [
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'basic-exec1',
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            'db-full-access',
+            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+          ),
+          iam.ManagedPolicy.fromManagedPolicyArn(
+            this,
+            's3-full-access',
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+          ),
+        ],
+      },
+    );
+    DBFullRole.addToPolicy(bedrockAccessPolicy);
+
     this.postFunction = new lambda_py.PythonFunction(this, 'post-chat', {
       entry: 'src/lambda/post-chat',
       description: 'Return result from GPT API.',
@@ -1439,6 +1486,8 @@ export class TestAIFunctions extends Construct {
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(5),
       environment: props.envVars,
+      role: DBFullRole,
+      layers: [latestBoto3Layer],
     })
       .addEnvironment('SYLLABUS_BUCKET_NAME', 'wasedatime-syllabus-prod')
       .addEnvironment('OPENAI_API_KEY', OPENAI_API_KEY);
