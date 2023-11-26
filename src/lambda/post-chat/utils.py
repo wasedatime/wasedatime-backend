@@ -149,15 +149,27 @@ class CourseRecommender:
     # Create a set of tuples for each (day, period) in the actual timetable
         timetable_schedule = set()
         for course_id in self.get_timetable_course_ids():
-            course = next((c for c in self.courses if c['a'] == course_id), None)
+            course = next((c for c in filtered_courses if c['a'] == course_id), None)
             if course:
+                print(course)
                 for occurrence in course.get('i', []):
                     day = occurrence.get('d')
                     period = occurrence.get('p')
                     timetable_schedule.add((day, period))
-    
-        # Exclude courses that have conflicting days and periods
-        return [course for course in filtered_courses if not any((occurrence.get('d'), occurrence.get('p')) in timetable_schedule for occurrence in course.get('i', []))]
+
+        print(timetable_schedule)
+
+        # Exclude courses that have conflicting days and periods with the timetable
+        non_conflicting_courses = []
+        for course in filtered_courses:
+            course_id = course.get('a')
+            if course_id not in self.get_timetable_course_ids():
+                # Check if this course's occurrences conflict with the timetable
+                course_occurrences = course.get('i', [])
+                if not any((occ.get('d'), occ.get('p')) in timetable_schedule for occ in course_occurrences):
+                    non_conflicting_courses.append(course)
+
+        return non_conflicting_courses
 
     def create_timetable_with_titles(self):
         timetable_with_titles = self.timetable_data.copy()
