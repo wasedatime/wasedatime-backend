@@ -8,7 +8,7 @@ def post_chat(prompt, timetable):
     recommender = CourseRecommender(s3_client, bucket, school_code_map)
 
 
-    prompt = recommender.generate_gpt_prompt(timetable)
+    prompt = recommender.generate_gpt_prompt(prompt, timetable)
     
     response = ai_client.chat.completions.create(
       model= "gpt-3.5-turbo-1106",
