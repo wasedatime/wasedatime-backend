@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 import { allowHeaders, allowOrigins } from '../../configs/api-gateway/cors';
 import {
   lambdaRespParams,
+  mockRespMapping,
   s3RespMapping,
   syllabusRespParams,
 } from '../../configs/api-gateway/mapping';
@@ -34,6 +35,7 @@ import {
   AdsImageProcessFunctionsAPI,
   CareerRestFunctions,
   ProfileProcessFunctions,
+  TestAIFunctions,
 } from '../common/lambda-functions';
 import { AbstractRestApiEndpoint } from './api-endpoint';
 
@@ -1363,6 +1365,67 @@ export class ProfileProcessApiService extends RestApiService {
         [apigw2.HttpMethod.PATCH]: patchUserProfile,
         [apigw2.HttpMethod.POST]: postUserProfile,
         [apigw2.HttpMethod.DELETE]: deleteUserProfile,
+      },
+    };
+  }
+}
+
+export class testAiApiService extends RestApiService {
+  readonly resourceMapping: {
+    [path: string]: { [method in apigw2.HttpMethod]?: apigw.Method };
+  };
+
+  constructor(
+    scope: AbstractRestApiEndpoint,
+    id: string,
+    props: RestApiServiceProps,
+  ) {
+    super(scope, id, props);
+
+    const root = scope.apiEndpoint.root.addResource('test');
+
+    const optionsProfileProcess = root.addCorsPreflight({
+      allowOrigins: allowOrigins,
+      allowHeaders: allowHeaders,
+      allowMethods: [
+        apigw2.HttpMethod.GET,
+        apigw2.HttpMethod.POST,
+        apigw2.HttpMethod.PATCH,
+        apigw2.HttpMethod.DELETE,
+        apigw2.HttpMethod.OPTIONS,
+      ],
+    });
+
+    const testAiFunctions = new TestAIFunctions(this, 'crud-functions', {
+      envVars: {
+        TABLE_NAME: props.dataSource!,
+      },
+    });
+
+    const postIntegration = new apigw.LambdaIntegration(
+      testAiFunctions.postFunction,
+      { proxy: true },
+    );
+
+    const postUserProfile = root.addMethod(
+      apigw2.HttpMethod.POST,
+      postIntegration,
+      {
+        operationName: 'PostUserProfile',
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: lambdaRespParams,
+          },
+        ],
+        requestValidator: props.validator,
+      },
+    );
+
+    this.resourceMapping = {
+      '/test': {
+        [apigw2.HttpMethod.OPTIONS]: optionsProfileProcess,
+        [apigw2.HttpMethod.POST]: postUserProfile,
       },
     };
   }

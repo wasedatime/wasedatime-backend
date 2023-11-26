@@ -48,6 +48,39 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       },
     );
 
+    const threadImgDataPipeline = new ThreadImgDataPipeline(
+      this,
+      'thread-img-data-pipeline',
+    );
+    this.dataPipelines[Worker.THREADIMG] = threadImgDataPipeline;
+
+    const forumThreadAIDataPipeline = new ForumThreadAIDataPipeline(
+      this,
+      'forum-thread-ai-data-pipeline',
+      {
+        dataSource: syllabusDataPipeline.dataWarehouse,
+        threadWareHouse: dynamoDatabase.tables[Collection.THREAD],
+        commentWareHouse: dynamoDatabase.tables[Collection.COMMENT],
+      },
+    );
+    this.dataPipelines[Worker.FORUMAI] = forumThreadAIDataPipeline;
+
+    const forumCommentAIDataPipeline = new ForumCommentAIDataPipeline(
+      this,
+      'forum-ai-comment-data-pipeline', // Error fixed
+      {
+        // dataSource: syllabusDataPipeline.dataWarehouse,
+        threadWareHouse: dynamoDatabase.tables[Collection.THREAD],
+        commentWareHouse: dynamoDatabase.tables[Collection.COMMENT],
+      },
+    );
+    this.dataPipelines[Worker.COMMENTAI] = forumCommentAIDataPipeline;
+
+    const adsDataPipeline = new AdsDataPipeline(this, 'ads-data-pipeline', {
+      dataWarehouse: dynamoDatabase.tables[Collection.ADS],
+    });
+    this.dataPipelines[Worker.ADS] = adsDataPipeline;
+
     this.dataInterface.setEndpoint(
       DataEndpoint.COURSE_REVIEWS,
       dynamoDatabase.tables[Collection.COURSE_REVIEW].tableName,
@@ -79,6 +112,10 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
     this.dataInterface.setEndpoint(
       DataEndpoint.PROFILE,
       dynamoDatabase.tables[Collection.PROFILE].tableName,
+    );
+    this.dataInterface.setEndpoint(
+      DataEndpoint.TESTAI,
+      dynamoDatabase.tables[Collection.TIMETABLE].tableName,
     );
 
     // this.dataInterface.setEndpoint(
