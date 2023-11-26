@@ -48,11 +48,11 @@ export class WasedaTimePersistenceLayer extends PersistenceLayer {
       },
     );
 
-    const threadImgDataPipeline = new ThreadImgDataPipeline(
-      this,
-      'thread-img-data-pipeline',
-    );
-    this.dataPipelines[Worker.THREADIMG] = threadImgDataPipeline;
+    // const threadImgDataPipeline = new ThreadImgDataPipeline(
+    //   this,
+    //   'thread-img-data-pipeline',
+    // );
+    // this.dataPipelines[Worker.THREADIMG] = threadImgDataPipeline;
 
     const forumThreadAIDataPipeline = new ForumThreadAIDataPipeline(
       this,
