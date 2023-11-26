@@ -97,6 +97,7 @@ class CourseRecommender:
     def __init__(self, s3_client, bucket, school_code_map, syllabus_file_template="syllabus/{}.json"):
         self.s3_client = s3_client
         self.bucket = bucket
+        self.simplified_timetable = []
         self.school_code_map = school_code_map
         self.syllabus_file_template = syllabus_file_template
         self.day_map = {1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
@@ -143,7 +144,17 @@ class CourseRecommender:
         return [course for course in filtered_courses if course.get('j') == most_common_min_year]
 
     def exclude_conflicting_courses(self, filtered_courses):
-        timetable_schedule = {(occurrence.get('d'), occurrence.get('p')) for course in self.timetable_data['courses'] for occurrence in course.get('i', [])}
+    # Create a set of tuples for each (day, period) in the actual timetable
+        timetable_schedule = set()
+        for course_id in self.get_timetable_course_ids():
+            course = next((c for c in self.courses if c['a'] == course_id), None)
+            if course:
+                for occurrence in course.get('i', []):
+                    day = occurrence.get('d')
+                    period = occurrence.get('p')
+                    timetable_schedule.add((day, period))
+    
+        # Exclude courses that have conflicting days and periods
         return [course for course in filtered_courses if not any((occurrence.get('d'), occurrence.get('p')) in timetable_schedule for occurrence in course.get('i', []))]
 
     def create_timetable_with_titles(self):
