@@ -1,42 +1,35 @@
-from datetime import datetime
-from utils import JsonPayloadBuilder, resp_handler, select_thread, build_thread_id, UID, table, select_school, UNIV_ID
+import json
+from utils import JsonPayloadBuilder, resp_handler, CourseRecommender, s3_client, bucket, ai_client
+from const import *
 
 
 @resp_handler
-def inject_thread(topic, content):
-    thread_id = build_thread_id()
-    selected_school = select_school()
+def post_chat(prompt, timetable):
+    recommender = CourseRecommender(s3_client, bucket, school_code_map)
 
-    dt_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
-    thread_item = {
-        "board_id": topic,
-        "created_at": dt_now,
-        "updated_at": dt_now,
-        "title": "default",
-        "body": content,
-        "uid": UID,
-        "thread_id": thread_id,
-        "tag_id": "default",
-        "group_id": selected_school,
-        "univ_id": UNIV_ID,
-        "views": 0,
-        "comment_count": 0,
-        "new_comment": False,
-    }
-
-    table.put_item(Item=thread_item)
+    prompt = recommender.generate_gpt_prompt(timetable)
+    
+    response = ai_client.chat.completions.create(
+      model= "gpt-3.5-turbo-1106",
+      messages= prompt
+    )
+    
+    message = response.choices[0].message.content
+    
+    data = {"messageContent": message, "messageType": "bot"}
+    
 
     body = JsonPayloadBuilder().add_status(
-        True).add_data('').add_message('').compile()
+        True).add_data(data).add_message('').compile()
     return body
 
 
 def handler(event, context):
-    resp = select_thread()
+    req = json.loads(event['body'])
+    params = {
+        "timetable": req["data"]["timetable"],
+        "prompt": req['data']['prompt']
+    }
 
-    if resp is None:
-        # No threads were found; end the Lambda function.
-        return
-
-    return inject_thread(**resp)
+    return post_chat(**params)
