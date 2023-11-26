@@ -98,6 +98,7 @@ class CourseRecommender:
         self.s3_client = s3_client
         self.bucket = bucket
         self.simplified_timetable = []
+        self.id_to_title = {}
         self.school_code_map = school_code_map
         self.syllabus_file_template = syllabus_file_template
         self.day_map = {1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
@@ -111,6 +112,7 @@ class CourseRecommender:
         response = self.s3_client.get_object(Bucket=self.bucket, Key=file_key)
         file_content = response['Body'].read().decode('utf-8')
         self.courses = json.loads(file_content)
+        self.id_to_title = {course['a']: course['b'] for course in self.courses}
 
     def get_most_frequent_school_code(self):
         school_code_counts = {}
