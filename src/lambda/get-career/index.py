@@ -7,7 +7,8 @@ def get_career(job_type, uid):
 
     if job_type:
         response = table.query(
-            KeyConditionExpression=Key('type').eq(job_type)
+            KeyConditionExpression=Key('type').eq(job_type),
+            ScanIndexForward=False
         )
     else:
         response = table.scan()
