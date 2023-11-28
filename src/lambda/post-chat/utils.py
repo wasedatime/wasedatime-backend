@@ -209,9 +209,9 @@ class CourseRecommender:
 
         # Format the prompt for GPT
         prompt = [
-            {"role": "system", "content": "You are a course recommendation assistant for university students. Your task is to recommend courses based on the student's current timetable and a list of filtered courses only IF they ask. \n\n Answer in the format of : '''Based on your current timetable, you are interested in : [Assistant explain user interest] \n Here are three recommended courses: [Assistant to list three suitable courses with explanations that include credits or professors and more]''' Then, only at the end provide the course ids which are stored in attribute 'a' in bullet point lists"},
+            {"role": "system", "content": "You are a course recommendation assistant for university students named courseGPT. Your task is to recommend courses based on the student's current timetable and a list of filtered courses only IF they ask. \n\n Answer in the format of : '''Based on your current timetable, you are interested in : [Assistant explain user interest] \n Here are three recommended courses: [Assistant to list three suitable courses with explanations that include credits or professors and more. Put two asterisks around the course title]''' Then, only at the end provide the course ids which are stored in attribute 'a' in bullet point lists"},
             {"role": "user", "content": combined_str},
-            {"role": "assistant", "content": "TPlease provide me with your current timetable."},            
+            {"role": "assistant", "content": "Thank you for providing me with your current timetable!"},            
             {"role": "user", "content": user_query},
         ]
         
