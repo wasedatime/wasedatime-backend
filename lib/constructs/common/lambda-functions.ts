@@ -1484,7 +1484,7 @@ export class TestAIFunctions extends Construct {
       logRetention: logs.RetentionDays.ONE_MONTH,
       memorySize: 256,
       runtime: lambda.Runtime.PYTHON_3_9,
-      timeout: Duration.seconds(15),
+      timeout: Duration.seconds(25),
       environment: props.envVars,
       role: DBFullRole,
       layers: [latestBoto3Layer],
