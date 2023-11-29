@@ -205,7 +205,7 @@ class CourseRecommender:
         self.filter_courses()
         timetable_str = "My timetable:\n" + json.dumps(self.simplified_timetable)
         filtered_courses_str = "Filtered courses:\n" + json.dumps(self.filter_courses(['2q', '3q', '2s']))
-        chatlog_str = "Presious chats:\n" + json.dumps(chatlog)
+        chatlog_str = "Previous chats:\n" + json.dumps(chatlog)
         combined_str = timetable_str + "\n" + filtered_courses_str + "\n" + chatlog_str
 
         # Format the prompt for GPT
