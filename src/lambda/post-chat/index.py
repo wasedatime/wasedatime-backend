@@ -4,11 +4,11 @@ from const import *
 
 
 @resp_handler
-def post_chat(prompt, timetable):
+def post_chat(prompt, timetable, chatlog):
     recommender = CourseRecommender(s3_client, bucket, school_code_map)
 
 
-    prompt = recommender.generate_gpt_prompt(prompt, timetable)
+    prompt = recommender.generate_gpt_prompt(prompt, timetable, chatlog)
     
     response = ai_client.chat.completions.create(
       model= "gpt-4-1106-preview",
@@ -29,7 +29,8 @@ def handler(event, context):
     req = json.loads(event['body'])
     params = {
         "timetable": req["data"]["timetable"],
-        "prompt": req['data']['prompt']
+        "prompt": req['data']['prompt'],
+        "chatlog": req['data']['chatlog'],
     }
 
     return post_chat(**params)
