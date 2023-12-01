@@ -4,11 +4,11 @@ from const import *
 
 
 @resp_handler
-def post_chat(prompt, timetable, chatlog):
+def post_chat(prompt, timetable, chat_log):
     recommender = CourseRecommender(s3_client, bucket, school_code_map)
 
 
-    prompt = recommender.generate_gpt_prompt(prompt, timetable, chatlog)
+    prompt = recommender.generate_gpt_prompt(prompt, timetable, chat_log)
     
     response = ai_client.chat.completions.create(
       model= "gpt-4-1106-preview",
