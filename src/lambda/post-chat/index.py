@@ -30,7 +30,7 @@ def handler(event, context):
     params = {
         "timetable": req["data"]["timetable"],
         "prompt": req['data']['prompt'],
-        "chatlog": req['data']['chatlog'],
+        "chat_log": req['data']['chat_log'],
     }
 
     return post_chat(**params)
