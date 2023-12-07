@@ -13,6 +13,7 @@ export enum Collection {
   ADS,
   PROFILE,
   TEST,
+  EVENTS,
 }
 
 export class DynamoDatabase extends Construct {
