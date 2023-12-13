@@ -1,9 +1,12 @@
+from utils import test_user
+
+
 def handler(event, context):
     email = event["request"]["userAttributes"]["email"]
     domain = email.split('@')[1]
 
     # Check for the specific test email address
-    if email == "t56299097@gmail.com":
+    if email == test_user:
         event["response"]["autoConfirmUser"] = True
         return event
 

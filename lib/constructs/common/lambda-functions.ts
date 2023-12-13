@@ -12,6 +12,7 @@ import {
   SLACK_WEBHOOK_URL,
   AWS_USER_POOL_ID,
   OPENAI_API_KEY,
+  TEST_USER,
 } from '../../configs/lambda/environment';
 
 interface FunctionsProps {
@@ -227,7 +228,7 @@ export class PreSignupWasedaMailValidator extends Construct {
       memorySize: 128,
       runtime: lambda.Runtime.PYTHON_3_9,
       timeout: Duration.seconds(3),
-    });
+    }).addEnvironment('TEST_USER', TEST_USER);
   }
 }
 
